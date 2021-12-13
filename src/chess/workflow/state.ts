@@ -1,4 +1,4 @@
-import { Color } from '../color';
+import { Color } from '../types';
 
 export interface State {
   boardOrientation: Color;

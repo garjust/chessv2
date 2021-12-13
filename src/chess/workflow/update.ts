@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { Color } from '../color';
+import { Color } from '../types';
 import { State, Action, Type } from './index';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -16,7 +16,7 @@ function handleInitialize(
   state: State,
   action: Action.Initialize
 ): Update<State, Action> {
-  return [state, null];
+  return [{ ...state, boardOrientation: Color.White }, null];
 }
 
 export function update(

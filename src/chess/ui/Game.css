@@ -1,0 +1,20 @@
+.game {
+  margin: 24px;
+  display: grid;
+  gap: 16px;
+  grid-template:
+    "board state" auto
+    "board buttons" auto / max-content auto
+}
+
+.game--board {
+  grid-area: board;
+}
+
+.game--state {
+  grid-area: state;
+}
+
+.game--buttons {
+  grid-area: buttons;
+}

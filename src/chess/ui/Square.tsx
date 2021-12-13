@@ -1,5 +1,5 @@
 import React from 'react';
-import { Color } from '../color';
+import { Color } from '../types';
 import { BOARD_SQUARE_BLACK, BOARD_SQUARE_WHITE } from './theme';
 
 export type SquareProps = {

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Color } from '../color';
+import { Color } from '../types';
 import './Board.css';
 import Square from './Square';
-import { useWorkflow } from './WorkflowContext';
+import { useWorkflow } from './workflow';
 
 const rankIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
@@ -12,9 +12,10 @@ const indicesToSquare = (rank: number, file: number): string =>
 
 export type BoardProps = {
   squareSize: number;
+  style?: React.CSSProperties;
 };
 
-const Board = ({ squareSize }: BoardProps) => {
+const Board = ({ squareSize, style }: BoardProps) => {
   const { state } = useWorkflow();
 
   const squares: JSX.Element[] = [];
@@ -32,23 +33,22 @@ const Board = ({ squareSize }: BoardProps) => {
   }
 
   return (
-    <div>
-      <div
-        className={
-          state.boardOrientation === Color.White
-            ? 'board'
-            : 'board board--flipped'
-        }
-        style={{
-          height: squareSize * 8,
-          width: squareSize * 8,
-          borderColor: 'black',
-          borderWidth: '2px',
-          borderStyle: 'solid',
-        }}
-      >
-        {squares}
-      </div>
+    <div
+      className={
+        state.boardOrientation === Color.White
+          ? 'board'
+          : 'board board--flipped'
+      }
+      style={{
+        ...style,
+        height: squareSize * 8,
+        width: squareSize * 8,
+        borderColor: 'black',
+        borderWidth: '2px',
+        borderStyle: 'solid',
+      }}
+    >
+      {squares}
     </div>
   );
 };
