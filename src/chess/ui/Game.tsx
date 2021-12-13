@@ -1,18 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState, initializeAction } from '../workflow';
+import init, {
+  createState,
+  initializeAction,
+  toggleSquareLabelsAction,
+} from '../workflow';
 import { updateLogger } from '../../lib/workflow';
-import { flipBoardAction } from '../workflow/action';
+import { flipBoardAction } from '../workflow';
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
+import { Color } from '../types';
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
 
   updates.subscribe(updateLogger('Chess'));
 
-  emit(initializeAction('1'));
+  useEffect(() => {
+    emit(initializeAction(Color.White));
+  });
 
   return (
     <div className="game">
@@ -22,6 +29,9 @@ const Game = () => {
         <div style={{ gridArea: 'buttons' }}>
           <button onClick={() => emit(flipBoardAction())}>
             Flip the board
+          </button>
+          <button onClick={() => emit(toggleSquareLabelsAction())}>
+            Toggle square labels
           </button>
         </div>
 

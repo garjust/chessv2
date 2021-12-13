@@ -6,7 +6,13 @@ import { update, Context } from './update';
 export type { State } from './state';
 export { createState } from './state';
 export type { Action } from './action';
-export { Type, initializeAction } from './action';
+export {
+  Type,
+  flipBoardAction,
+  initializeAction,
+  setPositionFromFENAction,
+  toggleSquareLabelsAction,
+} from './action';
 export type { Context } from './update';
 export { update } from './update';
 

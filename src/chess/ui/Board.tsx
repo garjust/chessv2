@@ -1,14 +1,9 @@
 import React from 'react';
 import { Color } from '../types';
+import { squareGenerator, squareLabel } from '../utils';
 import './Board.css';
 import Square from './Square';
 import { useWorkflow } from './workflow';
-
-const rankIndexToChar = (index: number): string =>
-  String.fromCharCode(index + 97);
-
-const indicesToSquare = (rank: number, file: number): string =>
-  `${rankIndexToChar(rank)}${file + 1}`;
 
 export type BoardProps = {
   squareSize: number;
@@ -19,17 +14,15 @@ const Board = ({ squareSize, style }: BoardProps) => {
   const { state } = useWorkflow();
 
   const squares: JSX.Element[] = [];
-  for (let rank = 0; rank <= 8; rank++) {
-    for (let file = 0; file <= 8; file++) {
-      const square = indicesToSquare(rank, file);
-      squares.push(
-        <Square
-          key={square}
-          label={square}
-          color={(rank + file) % 2 == 0 ? Color.Black : Color.White}
-        />
-      );
-    }
+  for (const { rank, file } of squareGenerator()) {
+    squares.push(
+      <Square
+        key={squareLabel({ rank, file })}
+        rank={rank}
+        file={file}
+        color={(rank + file) % 2 == 0 ? Color.Black : Color.White}
+      />
+    );
   }
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Color, Piece as PieceType } from '../types';
+import { Color, PieceType as PieceType } from '../types';
 import {
   PIECE_BLACK_FILL,
   PIECE_BLACK_STROKE,
@@ -16,7 +16,7 @@ export type PieceProps = {
 
 const Piece = ({ type, color, size }: PieceProps) => {
   color = color ?? Color.White;
-  size = size ?? 50;
+  // size = size ?? 50;
 
   let Svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   switch (type) {
@@ -43,6 +43,7 @@ const Piece = ({ type, color, size }: PieceProps) => {
   const css: React.CSSProperties = {
     fill: color === Color.White ? PIECE_WHITE_FILL : PIECE_BLACK_FILL,
     stroke: color === Color.White ? PIECE_WHITE_STROKE : PIECE_BLACK_STROKE,
+    marginBottom: -3,
   };
 
   return <Svg width={size} height={size} style={css} />;

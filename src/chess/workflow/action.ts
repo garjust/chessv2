@@ -1,6 +1,10 @@
+import { Color } from '../types';
+
 export enum Type {
   FlipBoard = 'FLIP_BOARD',
   Initialize = 'INITIALIZE',
+  SetPositionFromFEN = 'SET_POSITION_FRM_FEN',
+  ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
 }
 
 export declare namespace Action {
@@ -10,17 +14,41 @@ export declare namespace Action {
 
   export interface Initialize {
     readonly type: Type.Initialize;
-    readonly value: string;
+    readonly playingAs: Color;
+  }
+
+  export interface SetPositionFromFEN {
+    readonly type: Type.SetPositionFromFEN;
+    readonly fenString: string;
+  }
+
+  export interface ToggleSquareLabels {
+    readonly type: Type.ToggleSquareLabels;
   }
 }
 
-export type Action = Action.FlipBoard | Action.Initialize;
+export type Action =
+  | Action.FlipBoard
+  | Action.Initialize
+  | Action.SetPositionFromFEN
+  | Action.ToggleSquareLabels;
 
 export const flipBoardAction = (): Action.FlipBoard => ({
   type: Type.FlipBoard,
 });
 
-export const initializeAction = (value: string): Action.Initialize => ({
+export const initializeAction = (playingAs: Color): Action.Initialize => ({
   type: Type.Initialize,
-  value,
+  playingAs,
+});
+
+export const setPositionFromFENAction = (
+  fenString: string
+): Action.SetPositionFromFEN => ({
+  type: Type.SetPositionFromFEN,
+  fenString,
+});
+
+export const toggleSquareLabelsAction = (): Action.ToggleSquareLabels => ({
+  type: Type.ToggleSquareLabels,
 });
