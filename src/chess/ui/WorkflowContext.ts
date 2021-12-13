@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
-import type { Action, Context, State } from '../workflow';
+import { Action, Context, createState, State } from '../workflow';
 
 const WorkflowContext = React.createContext({
   states: new Observable<State>(),
@@ -9,5 +9,20 @@ const WorkflowContext = React.createContext({
   },
   updates: new Observable<[[State, State], Action, Context]>(),
 });
+
+export function useWorkflow() {
+  const [state, setState] = useState(createState());
+  const { states, emit } = useContext(WorkflowContext);
+
+  useEffect(() => {
+    const subscription = states.subscribe((newState) => setState(newState));
+
+    return function cleanup() {
+      subscription.unsubscribe();
+    };
+  });
+
+  return { state, emit };
+}
 
 export default WorkflowContext;
