@@ -82,6 +82,8 @@ module.exports = {
       extends: ['plugin:@typescript-eslint/recommended'],
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
+        '@typescript-eslint/no-namespace': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
       },
     },
   ],

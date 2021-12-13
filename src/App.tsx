@@ -1,15 +1,25 @@
 import React from 'react';
-import './App.css';
-import { ReactComponent as Pawn } from './piece-svg/pawn.svg';
+import Game from './chess/ui/Game';
+import Piece from './chess/ui/Piece';
+import * as PieceSvg from './chess/ui/piece-svg';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Pawn width="50" height="50" />
-      </header>
+    <div
+      style={{
+        minHeight: '100vh',
+      }}
+    >
+      <Piece Svg={PieceSvg.Bishop} />
+      <Piece Svg={PieceSvg.King} />
+      <Piece Svg={PieceSvg.Knight} />
+      <Piece Svg={PieceSvg.Pawn} />
+      <Piece Svg={PieceSvg.Queen} />
+      <Piece Svg={PieceSvg.Rook} />
+
+      <Game />
     </div>
   );
-}
+};
 
 export default App;
