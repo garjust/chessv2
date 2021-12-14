@@ -4,7 +4,6 @@ import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
 import {
   pieceInSquare,
-  squareIsSelected,
   squareOverlay,
   SquareOverlayType,
 } from '../engine/state';
@@ -26,13 +25,16 @@ export type SquareProps = {
 const Square = ({ rank, file, color }: SquareProps) => {
   const { state, emit } = useWorkflow();
 
+  const { position, selectedSquare } = state;
   const piece = pieceInSquare(state, { rank, file });
   const overlay = squareOverlay(state, { rank, file });
-  const { selectedSquare } = state;
+
+  const isClickable =
+    selectedSquare || (piece && piece.color === position.turn);
 
   let css: React.CSSProperties = {
     position: 'relative',
-    cursor: piece || selectedSquare ? 'pointer' : 'inherit',
+    cursor: isClickable ? 'pointer' : 'inherit',
     gridArea: squareLabel({ rank, file }),
     backgroundColor:
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
@@ -57,7 +59,7 @@ const Square = ({ rank, file, color }: SquareProps) => {
       className="square"
       style={css}
       onClick={() =>
-        piece || selectedSquare ? emit(clickSquareAction({ rank, file })) : null
+        isClickable ? emit(clickSquareAction({ rank, file })) : null
       }
       tabIndex={0}
     >

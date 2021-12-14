@@ -9,7 +9,7 @@ import {
   overlaySquaresAction,
 } from './action';
 import { State, Action, Type } from './index';
-import { SquareOverlayType, createState } from './state';
+import { SquareOverlayType, createState, pieceInSquare } from './state';
 import { from } from 'rxjs';
 import StringKeyMap from '../../lib/string-key-map';
 
@@ -21,6 +21,7 @@ function handleClickSquare(
   action: Action.ClickSquare
 ): Update<State, Action> {
   const { square } = action;
+  const { position } = state;
 
   if (state.selectedSquare) {
     return [
@@ -34,13 +35,13 @@ function handleClickSquare(
       ]),
     ];
   } else {
-    // overlayFor;
-    // state.squareOverlay.set({ rank: 5, file: 5 }, SquareOverlayType.Movable);
-    // state.squareOverlay.set({ rank: 5, file: 6 }, SquareOverlayType.Movable);
-    // state.squareOverlay.set({ rank: 5, file: 7 }, SquareOverlayType.Movable);
-    // state.squareOverlay.set({ rank: 4, file: 7 }, SquareOverlayType.Capturable);
-    return [{ ...state, selectedSquare: square }, overlaySquaresAction()];
+    // Nothing is already selected so attempt to "select" the square.
+    if (pieceInSquare(state, square)?.color === position.turn) {
+      return [{ ...state, selectedSquare: square }, overlaySquaresAction()];
+    }
   }
+
+  return [state, null];
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {

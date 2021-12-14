@@ -1,6 +1,6 @@
 import StringKeyMap from '../lib/string-key-map';
 import { Color, Piece, PieceType, Position, Square } from './types';
-import { squareLabel, squareLabelToDef } from './utils';
+import { squareLabel, labelToSquare } from './utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
@@ -126,7 +126,7 @@ export const parseFEN = (fenString: string): Position => {
       blackQueenside: castlingAvailability.includes('q'),
     },
     enPassantSquare:
-      enPassantSquare !== '-' ? squareLabelToDef(enPassantSquare) : null,
+      enPassantSquare !== '-' ? labelToSquare(enPassantSquare) : null,
     halfMoveCount: Number(halfMoveClock),
     fullMoveCount: Number(fullMoveNumber),
   };

@@ -1,12 +1,12 @@
-import { Move, Position, Square } from './types';
+import { Color, Move, Position, Square } from './types';
 
-export const fileIndexToChar = (index: number): string =>
+const fileIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
 
 export const squareLabel = ({ rank, file }: Square): string =>
   `${fileIndexToChar(file)}${rank + 1}`;
 
-export const squareLabelToDef = (label: string): Square => ({
+export const labelToSquare = (label: string): Square => ({
   rank: label.charCodeAt(0) - 97,
   file: Number(label[1]) - 1,
 });
@@ -19,30 +19,19 @@ export const squareGenerator = function* () {
   }
 };
 
-// export const buildBoard = (): Square[][] => {
-//   const board = new Array<Square[]>(8);
-//   for (let i = 0; i < 8; i++) {
-//     board[i] = new Array<Square>(8);
-//   }
-
-//   for (const { rank, file } of squareGenerator()) {
-//     board[rank][file] = {
-//       rank,
-//       file,
-//     };
-//   }
-
-//   return board;
-// };
-
 export const applyMove = (position: Position, move: Move): Position => {
   const piece = position.pieces.get(move.from);
-  if (piece) {
-    position.pieces.delete(move.from);
-    position.pieces.set(move.to, piece);
-  } else {
+
+  if (!piece) {
     throw Error('no piece to move');
   }
+  if (piece.color !== position.turn) {
+    throw Error('cannot move piece for other color');
+  }
+
+  position.pieces.delete(move.from);
+  position.pieces.set(move.to, piece);
+  position.turn = position.turn === Color.White ? Color.Black : Color.White;
 
   return position;
 };
