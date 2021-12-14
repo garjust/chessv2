@@ -1,5 +1,5 @@
-import { Color, Piece, Square, SquareDef } from '../types';
-import { buildBoard, squareInBoard } from '../utils';
+import { Color, FEN, Piece, Square, SquareDef } from '../types';
+import { buildBoard, findPiecesInboard, squareInBoard } from '../utils';
 
 export interface State {
   boardOrientation: Color;
@@ -26,3 +26,21 @@ export const pieceInSquare = (
   state: State,
   squareDef: SquareDef
 ): Piece | null => squareInBoard(state.board, squareDef).piece;
+
+export const fenForPosition = (state: State): FEN => {
+  const { turn } = state;
+
+  return {
+    pieces: findPiecesInboard(state.board),
+    turn,
+    castlingAvailability: {
+      whiteKingside: true,
+      whiteQueenside: true,
+      blackKingside: true,
+      blackQueenside: true,
+    },
+    enPassantSquare: null,
+    halfMoveCount: 6,
+    fullMoveCount: 36,
+  };
+};

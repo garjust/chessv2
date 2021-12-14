@@ -89,6 +89,36 @@ const fenNotationPieceToType = (pieceCharacter: string): PieceType => {
   }
 };
 
+const pieceToFenNotationCharacter = (piece: Piece): string => {
+  let letter: string;
+  switch (piece.type) {
+    case PieceType.Bishop:
+      letter = 'b';
+      break;
+    case PieceType.King:
+      letter = 'k';
+      break;
+    case PieceType.Knight:
+      letter = 'n';
+      break;
+    case PieceType.Pawn:
+      letter = 'p';
+      break;
+    case PieceType.Queen:
+      letter = 'q';
+      break;
+    case PieceType.Rook:
+      letter = 'R';
+      break;
+  }
+
+  if (piece.color === Color.White) {
+    return letter.toUpperCase();
+  } else {
+    return letter.toLowerCase();
+  }
+};
+
 const fenNotationPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
 
@@ -157,3 +187,62 @@ export const parseFEN = (fenString: string): FEN => {
     fullMoveCount: Number(fullMoveNumber),
   };
 };
+
+const formatFENPieces = (pieces: PieceAndSquare[]): string => {
+  let str = '';
+
+  const board = buildBoard();
+  setPosition(board, pieces);
+
+  let emptyCounter;
+
+  for (let rank = 7; rank >= 0; rank--) {
+    emptyCounter = 0;
+    for (let file = 0; file < 8; file++) {
+      const piece = board[rank][file].piece;
+      if (piece) {
+        if (emptyCounter > 0) {
+          str += String(emptyCounter);
+        }
+        str += pieceToFenNotationCharacter(piece);
+        emptyCounter = 0;
+      } else {
+        emptyCounter++;
+      }
+    }
+    if (emptyCounter > 0) {
+      str += String(emptyCounter);
+    }
+    str += '/';
+  }
+
+  return str;
+};
+
+export const formatFEN = (fen: FEN): string => {
+  return [
+    formatFENPieces(fen.pieces),
+    fen.turn === Color.White ? 'w' : 'b',
+    [
+      fen.castlingAvailability.whiteKingside ? 'K' : '',
+      fen.castlingAvailability.whiteQueenside ? 'Q' : '',
+      fen.castlingAvailability.blackKingside ? 'k' : '',
+      fen.castlingAvailability.blackQueenside ? 'Q' : '',
+    ].join(''),
+    fen.enPassantSquare ? squareLabel(fen.enPassantSquare) : '-',
+    fen.halfMoveCount,
+    fen.fullMoveCount,
+  ].join(' ');
+};
+
+export const findPiecesInboard = (board: Square[][]): PieceAndSquare[] =>
+  board
+    .flat()
+    .map((square) => ({
+      piece: square.piece,
+      squareDef: { rank: square.rank, file: square.file },
+    }))
+    .filter(
+      (pieceAndSquare): pieceAndSquare is PieceAndSquare =>
+        pieceAndSquare.piece !== null
+    );
