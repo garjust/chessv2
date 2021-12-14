@@ -41,10 +41,7 @@ function handleSetPositionFromFEN(
   state: State,
   action: Action.SetPositionFromFEN
 ): Update<State, Action> {
-  const position = parseFEN(action.fenString);
-  // setPosition(state.board, position.pieces);
-
-  return [{ ...state, position }, null];
+  return [{ ...state, position: parseFEN(action.fenString) }, null];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {

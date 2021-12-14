@@ -1,5 +1,5 @@
 import React from 'react';
-import { Color, PieceType as PieceType } from '../types';
+import { Color, PieceType } from '../types';
 import {
   PIECE_BLACK_FILL,
   PIECE_BLACK_STROKE,

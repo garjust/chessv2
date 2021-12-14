@@ -1,4 +1,5 @@
 import React from 'react';
+import './Square.css';
 import { Color, SquareDef } from '../types';
 import { squareLabel } from '../utils';
 import { pieceInSquare } from '../engine/state';
@@ -17,12 +18,14 @@ const Square = ({ rank, file, color }: SquareProps) => {
 
   return (
     <div
+      className="square"
       style={{
         position: 'relative',
         gridArea: squareLabel({ rank, file }),
         backgroundColor:
           color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
       }}
+      tabIndex={0}
     >
       {piece !== null ? <Piece type={piece.type} color={piece.color} /> : ''}
       <span

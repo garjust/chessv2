@@ -1,0 +1,8 @@
+.square {
+  cursor: pointer;
+
+}
+
+.square:focus {
+  background-color: cyan !important;
+}
