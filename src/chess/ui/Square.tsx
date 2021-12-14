@@ -1,7 +1,7 @@
 import React from 'react';
 import { Color, SquareDef } from '../types';
 import { squareLabel } from '../utils';
-import { pieceInSquare } from '../workflow/state';
+import { pieceInSquare } from '../engine/state';
 import Piece from './Piece';
 import { BOARD_SQUARE_BLACK, BOARD_SQUARE_WHITE } from './theme';
 import { useWorkflow } from './workflow';

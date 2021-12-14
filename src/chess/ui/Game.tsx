@@ -5,9 +5,9 @@ import init, {
   createState,
   initializeAction,
   toggleSquareLabelsAction,
-} from '../workflow';
+} from '../engine';
 import { updateLogger } from '../../lib/workflow';
-import { flipBoardAction } from '../workflow';
+import { flipBoardAction } from '../engine';
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
