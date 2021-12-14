@@ -4,6 +4,7 @@ import { applyMove } from '../utils';
 import { STARTING_POSITION_FEN, parseFEN } from '../fen';
 import { movePieceAction, setPositionFromFENAction } from './action';
 import { State, Action, Type } from './index';
+import { SquareOverlayType } from './state';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -23,6 +24,10 @@ function handleClickSquare(
       }),
     ];
   } else {
+    // state.squareOverlay.set({ rank: 5, file: 5 }, SquareOverlayType.Movable);
+    // state.squareOverlay.set({ rank: 5, file: 6 }, SquareOverlayType.Movable);
+    // state.squareOverlay.set({ rank: 5, file: 7 }, SquareOverlayType.Movable);
+    // state.squareOverlay.set({ rank: 4, file: 7 }, SquareOverlayType.Capturable);
     return [{ ...state, selectedSquare: square }, null];
   }
 }

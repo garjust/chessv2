@@ -2,9 +2,20 @@ import React from 'react';
 import './Square.css';
 import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
-import { pieceInSquare, squareIsSelected } from '../engine/state';
+import {
+  pieceInSquare,
+  squareIsSelected,
+  squareOverlay,
+  SquareOverlayType,
+} from '../engine/state';
 import Piece from './Piece';
-import { BOARD_SQUARE_BLACK, BOARD_SQUARE_WHITE } from './theme';
+import {
+  BOARD_SQUARE_BLACK,
+  BOARD_SQUARE_CAPTURABLE,
+  BOARD_SQUARE_MOVABLE,
+  BOARD_SQUARE_SELECTED,
+  BOARD_SQUARE_WHITE,
+} from './theme';
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../engine/action';
 
@@ -17,6 +28,7 @@ const Square = ({ rank, file, color }: SquareProps) => {
 
   const piece = pieceInSquare(state, { rank, file });
   const isSelected = squareIsSelected(state, { rank, file });
+  const overlay = squareOverlay(state, { rank, file });
   const { selectedSquare } = state;
 
   let css: React.CSSProperties = {
@@ -28,7 +40,18 @@ const Square = ({ rank, file, color }: SquareProps) => {
   };
 
   if (isSelected) {
-    css = { ...css, backgroundColor: 'rgba(83, 141, 199, 0.8)' };
+    css = { ...css, backgroundColor: BOARD_SQUARE_SELECTED };
+  }
+
+  if (overlay) {
+    switch (overlay) {
+      case SquareOverlayType.Capturable:
+        css = { ...css, backgroundColor: BOARD_SQUARE_CAPTURABLE };
+        break;
+      case SquareOverlayType.Movable:
+        css = { ...css, backgroundColor: BOARD_SQUARE_MOVABLE };
+        break;
+    }
   }
 
   return (

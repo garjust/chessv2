@@ -1,5 +1,12 @@
+import StringKeyMap from '../../lib/string-key-map';
 import { BLANK_POSITION_FEN, parseFEN } from '../fen';
 import { Color, Position, Piece, Square } from '../types';
+import { squareLabel } from '../utils';
+
+export enum SquareOverlayType {
+  Movable = 'MOVABLE',
+  Capturable = 'CAPTURABLE',
+}
 
 export interface State {
   boardOrientation: Color;
@@ -7,6 +14,7 @@ export interface State {
   humanPlayer: Color;
   position: Position;
   selectedSquare?: Square;
+  squareOverlay: StringKeyMap<Square, SquareOverlayType>;
 }
 
 const INITIAL_STATE: State = {
@@ -14,6 +22,7 @@ const INITIAL_STATE: State = {
   displaySquareLabels: false,
   humanPlayer: Color.White,
   position: parseFEN(BLANK_POSITION_FEN),
+  squareOverlay: new StringKeyMap<Square, SquareOverlayType>(squareLabel),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -28,3 +37,6 @@ export const squareIsSelected = (state: State, square: Square) =>
   state.selectedSquare &&
   state.selectedSquare.rank === square.rank &&
   state.selectedSquare.file === square.file;
+
+export const squareOverlay = (state: State, square: Square) =>
+  state.squareOverlay.get(square);

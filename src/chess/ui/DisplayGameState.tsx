@@ -9,6 +9,7 @@ export type DisplayGameStateProps = {
 const replacer = (key: string, value: unknown) => {
   switch (key) {
     case 'pieces':
+    case 'squareOverlay':
       return 'Map { ... }';
     default:
       return value;
