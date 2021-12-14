@@ -1,6 +1,6 @@
 import React from 'react';
 import './Square.css';
-import { Color, SquareDef } from '../types';
+import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
 import { pieceInSquare } from '../engine/state';
 import Piece from './Piece';
@@ -8,9 +8,9 @@ import { BOARD_SQUARE_BLACK, BOARD_SQUARE_WHITE } from './theme';
 import { useWorkflow } from './workflow';
 
 export type SquareProps = {
-  onClick: (squareDef: SquareDef) => void;
+  onClick: (squareDef: SquareData) => void;
   color: Color;
-} & SquareDef;
+} & SquareData;
 
 const Square = ({ rank, file, color, onClick }: SquareProps) => {
   const { state } = useWorkflow();

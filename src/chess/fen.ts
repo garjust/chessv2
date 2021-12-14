@@ -1,17 +1,6 @@
-import {
-  Color,
-  Piece,
-  PieceAndSquare,
-  PieceType,
-  Position,
-  Square,
-} from './types';
-import {
-  buildBoard,
-  setPosition,
-  squareLabel,
-  squareLabelToDef,
-} from './utils';
+import StringKeyMap from '../lib/string-key-map';
+import { Color, Piece, PieceType, Position, Square } from './types';
+import { squareLabel, squareLabelToDef } from './utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
@@ -75,8 +64,10 @@ const pieceToFenNotationCharacter = (piece: Piece): string => {
 const fenNotationPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
 
-const piecePlacementsFromFEN = (piecePlacements: string): PieceAndSquare[] => {
-  const pieces: PieceAndSquare[] = [];
+const piecePlacementsFromFEN = (
+  piecePlacements: string
+): StringKeyMap<Square, Piece> => {
+  const pieces = new StringKeyMap<Square, Piece>(squareLabel);
 
   let rank = 7;
   let file = 0;
@@ -100,13 +91,13 @@ const piecePlacementsFromFEN = (piecePlacements: string): PieceAndSquare[] => {
         file = 0;
         break;
       default:
-        pieces.push({
-          piece: {
+        pieces.set(
+          { rank, file },
+          {
             color: fenNotationPieceToColor(char),
             type: fenNotationPieceToType(char),
-          },
-          squareDef: { rank, file },
-        });
+          }
+        );
         // Advance the file after placing a piece.
         file += 1;
     }
@@ -141,18 +132,15 @@ export const parseFEN = (fenString: string): Position => {
   };
 };
 
-const formatFENPieces = (pieces: PieceAndSquare[]): string => {
+const formatFENPieces = (pieces: StringKeyMap<Square, Piece>): string => {
   let str = '';
-
-  const board = buildBoard();
-  setPosition(board, pieces);
 
   let emptyCounter;
 
   for (let rank = 7; rank >= 0; rank--) {
     emptyCounter = 0;
     for (let file = 0; file < 8; file++) {
-      const piece = board[rank][file].piece;
+      const piece = pieces.get({ rank, file });
       if (piece) {
         if (emptyCounter > 0) {
           str += String(emptyCounter);

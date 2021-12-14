@@ -1,5 +1,5 @@
 import { BLANK_POSITION_FEN, parseFEN } from '../fen';
-import { Color, Position, Piece, Square, SquareDef } from '../types';
+import { Color, Position, Piece, Square } from '../types';
 
 export interface State {
   boardOrientation: Color;
@@ -20,12 +20,5 @@ export const createState = (overrides: Partial<State> = {}): State => ({
   ...overrides,
 });
 
-export const pieceInSquare = (
-  state: State,
-  squareDef: SquareDef
-): Piece | null =>
-  state.position.pieces.find(
-    (piece) =>
-      piece.squareDef.rank === squareDef.rank &&
-      piece.squareDef.file === squareDef.file
-  )?.piece || null;
+export const pieceInSquare = (state: State, square: Square): Piece | null =>
+  state.position.pieces.get(square) || null;

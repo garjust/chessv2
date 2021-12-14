@@ -4,6 +4,7 @@ import './Game.css';
 import init, {
   createState,
   initializeAction,
+  setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from '../engine';
 import { updateLogger } from '../../lib/workflow';
@@ -12,6 +13,7 @@ import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
 import { movePieceAction } from '../engine/action';
+import { STARTING_POSITION_FEN } from '../fen';
 
 const moves = (function* () {
   while (true) {
@@ -49,6 +51,13 @@ const Game = () => {
           </button>
           <button onClick={() => emit(movePieceAction(moves.next().value))}>
             Move something
+          </button>
+          <button
+            onClick={() =>
+              emit(setPositionFromFENAction(STARTING_POSITION_FEN))
+            }
+          >
+            Reset game
           </button>
         </div>
 

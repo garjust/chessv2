@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { movePieceAction } from '../engine/action';
-import { Color, SquareDef } from '../types';
+import { Color, Square as SquareData } from '../types';
 import { squareGenerator, squareLabel } from '../utils';
 import './Board.css';
 import Square from './Square';
@@ -13,9 +13,9 @@ export type BoardProps = {
 
 const Board = ({ squareSize, style }: BoardProps) => {
   const { state, emit } = useWorkflow();
-  const [selected, setSelected] = useState<SquareDef>();
+  const [selected, setSelected] = useState<SquareData>();
 
-  function handleClick(squareDef: SquareDef) {
+  function handleClick(squareDef: SquareData) {
     if (selected) {
       emit(
         movePieceAction({
@@ -37,7 +37,7 @@ const Board = ({ squareSize, style }: BoardProps) => {
         rank={rank}
         file={file}
         color={(rank + file) % 2 == 0 ? Color.Black : Color.White}
-        onClick={(squareDef: SquareDef) => handleClick(squareDef)}
+        onClick={(squareDef: SquareData) => handleClick(squareDef)}
       />
     );
   }

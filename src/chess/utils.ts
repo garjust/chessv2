@@ -1,12 +1,12 @@
-import { Move, PieceAndSquare, Position, Square, SquareDef } from './types';
+import { Move, Position, Square } from './types';
 
 export const fileIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
 
-export const squareLabel = ({ rank, file }: SquareDef): string =>
+export const squareLabel = ({ rank, file }: Square): string =>
   `${fileIndexToChar(file)}${rank + 1}`;
 
-export const squareLabelToDef = (label: string): SquareDef => ({
+export const squareLabelToDef = (label: string): Square => ({
   rank: label.charCodeAt(0) - 97,
   file: Number(label[1]) - 1,
 });
@@ -19,56 +19,27 @@ export const squareGenerator = function* () {
   }
 };
 
-// export const squareInBoard = (
-//   board: Square[][],
-//   squareDef: SquareDef
-// ): Square => board[squareDef.rank][squareDef.file];
+// export const buildBoard = (): Square[][] => {
+//   const board = new Array<Square[]>(8);
+//   for (let i = 0; i < 8; i++) {
+//     board[i] = new Array<Square>(8);
+//   }
 
-export const buildBoard = (): Square[][] => {
-  const board = new Array<Square[]>(8);
-  for (let i = 0; i < 8; i++) {
-    board[i] = new Array<Square>(8);
-  }
+//   for (const { rank, file } of squareGenerator()) {
+//     board[rank][file] = {
+//       rank,
+//       file,
+//     };
+//   }
 
-  for (const { rank, file } of squareGenerator()) {
-    board[rank][file] = {
-      rank,
-      file,
-      piece: null,
-    };
-  }
-
-  return board;
-};
-
-export const setPosition = (board: Square[][], pieces: PieceAndSquare[]) =>
-  pieces.forEach(({ piece, squareDef }) => {
-    board[squareDef.rank][squareDef.file].piece = {
-      color: piece.color,
-      type: piece.type,
-    };
-  });
-
-export const findPiecesInboard = (board: Square[][]): PieceAndSquare[] =>
-  board
-    .flat()
-    .map((square) => ({
-      piece: square.piece,
-      squareDef: { rank: square.rank, file: square.file },
-    }))
-    .filter(
-      (pieceAndSquare): pieceAndSquare is PieceAndSquare =>
-        pieceAndSquare.piece !== null
-    );
+//   return board;
+// };
 
 export const applyMove = (position: Position, move: Move): Position => {
-  const piece = position.pieces.find(
-    (pieceAndSquare) =>
-      pieceAndSquare.squareDef.rank === move.from.rank &&
-      pieceAndSquare.squareDef.file === move.from.file
-  );
+  const piece = position.pieces.get(move.from);
   if (piece) {
-    piece.squareDef = move.to;
+    position.pieces.delete(move.from);
+    position.pieces.set(move.to, piece);
   } else {
     throw Error('no piece to move');
   }

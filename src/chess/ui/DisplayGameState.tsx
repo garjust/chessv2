@@ -8,9 +8,8 @@ export type DisplayGameStateProps = {
 
 const replacer = (key: string, value: unknown) => {
   switch (key) {
-    case 'board':
     case 'pieces':
-      return '...';
+      return 'Map { ... }';
     default:
       return value;
   }
@@ -18,7 +17,6 @@ const replacer = (key: string, value: unknown) => {
 
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
   const { state } = useWorkflow();
-  console.log(state.position.pieces);
   return (
     <pre
       style={{
