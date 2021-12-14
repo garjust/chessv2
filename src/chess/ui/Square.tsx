@@ -17,10 +17,11 @@ const Square = ({ rank, file, color }: SquareProps) => {
 
   const piece = pieceInSquare(state, { rank, file });
   const isSelected = squareIsSelected(state, { rank, file });
+  const { selectedSquare } = state;
 
   let css: React.CSSProperties = {
     position: 'relative',
-    cursor: 'pointer',
+    cursor: piece || selectedSquare ? 'pointer' : 'inherit',
     gridArea: squareLabel({ rank, file }),
     backgroundColor:
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
@@ -34,7 +35,9 @@ const Square = ({ rank, file, color }: SquareProps) => {
     <div
       className="square"
       style={css}
-      onClick={() => emit(clickSquareAction({ rank, file }))}
+      onClick={() =>
+        piece || selectedSquare ? emit(clickSquareAction({ rank, file })) : null
+      }
       tabIndex={0}
     >
       {piece !== null ? <Piece type={piece.type} color={piece.color} /> : ''}
