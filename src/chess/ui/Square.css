@@ -1,8 +1,4 @@
-.square {
-  cursor: pointer;
-
-}
-
-.square:focus {
-  box-shadow: inset 0 0 0 4px #538DC7;
+.square:focus-visible {
+  box-shadow: inset 0 0 0 4px rgb(83, 141, 199);
+  outline: none;
 }

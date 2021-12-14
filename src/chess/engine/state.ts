@@ -6,6 +6,7 @@ export interface State {
   displaySquareLabels: boolean;
   humanPlayer: Color;
   position: Position;
+  selectedSquare?: Square;
 }
 
 const INITIAL_STATE: State = {
@@ -22,3 +23,8 @@ export const createState = (overrides: Partial<State> = {}): State => ({
 
 export const pieceInSquare = (state: State, square: Square): Piece | null =>
   state.position.pieces.get(square) || null;
+
+export const squareIsSelected = (state: State, square: Square) =>
+  state.selectedSquare &&
+  state.selectedSquare.rank === square.rank &&
+  state.selectedSquare.file === square.file;

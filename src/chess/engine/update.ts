@@ -2,11 +2,30 @@ import { Update } from '../../lib/workflow';
 import { Color } from '../types';
 import { applyMove } from '../utils';
 import { STARTING_POSITION_FEN, parseFEN } from '../fen';
-import { setPositionFromFENAction } from './action';
+import { movePieceAction, setPositionFromFENAction } from './action';
 import { State, Action, Type } from './index';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
+
+function handleClickSquare(
+  state: State,
+  action: Action.ClickSquare
+): Update<State, Action> {
+  const { square } = action;
+
+  if (state.selectedSquare) {
+    return [
+      { ...state, selectedSquare: undefined },
+      movePieceAction({
+        from: state.selectedSquare,
+        to: square,
+      }),
+    ];
+  } else {
+    return [{ ...state, selectedSquare: square }, null];
+  }
+}
 
 function handleFlipBoard(state: State): Update<State, Action> {
   const newOrientation =
@@ -59,6 +78,8 @@ export function update(
   _context: Context
 ): Update<State, Action> {
   switch (action.type) {
+    case Type.ClickSquare:
+      return handleClickSquare(state, action);
     case Type.FlipBoard:
       return handleFlipBoard(state);
     case Type.Initialize:

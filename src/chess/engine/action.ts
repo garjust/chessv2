@@ -1,6 +1,7 @@
-import { Color, Move } from '../types';
+import { Color, Move, Square } from '../types';
 
 export enum Type {
+  ClickSquare = 'CLICK_SQUARE',
   FlipBoard = 'FLIP_BOARD',
   Initialize = 'INITIALIZE',
   MovePiece = 'MOVE_PIECE',
@@ -9,6 +10,11 @@ export enum Type {
 }
 
 export declare namespace Action {
+  export interface ClickSquare {
+    readonly type: Type.ClickSquare;
+    readonly square: Square;
+  }
+
   export interface FlipBoard {
     readonly type: Type.FlipBoard;
   }
@@ -34,11 +40,17 @@ export declare namespace Action {
 }
 
 export type Action =
+  | Action.ClickSquare
   | Action.FlipBoard
   | Action.Initialize
   | Action.MovePiece
   | Action.SetPositionFromFEN
   | Action.ToggleSquareLabels;
+
+export const clickSquareAction = (square: Square): Action.ClickSquare => ({
+  type: Type.ClickSquare,
+  square,
+});
 
 export const flipBoardAction = (): Action.FlipBoard => ({
   type: Type.FlipBoard,
