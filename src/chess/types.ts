@@ -33,6 +33,11 @@ export type Square = {
   piece: Piece | null;
 };
 
+export type Move = {
+  pieceAndSquare: PieceAndSquare;
+  square: SquareDef;
+};
+
 export type CastlingAvailability = {
   whiteKingside: boolean;
   whiteQueenside: boolean;
@@ -40,7 +45,7 @@ export type CastlingAvailability = {
   blackQueenside: boolean;
 };
 
-export type FEN = {
+export type Position = {
   pieces: PieceAndSquare[];
   // Which player's turn it is.
   turn: Color;

@@ -1,11 +1,7 @@
 import { Update } from '../../lib/workflow';
-import { Color, PieceType } from '../types';
-import {
-  buildBoard,
-  parseFEN,
-  setPosition,
-  STARTING_POSITION_FEN,
-} from '../utils';
+import { Color } from '../types';
+import { buildBoard, setPosition } from '../utils';
+import { STARTING_POSITION_FEN, parseFEN } from '../fen';
 import { setPositionFromFENAction } from './action';
 import { State, Action, Type } from './index';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatFEN } from '../utils';
+import { formatPosition } from '../fen';
 import { fenForPosition } from '../workflow/state';
 import { useWorkflow } from './workflow';
 
@@ -31,7 +31,7 @@ const DisplayGameState = ({ style }: DisplayGameStateProps) => {
     >
       <code>{JSON.stringify(state, replacer, 2)}</code>
       <code style={{ backgroundColor: 'aqua' }}>
-        {formatFEN(fenForPosition(state))}
+        {formatPosition(fenForPosition(state))}
       </code>
     </pre>
   );

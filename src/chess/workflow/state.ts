@@ -1,4 +1,4 @@
-import { Color, FEN, Piece, Square, SquareDef } from '../types';
+import { Color, Position, Piece, Square, SquareDef } from '../types';
 import { buildBoard, findPiecesInboard, squareInBoard } from '../utils';
 
 export interface State {
@@ -27,7 +27,7 @@ export const pieceInSquare = (
   squareDef: SquareDef
 ): Piece | null => squareInBoard(state.board, squareDef).piece;
 
-export const fenForPosition = (state: State): FEN => {
+export const fenForPosition = (state: State): Position => {
   const { turn } = state;
 
   return {
