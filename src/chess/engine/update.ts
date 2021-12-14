@@ -1,10 +1,17 @@
 import { Update } from '../../lib/workflow';
-import { Color } from '../types';
-import { applyMove } from '../utils';
-import { STARTING_POSITION_FEN, parseFEN } from '../fen';
-import { movePieceAction, setPositionFromFENAction } from './action';
+import { Color, Square } from '../types';
+import { applyMove, squareLabel } from '../utils';
+import { STARTING_POSITION_FEN, parseFEN, BLANK_POSITION_FEN } from '../fen';
+import {
+  movePieceAction,
+  setPositionFromFENAction,
+  resetOverlayAction,
+  overlaySquaresAction,
+} from './action';
 import { State, Action, Type } from './index';
-import { SquareOverlayType } from './state';
+import { SquareOverlayType, createState } from './state';
+import { from } from 'rxjs';
+import StringKeyMap from '../../lib/string-key-map';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -18,17 +25,21 @@ function handleClickSquare(
   if (state.selectedSquare) {
     return [
       { ...state, selectedSquare: undefined },
-      movePieceAction({
-        from: state.selectedSquare,
-        to: square,
-      }),
+      from([
+        movePieceAction({
+          from: state.selectedSquare,
+          to: square,
+        }),
+        resetOverlayAction(),
+      ]),
     ];
   } else {
+    // overlayFor;
     // state.squareOverlay.set({ rank: 5, file: 5 }, SquareOverlayType.Movable);
     // state.squareOverlay.set({ rank: 5, file: 6 }, SquareOverlayType.Movable);
     // state.squareOverlay.set({ rank: 5, file: 7 }, SquareOverlayType.Movable);
     // state.squareOverlay.set({ rank: 4, file: 7 }, SquareOverlayType.Capturable);
-    return [{ ...state, selectedSquare: square }, null];
+    return [{ ...state, selectedSquare: square }, overlaySquaresAction()];
   }
 }
 
@@ -40,15 +51,32 @@ function handleFlipBoard(state: State): Update<State, Action> {
 }
 
 function handleInitialize(
-  state: State,
+  _state: State,
   action: Action.Initialize
 ): Update<State, Action> {
   const { playingAs } = action;
 
   return [
-    { ...state, humanPlayer: playingAs, boardOrientation: playingAs },
-    setPositionFromFENAction(STARTING_POSITION_FEN),
+    createState({ humanPlayer: playingAs, boardOrientation: playingAs }),
+    setPositionFromFENAction(BLANK_POSITION_FEN),
   ];
+}
+
+function handleOverlaySquares(state: State): Update<State, Action> {
+  const squareOverlay = new StringKeyMap<Square, SquareOverlayType>(
+    squareLabel
+  );
+
+  const { selectedSquare } = state;
+  if (selectedSquare) {
+    squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
+  }
+
+  return [{ ...state, squareOverlay }, null];
+}
+
+function handleResetOverlay(state: State): Update<State, Action> {
+  return [{ ...state, squareOverlay: undefined }, null];
 }
 
 function handleMovePiece(
@@ -89,6 +117,10 @@ export function update(
       return handleFlipBoard(state);
     case Type.Initialize:
       return handleInitialize(state, action);
+    case Type.OverlaySquares:
+      return handleOverlaySquares(state);
+    case Type.ResetOverlay:
+      return handleResetOverlay(state);
     case Type.MovePiece:
       return handleMovePiece(state, action);
     case Type.SetPositionFromFEN:

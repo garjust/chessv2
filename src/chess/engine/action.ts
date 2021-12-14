@@ -5,6 +5,8 @@ export enum Type {
   FlipBoard = 'FLIP_BOARD',
   Initialize = 'INITIALIZE',
   MovePiece = 'MOVE_PIECE',
+  OverlaySquares = 'OVERLAY_SQUARES',
+  ResetOverlay = 'RESET_OVERLAY',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
   ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
 }
@@ -29,6 +31,14 @@ export declare namespace Action {
     readonly move: Move;
   }
 
+  export interface OverlaySquares {
+    readonly type: Type.OverlaySquares;
+  }
+
+  export interface ResetOverlay {
+    readonly type: Type.ResetOverlay;
+  }
+
   export interface SetPositionFromFEN {
     readonly type: Type.SetPositionFromFEN;
     readonly fenString: string;
@@ -43,6 +53,8 @@ export type Action =
   | Action.ClickSquare
   | Action.FlipBoard
   | Action.Initialize
+  | Action.OverlaySquares
+  | Action.ResetOverlay
   | Action.MovePiece
   | Action.SetPositionFromFEN
   | Action.ToggleSquareLabels;
@@ -59,6 +71,14 @@ export const flipBoardAction = (): Action.FlipBoard => ({
 export const initializeAction = (playingAs: Color): Action.Initialize => ({
   type: Type.Initialize,
   playingAs,
+});
+
+export const overlaySquaresAction = (): Action.OverlaySquares => ({
+  type: Type.OverlaySquares,
+});
+
+export const resetOverlayAction = (): Action.ResetOverlay => ({
+  type: Type.ResetOverlay,
 });
 
 export const movePieceAction = (move: Move): Action.MovePiece => ({

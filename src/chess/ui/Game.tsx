@@ -1,18 +1,17 @@
 import React, { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, {
-  createState,
+import init, { createState } from '../engine';
+import { updateLogger } from '../../lib/workflow';
+import {
+  flipBoardAction,
   initializeAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
-} from '../engine';
-import { updateLogger } from '../../lib/workflow';
-import { flipBoardAction } from '../engine';
+} from '../engine/action';
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
-import { movePieceAction } from '../engine/action';
 import { STARTING_POSITION_FEN } from '../fen';
 
 const moves = (function* () {
@@ -35,6 +34,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
+    emit(setPositionFromFENAction(STARTING_POSITION_FEN));
   });
 
   return (
@@ -49,13 +49,11 @@ const Game = () => {
           <button onClick={() => emit(toggleSquareLabelsAction())}>
             Toggle square labels
           </button>
-          <button onClick={() => emit(movePieceAction(moves.next().value))}>
-            Move something
-          </button>
           <button
-            onClick={() =>
-              emit(setPositionFromFENAction(STARTING_POSITION_FEN))
-            }
+            onClick={() => {
+              emit(initializeAction(Color.White));
+              emit(setPositionFromFENAction(STARTING_POSITION_FEN));
+            }}
           >
             Reset game
           </button>

@@ -27,7 +27,6 @@ const Square = ({ rank, file, color }: SquareProps) => {
   const { state, emit } = useWorkflow();
 
   const piece = pieceInSquare(state, { rank, file });
-  const isSelected = squareIsSelected(state, { rank, file });
   const overlay = squareOverlay(state, { rank, file });
   const { selectedSquare } = state;
 
@@ -39,12 +38,11 @@ const Square = ({ rank, file, color }: SquareProps) => {
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
   };
 
-  if (isSelected) {
-    css = { ...css, backgroundColor: BOARD_SQUARE_SELECTED };
-  }
-
   if (overlay) {
     switch (overlay) {
+      case SquareOverlayType.SelectedPiece:
+        css = { ...css, backgroundColor: BOARD_SQUARE_SELECTED };
+        break;
       case SquareOverlayType.Capturable:
         css = { ...css, backgroundColor: BOARD_SQUARE_CAPTURABLE };
         break;

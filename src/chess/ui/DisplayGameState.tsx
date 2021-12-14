@@ -1,4 +1,5 @@
 import React from 'react';
+import StringKeyMap from '../../lib/string-key-map';
 import { formatPosition } from '../fen';
 import { useWorkflow } from './workflow';
 
@@ -10,7 +11,11 @@ const replacer = (key: string, value: unknown) => {
   switch (key) {
     case 'pieces':
     case 'squareOverlay':
-      return 'Map { ... }';
+      if (value instanceof StringKeyMap) {
+        return `Map { size ${value.size} }`;
+      } else {
+        return value;
+      }
     default:
       return value;
   }
