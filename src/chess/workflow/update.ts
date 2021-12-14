@@ -39,34 +39,35 @@ function handleSetPositionFromFEN(
   const fen = parseFEN(action.fenString);
   console.log('FEN', fen);
 
-  setPosition(state.board, [
-    {
-      squareDef: { rank: 0, file: 0 },
-      piece: { color: Color.White, type: PieceType.King },
-    },
-    {
-      squareDef: { rank: 5, file: 7 },
-      piece: { color: Color.Black, type: PieceType.King },
-    },
-    {
-      squareDef: { rank: 0, file: 4 },
-      piece: { color: Color.White, type: PieceType.Knight },
-    },
-    {
-      squareDef: { rank: 5, file: 5 },
-      piece: { color: Color.White, type: PieceType.Knight },
-    },
-    {
-      squareDef: { rank: 1, file: 0 },
-      piece: { color: Color.Black, type: PieceType.Rook },
-    },
-    {
-      squareDef: { rank: 6, file: 6 },
-      piece: { color: Color.Black, type: PieceType.Queen },
-    },
-  ]);
+  setPosition(state.board, fen.pieces);
+  // setPosition(state.board, [
+  //   {
+  //     squareDef: { rank: 0, file: 0 },
+  //     piece: { color: Color.White, type: PieceType.King },
+  //   },
+  //   {
+  //     squareDef: { rank: 5, file: 7 },
+  //     piece: { color: Color.Black, type: PieceType.King },
+  //   },
+  //   {
+  //     squareDef: { rank: 0, file: 4 },
+  //     piece: { color: Color.White, type: PieceType.Knight },
+  //   },
+  //   {
+  //     squareDef: { rank: 5, file: 5 },
+  //     piece: { color: Color.White, type: PieceType.Knight },
+  //   },
+  //   {
+  //     squareDef: { rank: 1, file: 0 },
+  //     piece: { color: Color.Black, type: PieceType.Rook },
+  //   },
+  //   {
+  //     squareDef: { rank: 6, file: 6 },
+  //     piece: { color: Color.Black, type: PieceType.Queen },
+  //   },
+  // ]);
 
-  return [state, null];
+  return [{ ...state, turn: fen.turn }, null];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
