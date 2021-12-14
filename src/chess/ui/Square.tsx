@@ -8,10 +8,11 @@ import { BOARD_SQUARE_BLACK, BOARD_SQUARE_WHITE } from './theme';
 import { useWorkflow } from './workflow';
 
 export type SquareProps = {
+  onClick: (squareDef: SquareDef) => void;
   color: Color;
 } & SquareDef;
 
-const Square = ({ rank, file, color }: SquareProps) => {
+const Square = ({ rank, file, color, onClick }: SquareProps) => {
   const { state } = useWorkflow();
 
   const piece = pieceInSquare(state, { rank, file });
@@ -25,6 +26,7 @@ const Square = ({ rank, file, color }: SquareProps) => {
         backgroundColor:
           color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
       }}
+      onClick={() => onClick({ rank, file })}
       tabIndex={0}
     >
       {piece !== null ? <Piece type={piece.type} color={piece.color} /> : ''}

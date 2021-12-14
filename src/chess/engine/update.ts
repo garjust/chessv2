@@ -32,9 +32,14 @@ function handleMovePiece(
   action: Action.MovePiece
 ): Update<State, Action> {
   const { move } = action;
-  const position = applyMove(state.position, move);
+  try {
+    const position = applyMove(state.position, move);
+    return [{ ...state, position }, null];
+  } catch {
+    console.log('failed to move piece');
+  }
 
-  return [{ ...state, position }, null];
+  return [state, null];
 }
 
 function handleSetPositionFromFEN(

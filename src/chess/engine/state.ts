@@ -10,7 +10,7 @@ export interface State {
 
 const INITIAL_STATE: State = {
   boardOrientation: Color.White,
-  displaySquareLabels: true,
+  displaySquareLabels: false,
   humanPlayer: Color.White,
   position: parseFEN(BLANK_POSITION_FEN),
 };
