@@ -13,6 +13,7 @@ import {
   squareLabelToDef,
 } from './utils';
 
+export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 

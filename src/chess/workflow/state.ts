@@ -1,12 +1,13 @@
+import { BLANK_POSITION_FEN, parseFEN } from '../fen';
 import { Color, Position, Piece, Square, SquareDef } from '../types';
-import { buildBoard, findPiecesInboard, squareInBoard } from '../utils';
+import { buildBoard, squareInBoard } from '../utils';
 
 export interface State {
   boardOrientation: Color;
   board: Square[][];
   displaySquareLabels: boolean;
   humanPlayer: Color;
-  turn: Color;
+  position: Position;
 }
 
 const INITIAL_STATE: State = {
@@ -14,7 +15,7 @@ const INITIAL_STATE: State = {
   board: buildBoard(),
   displaySquareLabels: true,
   humanPlayer: Color.White,
-  turn: Color.White,
+  position: parseFEN(BLANK_POSITION_FEN),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -26,21 +27,3 @@ export const pieceInSquare = (
   state: State,
   squareDef: SquareDef
 ): Piece | null => squareInBoard(state.board, squareDef).piece;
-
-export const fenForPosition = (state: State): Position => {
-  const { turn } = state;
-
-  return {
-    pieces: findPiecesInboard(state.board),
-    turn,
-    castlingAvailability: {
-      whiteKingside: true,
-      whiteQueenside: true,
-      blackKingside: true,
-      blackQueenside: true,
-    },
-    enPassantSquare: null,
-    halfMoveCount: 6,
-    fullMoveCount: 36,
-  };
-};
