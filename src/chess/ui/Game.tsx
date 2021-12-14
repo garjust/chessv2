@@ -11,6 +11,20 @@ import { flipBoardAction } from '../engine';
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
+import { movePieceAction } from '../engine/action';
+
+const moves = (function* () {
+  while (true) {
+    yield {
+      from: { rank: 1, file: 3 },
+      to: { rank: 3, file: 3 },
+    };
+    yield {
+      from: { rank: 6, file: 4 },
+      to: { rank: 5, file: 4 },
+    };
+  }
+})();
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
@@ -32,6 +46,9 @@ const Game = () => {
           </button>
           <button onClick={() => emit(toggleSquareLabelsAction())}>
             Toggle square labels
+          </button>
+          <button onClick={() => emit(movePieceAction(moves.next().value))}>
+            Move something
           </button>
         </div>
 

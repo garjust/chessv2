@@ -1,4 +1,4 @@
-import { PieceAndSquare, Square, SquareDef } from './types';
+import { Move, PieceAndSquare, Position, Square, SquareDef } from './types';
 
 export const fileIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
@@ -19,10 +19,10 @@ export const squareGenerator = function* () {
   }
 };
 
-export const squareInBoard = (
-  board: Square[][],
-  squareDef: SquareDef
-): Square => board[squareDef.rank][squareDef.file];
+// export const squareInBoard = (
+//   board: Square[][],
+//   squareDef: SquareDef
+// ): Square => board[squareDef.rank][squareDef.file];
 
 export const buildBoard = (): Square[][] => {
   const board = new Array<Square[]>(8);
@@ -60,3 +60,18 @@ export const findPiecesInboard = (board: Square[][]): PieceAndSquare[] =>
       (pieceAndSquare): pieceAndSquare is PieceAndSquare =>
         pieceAndSquare.piece !== null
     );
+
+export const applyMove = (position: Position, move: Move): Position => {
+  const piece = position.pieces.find(
+    (pieceAndSquare) =>
+      pieceAndSquare.squareDef.rank === move.from.rank &&
+      pieceAndSquare.squareDef.file === move.from.file
+  );
+  if (piece) {
+    piece.squareDef = move.to;
+  } else {
+    throw Error('no piece to move');
+  }
+
+  return position;
+};

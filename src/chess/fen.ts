@@ -172,10 +172,6 @@ const formatFENPieces = (pieces: PieceAndSquare[]): string => {
   return str;
 };
 
-export const setPositionFromFEN = (board: Square[][], fenString: string) => {
-  setPosition(board, parseFEN(fenString).pieces);
-};
-
 export const formatPosition = (fen: Position): string => {
   return [
     formatFENPieces(fen.pieces),

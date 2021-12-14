@@ -18,7 +18,7 @@ const replacer = (key: string, value: unknown) => {
 
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
   const { state } = useWorkflow();
-
+  console.log(state.position.pieces);
   return (
     <pre
       style={{

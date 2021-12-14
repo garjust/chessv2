@@ -34,8 +34,8 @@ export type Square = {
 };
 
 export type Move = {
-  pieceAndSquare: PieceAndSquare;
-  square: SquareDef;
+  from: SquareDef;
+  to: SquareDef;
 };
 
 export type CastlingAvailability = {

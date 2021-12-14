@@ -1,6 +1,6 @@
 import { Update } from '../../lib/workflow';
 import { Color } from '../types';
-import { buildBoard, setPosition } from '../utils';
+import { applyMove } from '../utils';
 import { STARTING_POSITION_FEN, parseFEN } from '../fen';
 import { setPositionFromFENAction } from './action';
 import { State, Action, Type } from './index';
@@ -20,12 +20,21 @@ function handleInitialize(
   action: Action.Initialize
 ): Update<State, Action> {
   const { playingAs } = action;
-  const board = buildBoard();
 
   return [
-    { ...state, humanPlayer: playingAs, boardOrientation: playingAs, board },
+    { ...state, humanPlayer: playingAs, boardOrientation: playingAs },
     setPositionFromFENAction(STARTING_POSITION_FEN),
   ];
+}
+
+function handleMovePiece(
+  state: State,
+  action: Action.MovePiece
+): Update<State, Action> {
+  const { move } = action;
+  const position = applyMove(state.position, move);
+
+  return [{ ...state, position }, null];
 }
 
 function handleSetPositionFromFEN(
@@ -33,7 +42,7 @@ function handleSetPositionFromFEN(
   action: Action.SetPositionFromFEN
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
-  setPosition(state.board, position.pieces);
+  // setPosition(state.board, position.pieces);
 
   return [{ ...state, position }, null];
 }
@@ -52,6 +61,8 @@ export function update(
       return handleFlipBoard(state);
     case Type.Initialize:
       return handleInitialize(state, action);
+    case Type.MovePiece:
+      return handleMovePiece(state, action);
     case Type.SetPositionFromFEN:
       return handleSetPositionFromFEN(state, action);
     case Type.ToggleSquareLabels:

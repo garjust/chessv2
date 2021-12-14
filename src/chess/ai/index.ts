@@ -1,6 +1,6 @@
 import { Move, Position } from '../types';
 import { parseFEN } from '../fen';
-import { nextMove } from './v1';
+import { nextMove as nextMoveV1 } from './v1';
 
 export interface ChessComputer {
   nextMoveForFEN(fenString: string): Move;
@@ -8,6 +8,6 @@ export interface ChessComputer {
 }
 
 export const v1: ChessComputer = {
-  nextMove,
-  nextMoveForFEN: (fenString) => nextMove(parseFEN(fenString)),
+  nextMove: nextMoveV1,
+  nextMoveForFEN: (fenString) => nextMoveV1(parseFEN(fenString)),
 };
