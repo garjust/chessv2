@@ -2,11 +2,7 @@ import React from 'react';
 import './Square.css';
 import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
-import {
-  pieceInSquare,
-  squareOverlay,
-  SquareOverlayType,
-} from '../engine/state';
+import { pieceInSquare, SquareOverlayType } from '../engine/state';
 import Piece from './Piece';
 import {
   BOARD_SQUARE_BLACK,
@@ -24,11 +20,12 @@ export type SquareProps = {
 } & SquareData;
 
 const Square = ({ rank, file, color }: SquareProps) => {
-  const { state, emit } = useWorkflow();
+  const { state, emit } = useWorkflow(true);
+  // console.log('use state', state.debugN);
 
-  const { position, selectedSquare } = state;
+  const { position, selectedSquare, squareOverlay, debugN } = state;
   const piece = pieceInSquare(state, { rank, file });
-  const overlay = squareOverlay(state, { rank, file });
+  const overlay = squareOverlay?.get({ rank, file });
 
   const isClickable =
     selectedSquare || (piece && piece.color === position.turn);
@@ -75,7 +72,7 @@ const Square = ({ rank, file, color }: SquareProps) => {
           opacity: state.displaySquareLabels ? 1 : 0,
         }}
       >
-        {squareLabel({ rank, file })}
+        {debugN /*squareLabel({ rank, file }) */}
       </span>
     </div>
   );

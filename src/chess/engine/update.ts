@@ -25,13 +25,10 @@ function handleClickSquare(
   if (state.selectedSquare) {
     return [
       { ...state, selectedSquare: undefined },
-      from([
-        movePieceAction({
-          from: state.selectedSquare,
-          to: square,
-        }),
-        overlaySquaresAction(),
-      ]),
+      movePieceAction({
+        from: state.selectedSquare,
+        to: square,
+      }),
     ];
   } else {
     // Nothing is already selected so attempt to "select" the square.
@@ -40,7 +37,7 @@ function handleClickSquare(
     }
   }
 
-  return [state, null];
+  return [state, overlaySquaresAction()];
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {
@@ -85,7 +82,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     });
   }
 
-  return [{ ...state, squareOverlay }, null];
+  return [{ ...state, squareOverlay, debugN: (state.debugN || 0) + 1 }, null];
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
@@ -97,14 +94,19 @@ function handleMovePiece(
   action: Action.MovePiece
 ): Update<State, Action> {
   const { move } = action;
+  let position;
+
   try {
-    const position = applyMove(state.position, move);
-    return [{ ...state, position }, null];
+    position = applyMove(state.position, move);
   } catch (error) {
     console.log(`failed to move piece: ${error}`);
   }
 
-  return [state, null];
+  if (position) {
+    return [{ ...state, position }, overlaySquaresAction()];
+  } else {
+    return [state, null];
+  }
 }
 
 function handleSetPositionFromFEN(

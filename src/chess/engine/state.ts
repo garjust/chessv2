@@ -16,6 +16,7 @@ export interface State {
   position: Position;
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
+  debugN?: number;
 }
 
 const INITIAL_STATE: State = {
@@ -23,6 +24,7 @@ const INITIAL_STATE: State = {
   displaySquareLabels: false,
   humanPlayer: Color.White,
   position: parseFEN(BLANK_POSITION_FEN),
+  debugN: 0,
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
