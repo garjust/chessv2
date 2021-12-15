@@ -13,19 +13,7 @@ import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
 import { STARTING_POSITION_FEN } from '../fen';
-
-const moves = (function* () {
-  while (true) {
-    yield {
-      from: { rank: 1, file: 3 },
-      to: { rank: 3, file: 3 },
-    };
-    yield {
-      from: { rank: 6, file: 4 },
-      to: { rank: 5, file: 4 },
-    };
-  }
-})();
+import { debugGame } from '../debug';
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
@@ -36,6 +24,10 @@ const Game = () => {
     emit(initializeAction(Color.White));
     emit(setPositionFromFENAction(STARTING_POSITION_FEN));
   });
+
+  const emitExampleGame = (): void => {
+    debugGame(100).subscribe((action) => emit(action));
+  };
 
   return (
     <div className="game">
@@ -56,6 +48,13 @@ const Game = () => {
             }}
           >
             Reset game
+          </button>
+          <button
+            onClick={() => {
+              emitExampleGame();
+            }}
+          >
+            Example game
           </button>
         </div>
 
