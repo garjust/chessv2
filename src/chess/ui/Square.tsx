@@ -20,8 +20,7 @@ export type SquareProps = {
 } & SquareData;
 
 const Square = ({ rank, file, color }: SquareProps) => {
-  const { state, emit } = useWorkflow(true);
-  // console.log('use state', state.debugN);
+  const { state, emit } = useWorkflow();
 
   const { position, selectedSquare, squareOverlay, debugN } = state;
   const piece = pieceInSquare(state, { rank, file });
@@ -72,7 +71,7 @@ const Square = ({ rank, file, color }: SquareProps) => {
           opacity: state.displaySquareLabels ? 1 : 0,
         }}
       >
-        {debugN /*squareLabel({ rank, file }) */}
+        {squareLabel({ rank, file })}
       </span>
     </div>
   );

@@ -1,6 +1,5 @@
 import React from 'react';
 import StringKeyMap from '../../lib/string-key-map';
-import { formatPosition } from '../fen';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
@@ -31,19 +30,8 @@ const replacer = (key: string, value: unknown) => {
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
   const { state } = useWorkflow();
   return (
-    <pre
-      style={{
-        ...style,
-        display: 'grid',
-        gridTemplateRows: 'auto min-content',
-        gridTemplateColumns: 'min-content',
-        gap: '1em',
-      }}
-    >
+    <pre style={style}>
       <code>{JSON.stringify(state, replacer, 2)}</code>
-      <code style={{ backgroundColor: 'aqua' }}>
-        {formatPosition(state.position)}
-      </code>
     </pre>
   );
 };

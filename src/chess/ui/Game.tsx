@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import Board from './Board';
 import './Game.css';
 import init, { createState } from '../engine';
@@ -14,6 +14,12 @@ import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
 import { STARTING_POSITION_FEN } from '../fen';
 import { debugGame } from '../debug';
+import DisplayGameFEN from './DisplayGameFen';
+
+const BUTTON_CSS: CSSProperties = {
+  padding: 16,
+  cursor: 'pointer',
+};
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
@@ -25,40 +31,50 @@ const Game = () => {
     emit(setPositionFromFENAction(STARTING_POSITION_FEN));
   });
 
-  const emitExampleGame = (): void => {
-    debugGame(400).subscribe((action) => emit(action));
-  };
+  function emitExampleGame(): void {
+    emit(setPositionFromFENAction(STARTING_POSITION_FEN));
+    debugGame(400).subscribe({
+      next: (action) => emit(action),
+    });
+  }
 
   return (
     <div className="game">
       <WorkflowContext.Provider value={{ states, emit, updates }}>
         <Board squareSize={64} style={{ gridArea: 'board' }} />
 
-        <div style={{ gridArea: 'buttons' }}>
-          <button onClick={() => emit(flipBoardAction())}>
+        <div
+          style={{
+            gridArea: 'buttons',
+            display: 'flex',
+            justifyContent: 'left',
+            gap: 16,
+          }}
+        >
+          <button style={BUTTON_CSS} onClick={() => emit(flipBoardAction())}>
             Flip the board
           </button>
-          <button onClick={() => emit(toggleSquareLabelsAction())}>
+          <button
+            style={BUTTON_CSS}
+            onClick={() => emit(toggleSquareLabelsAction())}
+          >
             Toggle square labels
           </button>
           <button
+            style={BUTTON_CSS}
             onClick={() => {
-              emit(initializeAction(Color.White));
               emit(setPositionFromFENAction(STARTING_POSITION_FEN));
             }}
           >
             Reset game
           </button>
-          <button
-            onClick={() => {
-              emitExampleGame();
-            }}
-          >
+          <button style={BUTTON_CSS} onClick={emitExampleGame}>
             Example game
           </button>
         </div>
 
         <DisplayGameState style={{ gridArea: 'state' }} />
+        <DisplayGameFEN style={{ gridArea: 'fen' }} />
       </WorkflowContext.Provider>
     </div>
   );

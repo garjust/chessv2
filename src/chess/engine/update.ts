@@ -7,6 +7,7 @@ import {
   movePieceAction,
   setPositionFromFENAction,
   overlaySquaresAction,
+  resetOverlayAction,
 } from './action';
 import { State, Action, Type } from './index';
 import { SquareOverlayType, createState, pieceInSquare } from './state';
@@ -113,7 +114,10 @@ function handleSetPositionFromFEN(
   state: State,
   action: Action.SetPositionFromFEN
 ): Update<State, Action> {
-  return [{ ...state, position: parseFEN(action.fenString) }, null];
+  return [
+    { ...state, position: parseFEN(action.fenString) },
+    resetOverlayAction(),
+  ];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
