@@ -1,13 +1,13 @@
 import { Color, Move, Piece, PieceType, Position, Square } from './types';
-import { squareEquals, squareLabel, SquareMap, squaresInclude } from './utils';
+import {
+  isLegalSquare,
+  squareEquals,
+  SquareMap,
+  squaresInclude,
+} from './utils';
 
 const WHITE_PAWN_STARTING_RANK = 1;
 const BLACK_PAWN_STARTING_RANK = 6;
-
-const pruneIllegalSquares = (...squares: Square[]): Square[] =>
-  squares.filter(
-    ({ rank, file }) => rank >= 0 && rank < 8 && file >= 0 && file < 8
-  );
 
 const up = (square: Square, n = 1): Square => ({
   rank: square.rank + n,
@@ -88,6 +88,33 @@ const pawnMoves = (
   return squares;
 };
 
+const squareScanner = (position: Position, piece: Piece) => {
+  const scan = (
+    squares: Square[],
+    scanFn: (square: Square) => Square
+  ): Square[] => {
+    const next = scanFn(squares[squares.length - 1]);
+    if (!isLegalSquare(next)) {
+      return squares;
+    }
+
+    const nextPiece = position.pieces.get(next);
+    if (nextPiece) {
+      if (nextPiece.color === piece.color) {
+        // friend!
+        return squares;
+      } else {
+        // foe!
+        return [...squares, next];
+      }
+    }
+
+    return scan([...squares, next], scanFn);
+  };
+
+  return scan;
+};
+
 const bishopMoves = (
   position: Position,
   piece: Piece,
@@ -95,21 +122,9 @@ const bishopMoves = (
 ): Square[] => {
   const squares: Square[] = [];
 
-  [
-    up(left(square), 2),
-    up(right(square), 2),
-    left(up(square), 2),
-    left(down(square), 2),
-    down(left(square), 2),
-    down(right(square), 2),
-    right(up(square), 2),
-    right(down(square), 2),
-  ]
-    .filter(
-      (candidateSquare) =>
-        position.pieces.get(candidateSquare)?.color !== piece.color
-    )
-    .forEach((candidateSquare) => squares.push(candidateSquare));
+  [upLeft, upRight, downLeft, downRight].forEach((scanFn) => {
+    squares.push(...squareScanner(position, piece)([square], scanFn).slice(1));
+  });
 
   return squares;
 };
@@ -166,6 +181,38 @@ const kingMoves = (
   return squares;
 };
 
+const queenMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => {
+  const squares: Square[] = [];
+
+  [up, right, left, down, upLeft, upRight, downLeft, downRight].forEach(
+    (scanFn) => {
+      squares.push(
+        ...squareScanner(position, piece)([square], scanFn).slice(1)
+      );
+    }
+  );
+
+  return squares;
+};
+
+const rookMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => {
+  const squares: Square[] = [];
+
+  [up, right, left, down].forEach((scanFn) => {
+    squares.push(...squareScanner(position, piece)([square], scanFn).slice(1));
+  });
+
+  return squares;
+};
+
 export const findSquaresForMove = (
   position: Position,
   square: Square
@@ -190,9 +237,15 @@ export const findSquaresForMove = (
     case PieceType.Pawn:
       squares.push(...pawnMoves(position, piece, square));
       break;
+    case PieceType.Queen:
+      squares.push(...queenMoves(position, piece, square));
+      break;
+    case PieceType.Rook:
+      squares.push(...rookMoves(position, piece, square));
+      break;
   }
 
-  return pruneIllegalSquares(...squares);
+  return squares.filter(isLegalSquare);
 };
 
 export const applyMove = (position: Position, move: Move): Position => {

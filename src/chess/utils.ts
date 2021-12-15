@@ -35,3 +35,6 @@ export class SquareMap<T> extends StringKeyMap<Square, T> {
     super(squareLabel, labelToSquare);
   }
 }
+
+export const isLegalSquare = ({ rank, file }: Square): boolean =>
+  rank >= 0 && rank < 8 && file >= 0 && file < 8;
