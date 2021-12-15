@@ -1,6 +1,5 @@
-import StringKeyMap from '../lib/string-key-map';
 import { Color, Piece, PieceType, Position, Square } from './types';
-import { squareLabel, labelToSquare } from './utils';
+import { squareLabel, labelToSquare, SquareMap } from './utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
@@ -64,10 +63,8 @@ const pieceToFenNotationCharacter = (piece: Piece): string => {
 const fenNotationPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
 
-const piecePlacementsFromFEN = (
-  piecePlacements: string
-): StringKeyMap<Square, Piece> => {
-  const pieces = new StringKeyMap<Square, Piece>(squareLabel);
+const piecePlacementsFromFEN = (piecePlacements: string): SquareMap<Piece> => {
+  const pieces = new SquareMap<Piece>();
 
   let rank = 7;
   let file = 0;
@@ -116,23 +113,23 @@ export const parseFEN = (fenString: string): Position => {
     fullMoveNumber,
   ] = fenString.split(' ');
 
-  return {
+  return Object.freeze({
     pieces: piecePlacementsFromFEN(piecePlacements),
     turn: activeColor === 'w' ? Color.White : Color.Black,
-    castlingAvailability: {
+    castlingAvailability: Object.freeze({
       whiteKingside: castlingAvailability.includes('K'),
       whiteQueenside: castlingAvailability.includes('Q'),
       blackKingside: castlingAvailability.includes('k'),
       blackQueenside: castlingAvailability.includes('q'),
-    },
+    }),
     enPassantSquare:
       enPassantSquare !== '-' ? labelToSquare(enPassantSquare) : null,
     halfMoveCount: Number(halfMoveClock),
     fullMoveCount: Number(fullMoveNumber),
-  };
+  });
 };
 
-const formatFENPieces = (pieces: StringKeyMap<Square, Piece>): string => {
+const formatFENPieces = (pieces: SquareMap<Piece>): string => {
   let str = '';
 
   let emptyCounter;

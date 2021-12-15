@@ -1,9 +1,11 @@
 export default class StringKeyMap<K, V> implements Map<K, V> {
   #map: Map<string, V> = new Map<string, V>();
   #keyFn: (key: K) => string;
+  #inverseKeyFn: (str: string) => K;
 
-  constructor(keyFn: (key: K) => string) {
+  constructor(keyFn: (key: K) => string, inverseKeyFN: (str: string) => K) {
     this.#keyFn = keyFn;
+    this.#inverseKeyFn = inverseKeyFN;
   }
 
   clear(): void {
@@ -39,19 +41,33 @@ export default class StringKeyMap<K, V> implements Map<K, V> {
   }
 
   entries(): IterableIterator<[K, V]> {
-    throw new Error('Method not implemented.');
+    const map = this.#map;
+    const keyFn = this.#inverseKeyFn;
+
+    return (function* () {
+      for (const [key, value] of map.entries()) {
+        yield [keyFn(key), value] as [K, V];
+      }
+    })();
   }
 
   keys(): IterableIterator<K> {
-    throw new Error('Method not implemented.');
+    const map = this.#map;
+    const keyFn = this.#inverseKeyFn;
+
+    return (function* () {
+      for (const key of map.keys()) {
+        yield keyFn(key);
+      }
+    })();
   }
 
   values(): IterableIterator<V> {
-    throw new Error('Method not implemented.');
+    return this.#map.values();
   }
 
   [Symbol.iterator](): IterableIterator<[K, V]> {
-    throw new Error('Method not implemented.');
+    return this.entries();
   }
 
   [Symbol.toStringTag]: string;

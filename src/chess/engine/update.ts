@@ -1,8 +1,8 @@
 import { Update } from '../../lib/workflow';
-import { Color, Square } from '../types';
-import { squareLabel } from '../utils';
+import { Color } from '../types';
+import { SquareMap } from '../utils';
 import { applyMove, findSquaresForMove } from '../movement';
-import { STARTING_POSITION_FEN, parseFEN, BLANK_POSITION_FEN } from '../fen';
+import { parseFEN, BLANK_POSITION_FEN } from '../fen';
 import {
   movePieceAction,
   setPositionFromFENAction,
@@ -12,7 +12,6 @@ import {
 import { State, Action, Type } from './index';
 import { SquareOverlayType, createState, pieceInSquare } from './state';
 import { from } from 'rxjs';
-import StringKeyMap from '../../lib/string-key-map';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -65,9 +64,7 @@ function handleInitialize(
 }
 
 function handleOverlaySquares(state: State): Update<State, Action> {
-  const squareOverlay = new StringKeyMap<Square, SquareOverlayType>(
-    squareLabel
-  );
+  const squareOverlay = new SquareMap<SquareOverlayType>();
 
   const { position, selectedSquare } = state;
   if (selectedSquare) {

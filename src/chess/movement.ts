@@ -1,5 +1,8 @@
 import { Color, Move, Piece, PieceType, Position, Square } from './types';
-import { squareEquals, squaresInclude } from './utils';
+import { squareEquals, squareLabel, SquareMap, squaresInclude } from './utils';
+
+const WHITE_PAWN_STARTING_RANK = 1;
+const BLACK_PAWN_STARTING_RANK = 6;
 
 const pruneIllegalSquares = (...squares: Square[]): Square[] =>
   squares.filter(
@@ -32,13 +35,20 @@ const downLeft = (square: Square, n = 1): Square => down(left(square, n), n);
 const downRight = (square: Square, n = 1): Square => down(right(square, n), n);
 
 const isStartPositionPawn = (piece: Piece, square: Square): boolean =>
-  piece.color === Color.White ? square.rank === 1 : square.rank === 6;
+  piece.color === Color.White
+    ? square.rank === WHITE_PAWN_STARTING_RANK
+    : square.rank === BLACK_PAWN_STARTING_RANK;
 
 const isTwoSquarePawnMove = (move: Move): boolean =>
   Math.abs(move.from.rank - move.to.rank) == 2;
 
-const enPassantSquareFromMove = (move: Move): Square =>
-  move.from.rank === 1 ? up(move.from) : down(move.from);
+const enPassantSquareFromMove = (piece: Piece, move: Move): Square | null => {
+  if (piece.type === PieceType.Pawn && isTwoSquarePawnMove(move)) {
+    return move.from.rank === 1 ? up(move.from) : down(move.from);
+  } else {
+    return null;
+  }
+};
 
 const pawnMoves = (
   position: Position,
@@ -98,7 +108,12 @@ export const findSquaresForMove = (
 };
 
 export const applyMove = (position: Position, move: Move): Position => {
-  const piece = position.pieces.get(move.from);
+  const pieces = new SquareMap<Piece>();
+  for (const [key, value] of position.pieces) {
+    pieces.set(key, value);
+  }
+
+  const piece = pieces.get(move.from);
 
   if (!piece) {
     throw Error('no piece to move');
@@ -113,8 +128,8 @@ export const applyMove = (position: Position, move: Move): Position => {
   }
 
   // Execute the move
-  let isCapture = position.pieces.delete(move.from);
-  position.pieces.set(move.to, piece);
+  let isCapture = pieces.delete(move.from);
+  pieces.set(move.to, piece);
 
   if (
     piece.type === PieceType.Pawn &&
@@ -123,26 +138,24 @@ export const applyMove = (position: Position, move: Move): Position => {
     // This is an en passant capture
     isCapture = true;
     if (piece.color === Color.White) {
-      position.pieces.delete(down(move.to));
+      pieces.delete(down(move.to));
     } else {
-      position.pieces.delete(up(move.to));
+      pieces.delete(up(move.to));
     }
   }
 
-  // Update other state in the position
-  position.enPassantSquare = null;
-  if (piece.type === PieceType.Pawn && isTwoSquarePawnMove(move)) {
-    position.enPassantSquare = enPassantSquareFromMove(move);
-  }
-
-  if (position.turn === Color.Black) {
-    position.fullMoveCount++;
-  }
-  if (piece.type !== PieceType.Pawn && !isCapture) {
-    position.halfMoveCount++;
-  }
-
-  position.turn = position.turn === Color.White ? Color.Black : Color.White;
-
-  return position;
+  return Object.freeze({
+    pieces,
+    turn: position.turn === Color.White ? Color.Black : Color.White,
+    castlingAvailability: position.castlingAvailability,
+    enPassantSquare: enPassantSquareFromMove(piece, move),
+    halfMoveCount:
+      piece.type !== PieceType.Pawn && !isCapture
+        ? position.halfMoveCount + 1
+        : 0,
+    fullMoveCount:
+      position.turn === Color.Black
+        ? position.fullMoveCount + 1
+        : position.fullMoveCount,
+  });
 };

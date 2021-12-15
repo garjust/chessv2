@@ -1,3 +1,4 @@
+import StringKeyMap from '../lib/string-key-map';
 import { Square } from './types';
 
 type Nullable<T> = T | undefined | null;
@@ -8,9 +9,9 @@ const fileIndexToChar = (index: number): string =>
 export const squareLabel = ({ rank, file }: Square): string =>
   `${fileIndexToChar(file)}${rank + 1}`;
 
-export const labelToSquare = (label: string): Square => ({
-  rank: label.charCodeAt(0) - 97,
-  file: Number(label[1]) - 1,
+export const labelToSquare = ([file, rank]: string): Square => ({
+  file: file.charCodeAt(0) - 97,
+  rank: Number(rank) - 1,
 });
 
 export const squareGenerator = function* () {
@@ -28,3 +29,9 @@ export const squareEquals = (
 
 export const squaresInclude = (moves: Square[], move: Square): boolean =>
   Boolean(moves.find((maybeMove) => squareEquals(maybeMove, move)));
+
+export class SquareMap<T> extends StringKeyMap<Square, T> {
+  constructor() {
+    super(squareLabel, labelToSquare);
+  }
+}

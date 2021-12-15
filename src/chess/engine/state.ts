@@ -1,6 +1,6 @@
-import StringKeyMap from '../../lib/string-key-map';
 import { BLANK_POSITION_FEN, parseFEN } from '../fen';
 import { Color, Position, Piece, Square } from '../types';
+import { SquareMap } from '../utils';
 
 export enum SquareOverlayType {
   SelectedPiece = 'SELECTED_PIECE',
@@ -14,7 +14,7 @@ export interface State {
   humanPlayer: Color;
   position: Position;
   selectedSquare?: Square;
-  squareOverlay?: StringKeyMap<Square, SquareOverlayType>;
+  squareOverlay?: SquareMap<SquareOverlayType>;
 }
 
 const INITIAL_STATE: State = {
