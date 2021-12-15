@@ -59,7 +59,6 @@ const pawnMoves = (
   const opponentColor = piece.color === Color.White ? Color.Black : Color.White;
   const advanceFn = piece.color === Color.White ? up : down;
 
-  // if (piece.color === Color.White) {
   // space above the pawn.
   if (!position.pieces.get(advanceFn(square))) {
     squares.push(advanceFn(square));
@@ -89,6 +88,84 @@ const pawnMoves = (
   return squares;
 };
 
+const bishopMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => {
+  const squares: Square[] = [];
+
+  [
+    up(left(square), 2),
+    up(right(square), 2),
+    left(up(square), 2),
+    left(down(square), 2),
+    down(left(square), 2),
+    down(right(square), 2),
+    right(up(square), 2),
+    right(down(square), 2),
+  ]
+    .filter(
+      (candidateSquare) =>
+        position.pieces.get(candidateSquare)?.color !== piece.color
+    )
+    .forEach((candidateSquare) => squares.push(candidateSquare));
+
+  return squares;
+};
+
+const knightMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => {
+  const squares: Square[] = [];
+
+  [
+    up(left(square), 2),
+    up(right(square), 2),
+    left(up(square), 2),
+    left(down(square), 2),
+    down(left(square), 2),
+    down(right(square), 2),
+    right(up(square), 2),
+    right(down(square), 2),
+  ]
+    .filter(
+      (candidateSquare) =>
+        position.pieces.get(candidateSquare)?.color !== piece.color
+    )
+    .forEach((candidateSquare) => squares.push(candidateSquare));
+
+  return squares;
+};
+
+const kingMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => {
+  const squares: Square[] = [];
+
+  [
+    up(square),
+    left(square),
+    right(square),
+    down(square),
+    upLeft(square),
+    upRight(square),
+    downLeft(square),
+    downRight(square),
+  ]
+    .filter(
+      (candidateSquare) =>
+        position.pieces.get(candidateSquare)?.color !== piece.color
+    )
+    .forEach((candidateSquare) => squares.push(candidateSquare));
+
+  return squares;
+};
+
 export const findSquaresForMove = (
   position: Position,
   square: Square
@@ -100,8 +177,19 @@ export const findSquaresForMove = (
 
   const squares: Square[] = [];
 
-  if (piece.type === PieceType.Pawn) {
-    squares.push(...pawnMoves(position, piece, square));
+  switch (piece.type) {
+    case PieceType.Bishop:
+      squares.push(...bishopMoves(position, piece, square));
+      break;
+    case PieceType.King:
+      squares.push(...kingMoves(position, piece, square));
+      break;
+    case PieceType.Knight:
+      squares.push(...knightMoves(position, piece, square));
+      break;
+    case PieceType.Pawn:
+      squares.push(...pawnMoves(position, piece, square));
+      break;
   }
 
   return pruneIllegalSquares(...squares);
