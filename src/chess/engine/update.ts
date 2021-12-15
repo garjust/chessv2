@@ -1,6 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { Color, Square } from '../types';
-import { applyMove, squareLabel } from '../utils';
+import { squareLabel } from '../utils';
+import { applyMove, findSquaresForMove } from '../movement';
 import { STARTING_POSITION_FEN, parseFEN, BLANK_POSITION_FEN } from '../fen';
 import {
   movePieceAction,
@@ -68,9 +69,18 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     squareLabel
   );
 
-  const { selectedSquare } = state;
+  const { position, selectedSquare } = state;
   if (selectedSquare) {
     squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
+
+    const candidateSquares = findSquaresForMove(state.position, selectedSquare);
+    candidateSquares.forEach((square) => {
+      if (position.pieces.has(square)) {
+        squareOverlay.set(square, SquareOverlayType.Capturable);
+      } else {
+        squareOverlay.set(square, SquareOverlayType.Movable);
+      }
+    });
   }
 
   return [{ ...state, squareOverlay }, null];
@@ -88,8 +98,8 @@ function handleMovePiece(
   try {
     const position = applyMove(state.position, move);
     return [{ ...state, position }, null];
-  } catch {
-    console.log('failed to move piece');
+  } catch (error) {
+    console.log(`failed to move piece: ${error}`);
   }
 
   return [state, null];

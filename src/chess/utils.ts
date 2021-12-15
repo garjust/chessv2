@@ -1,4 +1,6 @@
-import { Color, Move, Position, Square } from './types';
+import { Square } from './types';
+
+type Nullable<T> = T | undefined | null;
 
 const fileIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
@@ -19,19 +21,10 @@ export const squareGenerator = function* () {
   }
 };
 
-export const applyMove = (position: Position, move: Move): Position => {
-  const piece = position.pieces.get(move.from);
+export const squareEquals = (
+  a: Nullable<Square>,
+  b: Nullable<Square>
+): boolean => Boolean(a && b && a.file === b.file && a.rank === b.rank);
 
-  if (!piece) {
-    throw Error('no piece to move');
-  }
-  if (piece.color !== position.turn) {
-    throw Error('cannot move piece for other color');
-  }
-
-  position.pieces.delete(move.from);
-  position.pieces.set(move.to, piece);
-  position.turn = position.turn === Color.White ? Color.Black : Color.White;
-
-  return position;
-};
+export const squaresInclude = (moves: Square[], move: Square): boolean =>
+  Boolean(moves.find((maybeMove) => squareEquals(maybeMove, move)));

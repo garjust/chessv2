@@ -1,6 +1,8 @@
 import React from 'react';
 import StringKeyMap from '../../lib/string-key-map';
 import { formatPosition } from '../fen';
+import { Square } from '../types';
+import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameStateProps = {
@@ -8,17 +10,22 @@ export type DisplayGameStateProps = {
 };
 
 const replacer = (key: string, value: unknown) => {
-  switch (key) {
-    case 'pieces':
-    case 'squareOverlay':
-      if (value instanceof StringKeyMap) {
-        return `Map { size ${value.size} }`;
-      } else {
-        return value;
-      }
-    default:
-      return value;
+  if (value instanceof StringKeyMap) {
+    return `{ Map of size ${value.size} }`;
   }
+
+  if (value instanceof Object) {
+    const valueKeys = Object.keys(value);
+    if (
+      valueKeys.length === 2 &&
+      valueKeys.includes('file') &&
+      valueKeys.includes('rank')
+    ) {
+      return `{ ${squareLabel(value as Square)} }`;
+    }
+  }
+
+  return value;
 };
 
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
