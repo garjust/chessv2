@@ -1,5 +1,5 @@
 import StringKeyMap from '../lib/string-key-map';
-import { Square } from './types';
+import { PieceType, Position, Square } from './types';
 
 type Nullable<T> = T | undefined | null;
 

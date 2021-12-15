@@ -1,12 +1,11 @@
 import { Update } from '../../lib/workflow';
 import { Color } from '../types';
 import { SquareMap } from '../utils';
-import { applyMove, findSquaresForMove } from '../movement';
+import { applyMove, checkedSquare, findSquaresForMove } from '../movement';
 import { parseFEN, BLANK_POSITION_FEN } from '../fen';
 import {
   movePieceAction,
   setPositionFromFENAction,
-  resetOverlayAction,
   overlaySquaresAction,
 } from './action';
 import { State, Action, Type } from './index';
@@ -31,7 +30,7 @@ function handleClickSquare(
           from: state.selectedSquare,
           to: square,
         }),
-        resetOverlayAction(),
+        overlaySquaresAction(),
       ]),
     ];
   } else {
@@ -67,6 +66,12 @@ function handleOverlaySquares(state: State): Update<State, Action> {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
   const { position, selectedSquare } = state;
+
+  const check = checkedSquare(position);
+  if (check) {
+    squareOverlay.set(check, SquareOverlayType.Check);
+  }
+
   if (selectedSquare) {
     squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
 

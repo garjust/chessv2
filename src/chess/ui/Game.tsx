@@ -26,7 +26,7 @@ const Game = () => {
   });
 
   const emitExampleGame = (): void => {
-    debugGame(400).subscribe((action) => emit(action));
+    debugGame(1000).subscribe((action) => emit(action));
   };
 
   return (

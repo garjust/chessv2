@@ -11,6 +11,7 @@ import Piece from './Piece';
 import {
   BOARD_SQUARE_BLACK,
   BOARD_SQUARE_CAPTURABLE,
+  BOARD_SQUARE_CHECK,
   BOARD_SQUARE_MOVABLE,
   BOARD_SQUARE_SELECTED,
   BOARD_SQUARE_WHITE,
@@ -47,6 +48,9 @@ const Square = ({ rank, file, color }: SquareProps) => {
         break;
       case SquareOverlayType.Capturable:
         css = { ...css, backgroundColor: BOARD_SQUARE_CAPTURABLE };
+        break;
+      case SquareOverlayType.Check:
+        css = { ...css, backgroundColor: BOARD_SQUARE_CHECK };
         break;
       case SquareOverlayType.Movable:
         css = { ...css, backgroundColor: BOARD_SQUARE_MOVABLE };

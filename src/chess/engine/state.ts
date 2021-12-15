@@ -6,6 +6,7 @@ export enum SquareOverlayType {
   SelectedPiece = 'SELECTED_PIECE',
   Movable = 'MOVABLE',
   Capturable = 'CAPTURABLE',
+  Check = 'CHECK',
 }
 
 export interface State {

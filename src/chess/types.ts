@@ -29,6 +29,18 @@ export type Move = {
   to: Square;
 };
 
+export type MoveDetail = {
+  to: Square;
+  capture: boolean;
+  kingCapture: boolean;
+};
+
+export type Moveset = {
+  piece: Piece;
+  square: Square;
+  moves: MoveDetail[];
+};
+
 export type CastlingAvailability = {
   whiteKingside: boolean;
   whiteQueenside: boolean;

@@ -1,4 +1,14 @@
-import { Color, Move, Piece, PieceType, Position, Square } from './types';
+import { filter, firstValueFrom, from, map, Observable, toArray } from 'rxjs';
+import {
+  Color,
+  Move,
+  MoveDetail,
+  Moveset,
+  Piece,
+  PieceType,
+  Position,
+  Square,
+} from './types';
 import {
   isLegalSquare,
   squareEquals,
@@ -213,6 +223,48 @@ const rookMoves = (
   return squares;
 };
 
+// const movesetsForPosition = (
+//   position: Position,
+//   color?: Color
+// ): Observable<Moveset> =>
+//   from(position.pieces.entries()).pipe(
+//     filter(([, piece]) => (color ? piece.color === color : true)),
+//     map(([square, piece]) => ({
+//       square,
+//       piece,
+//       moves: augmentMoves(position, findSquaresForMove(position, square)),
+//     }))
+//   );
+const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
+  const movesets: Moveset[] = [];
+
+  for (const [square, piece] of position.pieces.entries()) {
+    if (color && piece.color !== color) {
+      continue;
+    }
+    const moves = findSquaresForMove(position, square);
+    movesets.push({
+      square,
+      piece,
+      moves: augmentMoves(position, moves),
+    });
+  }
+
+  return movesets;
+};
+
+const augmentMove = (position: Position, move: Square): MoveDetail => {
+  const targetPiece = position.pieces.get(move);
+  return {
+    to: move,
+    capture: Boolean(targetPiece),
+    kingCapture: Boolean(targetPiece && targetPiece.type === PieceType.King),
+  };
+};
+
+const augmentMoves = (position: Position, moves: Square[]): MoveDetail[] =>
+  moves.map((move) => augmentMove(position, move));
+
 export const findSquaresForMove = (
   position: Position,
   square: Square
@@ -299,4 +351,30 @@ export const applyMove = (position: Position, move: Move): Position => {
         ? position.fullMoveCount + 1
         : position.fullMoveCount,
   });
+};
+
+export const isCheck = (position: Position, color?: Color): boolean =>
+  Boolean(checkedSquare(position, color));
+
+// export const checkedSquare = (
+//   position: Position,
+//   color?: Color
+// ): Square | undefined =>
+//   movesetsForPosition(position, color).find(({ moves }) =>
+//     moves.find(({ kingCapture }) => kingCapture)
+//   )?.square;
+export const checkedSquare = (
+  position: Position,
+  color?: Color
+): Square | undefined => {
+  let square;
+  movesetsForPosition(position, color).find(({ moves }) =>
+    moves.find(({ kingCapture, to }) => {
+      if (kingCapture) {
+        square = to;
+      }
+    })
+  );
+
+  return square;
 };
