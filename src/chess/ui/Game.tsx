@@ -76,7 +76,13 @@ const Game = () => {
             style={BUTTON_CSS}
             onClick={() => emit(loadChessComputerAction(Color.Black))}
           >
-            Load computer
+            Load black computer
+          </button>
+          <button
+            style={BUTTON_CSS}
+            onClick={() => emit(loadChessComputerAction(Color.White))}
+          >
+            Load white computer
           </button>
         </div>
 

@@ -110,9 +110,15 @@ function handleLoadChessComputer(
   const { playingAs } = action;
 
   if (playingAs === Color.White) {
-    return [{ ...state, whitePlayer: loadComputer() }, null];
+    return [
+      { ...state, whitePlayer: loadComputer() },
+      attemptComputerMoveAction(),
+    ];
   } else {
-    return [{ ...state, blackPlayer: loadComputer() }, null];
+    return [
+      { ...state, blackPlayer: loadComputer() },
+      attemptComputerMoveAction(),
+    ];
   }
 }
 
