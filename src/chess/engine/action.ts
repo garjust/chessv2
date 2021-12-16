@@ -1,4 +1,4 @@
-import { Color, Move, Square } from '../types';
+import { Color, Move, Position, Square } from '../types';
 
 export enum Type {
   ClickSquare = 'CLICK_SQUARE',
@@ -7,6 +7,7 @@ export enum Type {
   MovePiece = 'MOVE_PIECE',
   OverlaySquares = 'OVERLAY_SQUARES',
   ResetOverlay = 'RESET_OVERLAY',
+  SetPosition = 'SET_POSITION',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
   ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
 }
@@ -39,6 +40,11 @@ export declare namespace Action {
     readonly type: Type.ResetOverlay;
   }
 
+  export interface SetPosition {
+    readonly type: Type.SetPosition;
+    readonly position: Position;
+  }
+
   export interface SetPositionFromFEN {
     readonly type: Type.SetPositionFromFEN;
     readonly fenString: string;
@@ -56,6 +62,7 @@ export type Action =
   | Action.OverlaySquares
   | Action.ResetOverlay
   | Action.MovePiece
+  | Action.SetPosition
   | Action.SetPositionFromFEN
   | Action.ToggleSquareLabels;
 
@@ -84,6 +91,11 @@ export const resetOverlayAction = (): Action.ResetOverlay => ({
 export const movePieceAction = (move: Move): Action.MovePiece => ({
   type: Type.MovePiece,
   move,
+});
+
+export const setPositionAction = (position: Position): Action.SetPosition => ({
+  type: Type.SetPosition,
+  position,
 });
 
 export const setPositionFromFENAction = (

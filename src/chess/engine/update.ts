@@ -13,6 +13,7 @@ import {
   setPositionFromFENAction,
   overlaySquaresAction,
   resetOverlayAction,
+  setPositionAction,
 } from './action';
 import { State, Action, Type } from './index';
 import { SquareOverlayType, createState, pieceInSquare } from './state';
@@ -109,24 +110,27 @@ function handleMovePiece(
   }
 
   if (position) {
-    const computedPositionData = computeMovementData(position);
-    return [
-      { ...state, computedPositionData, position },
-      overlaySquaresAction(),
-    ];
+    return [state, setPositionAction(position)];
   } else {
     return [state, overlaySquaresAction()];
   }
+}
+
+function handleSetPosition(
+  state: State,
+  action: Action.SetPosition
+): Update<State, Action> {
+  const { position } = action;
+  const computedPositionData = computeMovementData(position);
+
+  return [{ ...state, position, computedPositionData }, overlaySquaresAction()];
 }
 
 function handleSetPositionFromFEN(
   state: State,
   action: Action.SetPositionFromFEN
 ): Update<State, Action> {
-  return [
-    { ...state, position: parseFEN(action.fenString) },
-    resetOverlayAction(),
-  ];
+  return [state, setPositionAction(parseFEN(action.fenString))];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
@@ -151,6 +155,8 @@ export function update(
       return handleResetOverlay(state);
     case Type.MovePiece:
       return handleMovePiece(state, action);
+    case Type.SetPosition:
+      return handleSetPosition(state, action);
     case Type.SetPositionFromFEN:
       return handleSetPositionFromFEN(state, action);
     case Type.ToggleSquareLabels:
