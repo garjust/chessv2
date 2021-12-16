@@ -1,13 +1,13 @@
 import StringKeyMap from '../lib/string-key-map';
-import { PieceType, Position, Square } from './types';
+import { PieceType, Position, Square, SquareLabel } from './types';
 
 type Nullable<T> = T | undefined | null;
 
 const fileIndexToChar = (index: number): string =>
   String.fromCharCode(index + 97);
 
-export const squareLabel = ({ rank, file }: Square): string =>
-  `${fileIndexToChar(file)}${rank + 1}`;
+export const squareLabel = ({ rank, file }: Square): SquareLabel =>
+  `${fileIndexToChar(file)}${rank + 1}` as SquareLabel;
 
 export const labelToSquare = ([file, rank]: string): Square => ({
   file: file.charCodeAt(0) - 97,

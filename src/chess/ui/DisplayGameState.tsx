@@ -9,8 +9,12 @@ export type DisplayGameStateProps = {
 };
 
 const replacer = (key: string, value: unknown) => {
-  if (value instanceof StringKeyMap) {
-    return `{ Map of size ${value.size} }`;
+  if (value instanceof StringKeyMap || value instanceof Map) {
+    return `{ size ${value.size} }`;
+  }
+
+  if (value instanceof Array) {
+    return `[ length ${value.length} ]`;
   }
 
   if (value instanceof Object) {

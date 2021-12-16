@@ -1,6 +1,8 @@
+import { check } from 'prettier';
 import { filter, firstValueFrom, from, map, Observable, toArray } from 'rxjs';
 import {
   Color,
+  ComputedPositionData,
   Move,
   MoveDetail,
   Moveset,
@@ -356,13 +358,6 @@ export const applyMove = (position: Position, move: Move): Position => {
 export const isCheck = (position: Position, color?: Color): boolean =>
   Boolean(checkedSquare(position, color));
 
-// export const checkedSquare = (
-//   position: Position,
-//   color?: Color
-// ): Square | undefined =>
-//   movesetsForPosition(position, color).find(({ moves }) =>
-//     moves.find(({ kingCapture }) => kingCapture)
-//   )?.square;
 export const checkedSquare = (
   position: Position,
   color?: Color
@@ -377,4 +372,58 @@ export const checkedSquare = (
   );
 
   return square;
+};
+
+export const computeMovementData = (
+  position: Position
+): Pick<
+  ComputedPositionData,
+  | 'movesByPiece'
+  | 'totalMoves'
+  | 'availableCaptures'
+  | 'availableChecks'
+  | 'checksOnSelf'
+  | 'checkmate'
+> => {
+  const movesByPiece = new Map<PieceType, Map<Square, Square[]>>();
+  movesByPiece.set(PieceType.Bishop, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.King, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.Knight, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.Pawn, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.Queen, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.Rook, new Map<Square, Square[]>());
+
+  let checkmate = false;
+  let totalMoves = 0;
+  const availableCaptures: Move[] = [];
+  const availableChecks: Move[] = [];
+
+  const movesets = movesetsForPosition(position, position.turn);
+  movesets.forEach(({ piece, square, moves }) => {
+    const map = movesByPiece.get(piece.type);
+    if (map) {
+      map.set(
+        square,
+        moves.map(({ to, capture, kingCapture }) => {
+          if (capture) {
+            availableCaptures.push({ from: square, to });
+          }
+          if (kingCapture) {
+            checkmate = true;
+          }
+          return to;
+        })
+      );
+      totalMoves += moves.length;
+    }
+  });
+
+  return {
+    movesByPiece,
+    totalMoves,
+    availableCaptures,
+    availableChecks,
+    checksOnSelf: [],
+    checkmate,
+  };
 };

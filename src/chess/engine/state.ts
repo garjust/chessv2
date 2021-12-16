@@ -1,5 +1,5 @@
 import { BLANK_POSITION_FEN, parseFEN } from '../fen';
-import { Color, Position, Piece, Square } from '../types';
+import { Color, Position, Piece, Square, ComputedPositionData } from '../types';
 import { SquareMap } from '../utils';
 
 export enum SquareOverlayType {
@@ -14,6 +14,7 @@ export interface State {
   displaySquareLabels: boolean;
   humanPlayer: Color;
   position: Position;
+  computedPositionData?: ComputedPositionData;
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
   debugN?: number;

@@ -1,7 +1,12 @@
 import { Update } from '../../lib/workflow';
 import { Color } from '../types';
 import { SquareMap } from '../utils';
-import { applyMove, checkedSquare, findSquaresForMove } from '../movement';
+import {
+  applyMove,
+  checkedSquare,
+  computeMovementData,
+  findSquaresForMove,
+} from '../movement';
 import { parseFEN, BLANK_POSITION_FEN } from '../fen';
 import {
   movePieceAction,
@@ -104,9 +109,13 @@ function handleMovePiece(
   }
 
   if (position) {
-    return [{ ...state, position }, overlaySquaresAction()];
+    const computedPositionData = computeMovementData(position);
+    return [
+      { ...state, computedPositionData, position },
+      overlaySquaresAction(),
+    ];
   } else {
-    return [state, null];
+    return [state, overlaySquaresAction()];
   }
 }
 
