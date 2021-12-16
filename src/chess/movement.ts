@@ -385,7 +385,7 @@ export const computeMovementData = (
   | 'checksOnSelf'
   | 'checkmate'
 > => {
-  const movesByPiece = new Map<PieceType, Map<Square, Square[]>>();
+  const movesByPiece = new Map<PieceType, SquareMap<Square[]>>();
   movesByPiece.set(PieceType.Bishop, new SquareMap<Square[]>());
   movesByPiece.set(PieceType.King, new SquareMap<Square[]>());
   movesByPiece.set(PieceType.Knight, new SquareMap<Square[]>());

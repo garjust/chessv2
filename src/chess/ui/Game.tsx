@@ -6,6 +6,7 @@ import { updateLogger } from '../../lib/workflow';
 import {
   flipBoardAction,
   initializeAction,
+  loadChessComputerAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from '../engine/action';
@@ -46,8 +47,9 @@ const Game = () => {
         <div
           style={{
             gridArea: 'buttons',
-            display: 'flex',
-            justifyContent: 'space-between',
+            display: 'grid',
+            gap: 16,
+            gridTemplateColumns: 'repeat(3, 1fr)',
           }}
         >
           <button style={BUTTON_CSS} onClick={() => emit(flipBoardAction())}>
@@ -69,6 +71,12 @@ const Game = () => {
           </button>
           <button style={BUTTON_CSS} onClick={emitExampleGame}>
             Example game
+          </button>
+          <button
+            style={BUTTON_CSS}
+            onClick={() => emit(loadChessComputerAction(Color.Black))}
+          >
+            Load computer
           </button>
         </div>
 

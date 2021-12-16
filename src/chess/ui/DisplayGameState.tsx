@@ -28,6 +28,10 @@ const replacer = (key: string, value: unknown) => {
     }
   }
 
+  if (key === 'blackPlayer' || key === 'whitePlayer') {
+    return (value as symbol).toString();
+  }
+
   return value;
 };
 

@@ -1,5 +1,13 @@
+import { ChessComputer } from '../ai/types';
 import { BLANK_POSITION_FEN, parseFEN } from '../fen';
-import { Color, Position, Piece, Square, ComputedPositionData } from '../types';
+import {
+  Color,
+  Position,
+  Piece,
+  Square,
+  ComputedPositionData,
+  PieceType,
+} from '../types';
 import { SquareMap } from '../utils';
 
 export enum SquareOverlayType {
@@ -9,23 +17,38 @@ export enum SquareOverlayType {
   Check = 'CHECK',
 }
 
+export const HumanPlayer = Symbol('HUMAN');
+
+export type Player = typeof HumanPlayer | ChessComputer;
+
 export interface State {
   debugVersion?: number;
   boardOrientation: Color;
   displaySquareLabels: boolean;
-  humanPlayer: Color;
-  position: Position;
-  computedPositionData?: ComputedPositionData;
+  blackPlayer: Player;
+  whitePlayer: Player;
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
+  position: Position;
+  computedPositionData: ComputedPositionData;
 }
 
 const INITIAL_STATE: State = {
   debugVersion: 0,
   boardOrientation: Color.White,
   displaySquareLabels: false,
-  humanPlayer: Color.White,
+  blackPlayer: HumanPlayer,
+  whitePlayer: HumanPlayer,
   position: parseFEN(BLANK_POSITION_FEN),
+  computedPositionData: {
+    movesByPiece: new Map<PieceType, SquareMap<Square[]>>(),
+    totalMoves: 0,
+    availableCaptures: [],
+    availableChecks: [],
+    checksOnSelf: [],
+    checkmate: false,
+    evaluation: 0,
+  },
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({

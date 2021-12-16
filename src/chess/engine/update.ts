@@ -14,10 +14,18 @@ import {
   overlaySquaresAction,
   resetOverlayAction,
   setPositionAction,
+  attemptComputerMoveAction,
 } from './action';
 import { State, Action, Type } from './index';
-import { SquareOverlayType, createState, pieceInSquare } from './state';
+import {
+  SquareOverlayType,
+  createState,
+  pieceInSquare,
+  HumanPlayer,
+} from './state';
 import { evaluate } from '../evaluation';
+import { v1 } from '../ai';
+import { from } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -27,6 +35,24 @@ function computeAll(position: Position): ComputedPositionData {
     ...computeMovementData(position),
     evaluation: evaluate(position),
   };
+}
+
+function handleAttemptComputerMove(state: State): Update<State, Action> {
+  const { position, whitePlayer, blackPlayer, computedPositionData } = state;
+
+  if (whitePlayer !== HumanPlayer && position.turn === Color.White) {
+    return [
+      state,
+      movePieceAction(whitePlayer.nextMove(position, computedPositionData)),
+    ];
+  }
+  if (blackPlayer !== HumanPlayer && position.turn === Color.Black) {
+    return [
+      state,
+      movePieceAction(blackPlayer.nextMove(position, computedPositionData)),
+    ];
+  }
+  return [state, null];
 }
 
 function handleClickSquare(
@@ -67,10 +93,20 @@ function handleInitialize(
 ): Update<State, Action> {
   const { playingAs } = action;
 
-  return [
-    createState({ humanPlayer: playingAs, boardOrientation: playingAs }),
-    setPositionFromFENAction(BLANK_POSITION_FEN),
-  ];
+  return [createState({}), setPositionFromFENAction(BLANK_POSITION_FEN)];
+}
+
+function handleLoadChessComputer(
+  state: State,
+  action: Action.LoadChessComputer
+): Update<State, Action> {
+  const { playingAs } = action;
+
+  if (playingAs === Color.White) {
+    return [{ ...state, whitePlayer: new v1() }, null];
+  } else {
+    return [{ ...state, blackPlayer: new v1() }, null];
+  }
 }
 
 function handleOverlaySquares(state: State): Update<State, Action> {
@@ -138,7 +174,10 @@ function handleSetPosition(
   const { position } = action;
   const computedPositionData = computeAll(position);
 
-  return [{ ...state, position, computedPositionData }, overlaySquaresAction()];
+  return [
+    { ...state, position, computedPositionData },
+    from([overlaySquaresAction(), attemptComputerMoveAction()]),
+  ];
 }
 
 function handleSetPositionFromFEN(
@@ -162,12 +201,16 @@ export function update(
   }
 
   switch (action.type) {
+    case Type.AttemptComputerMove:
+      return handleAttemptComputerMove(state);
     case Type.ClickSquare:
       return handleClickSquare(state, action);
     case Type.FlipBoard:
       return handleFlipBoard(state);
     case Type.Initialize:
       return handleInitialize(state, action);
+    case Type.LoadChessComputer:
+      return handleLoadChessComputer(state, action);
     case Type.OverlaySquares:
       return handleOverlaySquares(state);
     case Type.ResetOverlay:

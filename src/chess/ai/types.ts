@@ -1,5 +1,8 @@
-import { Move, Position } from '../types';
+import { ComputedPositionData, Move, Position } from '../types';
 
 export interface ChessComputer {
-  nextMove(position: Position): Move;
+  nextMove(
+    position: Position,
+    computedPositionData: ComputedPositionData
+  ): Move;
 }

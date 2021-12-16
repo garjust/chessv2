@@ -1,9 +1,11 @@
 import { Color, Move, Position, Square } from '../types';
 
 export enum Type {
+  AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
   ClickSquare = 'CLICK_SQUARE',
   FlipBoard = 'FLIP_BOARD',
   Initialize = 'INITIALIZE',
+  LoadChessComputer = 'LOAD_CHESS_COMPUTER',
   MovePiece = 'MOVE_PIECE',
   OverlaySquares = 'OVERLAY_SQUARES',
   ResetOverlay = 'RESET_OVERLAY',
@@ -13,6 +15,10 @@ export enum Type {
 }
 
 export declare namespace Action {
+  export interface AttemptComputerMove {
+    readonly type: Type.AttemptComputerMove;
+  }
+
   export interface ClickSquare {
     readonly type: Type.ClickSquare;
     readonly square: Square;
@@ -24,6 +30,11 @@ export declare namespace Action {
 
   export interface Initialize {
     readonly type: Type.Initialize;
+    readonly playingAs: Color;
+  }
+
+  export interface LoadChessComputer {
+    readonly type: Type.LoadChessComputer;
     readonly playingAs: Color;
   }
 
@@ -56,15 +67,21 @@ export declare namespace Action {
 }
 
 export type Action =
+  | Action.AttemptComputerMove
   | Action.ClickSquare
   | Action.FlipBoard
   | Action.Initialize
+  | Action.LoadChessComputer
   | Action.OverlaySquares
   | Action.ResetOverlay
   | Action.MovePiece
   | Action.SetPosition
   | Action.SetPositionFromFEN
   | Action.ToggleSquareLabels;
+
+export const attemptComputerMoveAction = (): Action.AttemptComputerMove => ({
+  type: Type.AttemptComputerMove,
+});
 
 export const clickSquareAction = (square: Square): Action.ClickSquare => ({
   type: Type.ClickSquare,
@@ -77,6 +94,13 @@ export const flipBoardAction = (): Action.FlipBoard => ({
 
 export const initializeAction = (playingAs: Color): Action.Initialize => ({
   type: Type.Initialize,
+  playingAs,
+});
+
+export const loadChessComputerAction = (
+  playingAs: Color
+): Action.LoadChessComputer => ({
+  type: Type.LoadChessComputer,
   playingAs,
 });
 
