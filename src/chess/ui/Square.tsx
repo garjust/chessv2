@@ -44,16 +44,16 @@ const Square = ({ rank, file, color }: SquareProps) => {
   if (overlay) {
     switch (overlay) {
       case SquareOverlayType.SelectedPiece:
-        css = { ...css, backgroundColor: BOARD_SQUARE_SELECTED };
+        css = { ...css, ...BOARD_SQUARE_SELECTED };
         break;
       case SquareOverlayType.Capturable:
-        css = { ...css, backgroundColor: BOARD_SQUARE_CAPTURABLE };
+        css = { ...css, ...BOARD_SQUARE_CAPTURABLE };
         break;
       case SquareOverlayType.Check:
-        css = { ...css, backgroundColor: BOARD_SQUARE_CHECK };
+        css = { ...css, ...BOARD_SQUARE_CHECK };
         break;
       case SquareOverlayType.Movable:
-        css = { ...css, backgroundColor: BOARD_SQUARE_MOVABLE };
+        css = { ...css, ...BOARD_SQUARE_MOVABLE };
         break;
     }
   }
