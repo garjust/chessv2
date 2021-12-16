@@ -73,8 +73,8 @@ export type ComputedPositionData = {
   availableCaptures: Move[];
   availableChecks: Move[];
   checksOnSelf: Move[];
-  checkmate?: boolean;
-  evaluation?: number;
+  checkmate: boolean;
+  evaluation: number;
 };
 
 export type SquareLabel =

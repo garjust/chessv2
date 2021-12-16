@@ -47,8 +47,7 @@ const Game = () => {
           style={{
             gridArea: 'buttons',
             display: 'flex',
-            justifyContent: 'left',
-            gap: 16,
+            justifyContent: 'space-between',
           }}
         >
           <button style={BUTTON_CSS} onClick={() => emit(flipBoardAction())}>

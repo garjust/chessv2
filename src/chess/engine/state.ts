@@ -10,6 +10,7 @@ export enum SquareOverlayType {
 }
 
 export interface State {
+  debugVersion?: number;
   boardOrientation: Color;
   displaySquareLabels: boolean;
   humanPlayer: Color;
@@ -17,15 +18,14 @@ export interface State {
   computedPositionData?: ComputedPositionData;
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
-  debugN?: number;
 }
 
 const INITIAL_STATE: State = {
+  debugVersion: 0,
   boardOrientation: Color.White,
   displaySquareLabels: false,
   humanPlayer: Color.White,
   position: parseFEN(BLANK_POSITION_FEN),
-  debugN: 0,
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({

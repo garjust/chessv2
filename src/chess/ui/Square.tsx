@@ -22,7 +22,7 @@ export type SquareProps = {
 const Square = ({ rank, file, color }: SquareProps) => {
   const { state, emit } = useWorkflow();
 
-  const { position, selectedSquare, squareOverlay, debugN } = state;
+  const { position, selectedSquare, squareOverlay } = state;
   const piece = pieceInSquare(state, { rank, file });
   const overlay = squareOverlay?.get({ rank, file });
 

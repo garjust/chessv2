@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { Color } from '../types';
+import { Color, ComputedPositionData, Position } from '../types';
 import { SquareMap } from '../utils';
 import {
   applyMove,
@@ -17,10 +17,17 @@ import {
 } from './action';
 import { State, Action, Type } from './index';
 import { SquareOverlayType, createState, pieceInSquare } from './state';
-import { from } from 'rxjs';
+import { evaluate } from '../evaluation';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
+
+function computeAll(position: Position): ComputedPositionData {
+  return {
+    ...computeMovementData(position),
+    evaluation: evaluate(position),
+  };
+}
 
 function handleClickSquare(
   state: State,
@@ -89,7 +96,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     });
   }
 
-  return [{ ...state, squareOverlay, debugN: (state.debugN || 0) + 1 }, null];
+  return [{ ...state, squareOverlay }, null];
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
@@ -121,7 +128,7 @@ function handleSetPosition(
   action: Action.SetPosition
 ): Update<State, Action> {
   const { position } = action;
-  const computedPositionData = computeMovementData(position);
+  const computedPositionData = computeAll(position);
 
   return [{ ...state, position, computedPositionData }, overlaySquaresAction()];
 }
@@ -142,6 +149,10 @@ export function update(
   action: Action,
   _context: Context
 ): Update<State, Action> {
+  if (state.debugVersion != undefined) {
+    state = { ...state, debugVersion: state.debugVersion + 1 };
+  }
+
   switch (action.type) {
     case Type.ClickSquare:
       return handleClickSquare(state, action);
