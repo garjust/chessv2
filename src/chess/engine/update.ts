@@ -86,14 +86,22 @@ function handleOverlaySquares(state: State): Update<State, Action> {
   if (selectedSquare) {
     squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
 
-    const candidateSquares = findSquaresForMove(state.position, selectedSquare);
-    candidateSquares.forEach((square) => {
-      if (position.pieces.has(square)) {
-        squareOverlay.set(square, SquareOverlayType.Capturable);
-      } else {
-        squareOverlay.set(square, SquareOverlayType.Movable);
+    const piece = pieceInSquare(state, selectedSquare);
+    if (piece) {
+      const candidateSquares = state.computedPositionData?.movesByPiece
+        .get(piece.type)
+        ?.get(selectedSquare);
+
+      if (candidateSquares) {
+        candidateSquares.forEach((square) => {
+          if (position.pieces.has(square)) {
+            squareOverlay.set(square, SquareOverlayType.Capturable);
+          } else {
+            squareOverlay.set(square, SquareOverlayType.Movable);
+          }
+        });
       }
-    });
+    }
   }
 
   return [{ ...state, squareOverlay }, null];

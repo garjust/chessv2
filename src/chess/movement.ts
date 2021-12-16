@@ -386,12 +386,12 @@ export const computeMovementData = (
   | 'checkmate'
 > => {
   const movesByPiece = new Map<PieceType, Map<Square, Square[]>>();
-  movesByPiece.set(PieceType.Bishop, new Map<Square, Square[]>());
-  movesByPiece.set(PieceType.King, new Map<Square, Square[]>());
-  movesByPiece.set(PieceType.Knight, new Map<Square, Square[]>());
-  movesByPiece.set(PieceType.Pawn, new Map<Square, Square[]>());
-  movesByPiece.set(PieceType.Queen, new Map<Square, Square[]>());
-  movesByPiece.set(PieceType.Rook, new Map<Square, Square[]>());
+  movesByPiece.set(PieceType.Bishop, new SquareMap<Square[]>());
+  movesByPiece.set(PieceType.King, new SquareMap<Square[]>());
+  movesByPiece.set(PieceType.Knight, new SquareMap<Square[]>());
+  movesByPiece.set(PieceType.Pawn, new SquareMap<Square[]>());
+  movesByPiece.set(PieceType.Queen, new SquareMap<Square[]>());
+  movesByPiece.set(PieceType.Rook, new SquareMap<Square[]>());
 
   let checkmate = false;
   let totalMoves = 0;
