@@ -66,3 +66,24 @@ export const squareIsSelected = (state: State, square: Square) =>
 
 export const squareOverlay = (state: State, square: Square) =>
   state.squareOverlay?.get(square);
+
+export const isSquareClickable = (state: State, square: Square): boolean => {
+  if (
+    (state.position.turn === Color.White &&
+      state.whitePlayer !== HumanPlayer) ||
+    (state.position.turn === Color.Black && state.blackPlayer !== HumanPlayer)
+  ) {
+    return false;
+  }
+
+  if (state.selectedSquare) {
+    return true;
+  }
+
+  const piece = pieceInSquare(state, square);
+  if (piece && piece.color === state.position.turn) {
+    return true;
+  }
+
+  return false;
+};

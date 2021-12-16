@@ -2,7 +2,12 @@ import React from 'react';
 import './Square.css';
 import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
-import { pieceInSquare, SquareOverlayType } from '../engine/state';
+import {
+  HumanPlayer,
+  isSquareClickable,
+  pieceInSquare,
+  SquareOverlayType,
+} from '../engine/state';
 import Piece from './Piece';
 import {
   BOARD_SQUARE_BLACK,
@@ -22,12 +27,11 @@ export type SquareProps = {
 const Square = ({ rank, file, color }: SquareProps) => {
   const { state, emit } = useWorkflow();
 
-  const { position, selectedSquare, squareOverlay } = state;
+  const { squareOverlay } = state;
   const piece = pieceInSquare(state, { rank, file });
   const overlay = squareOverlay?.get({ rank, file });
 
-  const isClickable =
-    selectedSquare || (piece && piece.color === position.turn);
+  const isClickable = isSquareClickable(state, { rank, file });
 
   let css: React.CSSProperties = {
     position: 'relative',

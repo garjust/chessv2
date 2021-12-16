@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { Color, ComputedPositionData, Position } from '../types';
+import { Color, ComputedPositionData, Move, Position } from '../types';
 import { SquareMap } from '../utils';
 import {
   applyMove,
@@ -15,6 +15,7 @@ import {
   resetOverlayAction,
   setPositionAction,
   attemptComputerMoveAction,
+  clickSquareAction,
 } from './action';
 import { State, Action, Type } from './index';
 import {
@@ -26,6 +27,7 @@ import {
 import { evaluate } from '../evaluation';
 import { v1 } from '../ai';
 import { from } from 'rxjs';
+import { delayOperator } from '../../lib/operators';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -39,20 +41,22 @@ function computeAll(position: Position): ComputedPositionData {
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, whitePlayer, blackPlayer, computedPositionData } = state;
+  let move: Move;
 
   if (whitePlayer !== HumanPlayer && position.turn === Color.White) {
-    return [
-      state,
-      movePieceAction(whitePlayer.nextMove(position, computedPositionData)),
-    ];
+    move = whitePlayer.nextMove(position, computedPositionData);
+  } else if (blackPlayer !== HumanPlayer && position.turn === Color.Black) {
+    move = blackPlayer.nextMove(position, computedPositionData);
+  } else {
+    return [state, null];
   }
-  if (blackPlayer !== HumanPlayer && position.turn === Color.Black) {
-    return [
-      state,
-      movePieceAction(blackPlayer.nextMove(position, computedPositionData)),
-    ];
-  }
-  return [state, null];
+
+  return [
+    state,
+    from([clickSquareAction(move.from), clickSquareAction(move.to)]).pipe(
+      delayOperator(400)
+    ),
+  ];
 }
 
 function handleClickSquare(

@@ -1,15 +1,8 @@
-import {
-  from,
-  interval,
-  map,
-  mergeMap,
-  Observable,
-  OperatorFunction,
-  zip,
-} from 'rxjs';
+import { from, map, mergeMap, Observable } from 'rxjs';
 import { clickSquareAction } from './engine/action';
 import { labelToSquare } from './utils';
 import { Action } from './engine';
+import { delayOperator } from '../lib/operators';
 
 const VIENNA_GAMBIT_ACCEPTED_GAME = [
   ['e2', 'e4'],
@@ -33,12 +26,6 @@ const VIENNA_GAMBIT_ACCEPTED_GAME = [
   ['c1', 'f4'],
   ['a8', 'd8'], // this should be black queenside castle
 ];
-
-// Delays the events in the source observable evenly by the eventDelay.
-const delayOperator =
-  <T>(eventDelay: number): OperatorFunction<T, T> =>
-  (observable: Observable<T>) =>
-    zip(observable, interval(eventDelay)).pipe(map(([t]) => t));
 
 export const debugGame = (
   actionDelay = 0,
