@@ -1,12 +1,12 @@
-import { ChessComputer } from '../types';
+import { ChessComputer } from './types';
 import {
   ComputedPositionData,
   Move,
   PieceType,
   Position,
   Square,
-} from '../../types';
-import { SquareMap } from '../../utils';
+} from '../types';
+import { SquareMap } from '../utils';
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
@@ -27,7 +27,7 @@ const flattenMoves = (
   return moves;
 };
 
-export default class AI implements ChessComputer {
+export default class v1 implements ChessComputer {
   nextMove(
     position: Position,
     computedPositionData: ComputedPositionData

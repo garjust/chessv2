@@ -25,12 +25,15 @@ import {
   HumanPlayer,
 } from './state';
 import { evaluate } from '../evaluation';
-import { v1 } from '../ai';
+import { v2 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
+import { ChessComputer } from '../ai/types';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
+
+const loadComputer = (): ChessComputer => new v2();
 
 function computeAll(position: Position): ComputedPositionData {
   return {
@@ -107,9 +110,9 @@ function handleLoadChessComputer(
   const { playingAs } = action;
 
   if (playingAs === Color.White) {
-    return [{ ...state, whitePlayer: new v1() }, null];
+    return [{ ...state, whitePlayer: loadComputer() }, null];
   } else {
-    return [{ ...state, blackPlayer: new v1() }, null];
+    return [{ ...state, blackPlayer: loadComputer() }, null];
   }
 }
 
