@@ -1,25 +1,16 @@
 import { ChessComputer } from './types';
-import {
-  ComputedPositionData,
-  Move,
-  PieceType,
-  Position,
-  Square,
-} from '../types';
-import { SquareMap } from '../utils';
+import { ComputedPositionData, Move, MovesByPiece, Position } from '../types';
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
 
-const flattenMoves = (
-  mapByPiece: Map<PieceType, SquareMap<Square[]>>
-): Move[][] => {
+const flattenMoves = (mapByPiece: MovesByPiece): Move[][] => {
   const moves: Move[][] = [];
 
   for (const map of mapByPiece.values()) {
     for (const [from, squares] of map.entries()) {
       const tempMoves: Move[] = [];
-      for (const to of squares) {
+      for (const { to } of squares) {
         tempMoves.push({ from, to });
       }
       if (tempMoves.length > 0) {

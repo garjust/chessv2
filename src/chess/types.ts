@@ -65,10 +65,12 @@ export type Position = {
   fullMoveCount: number;
 };
 
+export type MovesByPiece = Map<PieceType, StringKeyMap<Square, MoveDetail[]>>;
+
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.
 export type ComputedPositionData = {
-  movesByPiece: Map<PieceType, StringKeyMap<Square, Square[]>>;
+  movesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
   availableChecks: Move[];

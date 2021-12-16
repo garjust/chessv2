@@ -142,7 +142,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
         ?.get(selectedSquare);
 
       if (candidateSquares) {
-        candidateSquares.forEach((square) => {
+        candidateSquares.forEach(({ to: square }) => {
           if (position.pieces.has(square)) {
             squareOverlay.set(square, SquareOverlayType.Capturable);
           } else {

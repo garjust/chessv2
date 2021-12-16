@@ -5,6 +5,7 @@ import {
   ComputedPositionData,
   Move,
   MoveDetail,
+  MovesByPiece,
   Moveset,
   Piece,
   PieceType,
@@ -385,13 +386,16 @@ export const computeMovementData = (
   | 'checksOnSelf'
   | 'checkmate'
 > => {
-  const movesByPiece = new Map<PieceType, SquareMap<Square[]>>();
-  movesByPiece.set(PieceType.Bishop, new SquareMap<Square[]>());
-  movesByPiece.set(PieceType.King, new SquareMap<Square[]>());
-  movesByPiece.set(PieceType.Knight, new SquareMap<Square[]>());
-  movesByPiece.set(PieceType.Pawn, new SquareMap<Square[]>());
-  movesByPiece.set(PieceType.Queen, new SquareMap<Square[]>());
-  movesByPiece.set(PieceType.Rook, new SquareMap<Square[]>());
+  const movesByPiece: MovesByPiece = new Map<
+    PieceType,
+    SquareMap<MoveDetail[]>
+  >();
+  movesByPiece.set(PieceType.Bishop, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.King, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.Knight, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.Pawn, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.Queen, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.Rook, new SquareMap<MoveDetail[]>());
 
   let checkmate = false;
   let totalMoves = 0;
@@ -411,7 +415,7 @@ export const computeMovementData = (
           if (kingCapture) {
             checkmate = true;
           }
-          return to;
+          return { to, capture, kingCapture };
         })
       );
       totalMoves += moves.length;
