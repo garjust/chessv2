@@ -9,8 +9,8 @@ export type DisplayGameFENProps = {
 const DisplayGameFEN = ({ style }: DisplayGameFENProps) => {
   const { state } = useWorkflow();
   return (
-    <pre style={style}>
-      <code style={{ backgroundColor: 'aqua', margin: 0 }}>
+    <pre style={{ ...style, margin: 0, fontSize: 14 }}>
+      <code style={{ backgroundColor: 'aqua' }}>
         {formatPosition(state.position)}
       </code>
     </pre>

@@ -1,5 +1,11 @@
 import { Update } from '../../lib/workflow';
-import { Color, ComputedPositionData, Move, Position } from '../types';
+import {
+  Color,
+  ComputedPositionData,
+  Move,
+  PieceType,
+  Position,
+} from '../types';
 import { SquareMap } from '../utils';
 import { applyMove, checkedSquare, computeMovementData } from '../movement';
 import { parseFEN, BLANK_POSITION_FEN } from '../fen';
@@ -23,7 +29,7 @@ import { v2 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
-import { pieceMap } from '../bitmap';
+import { board } from '../bitmap';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -35,7 +41,14 @@ function computeAll(position: Position): ComputedPositionData {
     ...computeMovementData(position),
     evaluation: evaluate(position),
     bitmaps: {
-      allPieces: pieceMap(position),
+      whitePieces: board(position, { color: Color.White }),
+      blackPieces: board(position, { color: Color.Black }),
+      // bishops____: board(position, { pieceType: PieceType.Bishop }),
+      // kings______: board(position, { pieceType: PieceType.King }),
+      // knight_____: board(position, { pieceType: PieceType.Knight }),
+      // pawns______: board(position, { pieceType: PieceType.Pawn }),
+      // queens_____: board(position, { pieceType: PieceType.Queen }),
+      // rooks______: board(position, { pieceType: PieceType.Rook }),
     },
   };
 }

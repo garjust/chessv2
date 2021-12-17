@@ -86,7 +86,14 @@ export type ComputedPositionData = {
   checkmate: boolean;
   evaluation: number;
   bitmaps: {
-    allPieces?: bigint;
+    whitePieces?: bigint;
+    blackPieces?: bigint;
+    bishops____?: bigint;
+    kings______?: bigint;
+    knight_____?: bigint;
+    pawns______?: bigint;
+    queens_____?: bigint;
+    rooks______?: bigint;
   };
 };
 

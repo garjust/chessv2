@@ -3,7 +3,7 @@
   display: grid;
   gap: 16px;
   grid-template:
-    "fen fen" auto
     "board state" min-content
-    "buttons state" auto / max-content auto
+    "buttons state" auto
+    "fen state" auto / max-content auto
 }

@@ -42,7 +42,7 @@ const replacer = (key: string, value: unknown) => {
   }
 
   if (typeof value === 'bigint') {
-    return formatBitmapString(value.toString(2));
+    return formatBitmapString(value.toString(2).padStart(64, '0'));
   }
 
   return value;
