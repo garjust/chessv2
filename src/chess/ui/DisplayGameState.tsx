@@ -8,6 +8,15 @@ export type DisplayGameStateProps = {
   style?: React.CSSProperties;
 };
 
+const formatBitmapString = (bitmap: string): string => {
+  const parts: string[] = [];
+  for (let i = 0; i < 64; i += 8) {
+    parts.push(bitmap.slice(i, i + 8));
+  }
+
+  return parts.join(':');
+};
+
 const replacer = (key: string, value: unknown) => {
   if (value instanceof StringKeyMap || value instanceof Map) {
     return `{ size ${value.size} }`;
@@ -33,7 +42,7 @@ const replacer = (key: string, value: unknown) => {
   }
 
   if (typeof value === 'bigint') {
-    return value.toString(2);
+    return formatBitmapString(value.toString(2));
   }
 
   return value;
