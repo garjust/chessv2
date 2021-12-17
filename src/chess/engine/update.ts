@@ -1,18 +1,12 @@
 import { Update } from '../../lib/workflow';
 import { Color, ComputedPositionData, Move, Position } from '../types';
 import { SquareMap } from '../utils';
-import {
-  applyMove,
-  checkedSquare,
-  computeMovementData,
-  findSquaresForMove,
-} from '../movement';
+import { applyMove, checkedSquare, computeMovementData } from '../movement';
 import { parseFEN, BLANK_POSITION_FEN } from '../fen';
 import {
   movePieceAction,
   setPositionFromFENAction,
   overlaySquaresAction,
-  resetOverlayAction,
   setPositionAction,
   attemptComputerMoveAction,
   clickSquareAction,

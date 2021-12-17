@@ -33,6 +33,8 @@ export type MoveDetail = {
   to: Square;
   capture: boolean;
   kingCapture: boolean;
+  attack: boolean;
+  kingAttack: boolean;
 };
 
 export type Moveset = {
@@ -77,6 +79,7 @@ export type ComputedPositionData = {
   movesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
+  availableAttacks: Move[];
   availableChecks: Move[];
   checksOnSelf: Move[];
   checkmate: boolean;

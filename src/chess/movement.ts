@@ -251,38 +251,59 @@ const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
     if (color && piece.color !== color) {
       continue;
     }
-    const moves = findSquaresForMove(position, square);
+    const moves = findSquaresForMove(position, piece, square);
     movesets.push({
       square,
       piece,
-      moves: augmentMoves(position, moves),
+      moves: augmentMoves(position, piece, moves),
     });
   }
 
   return movesets;
 };
 
-const augmentMove = (position: Position, move: Square): MoveDetail => {
-  const targetPiece = position.pieces.get(move);
+const findCaptures = (
+  position: Position,
+  to: Square
+): Pick<MoveDetail, 'capture' | 'kingCapture'> => {
+  const targetPiece = position.pieces.get(to);
+
   return {
-    to: move,
     capture: Boolean(targetPiece),
     kingCapture: Boolean(targetPiece && targetPiece.type === PieceType.King),
   };
 };
 
-const augmentMoves = (position: Position, moves: Square[]): MoveDetail[] =>
-  moves.map((move) => augmentMove(position, move));
-
-export const findSquaresForMove = (
+const augmentMove = (
   position: Position,
+  piece: Piece,
+  to: Square
+): MoveDetail => {
+  const furtherMoves = findSquaresForMove(position, piece, to);
+  const furtherMovesWithCaptures = furtherMoves.map((furtherMove) => ({
+    to,
+    ...findCaptures(position, furtherMove),
+  }));
+
+  return {
+    to,
+    ...findCaptures(position, to),
+    attack: furtherMovesWithCaptures.some(({ capture }) => capture),
+    kingAttack: furtherMovesWithCaptures.some(({ kingCapture }) => kingCapture),
+  };
+};
+
+const augmentMoves = (
+  position: Position,
+  piece: Piece,
+  moves: Square[]
+): MoveDetail[] => moves.map((move) => augmentMove(position, piece, move));
+
+const findSquaresForMove = (
+  position: Position,
+  piece: Piece,
   square: Square
 ): Square[] => {
-  const piece = position.pieces.get(square);
-  if (!piece) {
-    throw Error('no piece to find moves for');
-  }
-
   const squares: Square[] = [];
 
   switch (piece.type) {
@@ -325,7 +346,7 @@ export const applyMove = (position: Position, move: Move): Position => {
     throw Error('cannot move piece for other color');
   }
 
-  const legalSquares = findSquaresForMove(position, move.from);
+  const legalSquares = findSquaresForMove(position, piece, move.from);
   if (!squaresInclude(legalSquares, move.to)) {
     throw Error('illegal move!');
   }
@@ -430,6 +451,7 @@ export const computeMovementData = (
   | 'movesByPiece'
   | 'totalMoves'
   | 'availableCaptures'
+  | 'availableAttacks'
   | 'availableChecks'
   | 'checksOnSelf'
   | 'checkmate'
@@ -448,6 +470,7 @@ export const computeMovementData = (
   let checkmate = false;
   let totalMoves = 0;
   const availableCaptures: Move[] = [];
+  const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
 
   const movesets = movesetsForPosition(position, position.turn);
@@ -456,14 +479,20 @@ export const computeMovementData = (
     if (map) {
       map.set(
         square,
-        moves.map(({ to, capture, kingCapture }) => {
-          if (capture) {
-            availableCaptures.push({ from: square, to });
+        moves.map((moveDetail) => {
+          if (moveDetail.capture) {
+            availableCaptures.push({ from: square, to: moveDetail.to });
           }
-          if (kingCapture) {
+          if (moveDetail.attack) {
+            availableAttacks.push({ from: square, to: moveDetail.to });
+          }
+          if (moveDetail.kingAttack) {
+            availableChecks.push({ from: square, to: moveDetail.to });
+          }
+          if (moveDetail.kingCapture) {
             checkmate = true;
           }
-          return { to, capture, kingCapture };
+          return moveDetail;
         })
       );
       totalMoves += moves.length;
@@ -474,6 +503,7 @@ export const computeMovementData = (
     movesByPiece,
     totalMoves,
     availableCaptures,
+    availableAttacks,
     availableChecks,
     checksOnSelf: [],
     checkmate,

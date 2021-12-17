@@ -45,6 +45,7 @@ const INITIAL_STATE: State = {
     movesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
     totalMoves: 0,
     availableCaptures: [],
+    availableAttacks: [],
     availableChecks: [],
     checksOnSelf: [],
     checkmate: false,
