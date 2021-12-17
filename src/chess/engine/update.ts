@@ -23,7 +23,7 @@ import { v2 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
-import { pieceMap } from '../bitwise';
+import { pieceMap } from '../bitmap';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -34,20 +34,19 @@ function computeAll(position: Position): ComputedPositionData {
   return {
     ...computeMovementData(position),
     evaluation: evaluate(position),
-    bit: {
-      pieceMap: pieceMap(position),
+    bitmaps: {
+      allPieces: pieceMap(position),
     },
   };
 }
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
-  const { position, whitePlayer, blackPlayer, computedPositionData } = state;
+  const { position, players, computedPositionData } = state;
+  const playerForTurn = players[position.turn];
   let move: Move;
 
-  if (whitePlayer !== HumanPlayer && position.turn === Color.White) {
-    move = whitePlayer.nextMove(position, computedPositionData);
-  } else if (blackPlayer !== HumanPlayer && position.turn === Color.Black) {
-    move = blackPlayer.nextMove(position, computedPositionData);
+  if (playerForTurn !== HumanPlayer) {
+    move = playerForTurn.nextMove(position, computedPositionData);
   } else {
     return [state, null];
   }
@@ -107,17 +106,10 @@ function handleLoadChessComputer(
 ): Update<State, Action> {
   const { playingAs } = action;
 
-  if (playingAs === Color.White) {
-    return [
-      { ...state, whitePlayer: loadComputer() },
-      attemptComputerMoveAction(),
-    ];
-  } else {
-    return [
-      { ...state, blackPlayer: loadComputer() },
-      attemptComputerMoveAction(),
-    ];
-  }
+  return [
+    { ...state, players: { ...state.players, [playingAs]: loadComputer() } },
+    attemptComputerMoveAction(),
+  ];
 }
 
 function handleOverlaySquares(state: State): Update<State, Action> {

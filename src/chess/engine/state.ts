@@ -26,8 +26,10 @@ export interface State {
   debugVersion?: number;
   boardOrientation: Color;
   displaySquareLabels: boolean;
-  blackPlayer: Player;
-  whitePlayer: Player;
+  players: {
+    [Color.White]: Player;
+    [Color.Black]: Player;
+  };
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
   position: Position;
@@ -38,8 +40,10 @@ const INITIAL_STATE: State = {
   debugVersion: 0,
   boardOrientation: Color.White,
   displaySquareLabels: false,
-  blackPlayer: HumanPlayer,
-  whitePlayer: HumanPlayer,
+  players: {
+    [Color.White]: HumanPlayer,
+    [Color.Black]: HumanPlayer,
+  },
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
     movesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
@@ -51,7 +55,7 @@ const INITIAL_STATE: State = {
     checksOnSelf: [],
     checkmate: false,
     evaluation: 0,
-    bit: {},
+    bitmaps: {},
   },
 };
 
@@ -74,8 +78,9 @@ export const squareOverlay = (state: State, square: Square) =>
 export const isSquareClickable = (state: State, square: Square): boolean => {
   if (
     (state.position.turn === Color.White &&
-      state.whitePlayer !== HumanPlayer) ||
-    (state.position.turn === Color.Black && state.blackPlayer !== HumanPlayer)
+      state.players[Color.White] !== HumanPlayer) ||
+    (state.position.turn === Color.Black &&
+      state.players[Color.Black] !== HumanPlayer)
   ) {
     return false;
   }

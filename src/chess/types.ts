@@ -85,8 +85,8 @@ export type ComputedPositionData = {
   checksOnSelf: Move[];
   checkmate: boolean;
   evaluation: number;
-  bit: {
-    pieceMap?: bigint;
+  bitmaps: {
+    allPieces?: bigint;
   };
 };
 
