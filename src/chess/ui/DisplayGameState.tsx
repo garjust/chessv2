@@ -42,7 +42,7 @@ const replacer = (key: string, value: unknown) => {
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
   const { state } = useWorkflow();
   return (
-    <pre style={style}>
+    <pre style={{ ...style, fontSize: 14, margin: 0 }}>
       <code>{JSON.stringify(state, replacer, 2)}</code>
     </pre>
   );

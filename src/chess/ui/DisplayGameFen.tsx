@@ -10,7 +10,7 @@ const DisplayGameFEN = ({ style }: DisplayGameFENProps) => {
   const { state } = useWorkflow();
   return (
     <pre style={style}>
-      <code style={{ backgroundColor: 'aqua' }}>
+      <code style={{ backgroundColor: 'aqua', margin: 0 }}>
         {formatPosition(state.position)}
       </code>
     </pre>
