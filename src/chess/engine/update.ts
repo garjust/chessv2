@@ -23,6 +23,7 @@ import { v2 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
+import { pieceMap } from '../bitwise';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -33,6 +34,9 @@ function computeAll(position: Position): ComputedPositionData {
   return {
     ...computeMovementData(position),
     evaluation: evaluate(position),
+    bit: {
+      pieceMap: pieceMap(position),
+    },
   };
 }
 

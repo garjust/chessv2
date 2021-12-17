@@ -24,7 +24,7 @@ const VIENNA_GAMBIT_ACCEPTED_GAME = [
   ['f1', 'b5'],
   ['b8', 'c6'],
   ['c1', 'f4'],
-  ['a8', 'd8'], // this should be black queenside castle
+  ['e8', 'c8'],
 ];
 
 export const debugGame = (

@@ -49,6 +49,7 @@ const Game = () => {
             gridArea: 'buttons',
             display: 'grid',
             gap: 16,
+            alignItems: 'center',
             gridTemplateColumns: 'repeat(3, 1fr)',
           }}
         >

@@ -43,6 +43,7 @@ const INITIAL_STATE: State = {
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
     movesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
+    opponentMovesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
     totalMoves: 0,
     availableCaptures: [],
     availableAttacks: [],
@@ -50,6 +51,7 @@ const INITIAL_STATE: State = {
     checksOnSelf: [],
     checkmate: false,
     evaluation: 0,
+    bit: {},
   },
 };
 

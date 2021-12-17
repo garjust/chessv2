@@ -449,6 +449,7 @@ export const computeMovementData = (
 ): Pick<
   ComputedPositionData,
   | 'movesByPiece'
+  | 'opponentMovesByPiece'
   | 'totalMoves'
   | 'availableCaptures'
   | 'availableAttacks'
@@ -467,11 +468,45 @@ export const computeMovementData = (
   movesByPiece.set(PieceType.Queen, new SquareMap<MoveDetail[]>());
   movesByPiece.set(PieceType.Rook, new SquareMap<MoveDetail[]>());
 
+  const opponentMovesByPiece: MovesByPiece = new Map<
+    PieceType,
+    SquareMap<MoveDetail[]>
+  >();
+  opponentMovesByPiece.set(PieceType.Bishop, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(PieceType.King, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(PieceType.Knight, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(PieceType.Pawn, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(PieceType.Queen, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(PieceType.Rook, new SquareMap<MoveDetail[]>());
+
   let checkmate = false;
   let totalMoves = 0;
   const availableCaptures: Move[] = [];
   const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
+  const checksOnSelf: Move[] = [];
+
+  // const opponentMovesets = movesetsForPosition(
+  //   position,
+  //   position.turn === Color.White ? Color.Black : Color.White
+  // );
+  // opponentMovesets.forEach(({ piece, square, moves }) => {
+  //   const map = movesByPiece.get(piece.type);
+  //   if (map) {
+  //     map.set(
+  //       square,
+  //       moves.map((moveDetail) => {
+  //         if (moveDetail.kingCapture) {
+  //           checksOnSelf.push({ from: square, to: moveDetail.to });
+  //         }
+  //         return moveDetail;
+  //       })
+  //     );
+  //     totalMoves += moves.length;
+  //   }
+  // });
+
+  // const inCheck = checksOnSelf.length > 0;
 
   const movesets = movesetsForPosition(position, position.turn);
   movesets.forEach(({ piece, square, moves }) => {
@@ -501,11 +536,12 @@ export const computeMovementData = (
 
   return {
     movesByPiece,
+    opponentMovesByPiece,
     totalMoves,
     availableCaptures,
     availableAttacks,
     availableChecks,
-    checksOnSelf: [],
+    checksOnSelf,
     checkmate,
   };
 };

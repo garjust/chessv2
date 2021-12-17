@@ -4,7 +4,6 @@
   gap: 8px;
   grid-template:
     "fen fen" auto
-    "board state" auto
-    "board state" auto
+    "board state" min-content
     "buttons state" auto / max-content auto
 }

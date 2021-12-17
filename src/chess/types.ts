@@ -77,6 +77,7 @@ export type MovesByPiece = Map<PieceType, StringKeyMap<Square, MoveDetail[]>>;
 // computation is expensive.
 export type ComputedPositionData = {
   movesByPiece: MovesByPiece;
+  opponentMovesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
   availableAttacks: Move[];
@@ -84,6 +85,9 @@ export type ComputedPositionData = {
   checksOnSelf: Move[];
   checkmate: boolean;
   evaluation: number;
+  bit: {
+    pieceMap?: bigint;
+  };
 };
 
 export type SquareLabel =

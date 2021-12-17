@@ -32,6 +32,10 @@ const replacer = (key: string, value: unknown) => {
     return (value as symbol).toString();
   }
 
+  if (key === 'pieceMap') {
+    return (value as bigint).toString(2);
+  }
+
   return value;
 };
 
