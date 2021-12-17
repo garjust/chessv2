@@ -1,5 +1,3 @@
-import { check } from 'prettier';
-import { filter, firstValueFrom, from, map, Observable, toArray } from 'rxjs';
 import {
   Color,
   ComputedPositionData,
@@ -17,10 +15,13 @@ import {
   squareEquals,
   SquareMap,
   squaresInclude,
+  BLACK_PAWN_STARTING_RANK,
+  WHITE_PAWN_STARTING_RANK,
+  WHITE_QUEENSIDE_ROOK_START_SQUARE,
+  WHITE_KINGSIDE_ROOK_START_SQUARE,
+  BLACK_QUEENSIDE_ROOK_START_SQUARE,
+  BLACK_KINGSIDE_ROOK_START_SQUARE,
 } from './utils';
-
-const WHITE_PAWN_STARTING_RANK = 1;
-const BLACK_PAWN_STARTING_RANK = 6;
 
 const up = (square: Square, n = 1): Square => ({
   rank: square.rank + n,
@@ -46,6 +47,34 @@ const upLeft = (square: Square, n = 1): Square => up(left(square, n), n);
 const upRight = (square: Square, n = 1): Square => up(right(square, n), n);
 const downLeft = (square: Square, n = 1): Square => down(left(square, n), n);
 const downRight = (square: Square, n = 1): Square => down(right(square, n), n);
+
+const squareScanner = (position: Position, piece: Piece) => {
+  const scan = (
+    squares: Square[],
+    scanFn: (square: Square) => Square
+  ): Square[] => {
+    const next = scanFn(squares[squares.length - 1]);
+    if (!isLegalSquare(next)) {
+      return squares;
+    }
+
+    const nextPiece = position.pieces.get(next);
+    if (nextPiece) {
+      if (nextPiece.color === piece.color) {
+        // friend!
+        return squares;
+      } else {
+        // foe!
+        return [...squares, next];
+      }
+    }
+
+    // empty! keep scanning!
+    return scan([...squares, next], scanFn);
+  };
+
+  return scan;
+};
 
 const isStartPositionPawn = (piece: Piece, square: Square): boolean =>
   piece.color === Color.White
@@ -99,33 +128,6 @@ const pawnMoves = (
   }
 
   return squares;
-};
-
-const squareScanner = (position: Position, piece: Piece) => {
-  const scan = (
-    squares: Square[],
-    scanFn: (square: Square) => Square
-  ): Square[] => {
-    const next = scanFn(squares[squares.length - 1]);
-    if (!isLegalSquare(next)) {
-      return squares;
-    }
-
-    const nextPiece = position.pieces.get(next);
-    if (nextPiece) {
-      if (nextPiece.color === piece.color) {
-        // friend!
-        return squares;
-      } else {
-        // foe!
-        return [...squares, next];
-      }
-    }
-
-    return scan([...squares, next], scanFn);
-  };
-
-  return scan;
 };
 
 const bishopMoves = (
@@ -191,6 +193,22 @@ const kingMoves = (
     )
     .forEach((candidateSquare) => squares.push(candidateSquare));
 
+  if (
+    position.castlingAvailability[piece.color].kingside &&
+    !position.pieces.get(right(square)) &&
+    !position.pieces.get(right(square, 2))
+  ) {
+    squares.push(right(square, 2));
+  }
+  if (
+    position.castlingAvailability[piece.color].queenside &&
+    !position.pieces.get(left(square)) &&
+    !position.pieces.get(left(square, 2)) &&
+    !position.pieces.get(left(square, 3))
+  ) {
+    squares.push(left(square, 2));
+  }
+
   return squares;
 };
 
@@ -226,18 +244,6 @@ const rookMoves = (
   return squares;
 };
 
-// const movesetsForPosition = (
-//   position: Position,
-//   color?: Color
-// ): Observable<Moveset> =>
-//   from(position.pieces.entries()).pipe(
-//     filter(([, piece]) => (color ? piece.color === color : true)),
-//     map(([square, piece]) => ({
-//       square,
-//       piece,
-//       moves: augmentMoves(position, findSquaresForMove(position, square)),
-//     }))
-//   );
 const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
   const movesets: Moveset[] = [];
 
@@ -308,6 +314,7 @@ export const applyMove = (position: Position, move: Move): Position => {
   for (const [key, value] of position.pieces) {
     pieces.set(key, value);
   }
+  const castlingAvailability = { ...position.castlingAvailability };
 
   const piece = pieces.get(move.from);
 
@@ -327,6 +334,47 @@ export const applyMove = (position: Position, move: Move): Position => {
   let isCapture = pieces.delete(move.from);
   pieces.set(move.to, piece);
 
+  if (piece.type === PieceType.Rook) {
+    if (squareEquals(move.from, WHITE_QUEENSIDE_ROOK_START_SQUARE)) {
+      castlingAvailability[Color.White].queenside = false;
+    } else if (squareEquals(move.from, WHITE_KINGSIDE_ROOK_START_SQUARE)) {
+      castlingAvailability[Color.White].kingside = false;
+    } else if (squareEquals(move.from, BLACK_QUEENSIDE_ROOK_START_SQUARE)) {
+      castlingAvailability[Color.Black].queenside = false;
+    } else if (squareEquals(move.from, BLACK_KINGSIDE_ROOK_START_SQUARE)) {
+      castlingAvailability[Color.Black].kingside = false;
+    }
+  }
+
+  if (piece.type === PieceType.King) {
+    castlingAvailability[piece.color].queenside = false;
+    castlingAvailability[piece.color].kingside = false;
+
+    // This is a castling move
+    if (Math.abs(move.from.file - move.to.file) === 2) {
+      if (move.from.file - move.to.file > 0) {
+        // queenside
+        const rookSquare = { rank: move.from.rank, file: 0 };
+        const rook = position.pieces.get(rookSquare);
+        if (!rook) {
+          throw Error('no rook to castle with');
+        }
+        pieces.delete(rookSquare);
+        pieces.set({ rank: move.from.rank, file: 3 }, rook);
+      } else {
+        // kingside
+        const rookSquare = { rank: move.from.rank, file: 7 };
+        const rook = position.pieces.get(rookSquare);
+        if (!rook) {
+          throw Error('no rook to castle with');
+        }
+        pieces.delete(rookSquare);
+        pieces.set({ rank: move.from.rank, file: 5 }, rook);
+        castlingAvailability[piece.color].kingside = false;
+      }
+    }
+  }
+
   if (
     piece.type === PieceType.Pawn &&
     squareEquals(position.enPassantSquare, move.to)
@@ -343,7 +391,7 @@ export const applyMove = (position: Position, move: Move): Position => {
   return Object.freeze({
     pieces,
     turn: position.turn === Color.White ? Color.Black : Color.White,
-    castlingAvailability: position.castlingAvailability,
+    castlingAvailability,
     enPassantSquare: enPassantSquareFromMove(piece, move),
     halfMoveCount:
       piece.type !== PieceType.Pawn && !isCapture

@@ -1,6 +1,14 @@
 import StringKeyMap from '../lib/string-key-map';
 import { Square, SquareLabel } from './types';
 
+export const WHITE_PAWN_STARTING_RANK = 1;
+export const BLACK_PAWN_STARTING_RANK = 6;
+
+export const WHITE_QUEENSIDE_ROOK_START_SQUARE: Square = { rank: 0, file: 0 };
+export const WHITE_KINGSIDE_ROOK_START_SQUARE: Square = { rank: 0, file: 7 };
+export const BLACK_QUEENSIDE_ROOK_START_SQUARE: Square = { rank: 7, file: 0 };
+export const BLACK_KINGSIDE_ROOK_START_SQUARE: Square = { rank: 7, file: 7 };
+
 type Nullable<T> = T | undefined | null;
 
 const fileIndexToChar = (index: number): string =>
@@ -27,8 +35,8 @@ export const squareEquals = (
   b: Nullable<Square>
 ): boolean => Boolean(a && b && a.file === b.file && a.rank === b.rank);
 
-export const squaresInclude = (moves: Square[], move: Square): boolean =>
-  Boolean(moves.find((maybeMove) => squareEquals(maybeMove, move)));
+export const squaresInclude = (squares: Square[], square: Square): boolean =>
+  Boolean(squares.find((x) => squareEquals(x, square)));
 
 export class SquareMap<T> extends StringKeyMap<Square, T> {
   constructor() {

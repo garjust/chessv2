@@ -117,10 +117,14 @@ export const parseFEN = (fenString: string): Position => {
     pieces: piecePlacementsFromFEN(piecePlacements),
     turn: activeColor === 'w' ? Color.White : Color.Black,
     castlingAvailability: Object.freeze({
-      whiteKingside: castlingAvailability.includes('K'),
-      whiteQueenside: castlingAvailability.includes('Q'),
-      blackKingside: castlingAvailability.includes('k'),
-      blackQueenside: castlingAvailability.includes('q'),
+      [Color.White]: {
+        kingside: castlingAvailability.includes('K'),
+        queenside: castlingAvailability.includes('Q'),
+      },
+      [Color.Black]: {
+        kingside: castlingAvailability.includes('k'),
+        queenside: castlingAvailability.includes('q'),
+      },
     }),
     enPassantSquare:
       enPassantSquare !== '-' ? labelToSquare(enPassantSquare) : null,
@@ -162,10 +166,10 @@ export const formatPosition = (fen: Position): string => {
     formatFENPieces(fen.pieces),
     fen.turn === Color.White ? 'w' : 'b',
     [
-      fen.castlingAvailability.whiteKingside ? 'K' : '',
-      fen.castlingAvailability.whiteQueenside ? 'Q' : '',
-      fen.castlingAvailability.blackKingside ? 'k' : '',
-      fen.castlingAvailability.blackQueenside ? 'Q' : '',
+      fen.castlingAvailability[Color.White].kingside ? 'K' : '',
+      fen.castlingAvailability[Color.White].queenside ? 'Q' : '',
+      fen.castlingAvailability[Color.Black].kingside ? 'k' : '',
+      fen.castlingAvailability[Color.Black].queenside ? 'Q' : '',
     ].join(''),
     fen.enPassantSquare ? squareLabel(fen.enPassantSquare) : '-',
     fen.halfMoveCount,

@@ -42,10 +42,14 @@ export type Moveset = {
 };
 
 export type CastlingAvailability = {
-  whiteKingside: boolean;
-  whiteQueenside: boolean;
-  blackKingside: boolean;
-  blackQueenside: boolean;
+  [Color.White]: {
+    kingside: boolean;
+    queenside: boolean;
+  };
+  [Color.Black]: {
+    kingside: boolean;
+    queenside: boolean;
+  };
 };
 
 export type Position = {

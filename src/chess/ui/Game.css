@@ -1,7 +1,7 @@
 .game {
   margin: 24px;
   display: grid;
-  gap: 16px;
+  gap: 8px;
   grid-template:
     "fen fen" auto
     "board state" auto
