@@ -5,71 +5,45 @@ export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-const fenNotationPieceToType = (pieceCharacter: string): PieceType => {
-  switch (pieceCharacter) {
-    case 'b':
-    case 'B':
-      return PieceType.Bishop;
-    case 'k':
-    case 'K':
-      return PieceType.King;
-    case 'n':
-    case 'N':
-      return PieceType.Knight;
-    case 'p':
-    case 'P':
-      return PieceType.Pawn;
-    case 'q':
-    case 'Q':
-      return PieceType.Queen;
-    case 'r':
-    case 'R':
-      return PieceType.Rook;
-    default:
-      throw Error(`no piece for FEN character ${pieceCharacter}`);
-  }
-};
+const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
+  b: PieceType.Bishop,
+  B: PieceType.Bishop,
+  k: PieceType.King,
+  K: PieceType.King,
+  n: PieceType.Knight,
+  N: PieceType.Knight,
+  p: PieceType.Pawn,
+  P: PieceType.Pawn,
+  q: PieceType.Queen,
+  Q: PieceType.Queen,
+  r: PieceType.Rook,
+  R: PieceType.Rook,
+});
 
-const pieceToFenNotationCharacter = (piece: Piece): string => {
-  let letter: string;
-  switch (piece.type) {
-    case PieceType.Bishop:
-      letter = 'b';
-      break;
-    case PieceType.King:
-      letter = 'k';
-      break;
-    case PieceType.Knight:
-      letter = 'n';
-      break;
-    case PieceType.Pawn:
-      letter = 'p';
-      break;
-    case PieceType.Queen:
-      letter = 'q';
-      break;
-    case PieceType.Rook:
-      letter = 'R';
-      break;
-  }
+const PIECE_TYPE_TO_FEN_PIECE = Object.freeze({
+  [PieceType.Bishop]: 'b',
+  [PieceType.King]: 'k',
+  [PieceType.Knight]: 'n',
+  [PieceType.Pawn]: 'p',
+  [PieceType.Queen]: 'q',
+  [PieceType.Rook]: 'R',
+});
 
-  if (piece.color === Color.White) {
-    return letter.toUpperCase();
-  } else {
-    return letter.toLowerCase();
-  }
-};
+const pieceToFenPiece = (piece: Piece): string =>
+  piece.color === Color.White
+    ? PIECE_TYPE_TO_FEN_PIECE[piece.type].toUpperCase()
+    : PIECE_TYPE_TO_FEN_PIECE[piece.type].toLowerCase();
 
-const fenNotationPieceToColor = (pieceCharacter: string): Color =>
+const fenPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
 
-const piecePlacementsFromFEN = (piecePlacements: string): SquareMap<Piece> => {
+const pieceMapFromFenPieces = (fenPieces: string): SquareMap<Piece> => {
   const pieces = new SquareMap<Piece>();
 
   let rank = 7;
   let file = 0;
 
-  for (const char of piecePlacements) {
+  for (const char of fenPieces) {
     switch (char) {
       case '1':
       case '2':
@@ -87,12 +61,23 @@ const piecePlacementsFromFEN = (piecePlacements: string): SquareMap<Piece> => {
         rank -= 1;
         file = 0;
         break;
-      default:
+      case 'b':
+      case 'B':
+      case 'k':
+      case 'K':
+      case 'n':
+      case 'N':
+      case 'p':
+      case 'P':
+      case 'q':
+      case 'Q':
+      case 'r':
+      case 'R':
         pieces.set(
           { rank, file },
           {
-            color: fenNotationPieceToColor(char),
-            type: fenNotationPieceToType(char),
+            color: fenPieceToColor(char),
+            type: FEN_PIECE_TO_PIECE_TYPE[char],
           }
         );
         // Advance the file after placing a piece.
@@ -101,6 +86,34 @@ const piecePlacementsFromFEN = (piecePlacements: string): SquareMap<Piece> => {
   }
 
   return pieces;
+};
+
+const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
+  let str = '';
+
+  let emptyCounter;
+
+  for (let rank = 7; rank >= 0; rank--) {
+    emptyCounter = 0;
+    for (let file = 0; file < 8; file++) {
+      const piece = pieces.get({ rank, file });
+      if (piece) {
+        if (emptyCounter > 0) {
+          str += String(emptyCounter);
+        }
+        str += pieceToFenPiece(piece);
+        emptyCounter = 0;
+      } else {
+        emptyCounter++;
+      }
+    }
+    if (emptyCounter > 0) {
+      str += String(emptyCounter);
+    }
+    str += '/';
+  }
+
+  return str;
 };
 
 export const parseFEN = (fenString: string): Position => {
@@ -114,7 +127,7 @@ export const parseFEN = (fenString: string): Position => {
   ] = fenString.split(' ');
 
   return Object.freeze({
-    pieces: piecePlacementsFromFEN(piecePlacements),
+    pieces: pieceMapFromFenPieces(piecePlacements),
     turn: activeColor === 'w' ? Color.White : Color.Black,
     castlingAvailability: Object.freeze({
       [Color.White]: {
@@ -133,37 +146,9 @@ export const parseFEN = (fenString: string): Position => {
   });
 };
 
-const formatFENPieces = (pieces: SquareMap<Piece>): string => {
-  let str = '';
-
-  let emptyCounter;
-
-  for (let rank = 7; rank >= 0; rank--) {
-    emptyCounter = 0;
-    for (let file = 0; file < 8; file++) {
-      const piece = pieces.get({ rank, file });
-      if (piece) {
-        if (emptyCounter > 0) {
-          str += String(emptyCounter);
-        }
-        str += pieceToFenNotationCharacter(piece);
-        emptyCounter = 0;
-      } else {
-        emptyCounter++;
-      }
-    }
-    if (emptyCounter > 0) {
-      str += String(emptyCounter);
-    }
-    str += '/';
-  }
-
-  return str;
-};
-
 export const formatPosition = (fen: Position): string => {
   return [
-    formatFENPieces(fen.pieces),
+    piecesToFenPieces(fen.pieces),
     fen.turn === Color.White ? 'w' : 'b',
     [
       fen.castlingAvailability[Color.White].kingside ? 'K' : '',

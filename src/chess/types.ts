@@ -1,5 +1,3 @@
-import StringKeyMap from '../lib/string-key-map';
-
 export enum Color {
   White = 'WHITE',
   Black = 'BLACK',
@@ -55,7 +53,7 @@ export type CastlingAvailability = {
 };
 
 export type Position = {
-  pieces: StringKeyMap<Square, Piece>;
+  pieces: Map<Square, Piece>;
   // Which player's turn it is.
   turn: Color;
   // Castling availability.
@@ -71,7 +69,7 @@ export type Position = {
   fullMoveCount: number;
 };
 
-export type MovesByPiece = Map<PieceType, StringKeyMap<Square, MoveDetail[]>>;
+export type MovesByPiece = Map<PieceType, Map<Square, MoveDetail[]>>;
 
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.

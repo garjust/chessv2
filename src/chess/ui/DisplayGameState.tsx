@@ -1,7 +1,8 @@
 import React from 'react';
 import StringKeyMap from '../../lib/string-key-map';
-import { Square } from '../types';
-import { squareLabel } from '../utils';
+import { HumanPlayer } from '../engine/state';
+import { Color, Square } from '../types';
+import { squareLabel, SquareMap } from '../utils';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameStateProps = {
@@ -18,7 +19,11 @@ const formatBitmapString = (bitmap: string): string => {
 };
 
 const replacer = (key: string, value: unknown) => {
-  if (value instanceof StringKeyMap || value instanceof Map) {
+  if (
+    value instanceof StringKeyMap ||
+    value instanceof Map ||
+    value instanceof SquareMap
+  ) {
     return `{ size ${value.size} }`;
   }
 
@@ -37,8 +42,8 @@ const replacer = (key: string, value: unknown) => {
     }
   }
 
-  if (key === 'blackPlayer' || key === 'whitePlayer') {
-    return (value as symbol).toString();
+  if (typeof value === 'symbol') {
+    return value.toString();
   }
 
   if (typeof value === 'bigint') {
