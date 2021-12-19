@@ -301,53 +301,23 @@ export const computeMovementData = (
 ): Pick<
   ComputedPositionData,
   | 'movesByPiece'
-  | 'opponentMovesByPiece'
   | 'totalMoves'
   | 'availableCaptures'
   | 'availableAttacks'
   | 'availableChecks'
-  | 'checksOnSelf'
   | 'checkmate'
 > => {
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
     SquareMap<MoveWithExtraData[]>
-  >();
-  movesByPiece.set(PieceType.Bishop, new SquareMap<MoveWithExtraData[]>());
-  movesByPiece.set(PieceType.King, new SquareMap<MoveWithExtraData[]>());
-  movesByPiece.set(PieceType.Knight, new SquareMap<MoveWithExtraData[]>());
-  movesByPiece.set(PieceType.Pawn, new SquareMap<MoveWithExtraData[]>());
-  movesByPiece.set(PieceType.Queen, new SquareMap<MoveWithExtraData[]>());
-  movesByPiece.set(PieceType.Rook, new SquareMap<MoveWithExtraData[]>());
-
-  const opponentMovesByPiece: MovesByPiece = new Map<
-    PieceType,
-    SquareMap<MoveWithExtraData[]>
-  >();
-  opponentMovesByPiece.set(
-    PieceType.Bishop,
-    new SquareMap<MoveWithExtraData[]>()
-  );
-  opponentMovesByPiece.set(
-    PieceType.King,
-    new SquareMap<MoveWithExtraData[]>()
-  );
-  opponentMovesByPiece.set(
-    PieceType.Knight,
-    new SquareMap<MoveWithExtraData[]>()
-  );
-  opponentMovesByPiece.set(
-    PieceType.Pawn,
-    new SquareMap<MoveWithExtraData[]>()
-  );
-  opponentMovesByPiece.set(
-    PieceType.Queen,
-    new SquareMap<MoveWithExtraData[]>()
-  );
-  opponentMovesByPiece.set(
-    PieceType.Rook,
-    new SquareMap<MoveWithExtraData[]>()
-  );
+  >([
+    [PieceType.Bishop, new SquareMap<MoveWithExtraData[]>()],
+    [PieceType.King, new SquareMap<MoveWithExtraData[]>()],
+    [PieceType.Knight, new SquareMap<MoveWithExtraData[]>()],
+    [PieceType.Pawn, new SquareMap<MoveWithExtraData[]>()],
+    [PieceType.Queen, new SquareMap<MoveWithExtraData[]>()],
+    [PieceType.Rook, new SquareMap<MoveWithExtraData[]>()],
+  ]);
 
   let checkmate = false;
   let totalMoves = 0;
@@ -355,28 +325,6 @@ export const computeMovementData = (
   const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
   const checksOnSelf: Move[] = [];
-
-  // const opponentMovesets = movesetsForPosition(
-  //   position,
-  //   position.turn === Color.White ? Color.Black : Color.White
-  // );
-  // opponentMovesets.forEach(({ piece, square, moves }) => {
-  //   const map = movesByPiece.get(piece.type);
-  //   if (map) {
-  //     map.set(
-  //       square,
-  //       moves.map((moveDetail) => {
-  //         if (moveDetail.kingCapture) {
-  //           checksOnSelf.push({ from: square, to: moveDetail.to });
-  //         }
-  //         return moveDetail;
-  //       })
-  //     );
-  //     totalMoves += moves.length;
-  //   }
-  // });
-
-  // const inCheck = checksOnSelf.length > 0;
 
   const movesets = movesetsForPosition(position, position.turn);
   movesets.forEach(({ piece, from, moves }) => {
@@ -406,12 +354,10 @@ export const computeMovementData = (
 
   return {
     movesByPiece,
-    opponentMovesByPiece,
     totalMoves,
     availableCaptures,
     availableAttacks,
     availableChecks,
-    checksOnSelf,
     checkmate,
   };
 };

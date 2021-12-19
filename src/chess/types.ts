@@ -77,12 +77,10 @@ export type MovesByPiece = Map<PieceType, Map<Square, MoveWithExtraData[]>>;
 // computation is expensive.
 export type ComputedPositionData = {
   movesByPiece: MovesByPiece;
-  opponentMovesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
   availableAttacks: Move[];
   availableChecks: Move[];
-  checksOnSelf: Move[];
   checkmate: boolean;
   evaluation: number;
   bitmaps: {
