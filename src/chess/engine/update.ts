@@ -185,7 +185,7 @@ function handleMovePiece(
   // as queen for human players.
   if (
     pieceToMove.type === PieceType.Pawn &&
-    isPromotionPositionPawn(pieceToMove, move.from) &&
+    isPromotionPositionPawn(pieceToMove.color, move.from) &&
     !move.promotion
   ) {
     move.promotion = PieceType.Queen;

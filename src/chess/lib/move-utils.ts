@@ -5,16 +5,16 @@ import {
   WHITE_PAWN_STARTING_RANK,
 } from '../utils';
 
-export const isStartPositionPawn = (piece: Piece, square: Square): boolean =>
-  piece.color === Color.White
+export const isStartPositionPawn = (color: Color, square: Square): boolean =>
+  color === Color.White
     ? square.rank === WHITE_PAWN_STARTING_RANK
     : square.rank === BLACK_PAWN_STARTING_RANK;
 
 export const isPromotionPositionPawn = (
-  piece: Piece,
+  color: Color,
   square: Square
 ): boolean =>
-  piece.color === Color.White
+  color === Color.White
     ? square.rank === BLACK_PAWN_STARTING_RANK
     : square.rank === WHITE_PAWN_STARTING_RANK;
 
