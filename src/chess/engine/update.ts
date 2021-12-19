@@ -6,9 +6,9 @@ import {
   PieceType,
   Position,
 } from '../types';
-import { SquareMap } from '../utils';
-import { applyMove, checkedSquare, computeMovementData } from '../movement';
-import { parseFEN, BLANK_POSITION_FEN } from '../fen';
+import { flipColor, SquareMap } from '../utils';
+import { applyMove, checkedSquare, computeMovementData } from '../lib/movement';
+import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
   setPositionFromFENAction,
@@ -24,12 +24,12 @@ import {
   pieceInSquare,
   HumanPlayer,
 } from './state';
-import { evaluate } from '../evaluation';
+import { evaluate } from '../lib/evaluation';
 import { v2 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
-import { board } from '../bitmap';
+import { board } from '../lib/bitmap';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -98,8 +98,7 @@ function handleClickSquare(
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {
-  const newOrientation =
-    state.boardOrientation === Color.White ? Color.Black : Color.White;
+  const newOrientation = flipColor(state.boardOrientation);
 
   return [{ ...state, boardOrientation: newOrientation }, null];
 }

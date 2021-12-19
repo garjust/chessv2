@@ -13,7 +13,7 @@ import {
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
-import { STARTING_POSITION_FEN } from '../fen';
+import { STARTING_POSITION_FEN } from '../lib/fen';
 import { debugGame } from '../debug';
 import DisplayGameFEN from './DisplayGameFen';
 

@@ -6,7 +6,10 @@ export const contextFactory = <S, A, C>(
   initialState: S
 ): {
   WorkflowContext: React.Context<Workflow<S, A, C>>;
-  useWorkflow: () => { state: S; emit: (action: A) => void };
+  useWorkflow: <R>(render: (state: S) => R) => {
+    rendering: R;
+    emit: (action: A) => void;
+  };
 } => {
   const reactContext = React.createContext({
     states: new Observable<S>(),
@@ -18,9 +21,10 @@ export const contextFactory = <S, A, C>(
 
   return {
     WorkflowContext: reactContext,
-    useWorkflow: () => {
+    useWorkflow: <R>(render: (state: S) => R) => {
       const [state, setState] = useState(initialState);
       const { states, emit } = useContext(reactContext);
+
       useEffect(() => {
         const subscription = states.subscribe((newState) => {
           setState(newState);
@@ -30,7 +34,7 @@ export const contextFactory = <S, A, C>(
         };
       }, [states]);
 
-      return { state, emit };
+      return { rendering: render(state), emit };
     },
   };
 };

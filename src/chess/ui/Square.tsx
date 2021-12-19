@@ -1,14 +1,13 @@
 import React from 'react';
 import './Square.css';
-import { Color, Square as SquareData } from '../types';
+import { Color, Piece as PieceData, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
 import {
-  HumanPlayer,
+  State,
   isSquareClickable,
   pieceInSquare,
   SquareOverlayType,
 } from '../engine/state';
-import Piece from './Piece';
 import {
   BOARD_SQUARE_BLACK,
   BOARD_SQUARE_CAPTURABLE,
@@ -19,19 +18,26 @@ import {
 } from './theme';
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../engine/action';
+import Piece from './Piece';
 
 export type SquareProps = {
   color: Color;
 } & SquareData;
 
-const Square = ({ rank, file, color }: SquareProps) => {
-  const { state, emit } = useWorkflow();
+const makeRender =
+  ({ rank, file }: Pick<SquareProps, 'rank' | 'file'>) =>
+  (state: State) => ({
+    piece: pieceInSquare(state, { rank, file }),
+    overlay: state.squareOverlay?.get({ rank, file }),
+    isClickable: isSquareClickable(state, { rank, file }),
+    displaySquareLabels: state.displaySquareLabels,
+  });
 
-  const { squareOverlay } = state;
-  const piece = pieceInSquare(state, { rank, file });
-  const overlay = squareOverlay?.get({ rank, file });
+const Square = (props: SquareProps) => {
+  const { rendering, emit } = useWorkflow(makeRender(props));
 
-  const isClickable = isSquareClickable(state, { rank, file });
+  const { rank, file, color } = props;
+  const { piece, overlay, isClickable, displaySquareLabels } = rendering;
 
   let css: React.CSSProperties = {
     position: 'relative',
@@ -67,12 +73,14 @@ const Square = ({ rank, file, color }: SquareProps) => {
       }
       tabIndex={0}
     >
-      {piece !== null ? <Piece type={piece.type} color={piece.color} /> : ''}
+      {piece !== undefined ? (
+        <Piece type={piece.type} color={piece.color} />
+      ) : null}
       <span
         style={{
           position: 'absolute',
           left: 0,
-          opacity: state.displaySquareLabels ? 1 : 0,
+          opacity: displaySquareLabels ? 1 : 0,
         }}
       >
         {squareLabel({ rank, file })}

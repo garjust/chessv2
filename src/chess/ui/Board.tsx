@@ -1,4 +1,5 @@
 import React from 'react';
+import { State } from '../engine';
 import { Color } from '../types';
 import { squareGenerator, squareLabel } from '../utils';
 import './Board.css';
@@ -10,8 +11,14 @@ export type BoardProps = {
   style?: React.CSSProperties;
 };
 
+const render = (state: State) => ({
+  boardOrientation: state.boardOrientation,
+});
+
 const Board = ({ squareSize, style }: BoardProps) => {
-  const { state } = useWorkflow();
+  const { rendering } = useWorkflow(render);
+
+  const { boardOrientation } = rendering;
 
   const squares: JSX.Element[] = [];
   for (const { rank, file } of squareGenerator()) {
@@ -28,9 +35,7 @@ const Board = ({ squareSize, style }: BoardProps) => {
   return (
     <div
       className={
-        state.boardOrientation === Color.White
-          ? 'board'
-          : 'board board--flipped'
+        boardOrientation === Color.White ? 'board' : 'board board--flipped'
       }
       style={{
         ...style,

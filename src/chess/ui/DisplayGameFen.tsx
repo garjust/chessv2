@@ -1,17 +1,25 @@
 import React from 'react';
-import { formatPosition } from '../fen';
+import { State } from '../engine';
+import { formatPosition } from '../lib/fen';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameFENProps = {
   style?: React.CSSProperties;
 };
 
+const render = (state: State) => ({
+  position: state.position,
+});
+
 const DisplayGameFEN = ({ style }: DisplayGameFENProps) => {
-  const { state } = useWorkflow();
+  const { rendering } = useWorkflow(render);
+
+  const { position } = rendering;
+
   return (
     <pre style={{ ...style, margin: 0, fontSize: 14 }}>
       <code style={{ backgroundColor: 'aqua' }}>
-        {formatPosition(state.position)}
+        {formatPosition(position)}
       </code>
     </pre>
   );

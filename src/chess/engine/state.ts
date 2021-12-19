@@ -1,5 +1,5 @@
 import { ChessComputer } from '../ai/types';
-import { BLANK_POSITION_FEN, parseFEN } from '../fen';
+import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
   Position,
@@ -64,8 +64,10 @@ export const createState = (overrides: Partial<State> = {}): State => ({
   ...overrides,
 });
 
-export const pieceInSquare = (state: State, square: Square): Piece | null =>
-  state.position.pieces.get(square) || null;
+export const pieceInSquare = (
+  state: State,
+  square: Square
+): Piece | undefined => state.position.pieces.get(square);
 
 export const squareIsSelected = (state: State, square: Square) =>
   state.selectedSquare &&

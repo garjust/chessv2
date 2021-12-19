@@ -1,6 +1,6 @@
 import { SquareBitmask } from './bitmap-def';
-import { Color, PieceType, Position } from './types';
-import { squareLabel } from './utils';
+import { Color, PieceType, Position } from '../types';
+import { squareLabel } from '../utils';
 
 export const board = (
   position: Position,

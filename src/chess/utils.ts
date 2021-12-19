@@ -1,5 +1,5 @@
 import StringKeyMap from '../lib/string-key-map';
-import { Square, SquareLabel } from './types';
+import { Color, Square, SquareLabel } from './types';
 
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
@@ -46,3 +46,6 @@ export class SquareMap<T> extends StringKeyMap<Square, T> {
 
 export const isLegalSquare = ({ rank, file }: Square): boolean =>
   rank >= 0 && rank < 8 && file >= 0 && file < 8;
+
+export const flipColor = (color: Color): Color =>
+  color === Color.White ? Color.Black : Color.White;

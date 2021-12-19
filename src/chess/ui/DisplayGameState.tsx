@@ -1,13 +1,17 @@
 import React from 'react';
 import StringKeyMap from '../../lib/string-key-map';
-import { HumanPlayer } from '../engine/state';
-import { Color, Square } from '../types';
+import { State } from '../engine';
+import { Square } from '../types';
 import { squareLabel, SquareMap } from '../utils';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameStateProps = {
   style?: React.CSSProperties;
 };
+
+const render = (state: State) => ({
+  state,
+});
 
 const formatBitmapString = (bitmap: string): string => {
   const parts: string[] = [];
@@ -54,7 +58,10 @@ const replacer = (key: string, value: unknown) => {
 };
 
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
-  const { state } = useWorkflow();
+  const { rendering } = useWorkflow(render);
+
+  const { state } = rendering;
+
   return (
     <pre style={{ ...style, fontSize: 14, margin: 0 }}>
       <code>{JSON.stringify(state, replacer, 2)}</code>

@@ -9,7 +9,7 @@ import {
   PieceType,
   Position,
   Square,
-} from './types';
+} from '../types';
 import {
   isLegalSquare,
   squareEquals,
@@ -21,23 +21,21 @@ import {
   WHITE_KINGSIDE_ROOK_START_SQUARE,
   BLACK_QUEENSIDE_ROOK_START_SQUARE,
   BLACK_KINGSIDE_ROOK_START_SQUARE,
-} from './utils';
+  flipColor,
+} from '../utils';
 
 const up = (square: Square, n = 1): Square => ({
   rank: square.rank + n,
   file: square.file,
 });
-
 const down = (square: Square, n = 1): Square => ({
   rank: square.rank - n,
   file: square.file,
 });
-
 const left = (square: Square, n = 1): Square => ({
   rank: square.rank,
   file: square.file - n,
 });
-
 const right = (square: Square, n = 1): Square => ({
   rank: square.rank,
   file: square.file + n,
@@ -81,16 +79,8 @@ const isStartPositionPawn = (piece: Piece, square: Square): boolean =>
     ? square.rank === WHITE_PAWN_STARTING_RANK
     : square.rank === BLACK_PAWN_STARTING_RANK;
 
-const isTwoSquarePawnMove = (move: Move): boolean =>
-  Math.abs(move.from.rank - move.to.rank) == 2;
-
-const enPassantSquareFromMove = (piece: Piece, move: Move): Square | null => {
-  if (piece.type === PieceType.Pawn && isTwoSquarePawnMove(move)) {
-    return move.from.rank === 1 ? up(move.from) : down(move.from);
-  } else {
-    return null;
-  }
-};
+const isTwoRankMove = (move: Move): boolean =>
+  Math.abs(move.from.rank - move.to.rank) === 2;
 
 const pawnMoves = (
   position: Position,
@@ -98,7 +88,7 @@ const pawnMoves = (
   square: Square
 ): Square[] => {
   const squares: Square[] = [];
-  const opponentColor = piece.color === Color.White ? Color.Black : Color.White;
+  const opponentColor = flipColor(piece.color);
   const advanceFn = piece.color === Color.White ? up : down;
 
   // space above the pawn.
@@ -335,7 +325,9 @@ export const applyMove = (position: Position, move: Move): Position => {
   for (const [key, value] of position.pieces) {
     pieces.set(key, value);
   }
+
   const castlingAvailability = { ...position.castlingAvailability };
+  let enPassantSquare: Square | null = null;
 
   const piece = pieces.get(move.from);
 
@@ -396,24 +388,28 @@ export const applyMove = (position: Position, move: Move): Position => {
     }
   }
 
-  if (
-    piece.type === PieceType.Pawn &&
-    squareEquals(position.enPassantSquare, move.to)
-  ) {
-    // This is an en passant capture
-    isCapture = true;
-    if (piece.color === Color.White) {
-      pieces.delete(down(move.to));
-    } else {
-      pieces.delete(up(move.to));
+  // En passant pawn move handling.
+  if (piece.type === PieceType.Pawn) {
+    if (squareEquals(position.enPassantSquare, move.to)) {
+      // This is an en passant capture
+      isCapture = true;
+      if (piece.color === Color.White) {
+        pieces.delete(down(move.to));
+      } else {
+        pieces.delete(up(move.to));
+      }
+    }
+
+    if (isTwoRankMove(move)) {
+      enPassantSquare = move.from.rank === 1 ? up(move.from) : down(move.from);
     }
   }
 
   return Object.freeze({
     pieces,
-    turn: position.turn === Color.White ? Color.Black : Color.White,
+    turn: flipColor(position.turn),
     castlingAvailability,
-    enPassantSquare: enPassantSquareFromMove(piece, move),
+    enPassantSquare,
     halfMoveCount:
       piece.type !== PieceType.Pawn && !isCapture
         ? position.halfMoveCount + 1
