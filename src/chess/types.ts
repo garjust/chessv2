@@ -28,14 +28,19 @@ export type Move = {
   promotion?: PieceType;
 };
 
-type ExtraMoveData = {
+type CaptureMoveData = {
   capture: boolean;
   kingCapture: boolean;
+};
+
+type AttackMoveData = {
   attack: boolean;
   kingAttack: boolean;
 };
 
-export type MoveWithExtraData = Pick<Move, 'to'> & ExtraMoveData;
+export type MoveWithExtraData = Pick<Move, 'to' | 'promotion'> &
+  CaptureMoveData &
+  AttackMoveData;
 
 export type PieceMoves = {
   piece: Piece;

@@ -10,14 +10,7 @@ import {
   Position,
   Square,
 } from '../types';
-import {
-  isLegalSquare,
-  squareEquals,
-  SquareMap,
-  BLACK_PAWN_STARTING_RANK,
-  WHITE_PAWN_STARTING_RANK,
-  flipColor,
-} from '../utils';
+import { isLegalSquare, squareEquals, SquareMap, flipColor } from '../utils';
 import {
   down,
   left,
@@ -28,27 +21,27 @@ import {
   downLeft,
   downRight,
   squareScanner,
+  isPromotionPositionPawn,
+  isStartPositionPawn,
 } from './move-utils';
-
-const isStartPositionPawn = (piece: Piece, square: Square): boolean =>
-  piece.color === Color.White
-    ? square.rank === WHITE_PAWN_STARTING_RANK
-    : square.rank === BLACK_PAWN_STARTING_RANK;
 
 const pawnMoves = (
   position: Position,
   piece: Piece,
   square: Square
 ): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] => {
-  const squares: Square[] = [];
+  let squares: Square[] = [];
   const opponentColor = flipColor(piece.color);
   const advanceFn = piece.color === Color.White ? up : down;
 
-  // space above the pawn.
-  if (!position.pieces.get(advanceFn(square))) {
+  // Space forward of the pawn.
+  if (
+    !position.pieces.get(advanceFn(square)) &&
+    isLegalSquare(advanceFn(square))
+  ) {
     squares.push(advanceFn(square));
 
-    // space two squares above the pawn and it is in the starting position.
+    // Space two squares forward of the pawn when it is in it's starting rank.
     if (
       !position.pieces.get(advanceFn(square, 2)) &&
       isStartPositionPawn(piece, square)
@@ -57,6 +50,7 @@ const pawnMoves = (
     }
   }
 
+  // Pawn captures diagonally.
   if (
     position.pieces.get(advanceFn(left(square)))?.color === opponentColor ||
     squareEquals(position.enPassantSquare, advanceFn(left(square)))
@@ -68,6 +62,16 @@ const pawnMoves = (
     squareEquals(position.enPassantSquare, advanceFn(right(square)))
   ) {
     squares.push(advanceFn(right(square)));
+  }
+
+  // If the pawn will promote on next advancement take the possible pawn moves
+  // and add possible promotions.
+  if (isPromotionPositionPawn(piece, square)) {
+    squares = squares.flatMap((move) =>
+      [PieceType.Bishop, PieceType.Knight, PieceType.Queen, PieceType.Rook].map(
+        (pieceType) => ({ ...move, promotion: pieceType })
+      )
+    );
   }
 
   return squares.map((square) => ({
@@ -93,6 +97,7 @@ const knightMoves = (
   ]
     .filter(
       (candidateSquare) =>
+        isLegalSquare(candidateSquare) &&
         position.pieces.get(candidateSquare)?.color !== piece.color
     )
     .map((square) => ({
@@ -116,6 +121,7 @@ const kingMoves = (
     downRight(square),
   ].filter(
     (candidateSquare) =>
+      isLegalSquare(candidateSquare) &&
       position.pieces.get(candidateSquare)?.color !== piece.color
   );
 
@@ -191,7 +197,7 @@ const findCaptures = (
 const augmentMoveWithAttacks = (
   position: Position,
   piece: Piece,
-  move: Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>
+  move: Omit<MoveWithExtraData, 'attack' | 'kingAttack'>
 ): MoveWithExtraData => {
   const nextMoves = movesForPiece(position, piece, move.to);
 
@@ -205,16 +211,15 @@ const augmentMoveWithAttacks = (
 const augmentMovesWithAttacks = (
   position: Position,
   piece: Piece,
-  moves: Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[]
+  moves: Omit<MoveWithExtraData, 'attack' | 'kingAttack'>[]
 ): MoveWithExtraData[] =>
   moves.map((move) => augmentMoveWithAttacks(position, piece, move));
 
-export const movesForPiece = (
-  position: Position,
-  piece: Piece,
-  square: Square
-) => {
-  const moves: Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] = [];
+const movesForPiece = (position: Position, piece: Piece, square: Square) => {
+  const moves: Pick<
+    MoveWithExtraData,
+    'to' | 'capture' | 'kingCapture' | 'promotion'
+  >[] = [];
 
   switch (piece.type) {
     case PieceType.Bishop:

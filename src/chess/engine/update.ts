@@ -1,5 +1,11 @@
 import { Update } from '../../lib/workflow';
-import { Color, ComputedPositionData, Move, Position } from '../types';
+import {
+  Color,
+  ComputedPositionData,
+  Move,
+  PieceType,
+  Position,
+} from '../types';
 import { flattenMoves, flipColor, movesIncludes, SquareMap } from '../utils';
 import { checkedSquare, computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
@@ -25,6 +31,7 @@ import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
 import { board } from '../lib/bitmap';
 import { applyMove } from '../lib/move-execution';
+import { isPromotionPositionPawn } from '../lib/move-utils';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -167,6 +174,21 @@ function handleMovePiece(
   if (!movesIncludes(legalMoves, move)) {
     console.log('illegal move!');
     return [state, null];
+  }
+
+  const pieceToMove = pieceInSquare(state, move.from);
+  if (!pieceToMove) {
+    throw Error('there should be a piece to move');
+  }
+
+  // Check if the move is a promotion. Since there is no UI we need to auto-promot
+  // as queen for human players.
+  if (
+    pieceToMove.type === PieceType.Pawn &&
+    isPromotionPositionPawn(pieceToMove, move.from) &&
+    !move.promotion
+  ) {
+    move.promotion = PieceType.Queen;
   }
 
   const { position } = applyMove(state.position, move);
