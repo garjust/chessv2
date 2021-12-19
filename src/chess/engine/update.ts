@@ -181,6 +181,19 @@ function handleSetPosition(
   const { position } = action;
   const computedPositionData = computeAll(position);
 
+  // Check if current player has no moves to end the game
+  if (flattenMoves(computedPositionData.movesByPiece).length === 0) {
+    return [
+      {
+        ...state,
+        position,
+        computedPositionData,
+        winner: flipColor(position.turn),
+      },
+      null,
+    ];
+  }
+
   return [
     { ...state, position, computedPositionData },
     from([overlaySquaresAction(), attemptComputerMoveAction()]),

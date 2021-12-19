@@ -286,7 +286,6 @@ export const computeMovementData = (
   | 'availableCaptures'
   | 'availableAttacks'
   | 'availableChecks'
-  | 'checkmate'
 > => {
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
@@ -300,7 +299,6 @@ export const computeMovementData = (
     [PieceType.Rook, new SquareMap<MoveWithExtraData[]>()],
   ]);
 
-  let checkmate = false;
   let totalMoves = 0;
   const availableCaptures: Move[] = [];
   const availableAttacks: Move[] = [];
@@ -323,9 +321,6 @@ export const computeMovementData = (
           if (move.kingAttack) {
             availableChecks.push({ from, to: move.to });
           }
-          if (move.kingCapture) {
-            checkmate = true;
-          }
           return move;
         })
       );
@@ -339,6 +334,5 @@ export const computeMovementData = (
     availableCaptures,
     availableAttacks,
     availableChecks,
-    checkmate,
   };
 };

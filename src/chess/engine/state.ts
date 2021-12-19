@@ -19,6 +19,7 @@ export enum SquareOverlayType {
 }
 
 export const HumanPlayer = Symbol('HUMAN');
+export const Draw = Symbol('DRAW');
 
 export type Player = typeof HumanPlayer | ChessComputer;
 
@@ -30,6 +31,7 @@ export interface State {
     [Color.White]: Player;
     [Color.Black]: Player;
   };
+  winner?: Color | typeof Draw;
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
   position: Position;
@@ -51,7 +53,6 @@ const INITIAL_STATE: State = {
     availableCaptures: [],
     availableAttacks: [],
     availableChecks: [],
-    checkmate: false,
     evaluation: 0,
     bitmaps: {},
   },

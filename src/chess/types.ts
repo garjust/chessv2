@@ -81,7 +81,6 @@ export type ComputedPositionData = {
   availableCaptures: Move[];
   availableAttacks: Move[];
   availableChecks: Move[];
-  checkmate: boolean;
   evaluation: number;
   bitmaps: {
     whitePieces?: bigint;
