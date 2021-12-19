@@ -2,7 +2,7 @@ import {
   Color,
   ComputedPositionData,
   Move,
-  MoveDetail,
+  MoveWithExtraData,
   MovesByPiece,
   Moveset,
   Piece,
@@ -14,10 +14,8 @@ import {
   isLegalSquare,
   squareEquals,
   SquareMap,
-  squaresInclude,
   BLACK_PAWN_STARTING_RANK,
   WHITE_PAWN_STARTING_RANK,
-  ROOK_STARTING_SQUARES,
   flipColor,
 } from '../utils';
 import {
@@ -210,7 +208,7 @@ const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
 const findCaptures = (
   position: Position,
   to: Square
-): Pick<MoveDetail, 'capture' | 'kingCapture'> => {
+): { capture: boolean; kingCapture: boolean } => {
   const targetPiece = position.pieces.get(to);
 
   return {
@@ -223,7 +221,7 @@ const augmentMove = (
   position: Position,
   piece: Piece,
   to: Square
-): MoveDetail => {
+): MoveWithExtraData => {
   const furtherMoves = findSquaresForMove(position, piece, to);
   const furtherMovesWithCaptures = furtherMoves.map((furtherMove) => ({
     to,
@@ -242,7 +240,8 @@ const augmentMoves = (
   position: Position,
   piece: Piece,
   moves: Square[]
-): MoveDetail[] => moves.map((move) => augmentMove(position, piece, move));
+): MoveWithExtraData[] =>
+  moves.map((move) => augmentMove(position, piece, move));
 
 export const findSquaresForMove = (
   position: Position,
@@ -309,25 +308,43 @@ export const computeMovementData = (
 > => {
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
-    SquareMap<MoveDetail[]>
+    SquareMap<MoveWithExtraData[]>
   >();
-  movesByPiece.set(PieceType.Bishop, new SquareMap<MoveDetail[]>());
-  movesByPiece.set(PieceType.King, new SquareMap<MoveDetail[]>());
-  movesByPiece.set(PieceType.Knight, new SquareMap<MoveDetail[]>());
-  movesByPiece.set(PieceType.Pawn, new SquareMap<MoveDetail[]>());
-  movesByPiece.set(PieceType.Queen, new SquareMap<MoveDetail[]>());
-  movesByPiece.set(PieceType.Rook, new SquareMap<MoveDetail[]>());
+  movesByPiece.set(PieceType.Bishop, new SquareMap<MoveWithExtraData[]>());
+  movesByPiece.set(PieceType.King, new SquareMap<MoveWithExtraData[]>());
+  movesByPiece.set(PieceType.Knight, new SquareMap<MoveWithExtraData[]>());
+  movesByPiece.set(PieceType.Pawn, new SquareMap<MoveWithExtraData[]>());
+  movesByPiece.set(PieceType.Queen, new SquareMap<MoveWithExtraData[]>());
+  movesByPiece.set(PieceType.Rook, new SquareMap<MoveWithExtraData[]>());
 
   const opponentMovesByPiece: MovesByPiece = new Map<
     PieceType,
-    SquareMap<MoveDetail[]>
+    SquareMap<MoveWithExtraData[]>
   >();
-  opponentMovesByPiece.set(PieceType.Bishop, new SquareMap<MoveDetail[]>());
-  opponentMovesByPiece.set(PieceType.King, new SquareMap<MoveDetail[]>());
-  opponentMovesByPiece.set(PieceType.Knight, new SquareMap<MoveDetail[]>());
-  opponentMovesByPiece.set(PieceType.Pawn, new SquareMap<MoveDetail[]>());
-  opponentMovesByPiece.set(PieceType.Queen, new SquareMap<MoveDetail[]>());
-  opponentMovesByPiece.set(PieceType.Rook, new SquareMap<MoveDetail[]>());
+  opponentMovesByPiece.set(
+    PieceType.Bishop,
+    new SquareMap<MoveWithExtraData[]>()
+  );
+  opponentMovesByPiece.set(
+    PieceType.King,
+    new SquareMap<MoveWithExtraData[]>()
+  );
+  opponentMovesByPiece.set(
+    PieceType.Knight,
+    new SquareMap<MoveWithExtraData[]>()
+  );
+  opponentMovesByPiece.set(
+    PieceType.Pawn,
+    new SquareMap<MoveWithExtraData[]>()
+  );
+  opponentMovesByPiece.set(
+    PieceType.Queen,
+    new SquareMap<MoveWithExtraData[]>()
+  );
+  opponentMovesByPiece.set(
+    PieceType.Rook,
+    new SquareMap<MoveWithExtraData[]>()
+  );
 
   let checkmate = false;
   let totalMoves = 0;
@@ -364,20 +381,20 @@ export const computeMovementData = (
     if (map) {
       map.set(
         square,
-        moves.map((moveDetail) => {
-          if (moveDetail.capture) {
-            availableCaptures.push({ from: square, to: moveDetail.to });
+        moves.map((move) => {
+          if (move.capture) {
+            availableCaptures.push({ from: square, to: move.to });
           }
-          if (moveDetail.attack) {
-            availableAttacks.push({ from: square, to: moveDetail.to });
+          if (move.attack) {
+            availableAttacks.push({ from: square, to: move.to });
           }
-          if (moveDetail.kingAttack) {
-            availableChecks.push({ from: square, to: moveDetail.to });
+          if (move.kingAttack) {
+            availableChecks.push({ from: square, to: move.to });
           }
-          if (moveDetail.kingCapture) {
+          if (move.kingCapture) {
             checkmate = true;
           }
-          return moveDetail;
+          return move;
         })
       );
       totalMoves += moves.length;

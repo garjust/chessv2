@@ -28,18 +28,19 @@ export type Move = {
   promotion?: PieceType;
 };
 
-export type MoveDetail = {
-  to: Square;
+type ExtraMoveData = {
   capture: boolean;
   kingCapture: boolean;
   attack: boolean;
   kingAttack: boolean;
 };
 
+export type MoveWithExtraData = Pick<Move, 'to'> & ExtraMoveData;
+
 export type Moveset = {
   piece: Piece;
   square: Square;
-  moves: MoveDetail[];
+  moves: MoveWithExtraData[];
 };
 
 export type CastlingAvailability = {
@@ -70,7 +71,7 @@ export type Position = {
   fullMoveCount: number;
 };
 
-export type MovesByPiece = Map<PieceType, Map<Square, MoveDetail[]>>;
+export type MovesByPiece = Map<PieceType, Map<Square, MoveWithExtraData[]>>;
 
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.

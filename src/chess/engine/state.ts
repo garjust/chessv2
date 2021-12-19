@@ -7,7 +7,7 @@ import {
   Square,
   ComputedPositionData,
   PieceType,
-  MoveDetail,
+  MoveWithExtraData,
 } from '../types';
 import { SquareMap } from '../utils';
 
@@ -46,8 +46,8 @@ const INITIAL_STATE: State = {
   },
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
-    movesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
-    opponentMovesByPiece: new Map<PieceType, SquareMap<MoveDetail[]>>(),
+    movesByPiece: new Map<PieceType, SquareMap<MoveWithExtraData[]>>(),
+    opponentMovesByPiece: new Map<PieceType, SquareMap<MoveWithExtraData[]>>(),
     totalMoves: 0,
     availableCaptures: [],
     availableAttacks: [],
