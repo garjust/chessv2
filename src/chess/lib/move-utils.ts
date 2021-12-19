@@ -1,4 +1,4 @@
-import { Piece, Position, Square } from '../types';
+import { Color, Piece, Position, Square } from '../types';
 import { isLegalSquare } from '../utils';
 
 export const up = (square: Square, n = 1): Square => ({
@@ -26,7 +26,7 @@ export const downLeft = (square: Square, n = 1): Square =>
 export const downRight = (square: Square, n = 1): Square =>
   down(right(square, n), n);
 
-export const squareScanner = (position: Position, piece: Piece) => {
+export const squareScanner = (position: Position, friendlyColor: Color) => {
   const scan = (
     squares: Square[],
     scanFn: (square: Square) => Square
@@ -38,7 +38,7 @@ export const squareScanner = (position: Position, piece: Piece) => {
 
     const nextPiece = position.pieces.get(next);
     if (nextPiece) {
-      if (nextPiece.color === piece.color) {
+      if (nextPiece.color === friendlyColor) {
         // friend!
         return squares;
       } else {

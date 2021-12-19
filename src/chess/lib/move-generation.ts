@@ -73,20 +73,6 @@ const pawnMoves = (
   return squares;
 };
 
-const bishopMoves = (
-  position: Position,
-  piece: Piece,
-  square: Square
-): Square[] => {
-  const squares: Square[] = [];
-
-  [upLeft, upRight, downLeft, downRight].forEach((scanFn) => {
-    squares.push(...squareScanner(position, piece)([square], scanFn).slice(1));
-  });
-
-  return squares;
-};
-
 const knightMoves = (
   position: Position,
   piece: Piece,
@@ -155,20 +141,18 @@ const kingMoves = (
   return squares;
 };
 
-const queenMoves = (
+const bishopMoves = (
   position: Position,
   piece: Piece,
   square: Square
 ): Square[] => {
   const squares: Square[] = [];
 
-  [up, right, left, down, upLeft, upRight, downLeft, downRight].forEach(
-    (scanFn) => {
-      squares.push(
-        ...squareScanner(position, piece)([square], scanFn).slice(1)
-      );
-    }
-  );
+  [upLeft, upRight, downLeft, downRight].forEach((scanFn) => {
+    squares.push(
+      ...squareScanner(position, piece.color)([square], scanFn).slice(1)
+    );
+  });
 
   return squares;
 };
@@ -181,11 +165,22 @@ const rookMoves = (
   const squares: Square[] = [];
 
   [up, right, left, down].forEach((scanFn) => {
-    squares.push(...squareScanner(position, piece)([square], scanFn).slice(1));
+    squares.push(
+      ...squareScanner(position, piece.color)([square], scanFn).slice(1)
+    );
   });
 
   return squares;
 };
+
+const queenMoves = (
+  position: Position,
+  piece: Piece,
+  square: Square
+): Square[] => [
+  ...bishopMoves(position, piece, square),
+  ...rookMoves(position, piece, square),
+];
 
 const movesetsForPosition = (
   position: Position,
