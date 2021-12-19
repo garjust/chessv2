@@ -4,7 +4,7 @@ import {
   Move,
   MoveWithExtraData,
   MovesByPiece,
-  Moveset,
+  PieceMoves,
   Piece,
   PieceType,
   Position,
@@ -187,8 +187,11 @@ const rookMoves = (
   return squares;
 };
 
-const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
-  const movesets: Moveset[] = [];
+const movesetsForPosition = (
+  position: Position,
+  color?: Color
+): PieceMoves[] => {
+  const movesets: PieceMoves[] = [];
 
   for (const [square, piece] of position.pieces.entries()) {
     if (color && piece.color !== color) {
@@ -196,7 +199,7 @@ const movesetsForPosition = (position: Position, color?: Color): Moveset[] => {
     }
     const moves = findSquaresForMove(position, piece, square);
     movesets.push({
-      square,
+      from: square,
       piece,
       moves: augmentMoves(position, piece, moves),
     });
@@ -376,20 +379,20 @@ export const computeMovementData = (
   // const inCheck = checksOnSelf.length > 0;
 
   const movesets = movesetsForPosition(position, position.turn);
-  movesets.forEach(({ piece, square, moves }) => {
+  movesets.forEach(({ piece, from, moves }) => {
     const map = movesByPiece.get(piece.type);
     if (map) {
       map.set(
-        square,
+        from,
         moves.map((move) => {
           if (move.capture) {
-            availableCaptures.push({ from: square, to: move.to });
+            availableCaptures.push({ from, to: move.to });
           }
           if (move.attack) {
-            availableAttacks.push({ from: square, to: move.to });
+            availableAttacks.push({ from, to: move.to });
           }
           if (move.kingAttack) {
-            availableChecks.push({ from: square, to: move.to });
+            availableChecks.push({ from, to: move.to });
           }
           if (move.kingCapture) {
             checkmate = true;

@@ -37,9 +37,9 @@ type ExtraMoveData = {
 
 export type MoveWithExtraData = Pick<Move, 'to'> & ExtraMoveData;
 
-export type Moveset = {
+export type PieceMoves = {
   piece: Piece;
-  square: Square;
+  from: Square;
   moves: MoveWithExtraData[];
 };
 
