@@ -7,7 +7,7 @@ import {
   Position,
 } from '../types';
 import { flipColor, SquareMap } from '../utils';
-import { applyMove, checkedSquare, computeMovementData } from '../lib/movement';
+import { checkedSquare, computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
@@ -30,6 +30,7 @@ import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
 import { board } from '../lib/bitmap';
+import { applyMove } from '../lib/move-execution';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -167,16 +168,16 @@ function handleMovePiece(
   action: Action.MovePiece
 ): Update<State, Action> {
   const { move } = action;
-  let position;
+  let moveResult;
 
   try {
-    position = applyMove(state.position, move);
+    moveResult = applyMove(state.position, move);
   } catch (error) {
     console.log(`failed to move piece: ${error}`);
   }
 
-  if (position) {
-    return [state, setPositionAction(position)];
+  if (moveResult) {
+    return [state, setPositionAction(moveResult.position)];
   } else {
     return [state, overlaySquaresAction()];
   }
