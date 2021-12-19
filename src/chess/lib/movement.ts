@@ -327,7 +327,7 @@ export const applyMove = (position: Position, move: Move): Position => {
   let enPassantSquare: Square | null = null;
   let isCapture = false;
 
-  const piece = pieces.get(move.from);
+  let piece = pieces.get(move.from);
 
   if (!piece) {
     throw Error('no piece to move');
@@ -339,6 +339,13 @@ export const applyMove = (position: Position, move: Move): Position => {
   const legalSquares = findSquaresForMove(position, piece, move.from);
   if (!squaresInclude(legalSquares, move.to)) {
     throw Error('illegal move!');
+  }
+
+  // If the move is a pawn promoting it will have the promotion property set.
+  // In this case swap out the piece befor executing the move so we only insert
+  // a piece once.
+  if (move.promotion) {
+    piece = { ...piece, type: move.promotion };
   }
 
   // Execute the move

@@ -25,6 +25,7 @@ export type Square = {
 export type Move = {
   from: Square;
   to: Square;
+  promotion?: PieceType;
 };
 
 export type MoveDetail = {
