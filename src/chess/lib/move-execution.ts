@@ -34,11 +34,6 @@ export const applyMove = (
     throw Error('cannot move piece for other color');
   }
 
-  const legalSquares = findSquaresForMove(position, piece, move.from);
-  if (!squaresInclude(legalSquares, move.to)) {
-    throw Error('illegal move!');
-  }
-
   // If the move is a pawn promoting it will have the promotion property set.
   // In this case swap out the piece befor executing the move so we only insert
   // a piece once.

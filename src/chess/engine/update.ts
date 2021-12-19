@@ -6,7 +6,13 @@ import {
   PieceType,
   Position,
 } from '../types';
-import { flipColor, SquareMap } from '../utils';
+import {
+  flattenMoves,
+  flipColor,
+  movesIncludes,
+  SquareMap,
+  squaresInclude,
+} from '../utils';
 import { checkedSquare, computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
@@ -168,19 +174,15 @@ function handleMovePiece(
   action: Action.MovePiece
 ): Update<State, Action> {
   const { move } = action;
-  let moveResult;
 
-  try {
-    moveResult = applyMove(state.position, move);
-  } catch (error) {
-    console.log(`failed to move piece: ${error}`);
+  const legalMoves = flattenMoves(state.computedPositionData.movesByPiece);
+  if (!movesIncludes(legalMoves, move)) {
+    throw Error('illegal move!');
   }
 
-  if (moveResult) {
-    return [state, setPositionAction(moveResult.position)];
-  } else {
-    return [state, overlaySquaresAction()];
-  }
+  const { position } = applyMove(state.position, move);
+
+  return [state, setPositionAction(position)];
 }
 
 function handleSetPosition(

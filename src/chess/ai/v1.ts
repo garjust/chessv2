@@ -1,22 +1,9 @@
 import { ChessComputer } from './types';
 import { ComputedPositionData, Move, MovesByPiece, Position } from '../types';
+import { flattenMoves } from '../utils';
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
-
-const flattenMoves = (mapByPiece: MovesByPiece): Move[] => {
-  const moves: Move[] = [];
-
-  for (const map of mapByPiece.values()) {
-    for (const [from, squares] of map.entries()) {
-      for (const { to } of squares) {
-        moves.push({ from, to });
-      }
-    }
-  }
-
-  return moves;
-};
 
 export default class v1 implements ChessComputer {
   nextMove(
