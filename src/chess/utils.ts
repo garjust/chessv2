@@ -4,10 +4,16 @@ import { Color, Square, SquareLabel } from './types';
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
 
-export const WHITE_QUEENSIDE_ROOK_START_SQUARE: Square = { rank: 0, file: 0 };
-export const WHITE_KINGSIDE_ROOK_START_SQUARE: Square = { rank: 0, file: 7 };
-export const BLACK_QUEENSIDE_ROOK_START_SQUARE: Square = { rank: 7, file: 0 };
-export const BLACK_KINGSIDE_ROOK_START_SQUARE: Square = { rank: 7, file: 7 };
+export const ROOK_STARTING_SQUARES = Object.freeze({
+  [Color.White]: {
+    queenside: { rank: 0, file: 0 },
+    kingside: { rank: 0, file: 7 },
+  },
+  [Color.Black]: {
+    queenside: { rank: 7, file: 0 },
+    kingside: { rank: 7, file: 7 },
+  },
+});
 
 type Nullable<T> = T | undefined | null;
 

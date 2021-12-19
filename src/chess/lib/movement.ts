@@ -17,10 +17,7 @@ import {
   squaresInclude,
   BLACK_PAWN_STARTING_RANK,
   WHITE_PAWN_STARTING_RANK,
-  WHITE_QUEENSIDE_ROOK_START_SQUARE,
-  WHITE_KINGSIDE_ROOK_START_SQUARE,
-  BLACK_QUEENSIDE_ROOK_START_SQUARE,
-  BLACK_KINGSIDE_ROOK_START_SQUARE,
+  ROOK_STARTING_SQUARES,
   flipColor,
 } from '../utils';
 
@@ -328,6 +325,7 @@ export const applyMove = (position: Position, move: Move): Position => {
 
   const castlingAvailability = { ...position.castlingAvailability };
   let enPassantSquare: Square | null = null;
+  let isCapture = false;
 
   const piece = pieces.get(move.from);
 
@@ -344,45 +342,20 @@ export const applyMove = (position: Position, move: Move): Position => {
   }
 
   // Execute the move
-  let isCapture = pieces.delete(move.from);
+  const capturedPiece = pieces.get(move.to);
+  pieces.delete(move.from);
   pieces.set(move.to, piece);
 
-  if (piece.type === PieceType.Rook) {
-    if (squareEquals(move.from, WHITE_QUEENSIDE_ROOK_START_SQUARE)) {
-      castlingAvailability[Color.White].queenside = false;
-    } else if (squareEquals(move.from, WHITE_KINGSIDE_ROOK_START_SQUARE)) {
-      castlingAvailability[Color.White].kingside = false;
-    } else if (squareEquals(move.from, BLACK_QUEENSIDE_ROOK_START_SQUARE)) {
-      castlingAvailability[Color.Black].queenside = false;
-    } else if (squareEquals(move.from, BLACK_KINGSIDE_ROOK_START_SQUARE)) {
-      castlingAvailability[Color.Black].kingside = false;
-    }
-  }
+  if (capturedPiece) {
+    isCapture = true;
 
-  if (piece.type === PieceType.King) {
-    castlingAvailability[piece.color].queenside = false;
-    castlingAvailability[piece.color].kingside = false;
-
-    // This is a castling move
-    if (Math.abs(move.from.file - move.to.file) === 2) {
-      if (move.from.file - move.to.file > 0) {
-        // queenside
-        const rookSquare = { rank: move.from.rank, file: 0 };
-        const rook = position.pieces.get(rookSquare);
-        if (!rook) {
-          throw Error('no rook to castle with');
-        }
-        pieces.delete(rookSquare);
-        pieces.set({ rank: move.from.rank, file: 3 }, rook);
-      } else {
-        // kingside
-        const rookSquare = { rank: move.from.rank, file: 7 };
-        const rook = position.pieces.get(rookSquare);
-        if (!rook) {
-          throw Error('no rook to castle with');
-        }
-        pieces.delete(rookSquare);
-        pieces.set({ rank: move.from.rank, file: 5 }, rook);
+    // If the captured piece is a rook we need to update castling state.
+    if (capturedPiece.type === PieceType.Rook) {
+      if (squareEquals(move.to, ROOK_STARTING_SQUARES[piece.color].queenside)) {
+        castlingAvailability[piece.color].queenside = false;
+      } else if (
+        squareEquals(move.to, ROOK_STARTING_SQUARES[piece.color].kingside)
+      ) {
         castlingAvailability[piece.color].kingside = false;
       }
     }
@@ -402,6 +375,47 @@ export const applyMove = (position: Position, move: Move): Position => {
 
     if (isTwoRankMove(move)) {
       enPassantSquare = move.from.rank === 1 ? up(move.from) : down(move.from);
+    }
+  }
+
+  // King move special handling.
+  if (piece.type === PieceType.King) {
+    // The king moved, no more castling.
+    castlingAvailability[piece.color].queenside = false;
+    castlingAvailability[piece.color].kingside = false;
+
+    // If the king move is a castle we need to move the corresponding rook.
+    if (Math.abs(move.from.file - move.to.file) === 2) {
+      if (move.from.file - move.to.file > 0) {
+        // queenside
+        const rookSquare = { rank: move.from.rank, file: 0 };
+        const rook = position.pieces.get(rookSquare);
+        if (!rook) {
+          throw Error('no rook to castle with');
+        }
+        pieces.delete(rookSquare);
+        pieces.set({ rank: move.from.rank, file: 3 }, rook);
+      } else {
+        // kingside
+        const rookSquare = { rank: move.from.rank, file: 7 };
+        const rook = position.pieces.get(rookSquare);
+        if (!rook) {
+          throw Error('no rook to castle with');
+        }
+        pieces.delete(rookSquare);
+        pieces.set({ rank: move.from.rank, file: 5 }, rook);
+      }
+    }
+  }
+
+  // If the moved piece is a rook update castling state.
+  if (piece.type === PieceType.Rook) {
+    if (squareEquals(move.from, ROOK_STARTING_SQUARES[piece.color].queenside)) {
+      castlingAvailability[piece.color].queenside = false;
+    } else if (
+      squareEquals(move.from, ROOK_STARTING_SQUARES[piece.color].kingside)
+    ) {
+      castlingAvailability[piece.color].kingside = false;
     }
   }
 
