@@ -26,30 +26,37 @@ export const downLeft = (square: Square, n = 1): Square =>
 export const downRight = (square: Square, n = 1): Square =>
   down(right(square, n), n);
 
-export const squareScanner = (position: Position, friendlyColor: Color) => {
-  const scan = (
-    squares: Square[],
-    scanFn: (square: Square) => Square
-  ): Square[] => {
-    const next = scanFn(squares[squares.length - 1]);
-    if (!isLegalSquare(next)) {
+const scan = (
+  position: Position,
+  friendlyColor: Color,
+  scanFn: (square: Square) => Square,
+  squares: Square[]
+): Square[] => {
+  const next = scanFn(squares[squares.length - 1]);
+  if (!isLegalSquare(next)) {
+    return squares;
+  }
+
+  const nextPiece = position.pieces.get(next);
+  if (nextPiece) {
+    if (nextPiece.color === friendlyColor) {
+      // friend!
       return squares;
+    } else {
+      // foe!
+      return [...squares, next];
     }
+  }
 
-    const nextPiece = position.pieces.get(next);
-    if (nextPiece) {
-      if (nextPiece.color === friendlyColor) {
-        // friend!
-        return squares;
-      } else {
-        // foe!
-        return [...squares, next];
-      }
-    }
+  // empty! keep scanning!
+  return scan(position, friendlyColor, scanFn, [...squares, next]);
+};
 
-    // empty! keep scanning!
-    return scan([...squares, next], scanFn);
-  };
-
-  return scan;
+export const squareScanner = (
+  position: Position,
+  square: Square,
+  friendlyColor: Color,
+  scanFn: (square: Square) => Square
+): Square[] => {
+  return scan(position, friendlyColor, scanFn, [square]).slice(1);
 };

@@ -2,11 +2,9 @@ import { Color, Move, Piece, PieceType, Position, Square } from '../types';
 import {
   squareEquals,
   SquareMap,
-  squaresInclude,
   ROOK_STARTING_SQUARES,
   flipColor,
 } from '../utils';
-import { findSquaresForMove } from './move-generation';
 import { down, up } from './move-utils';
 
 const isTwoRankMove = (move: Move): boolean =>

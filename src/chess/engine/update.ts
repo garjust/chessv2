@@ -1,18 +1,6 @@
 import { Update } from '../../lib/workflow';
-import {
-  Color,
-  ComputedPositionData,
-  Move,
-  PieceType,
-  Position,
-} from '../types';
-import {
-  flattenMoves,
-  flipColor,
-  movesIncludes,
-  SquareMap,
-  squaresInclude,
-} from '../utils';
+import { Color, ComputedPositionData, Move, Position } from '../types';
+import { flattenMoves, flipColor, movesIncludes, SquareMap } from '../utils';
 import { checkedSquare, computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
@@ -177,7 +165,8 @@ function handleMovePiece(
 
   const legalMoves = flattenMoves(state.computedPositionData.movesByPiece);
   if (!movesIncludes(legalMoves, move)) {
-    throw Error('illegal move!');
+    console.log('illegal move!');
+    return [state, null];
   }
 
   const { position } = applyMove(state.position, move);
