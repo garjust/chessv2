@@ -97,3 +97,6 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 
   return false;
 };
+
+export const checkedSquare = (state: State): Square | undefined =>
+  state.computedPositionData.checksOnSelf?.attackedSquare;

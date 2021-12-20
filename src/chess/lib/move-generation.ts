@@ -9,6 +9,7 @@ import {
   PieceType,
   Position,
   Square,
+  AttackObject,
 } from '../types';
 import { isLegalSquare, squareEquals, SquareMap, flipColor } from '../utils';
 import {
@@ -23,6 +24,7 @@ import {
   squareScanner,
   isPromotionPositionPawn,
   isStartPositionPawn,
+  squaresBetweenMove,
 } from './move-utils';
 
 const pawnMoves = (
@@ -213,13 +215,19 @@ const augmentMovesWithAttacks = (
 ): MoveWithExtraData[] =>
   moves.map((move) => augmentMoveWithAttacks(position, piece, move));
 
-const attackersToSquare = (
+const attacksOnSquare = (
   position: Position,
   color: Color,
   square: Square
-): Square[] => {
-  const attackers: Square[] = [];
+): AttackObject => {
+  const attackObj: AttackObject = {
+    attackedSquare: square,
+    squares: [],
+    attackerCount: 0,
+  };
+
   const superPieceMoves = {
+    [PieceType.King]: kingMoves(position, color, square),
     [PieceType.Bishop]: bishopMoves(position, color, square),
     [PieceType.Rook]: rookMoves(position, color, square),
     [PieceType.Knight]: knightMoves(position, color, square),
@@ -230,7 +238,8 @@ const attackersToSquare = (
   // the attacked piece is a pawn.
   superPieceMoves[PieceType.Pawn].forEach((move) => {
     if (position.pieces.get(move.to)?.type === PieceType.Pawn) {
-      attackers.push(move.to);
+      attackObj.squares.push(move.to);
+      attackObj.attackerCount++;
     }
   });
 
@@ -240,7 +249,16 @@ const attackersToSquare = (
       move.capture &&
       position.pieces.get(move.to)?.type === PieceType.Knight
     ) {
-      attackers.push(move.to);
+      attackObj.squares.push(move.to);
+      attackObj.attackerCount++;
+    }
+  });
+
+  // Look for kings attacked by a king move.
+  superPieceMoves[PieceType.King].forEach((move) => {
+    if (move.capture && position.pieces.get(move.to)?.type === PieceType.King) {
+      attackObj.squares.push(move.to);
+      attackObj.attackerCount++;
     }
   });
 
@@ -251,7 +269,11 @@ const attackersToSquare = (
       (position.pieces.get(move.to)?.type === PieceType.Bishop ||
         position.pieces.get(move.to)?.type === PieceType.Queen)
     ) {
-      attackers.push(move.to);
+      attackObj.squares.push(move.to);
+      attackObj.squares.push(
+        ...squaresBetweenMove({ from: square, to: move.to })
+      );
+      attackObj.attackerCount++;
     }
   });
 
@@ -262,11 +284,15 @@ const attackersToSquare = (
       (position.pieces.get(move.to)?.type === PieceType.Rook ||
         position.pieces.get(move.to)?.type === PieceType.Queen)
     ) {
-      attackers.push(move.to);
+      attackObj.squares.push(move.to);
+      attackObj.squares.push(
+        ...squaresBetweenMove({ from: square, to: move.to })
+      );
+      attackObj.attackerCount++;
     }
   });
 
-  return attackers;
+  return attackObj;
 };
 
 const movesForPiece = (position: Position, piece: Piece, square: Square) => {
@@ -317,35 +343,40 @@ const movesForPosition = (position: Position, color?: Color): PieceMoves[] => {
   return pieceMoves;
 };
 
-export const isCheck = (position: Position, color?: Color): boolean =>
-  Boolean(checkedSquare(position, color));
-
-export const checkedSquare = (
+const findAttacksOnKing = (
   position: Position,
-  color?: Color
-): Square | undefined => {
-  let square;
-  movesForPosition(position, color).find(({ moves }) =>
-    moves.find(({ kingCapture, to }) => {
-      if (kingCapture) {
-        square = to;
-      }
-    })
-  );
+  color: Color
+): AttackObject | undefined => {
+  let king: Square | undefined;
+  for (const [square, piece] of position.pieces) {
+    if (piece.type === PieceType.King && piece.color === color) {
+      king = square;
+      break;
+    }
+  }
+  if (!king) {
+    return;
+  }
 
-  return square;
+  return attacksOnSquare(position, color, king);
 };
 
 export const computeMovementData = (
   position: Position
 ): Pick<
   ComputedPositionData,
+  | 'checksOnSelf'
   | 'movesByPiece'
   | 'totalMoves'
   | 'availableCaptures'
   | 'availableAttacks'
   | 'availableChecks'
 > => {
+  let checksOnSelf = findAttacksOnKing(position, position.turn);
+  if (checksOnSelf?.attackerCount === 0) {
+    checksOnSelf = undefined;
+  }
+
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
     SquareMap<MoveWithExtraData[]>
@@ -362,7 +393,6 @@ export const computeMovementData = (
   const availableCaptures: Move[] = [];
   const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
-  const checksOnSelf: Move[] = [];
 
   const movesets = movesForPosition(position, position.turn);
   movesets.forEach(({ piece, from, moves }) => {
@@ -388,6 +418,7 @@ export const computeMovementData = (
   });
 
   return {
+    checksOnSelf,
     movesByPiece,
     totalMoves,
     availableCaptures,

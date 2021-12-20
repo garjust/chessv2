@@ -7,7 +7,7 @@ import {
   Position,
 } from '../types';
 import { flattenMoves, flipColor, movesIncludes, SquareMap } from '../utils';
-import { checkedSquare, computeMovementData } from '../lib/move-generation';
+import { computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
@@ -23,6 +23,7 @@ import {
   createState,
   pieceInSquare,
   HumanPlayer,
+  checkedSquare,
 } from './state';
 import { evaluate } from '../lib/evaluation';
 import { v2 } from '../ai';
@@ -131,7 +132,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
 
   const { position, selectedSquare } = state;
 
-  const check = checkedSquare(position);
+  const check = checkedSquare(state);
   if (check) {
     squareOverlay.set(check, SquareOverlayType.Check);
   }

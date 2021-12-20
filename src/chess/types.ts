@@ -22,6 +22,11 @@ export type Square = {
   file: number;
 };
 
+export enum SlideType {
+  Cardinal = 'CARDINAL',
+  Diagonal = 'DIAGONAL',
+}
+
 export type Move = {
   from: Square;
   to: Square;
@@ -78,9 +83,19 @@ export type Position = {
 
 export type MovesByPiece = Map<PieceType, Map<Square, MoveWithExtraData[]>>;
 
+export type AttackObject = {
+  // The square being attacked for this object
+  attackedSquare: Square;
+  // If there are attackers this is the set of squares the attackers are on and
+  // any squares they attack through (for sliders).
+  squares: Square[];
+  attackerCount: number;
+};
+
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.
 export type ComputedPositionData = {
+  checksOnSelf?: AttackObject;
   movesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
