@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
 import init, { createState } from '../engine';
@@ -7,6 +7,7 @@ import {
   flipBoardAction,
   initializeAction,
   loadChessComputerAction,
+  previousPositionAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from '../engine/action';
@@ -65,10 +66,10 @@ const Game = () => {
           <button
             style={BUTTON_CSS}
             onClick={() => {
-              emit(setPositionFromFENAction(STARTING_POSITION_FEN));
+              emit(previousPositionAction());
             }}
           >
-            Reset game
+            Go back
           </button>
           <button style={BUTTON_CSS} onClick={emitExampleGame}>
             Example game

@@ -8,6 +8,7 @@ export enum Type {
   LoadChessComputer = 'LOAD_CHESS_COMPUTER',
   MovePiece = 'MOVE_PIECE',
   OverlaySquares = 'OVERLAY_SQUARES',
+  PreviousPosition = 'PREVIOUS_POSITION',
   ResetOverlay = 'RESET_OVERLAY',
   SetPosition = 'SET_POSITION',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
@@ -47,6 +48,10 @@ export declare namespace Action {
     readonly type: Type.OverlaySquares;
   }
 
+  export interface PreviousPosition {
+    readonly type: Type.PreviousPosition;
+  }
+
   export interface ResetOverlay {
     readonly type: Type.ResetOverlay;
   }
@@ -73,6 +78,7 @@ export type Action =
   | Action.Initialize
   | Action.LoadChessComputer
   | Action.OverlaySquares
+  | Action.PreviousPosition
   | Action.ResetOverlay
   | Action.MovePiece
   | Action.SetPosition
@@ -106,6 +112,10 @@ export const loadChessComputerAction = (
 
 export const overlaySquaresAction = (): Action.OverlaySquares => ({
   type: Type.OverlaySquares,
+});
+
+export const previousPositionAction = (): Action.PreviousPosition => ({
+  type: Type.PreviousPosition,
 });
 
 export const resetOverlayAction = (): Action.ResetOverlay => ({

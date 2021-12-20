@@ -35,6 +35,7 @@ export interface State {
   selectedSquare?: Square;
   squareOverlay?: SquareMap<SquareOverlayType>;
   position: Position;
+  previousPositions: Position[];
   computedPositionData: ComputedPositionData;
 }
 
@@ -46,6 +47,7 @@ const INITIAL_STATE: State = {
     [Color.White]: HumanPlayer,
     [Color.Black]: HumanPlayer,
   },
+  previousPositions: [],
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
     movesByPiece: new Map<PieceType, SquareMap<MoveWithExtraData[]>>(),

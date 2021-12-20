@@ -6,7 +6,13 @@ import {
   PieceType,
   Position,
 } from '../types';
-import { flattenMoves, flipColor, movesIncludes, SquareMap } from '../utils';
+import {
+  flattenMoves,
+  flipColor,
+  movesIncludes,
+  squareEquals,
+  SquareMap,
+} from '../utils';
 import { computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
@@ -83,6 +89,10 @@ function handleClickSquare(
   const { position } = state;
 
   if (state.selectedSquare) {
+    if (squareEquals(state.selectedSquare, square)) {
+      return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
+    }
+
     return [
       { ...state, selectedSquare: undefined },
       movePieceAction({
@@ -161,6 +171,19 @@ function handleOverlaySquares(state: State): Update<State, Action> {
   return [{ ...state, squareOverlay }, null];
 }
 
+function handlePreviousPosition(state: State): Update<State, Action> {
+  let previousPositions = state.previousPositions;
+  let work: Action | null = null;
+
+  const position = previousPositions[state.previousPositions.length - 1];
+  if (position) {
+    previousPositions = previousPositions.slice(0, -1);
+    work = setPositionAction(position);
+  }
+
+  return [{ ...state, previousPositions, selectedSquare: undefined }, work];
+}
+
 function handleResetOverlay(state: State): Update<State, Action> {
   return [{ ...state, squareOverlay: undefined }, null];
 }
@@ -182,7 +205,7 @@ function handleMovePiece(
       move.to,
       state.position
     );
-    return [state, null];
+    return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
   }
 
   const pieceToMove = pieceInSquare(state, move.from);
@@ -202,7 +225,13 @@ function handleMovePiece(
 
   const { position } = applyMove(state.position, move);
 
-  return [state, setPositionAction(position)];
+  return [
+    {
+      ...state,
+      previousPositions: [...state.previousPositions, state.position],
+    },
+    setPositionAction(position),
+  ];
 }
 
 function handleSetPosition(
@@ -264,6 +293,8 @@ export function update(
       return handleLoadChessComputer(state, action);
     case Type.OverlaySquares:
       return handleOverlaySquares(state);
+    case Type.PreviousPosition:
+      return handlePreviousPosition(state);
     case Type.ResetOverlay:
       return handleResetOverlay(state);
     case Type.MovePiece:
