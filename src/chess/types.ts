@@ -86,10 +86,11 @@ export type MovesByPiece = Map<PieceType, Map<Square, MoveWithExtraData[]>>;
 export type AttackObject = {
   // The square being attacked for this object
   attackedSquare: Square;
-  // If there are attackers this is the set of squares the attackers are on and
-  // any squares they attack through (for sliders).
-  squares: Square[];
-  attackerCount: number;
+  // The list of attackers and their resident
+  attackers: { square: Square; type: PieceType }[];
+  // If there are sliding attackers this is the set of squares the move through
+  // for the attack. A move to one of these squares blocks an attacker.
+  slideSquares: Square[];
 };
 
 // Data that can be computed from a position that we may want to cache because
