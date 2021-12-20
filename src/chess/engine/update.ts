@@ -173,7 +173,15 @@ function handleMovePiece(
 
   const legalMoves = flattenMoves(state.computedPositionData.movesByPiece);
   if (!movesIncludes(legalMoves, move)) {
-    console.log('illegal move!');
+    const piece = pieceInSquare(state, move.from);
+    console.log(
+      'illegal move!',
+      piece,
+      move.from,
+      '\u2B95',
+      move.to,
+      state.position
+    );
     return [state, null];
   }
 

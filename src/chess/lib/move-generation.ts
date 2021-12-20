@@ -358,7 +358,12 @@ const findAttacksOnKing = (
     return;
   }
 
-  return attacksOnSquare(position, color, king);
+  const attackObject = attacksOnSquare(position, color, king);
+  if (attackObject.attackerCount > 0) {
+    return attackObject;
+  } else {
+    return;
+  }
 };
 
 export const computeMovementData = (
@@ -372,10 +377,7 @@ export const computeMovementData = (
   | 'availableAttacks'
   | 'availableChecks'
 > => {
-  let checksOnSelf = findAttacksOnKing(position, position.turn);
-  if (checksOnSelf?.attackerCount === 0) {
-    checksOnSelf = undefined;
-  }
+  const checksOnSelf = findAttacksOnKing(position, position.turn);
 
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
@@ -394,25 +396,32 @@ export const computeMovementData = (
   const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
 
+  // TODO: different move generation function when in check?
   const movesets = movesForPosition(position, position.turn);
   movesets.forEach(({ piece, from, moves }) => {
     const map = movesByPiece.get(piece.type);
+
+    if (checksOnSelf) {
+      console.log('filtering moves');
+      // moves = moves.filter((move) => {
+      //   // get rid of moves that are illegal because of checks.
+      // });
+    }
+
+    moves.forEach((move) => {
+      if (move.capture) {
+        availableCaptures.push({ from, to: move.to });
+      }
+      if (move.attack) {
+        availableAttacks.push({ from, to: move.to });
+      }
+      if (move.kingAttack) {
+        availableChecks.push({ from, to: move.to });
+      }
+    });
+
     if (map) {
-      map.set(
-        from,
-        moves.map((move) => {
-          if (move.capture) {
-            availableCaptures.push({ from, to: move.to });
-          }
-          if (move.attack) {
-            availableAttacks.push({ from, to: move.to });
-          }
-          if (move.kingAttack) {
-            availableChecks.push({ from, to: move.to });
-          }
-          return move;
-        })
-      );
+      map.set(from, moves);
       totalMoves += moves.length;
     }
   });
