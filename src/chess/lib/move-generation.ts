@@ -139,6 +139,9 @@ const kingMoves = (
     !skipCastling &&
     position.castlingAvailability[color].kingside &&
     !position.pieces.get(right(from)) &&
+    // Also check nothing is attacking the square being castled through
+    attacksOnSquare(position, flipColor(color), right(from)).attackers
+      .length === 0 &&
     !position.pieces.get(right(from, 2))
   ) {
     squares.push(right(from, 2));
@@ -147,6 +150,9 @@ const kingMoves = (
     !skipCastling &&
     position.castlingAvailability[color].queenside &&
     !position.pieces.get(left(from)) &&
+    // Also check nothing is attacking the square being castled through
+    attacksOnSquare(position, flipColor(color), left(from)).attackers.length ===
+      0 &&
     !position.pieces.get(left(from, 2)) &&
     !position.pieces.get(left(from, 3))
   ) {
