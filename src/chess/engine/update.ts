@@ -242,13 +242,23 @@ function handleSetPosition(
   const { position } = action;
   const computedPositionData = computeAll(position);
 
+  state = { ...state, position, computedPositionData };
+
+  if (position.halfMoveCount === 100) {
+    return [
+      {
+        ...state,
+        winner: Draw,
+      },
+      null,
+    ];
+  }
+
   // Check if current player has no moves to end the game
   if (flattenMoves(computedPositionData.movesByPiece).length === 0) {
     return [
       {
         ...state,
-        position,
-        computedPositionData,
         winner: computedPositionData.checksOnSelf
           ? flipColor(position.turn)
           : Draw,
@@ -257,10 +267,7 @@ function handleSetPosition(
     ];
   }
 
-  return [
-    { ...state, position, computedPositionData },
-    from([overlaySquaresAction(), attemptComputerMoveAction()]),
-  ];
+  return [state, from([overlaySquaresAction(), attemptComputerMoveAction()])];
 }
 
 function handleSetPositionFromFEN(
