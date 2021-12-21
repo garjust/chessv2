@@ -18,6 +18,7 @@ import {
   flipColor,
   squaresInclude,
 } from '../utils';
+import { applyMove } from './move-execution';
 import {
   down,
   left,
@@ -228,7 +229,7 @@ const augmentMovesWithAttacks = (
 
 const attacksOnSquare = (
   position: Position,
-  color: Color,
+  attackingColor: Color,
   square: Square
 ): AttackObject => {
   const attackObj: AttackObject = {
@@ -236,6 +237,7 @@ const attacksOnSquare = (
     attackers: [],
     slideSquares: [],
   };
+  const color = flipColor(attackingColor);
 
   const superPieceMoves = {
     [PieceType.King]: kingMoves(position, color, square, {
@@ -366,11 +368,12 @@ const movesForPosition = (
 
 const findAttacksOnKing = (
   position: Position,
-  color: Color
+  attackingColor: Color
 ): AttackObject | undefined => {
   let king: Square | undefined;
   for (const [square, piece] of position.pieces) {
-    if (piece.type === PieceType.King && piece.color === color) {
+    // Find the king we want to compute attacks for.
+    if (piece.type === PieceType.King && piece.color !== attackingColor) {
       king = square;
       break;
     }
@@ -379,7 +382,7 @@ const findAttacksOnKing = (
     return;
   }
 
-  const attackObject = attacksOnSquare(position, color, king);
+  const attackObject = attacksOnSquare(position, attackingColor, king);
   if (attackObject.attackers.length > 0) {
     return attackObject;
   } else {
@@ -398,7 +401,7 @@ export const computeMovementData = (
   | 'availableAttacks'
   | 'availableChecks'
 > => {
-  const checksOnSelf = findAttacksOnKing(position, position.turn);
+  const checksOnSelf = findAttacksOnKing(position, flipColor(position.turn));
 
   const movesByPiece: MovesByPiece = new Map<
     PieceType,
@@ -459,7 +462,14 @@ export const computeMovementData = (
       }
     }
 
-    // TODO: Prune moves that _result_ in a check on self. ugh
+    // We need to prune moves that result in a check on ourselves.
+    //
+    // This strategy computes an entirely new position after the candidate move
+    // and then looks for attacks on the players king.
+    moves = moves.filter((move) => {
+      const result = applyMove(position, { from, to: move.to });
+      return !findAttacksOnKing(result.position, result.position.turn);
+    });
 
     moves.forEach((move) => {
       if (move.capture) {
