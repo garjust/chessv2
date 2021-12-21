@@ -1,3 +1,5 @@
+export const ZERO = BigInt(0b0);
+
 const a1 = BigInt(0b1);
 const b1 = BigInt(0b10);
 const c1 = BigInt(0b100);

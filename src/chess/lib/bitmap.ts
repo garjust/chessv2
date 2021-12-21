@@ -1,12 +1,14 @@
-import { SquareBitmask } from './bitmap-def';
-import { Color, PieceType, Position } from '../types';
-import { squareLabel } from '../utils';
+import { SquareBitmask, ZERO } from './bitmap-def';
+import { Color, PieceType, Position, Square } from '../types';
+import { labelToSquare, squareLabel } from '../utils';
+
+type Bitboard = bigint;
 
 export const board = (
   position: Position,
   { pieceType, color }: { pieceType?: PieceType; color?: Color }
 ): bigint => {
-  let n = BigInt(0b0);
+  let n = ZERO;
 
   for (const [square, piece] of position.pieces.entries()) {
     if (
@@ -21,3 +23,18 @@ export const board = (
 
   return n;
 };
+
+export const toSquares = (bitboard: Bitboard): Square[] =>
+  Object.entries(SquareBitmask).reduce((squares, [label, long]) => {
+    if ((bitboard & long) === long) {
+      squares.push(labelToSquare(label));
+    }
+
+    return squares;
+  }, [] as Square[]);
+
+export const fromSquares = (squares: Square[]): Bitboard =>
+  squares.reduce(
+    (n, square) => n | SquareBitmask[squareLabel(square)],
+    BigInt(0b0)
+  );
