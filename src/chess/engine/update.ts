@@ -30,6 +30,7 @@ import {
   pieceInSquare,
   HumanPlayer,
   checkedSquare,
+  Draw,
 } from './state';
 import { evaluate } from '../lib/evaluation';
 import { v2 } from '../ai';
@@ -248,7 +249,9 @@ function handleSetPosition(
         ...state,
         position,
         computedPositionData,
-        winner: flipColor(position.turn),
+        winner: computedPositionData.checksOnSelf
+          ? flipColor(position.turn)
+          : Draw,
       },
       null,
     ];
