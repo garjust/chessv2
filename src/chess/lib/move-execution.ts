@@ -19,7 +19,16 @@ export const applyMove = (
     pieces.set(key, value);
   }
 
-  const castlingAvailability = { ...position.castlingAvailability };
+  const castlingAvailability = {
+    [Color.White]: {
+      kingside: position.castlingAvailability[Color.White].kingside,
+      queenside: position.castlingAvailability[Color.White].queenside,
+    },
+    [Color.Black]: {
+      kingside: position.castlingAvailability[Color.Black].kingside,
+      queenside: position.castlingAvailability[Color.Black].queenside,
+    },
+  };
   let enPassantSquare: Square | null = null;
   let isCapture = false;
 
