@@ -17,7 +17,7 @@ const DisplayGameFEN = ({ style }: DisplayGameFENProps) => {
   const { position } = rendering;
 
   return (
-    <pre style={{ ...style, margin: 0, fontSize: 14 }}>
+    <pre style={{ ...style, margin: 0, fontSize: 12 }}>
       <code style={{ backgroundColor: 'aqua' }}>
         {formatPosition(position)}
       </code>
