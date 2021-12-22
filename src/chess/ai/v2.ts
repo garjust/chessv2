@@ -24,9 +24,15 @@ const flattenMoves = (mapByPiece: MovesByPiece): Move[][] => {
 
 export default class v2 implements ChessComputer {
   nextMove(
-    position: Position,
+    _: Position,
     computedPositionData: ComputedPositionData
-  ): Move {
+  ): Promise<Move> {
+    return new Promise((resolve) => {
+      resolve(this._nextMove(computedPositionData));
+    });
+  }
+
+  _nextMove(computedPositionData: ComputedPositionData): Move {
     if (computedPositionData.availableChecks.length) {
       return pluck(computedPositionData.availableChecks);
     }

@@ -22,6 +22,7 @@ import {
   setPositionAction,
   attemptComputerMoveAction,
   clickSquareAction,
+  receiveComputerMoveAction,
 } from './action';
 import { State, Action, Type } from './index';
 import {
@@ -66,20 +67,20 @@ function computeAll(position: Position): ComputedPositionData {
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players, computedPositionData } = state;
   const playerForTurn = players[position.turn];
-  let move: Move;
 
   if (playerForTurn !== HumanPlayer) {
-    move = playerForTurn.nextMove(position, computedPositionData);
+    console.log('attempting computer move');
+    return [
+      state,
+      from(
+        playerForTurn
+          .nextMove(position, computedPositionData)
+          .then((move) => receiveComputerMoveAction(move))
+      ),
+    ];
   } else {
     return [state, null];
   }
-
-  return [
-    state,
-    from([clickSquareAction(move.from), clickSquareAction(move.to)]).pipe(
-      delayOperator(400)
-    ),
-  ];
 }
 
 function handleClickSquare(
@@ -185,6 +186,20 @@ function handlePreviousPosition(state: State): Update<State, Action> {
   return [{ ...state, previousPositions, selectedSquare: undefined }, work];
 }
 
+function handleReceiveComputerMove(
+  state: State,
+  action: Action.ReceiveComputerMove
+): Update<State, Action> {
+  const { move } = action;
+
+  return [
+    state,
+    from([clickSquareAction(move.from), clickSquareAction(move.to)]).pipe(
+      delayOperator(400)
+    ),
+  ];
+}
+
 function handleResetOverlay(state: State): Update<State, Action> {
   return [{ ...state, squareOverlay: undefined }, null];
 }
@@ -274,7 +289,10 @@ function handleSetPositionFromFEN(
   state: State,
   action: Action.SetPositionFromFEN
 ): Update<State, Action> {
-  return [state, setPositionAction(parseFEN(action.fenString))];
+  return [
+    { ...state, winner: undefined },
+    setPositionAction(parseFEN(action.fenString)),
+  ];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
@@ -305,6 +323,8 @@ export function update(
       return handleOverlaySquares(state);
     case Type.PreviousPosition:
       return handlePreviousPosition(state);
+    case Type.ReceiveComputerMove:
+      return handleReceiveComputerMove(state, action);
     case Type.ResetOverlay:
       return handleResetOverlay(state);
     case Type.MovePiece:

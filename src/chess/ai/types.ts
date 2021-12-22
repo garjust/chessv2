@@ -4,5 +4,5 @@ export interface ChessComputer {
   nextMove(
     position: Position,
     computedPositionData: ComputedPositionData
-  ): Move;
+  ): Promise<Move>;
 }

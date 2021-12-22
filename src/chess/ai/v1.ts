@@ -7,9 +7,15 @@ const pluck = <T>(array: Array<T>): T =>
 
 export default class v1 implements ChessComputer {
   nextMove(
-    position: Position,
+    _: Position,
     computedPositionData: ComputedPositionData
-  ): Move {
+  ): Promise<Move> {
+    return new Promise((resolve) => {
+      resolve(this._nextMove(computedPositionData));
+    });
+  }
+
+  _nextMove(computedPositionData: ComputedPositionData): Move {
     if (computedPositionData.availableChecks.length) {
       return pluck(computedPositionData.availableChecks);
     }
