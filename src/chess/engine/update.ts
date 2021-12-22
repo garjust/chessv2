@@ -33,7 +33,7 @@ import {
   Draw,
 } from './state';
 import { evaluate } from '../lib/evaluation';
-import { v2 } from '../ai';
+import { v3 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import { ChessComputer } from '../ai/types';
@@ -44,7 +44,7 @@ import { isPromotionPositionPawn } from '../lib/move-utils';
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
 
-const loadComputer = (): ChessComputer => new v2();
+const loadComputer = (): ChessComputer => new v3();
 
 function computeAll(position: Position): ComputedPositionData {
   return {
