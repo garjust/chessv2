@@ -69,7 +69,6 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   const playerForTurn = players[position.turn];
 
   if (playerForTurn !== HumanPlayer) {
-    console.log('attempting computer move');
     return [
       state,
       from(

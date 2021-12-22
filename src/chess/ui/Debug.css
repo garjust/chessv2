@@ -1,0 +1,7 @@
+.debug {
+  margin: 24px;
+  display: grid;
+  gap: 16px;
+  grid-template:
+    "buttons log" min-content / min-content auto
+}
