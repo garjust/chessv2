@@ -1,7 +1,13 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
-import { Observable, Subject } from 'rxjs';
-import { parseFEN, STARTING_POSITION_FEN } from '../lib/fen';
-import { countMoves, isCountCorrectForDepthFromStart } from '../lib/move-test';
+import { Subject } from 'rxjs';
+import { parseFEN } from '../lib/fen';
+import {
+  countMoves,
+  isCountCorrectForDepthFromStart,
+  MoveTest,
+  PERFT_POSITION_5,
+  STARTING_POSITION,
+} from '../lib/move-test';
 import './Debug.css';
 
 const BUTTON_CSS: CSSProperties = {
@@ -9,14 +15,18 @@ const BUTTON_CSS: CSSProperties = {
   cursor: 'pointer',
 };
 
-function runMoveGenerationTest(logger: Subject<string>, toDepth = 4) {
-  const position = parseFEN(STARTING_POSITION_FEN);
+function runMoveGenerationTest(
+  logger: Subject<string>,
+  test: MoveTest,
+  toDepth = 4
+) {
+  const position = parseFEN(test.fen);
 
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
     const count = countMoves(position, i);
     const timing = Date.now() - start;
-    const passed = isCountCorrectForDepthFromStart(i, count);
+    const passed = isCountCorrectForDepthFromStart(i, count, test);
     logger.next(
       `depth=${i}; count=${count}; timing=${timing}ms; passed=${
         passed ? 'yes' : 'no'
@@ -42,9 +52,26 @@ const Debug = () => {
 
   return (
     <div className="debug">
-      <div style={{ gridArea: 'buttons' }}>
-        <button onClick={() => runMoveGenerationTest(logger)}>
-          Move Generation
+      <div
+        style={{
+          gridArea: 'buttons',
+          display: 'grid',
+          gap: 16,
+          gridTemplateColumns: 'auto',
+        }}
+      >
+        <button
+          style={BUTTON_CSS}
+          onClick={() => runMoveGenerationTest(logger, STARTING_POSITION)}
+        >
+          Move Generation Test
+        </button>
+
+        <button
+          style={BUTTON_CSS}
+          onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5, 3)}
+        >
+          Move Generation Test PERFT_5
         </button>
       </div>
       <pre style={{ gridArea: 'log' }}>
