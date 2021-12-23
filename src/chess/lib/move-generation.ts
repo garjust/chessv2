@@ -1,3 +1,4 @@
+import { SquareMap } from '../square-map';
 import {
   Color,
   ComputedPositionData,
@@ -14,7 +15,6 @@ import {
 import {
   isLegalSquare,
   squareEquals,
-  SquareMap,
   flipColor,
   squaresInclude,
 } from '../utils';

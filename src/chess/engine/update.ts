@@ -6,13 +6,7 @@ import {
   PieceType,
   Position,
 } from '../types';
-import {
-  flattenMoves,
-  flipColor,
-  movesIncludes,
-  squareEquals,
-  SquareMap,
-} from '../utils';
+import { flattenMoves, flipColor, movesIncludes, squareEquals } from '../utils';
 import { computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
@@ -41,6 +35,7 @@ import { ChessComputer } from '../ai/types';
 import { board } from '../lib/bitmap';
 import { applyMove } from '../lib/move-execution';
 import { isPromotionPositionPawn } from '../lib/move-utils';
+import { SquareMap } from '../square-map';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};

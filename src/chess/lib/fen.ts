@@ -1,5 +1,6 @@
+import { SquareMap } from '../square-map';
 import { Color, Piece, PieceType, Position, Square } from '../types';
-import { squareLabel, labelToSquare, SquareMap } from '../utils';
+import { squareLabel, labelToSquare } from '../utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =

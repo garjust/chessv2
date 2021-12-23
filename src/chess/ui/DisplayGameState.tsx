@@ -1,8 +1,9 @@
 import React from 'react';
 import StringKeyMap from '../../lib/string-key-map';
 import { State } from '../engine';
+import { SquareMap } from '../square-map';
 import { Square } from '../types';
-import { squareLabel, SquareMap } from '../utils';
+import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameStateProps = {

@@ -1,4 +1,3 @@
-import StringKeyMap from '../lib/string-key-map';
 import { Color, Move, MovesByPiece, Square, SquareLabel } from './types';
 
 export const WHITE_PAWN_STARTING_RANK = 1;
@@ -49,12 +48,6 @@ export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
 
 export const movesIncludes = (moves: Move[], move: Move): boolean =>
   moves.some((x) => moveEquals(x, move));
-
-export class SquareMap<T> extends StringKeyMap<Square, T> {
-  constructor() {
-    super(squareLabel, labelToSquare);
-  }
-}
 
 export const isLegalSquare = ({ rank, file }: Square): boolean =>
   rank >= 0 && rank < 8 && file >= 0 && file < 8;

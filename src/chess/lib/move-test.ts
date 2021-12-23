@@ -35,10 +35,10 @@ export const countMoves = (position: Position, depth: number): number => {
   let n = 0;
 
   const movementData = computeMovementData(position);
-  flattenMoves(movementData.movesByPiece).forEach((move) => {
+  for (const move of flattenMoves(movementData.movesByPiece)) {
     const result = applyMove(position, move);
     n += countMoves(result.position, depth - 1);
-  });
+  }
 
   return n;
 };

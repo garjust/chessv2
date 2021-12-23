@@ -1,5 +1,6 @@
 import { ChessComputer } from '../ai/types';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
+import { SquareMap } from '../square-map';
 import {
   Color,
   Position,
@@ -9,7 +10,6 @@ import {
   PieceType,
   MoveWithExtraData,
 } from '../types';
-import { SquareMap } from '../utils';
 
 export enum SquareOverlayType {
   SelectedPiece = 'SELECTED_PIECE',
