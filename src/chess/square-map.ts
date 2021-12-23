@@ -1,63 +1,51 @@
 import { Square } from './types';
 
 export class SquareMap<T> implements Map<Square, T> {
-  #map: T[][];
+  #map: T[];
 
   constructor() {
-    this.#map = new Array<Array<T>>(
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8)
-    );
+    this.#map = Array(64);
   }
 
   clear(): void {
-    this.#map = new Array<Array<T>>(
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8),
-      new Array<T>(8)
-    );
+    this.#map = Array(64);
   }
 
   delete(key: Square): boolean {
-    return delete this.#map[key.rank][key.file];
+    const exists = this.#map[key.rank * 8 + key.file] !== undefined;
+    delete this.#map[key.rank * 8 + key.file];
+    return exists;
   }
 
   forEach(
     callbackfn: (value: T, key: Square, map: Map<Square, T>) => void,
-    thisArg?: any
+    thisArg?: unknown
   ): void {
     throw new Error('Method not implemented.');
   }
 
   get(key: Square): T | undefined {
-    return this.#map[key.rank][key.file];
+    if (key.rank < 0 || key.rank >= 8 || key.file < 0 || key.file >= 8) {
+      return undefined;
+    }
+
+    return this.#map[key.rank * 8 + key.file];
   }
 
   has(key: Square): boolean {
-    return Boolean(this.#map[key.rank][key.file]);
+    return this.#map[key.rank * 8 + key.file] !== undefined;
   }
 
   set(key: Square, value: T): this {
-    this.#map[key.rank][key.file] = value;
+    this.#map[key.rank * 8 + key.file] = value;
     return this;
   }
 
   get size() {
     let counter = 0;
-    for (let rank = 0; rank < 7; rank++) {
-      for (let file = 0; file < 7; file++) {
-        counter += this.#map[rank][file] === undefined ? 0 : 1;
+    for (let rank = 0; rank < 8; rank++) {
+      for (let file = 0; file < 8; file++) {
+        counter += this.#map[rank * 8 + file] !== undefined ? 1 : 0;
       }
     }
     return counter;
@@ -66,12 +54,12 @@ export class SquareMap<T> implements Map<Square, T> {
   entries(): IterableIterator<[Square, T]> {
     const map = this.#map;
 
-    return (function* () {
-      for (let rank = 0; rank < 7; rank++) {
-        for (let file = 0; file < 7; file++) {
-          const value = map[rank][file];
+    return (function* entriesGenerator() {
+      for (let rank = 0; rank < 8; rank++) {
+        for (let file = 0; file < 8; file++) {
+          const value = map[rank * 8 + file];
 
-          if (value) {
+          if (value !== undefined) {
             const tuple: [Square, T] = [{ rank, file }, value];
             yield tuple;
           }
@@ -84,11 +72,11 @@ export class SquareMap<T> implements Map<Square, T> {
     const map = this.#map;
 
     return (function* () {
-      for (let rank = 0; rank < 7; rank++) {
-        for (let file = 0; file < 7; file++) {
-          const value = map[rank][file];
+      for (let rank = 0; rank < 8; rank++) {
+        for (let file = 0; file < 8; file++) {
+          const value = map[rank * 8 + file];
 
-          if (value) {
+          if (value !== undefined) {
             yield { rank, file };
           }
         }
@@ -100,10 +88,10 @@ export class SquareMap<T> implements Map<Square, T> {
     const map = this.#map;
 
     return (function* () {
-      for (let rank = 0; rank < 7; rank++) {
-        for (let file = 0; file < 7; file++) {
-          const value = map[rank][file];
-          if (value) {
+      for (let rank = 0; rank < 8; rank++) {
+        for (let file = 0; file < 8; file++) {
+          const value = map[rank * 8 + file];
+          if (value !== undefined) {
             yield value;
           }
         }
@@ -115,5 +103,5 @@ export class SquareMap<T> implements Map<Square, T> {
     return this.entries();
   }
 
-  [Symbol.toStringTag]: string;
+  [Symbol.toStringTag] = 'SquareMap';
 }

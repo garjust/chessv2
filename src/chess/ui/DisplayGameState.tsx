@@ -1,5 +1,4 @@
 import React from 'react';
-import StringKeyMap from '../../lib/string-key-map';
 import { State } from '../engine';
 import { SquareMap } from '../square-map';
 import { Square } from '../types';
@@ -24,11 +23,7 @@ const formatBitmapString = (bitmap: string): string => {
 };
 
 const replacer = (key: string, value: unknown) => {
-  if (
-    value instanceof StringKeyMap ||
-    value instanceof Map ||
-    value instanceof SquareMap
-  ) {
+  if (value instanceof Map || value instanceof SquareMap) {
     return `{ size ${value.size} }`;
   }
 

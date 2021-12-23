@@ -70,5 +70,5 @@ export default class StringKeyMap<K, V> implements Map<K, V> {
     return this.entries();
   }
 
-  [Symbol.toStringTag]: string;
+  [Symbol.toStringTag] = 'StringKeyMap';
 }
