@@ -1,10 +1,12 @@
 import { from, map, mergeMap, Observable } from 'rxjs';
-import { clickSquareAction } from './engine/action';
-import { labelToSquare } from './utils';
-import { Action } from './engine';
-import { delayOperator } from '../lib/operators';
+import { clickSquareAction } from './action';
+import { labelToSquare } from '../utils';
+import { Action } from '.';
+import { delayOperator } from '../../lib/operators';
 
-const VIENNA_GAMBIT_ACCEPTED_GAME = [
+type TestGameMoveSet = [string, string][];
+
+export const VIENNA_GAMBIT_ACCEPTED_GAME: TestGameMoveSet = [
   ['e2', 'e4'],
   ['e7', 'e5'],
   ['b1', 'c3'],
@@ -27,9 +29,9 @@ const VIENNA_GAMBIT_ACCEPTED_GAME = [
   ['e8', 'c8'],
 ];
 
-export const debugGame = (
+export const runTestGame = (
   actionDelay = 0,
-  squareLabelTuples = VIENNA_GAMBIT_ACCEPTED_GAME
+  squareLabelTuples: TestGameMoveSet
 ): Observable<Action> =>
   from(squareLabelTuples).pipe(
     map(([labelA, labelB]) => [labelToSquare(labelA), labelToSquare(labelB)]),

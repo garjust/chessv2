@@ -15,7 +15,7 @@ import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
 import { STARTING_POSITION_FEN } from '../lib/fen';
-import { debugGame } from '../debug';
+import { runTestGame, VIENNA_GAMBIT_ACCEPTED_GAME } from '../engine/test-games';
 import DisplayGameFEN from './DisplayGameFen';
 
 const BUTTON_CSS: CSSProperties = {
@@ -35,7 +35,7 @@ const Game = () => {
 
   function emitExampleGame(): void {
     emit(setPositionFromFENAction(STARTING_POSITION_FEN));
-    debugGame(400).subscribe({
+    runTestGame(400, VIENNA_GAMBIT_ACCEPTED_GAME).subscribe({
       next: (action) => emit(action),
     });
   }

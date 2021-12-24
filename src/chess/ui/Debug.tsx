@@ -40,7 +40,6 @@ const Debug = () => {
   const [log, setLog] = useState([] as string[]);
 
   useEffect(() => {
-    console.log('subscribe');
     const subscription = logger.subscribe((str) => {
       setLog((log) => [...log, str]);
     });
