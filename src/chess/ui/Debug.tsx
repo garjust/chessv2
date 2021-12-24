@@ -2,7 +2,7 @@ import React, { CSSProperties, useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
 import { parseFEN } from '../lib/fen';
 import {
-  countMoves,
+  run,
   isCountCorrectForDepthFromStart,
   MoveTest,
   PERFT_POSITION_5,
@@ -15,7 +15,7 @@ const BUTTON_CSS: CSSProperties = {
   cursor: 'pointer',
 };
 
-function runMoveGenerationTest(
+async function runMoveGenerationTest(
   logger: Subject<string>,
   test: MoveTest,
   toDepth = 4
@@ -24,7 +24,7 @@ function runMoveGenerationTest(
 
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
-    const count = countMoves(position, i);
+    const count = await run(position, i);
     const timing = Date.now() - start;
     const passed = isCountCorrectForDepthFromStart(i, count, test);
     logger.next(

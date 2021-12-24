@@ -1,4 +1,5 @@
 import { Square } from './types';
+import { isLegalSquare } from './utils';
 
 export class SquareMap<T> implements Map<Square, T> {
   #map: T[];
@@ -25,7 +26,7 @@ export class SquareMap<T> implements Map<Square, T> {
   }
 
   get(key: Square): T | undefined {
-    if (key.rank < 0 || key.rank >= 8 || key.file < 0 || key.file >= 8) {
+    if (!isLegalSquare(key)) {
       return undefined;
     }
 

@@ -27,7 +27,10 @@ export const isCountCorrectForDepthFromStart = (
   return test.counts[depth - 1] === count;
 };
 
-export const countMoves = (position: Position, depth: number): number => {
+export const run = async (
+  position: Position,
+  depth: number
+): Promise<number> => {
   if (depth === 0) {
     return 1;
   }
@@ -37,7 +40,7 @@ export const countMoves = (position: Position, depth: number): number => {
   const movementData = computeMovementData(position);
   for (const move of flattenMoves(movementData.movesByPiece)) {
     const result = applyMove(position, move);
-    n += countMoves(result.position, depth - 1);
+    n += await run(result.position, depth - 1);
   }
 
   return n;
