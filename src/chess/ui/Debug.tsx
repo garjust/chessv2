@@ -1,9 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { parseFEN } from '../lib/fen';
 import {
-  run,
-  isCountCorrectForDepthFromStart,
   MoveTest,
   PERFT_POSITION_5,
   STARTING_POSITION,
@@ -20,19 +17,12 @@ async function runMoveGenerationTest(
   test: MoveTest,
   toDepth = 4
 ) {
-  const position = parseFEN(test.fen);
+  const worker = new Worker(new URL('../workers/move-test', import.meta.url));
 
-  for (let i = 1; i <= toDepth; i++) {
-    const start = Date.now();
-    const count = await run(position, i);
-    const timing = Date.now() - start;
-    const passed = isCountCorrectForDepthFromStart(i, count, test);
-    logger.next(
-      `depth=${i}; count=${count}; timing=${timing}ms; passed=${
-        passed ? 'yes' : 'no'
-      }`
-    );
-  }
+  worker.onmessage = (message: MessageEvent<string>) => {
+    logger.next(message.data);
+  };
+  worker.postMessage({ test, toDepth });
 }
 
 const Debug = () => {
