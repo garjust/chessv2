@@ -60,8 +60,7 @@ const INITIAL_STATE: State = {
   previousPositions: [],
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
-    movesByPiece: new Map<PieceType, SquareMap<MoveWithExtraData[]>>(),
-    totalMoves: 0,
+    moves: [],
     availableCaptures: [],
     availableAttacks: [],
     availableChecks: [],

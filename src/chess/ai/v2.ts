@@ -1,25 +1,7 @@
 import { ChessComputer } from './types';
-import { Move, MovesByPiece, Position } from '../types';
+import { Piece, Position, Square } from '../types';
 import { computeAll } from '../engines/default/computed';
 import { pluck } from '../../lib/array';
-
-const flattenMovesLess = (mapByPiece: MovesByPiece): Move[][] => {
-  const moves: Move[][] = [];
-
-  for (const map of mapByPiece.values()) {
-    for (const [from, squares] of map.entries()) {
-      const tempMoves: Move[] = [];
-      for (const { to } of squares) {
-        tempMoves.push({ from, to });
-      }
-      if (tempMoves.length > 0) {
-        moves.push(tempMoves);
-      }
-    }
-  }
-
-  return moves;
-};
 
 export default class v2 implements ChessComputer<Position> {
   nextMove(position: Position) {
@@ -33,9 +15,19 @@ export default class v2 implements ChessComputer<Position> {
       return Promise.resolve(pluck(computedPositionData.availableCaptures));
     }
 
-    return Promise.resolve(
-      pluck(pluck(flattenMovesLess(computedPositionData.movesByPiece)))
+    const pieces: { square: Square; piece: Piece }[] = [];
+    for (const [square, piece] of position.pieces.entries()) {
+      if (piece.color === position.turn) {
+        pieces.push({ square, piece });
+      }
+    }
+
+    const piece = pluck(pieces);
+    const moves = computedPositionData.moves.filter(
+      ({ from }) => from === piece.square
     );
+
+    return Promise.resolve(pluck(moves));
   }
 
   toJSON(): string {

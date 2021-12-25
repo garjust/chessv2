@@ -38,9 +38,7 @@ type AttackMoveData = {
   kingAttack: boolean;
 };
 
-export type MoveWithExtraData = Pick<Move, 'to' | 'promotion'> &
-  CaptureMoveData &
-  AttackMoveData;
+export type MoveWithExtraData = Move & CaptureMoveData & AttackMoveData;
 
 export type PieceMoves = {
   piece: Piece;
@@ -76,8 +74,6 @@ export type Position = {
   fullMoveCount: number;
 };
 
-export type MovesByPiece = Map<PieceType, Map<Square, MoveWithExtraData[]>>;
-
 export type AttackObject = {
   // The square being attacked for this object
   attackedSquare: Square;
@@ -91,9 +87,8 @@ export type AttackObject = {
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.
 export type ComputedPositionData = {
+  moves: MoveWithExtraData[];
   checksOnSelf?: AttackObject;
-  movesByPiece: MovesByPiece;
-  totalMoves: number;
   availableCaptures: Move[];
   availableAttacks: Move[];
   availableChecks: Move[];

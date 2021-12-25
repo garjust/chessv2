@@ -1,5 +1,4 @@
 import { Position } from '../types';
-import { flattenMoves } from '../utils';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
 import engine from '../engines/default';
 import { computeMovementData } from '../engines/default/move-generation';
@@ -38,7 +37,7 @@ export const run = async (
   let n = 0;
 
   const movementData = computeMovementData(position);
-  for (const move of flattenMoves(movementData.movesByPiece)) {
+  for (const move of movementData.moves) {
     const result = engine.applyMove(position, move);
     n += await run(result.position, depth - 1);
   }

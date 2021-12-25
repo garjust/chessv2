@@ -4,7 +4,6 @@ import {
   ComputedPositionData,
   Move,
   MoveWithExtraData,
-  MovesByPiece,
   PieceMoves,
   Piece,
   PieceType,
@@ -365,7 +364,11 @@ const movesForPosition = (
     pieceMoves.push({
       from: square,
       piece,
-      moves: augmentMovesWithAttacks(position, piece, moves),
+      moves: augmentMovesWithAttacks(
+        position,
+        piece,
+        moves.map((move) => ({ ...move, from: square }))
+      ),
     });
   }
 
@@ -401,27 +404,14 @@ export const computeMovementData = (
 ): Pick<
   ComputedPositionData,
   | 'checksOnSelf'
-  | 'movesByPiece'
-  | 'totalMoves'
+  | 'moves'
   | 'availableCaptures'
   | 'availableAttacks'
   | 'availableChecks'
 > => {
   const checksOnSelf = findAttacksOnKing(position, flipColor(position.turn));
 
-  const movesByPiece: MovesByPiece = new Map<
-    PieceType,
-    SquareMap<MoveWithExtraData[]>
-  >([
-    [PieceType.Bishop, new SquareMap<MoveWithExtraData[]>()],
-    [PieceType.King, new SquareMap<MoveWithExtraData[]>()],
-    [PieceType.Knight, new SquareMap<MoveWithExtraData[]>()],
-    [PieceType.Pawn, new SquareMap<MoveWithExtraData[]>()],
-    [PieceType.Queen, new SquareMap<MoveWithExtraData[]>()],
-    [PieceType.Rook, new SquareMap<MoveWithExtraData[]>()],
-  ]);
-
-  let totalMoves = 0;
+  const allMoves: MoveWithExtraData[] = [];
   const availableCaptures: Move[] = [];
   const availableAttacks: Move[] = [];
   const availableChecks: Move[] = [];
@@ -432,8 +422,6 @@ export const computeMovementData = (
   });
 
   movesets.forEach(({ piece, from, moves }) => {
-    const map = movesByPiece.get(piece.type);
-
     // We need to prune moves when in check since only moves that remove the
     // check are legal.
     if (checksOnSelf) {
@@ -489,16 +477,12 @@ export const computeMovementData = (
       }
     });
 
-    if (map) {
-      map.set(from, moves);
-      totalMoves += moves.length;
-    }
+    allMoves.push(...moves);
   });
 
   return {
     checksOnSelf,
-    movesByPiece,
-    totalMoves,
+    moves: allMoves,
     availableCaptures,
     availableAttacks,
     availableChecks,

@@ -1,4 +1,4 @@
-import { Color, Move, MovesByPiece, Square, SquareLabel } from './types';
+import { Color, Move, Square, SquareLabel } from './types';
 
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
@@ -62,20 +62,6 @@ export const isLegalSquare = ({ rank, file }: Square): boolean =>
 
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
-
-export const flattenMoves = (movesByPiece: MovesByPiece): Move[] => {
-  const moves: Move[] = [];
-
-  for (const map of movesByPiece.values()) {
-    for (const [from, squares] of map.entries()) {
-      for (const { to } of squares) {
-        moves.push({ from, to });
-      }
-    }
-  }
-
-  return moves;
-};
 
 export const moveToDirectionString = (move: Move): string =>
   `${squareLabel(move.from)}->${squareLabel(move.to)}`;

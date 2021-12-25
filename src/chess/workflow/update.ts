@@ -1,11 +1,11 @@
 import { Update } from '../../lib/workflow';
 import { PieceType } from '../types';
 import {
-  flattenMoves,
   flipColor,
   isPromotionPositionPawn,
   movesIncludes,
   squareEquals,
+  squareLabel,
 } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
@@ -169,19 +169,17 @@ function handleOverlaySquares(state: State): Update<State, Action> {
 
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
-      const candidateSquares = state.computedPositionData?.movesByPiece
-        .get(piece.type)
-        ?.get(selectedSquare);
+      const candidateSquares = state.computedPositionData.moves.filter((move) =>
+        squareEquals(move.from, selectedSquare)
+      );
 
-      if (candidateSquares) {
-        candidateSquares.forEach(({ to: square }) => {
-          if (position.pieces.has(square)) {
-            squareOverlay.set(square, SquareOverlayType.Capturable);
-          } else {
-            squareOverlay.set(square, SquareOverlayType.Movable);
-          }
-        });
-      }
+      candidateSquares.forEach(({ to: square }) => {
+        if (position.pieces.has(square)) {
+          squareOverlay.set(square, SquareOverlayType.Capturable);
+        } else {
+          squareOverlay.set(square, SquareOverlayType.Movable);
+        }
+      });
     }
   }
 
@@ -225,7 +223,7 @@ function handleMovePiece(
 ): Update<State, Action> {
   const { move } = action;
 
-  const legalMoves = flattenMoves(state.computedPositionData.movesByPiece);
+  const legalMoves = state.computedPositionData.moves;
   if (!movesIncludes(legalMoves, move)) {
     const piece = pieceInSquare(state, move.from);
     console.log(
@@ -285,7 +283,7 @@ function handleSetPosition(
   }
 
   // Check if current player has no moves to end the game
-  if (flattenMoves(computedPositionData.movesByPiece).length === 0) {
+  if (computedPositionData.moves.length === 0) {
     return [
       {
         ...state,
