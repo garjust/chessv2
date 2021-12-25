@@ -1,23 +1,5 @@
 import { Color, Move, Position, Square } from '../../types';
-import {
-  isLegalSquare,
-  BLACK_PAWN_STARTING_RANK,
-  WHITE_PAWN_STARTING_RANK,
-  squareEquals,
-} from '../../utils';
-
-export const isStartPositionPawn = (color: Color, square: Square): boolean =>
-  color === Color.White
-    ? square.rank === WHITE_PAWN_STARTING_RANK
-    : square.rank === BLACK_PAWN_STARTING_RANK;
-
-export const isPromotionPositionPawn = (
-  color: Color,
-  square: Square
-): boolean =>
-  color === Color.White
-    ? square.rank === BLACK_PAWN_STARTING_RANK
-    : square.rank === WHITE_PAWN_STARTING_RANK;
+import { isLegalSquare, squareEquals } from '../../utils';
 
 type MoveSquareFunction = (square: Square, n: number) => Square;
 

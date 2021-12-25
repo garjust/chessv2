@@ -17,6 +17,8 @@ import {
   squareEquals,
   flipColor,
   squaresInclude,
+  isStartPositionPawn,
+  isPromotionPositionPawn,
 } from '../../utils';
 import { applyMove } from './move-execution';
 import {
@@ -29,8 +31,6 @@ import {
   downLeft,
   downRight,
   squareScanner,
-  isPromotionPositionPawn,
-  isStartPositionPawn,
   squaresBetweenMove,
 } from './move-utils';
 

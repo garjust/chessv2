@@ -79,3 +79,16 @@ export const flattenMoves = (movesByPiece: MovesByPiece): Move[] => {
 
 export const moveToDirectionString = (move: Move): string =>
   `${squareLabel(move.from)}->${squareLabel(move.to)}`;
+
+export const isStartPositionPawn = (color: Color, square: Square): boolean =>
+  color === Color.White
+    ? square.rank === WHITE_PAWN_STARTING_RANK
+    : square.rank === BLACK_PAWN_STARTING_RANK;
+
+export const isPromotionPositionPawn = (
+  color: Color,
+  square: Square
+): boolean =>
+  color === Color.White
+    ? square.rank === BLACK_PAWN_STARTING_RANK
+    : square.rank === WHITE_PAWN_STARTING_RANK;

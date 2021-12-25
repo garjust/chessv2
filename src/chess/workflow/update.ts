@@ -1,6 +1,12 @@
 import { Update } from '../../lib/workflow';
 import { PieceType } from '../types';
-import { flattenMoves, flipColor, movesIncludes, squareEquals } from '../utils';
+import {
+  flattenMoves,
+  flipColor,
+  isPromotionPositionPawn,
+  movesIncludes,
+  squareEquals,
+} from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
@@ -29,7 +35,6 @@ import {
   ChessComputerWorkerConstructor,
 } from '../ai/types';
 import { applyMove } from '../engines/default/move-execution';
-import { isPromotionPositionPawn } from '../engines/default/move-utils';
 import { SquareMap } from '../square-map';
 import { computeAll } from '../engines/default/computed';
 import { wrap } from 'comlink';
