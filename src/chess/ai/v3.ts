@@ -1,5 +1,5 @@
 import { ChessComputer } from './types';
-import { Color, ComputedPositionData, Move, Position } from '../types';
+import { Color, Move, Position } from '../types';
 import { flattenMoves, moveToDirectionString } from '../utils';
 import engine from '../engines/default';
 import { computeAll } from '../engines/default/computed';
@@ -8,19 +8,6 @@ const DEPTH = 2;
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
-
-type Node = {
-  position: Position;
-  computedPositionData: ComputedPositionData;
-  normalizedEvaluation: number;
-};
-
-const RESULTS_SORT = {
-  [Color.White]: (a: { evaluation: number }, b: { evaluation: number }) =>
-    b.evaluation - a.evaluation,
-  [Color.Black]: (a: { evaluation: number }, b: { evaluation: number }) =>
-    a.evaluation - b.evaluation,
-};
 
 export default class v3 implements ChessComputer<Position> {
   counter = 0;
@@ -38,63 +25,46 @@ export default class v3 implements ChessComputer<Position> {
     const computedPositionData = computeAll(position);
     const moves = flattenMoves(computedPositionData.movesByPiece);
 
+    const normalization = position.turn === Color.White ? 1 : -1;
+
     const results = moves
       .map((move) => {
         const result = engine.applyMove(position, move);
-        const computedPositionData = computeAll(result.position);
 
         return {
           move,
-          evaluation: this.score(
-            {
-              position: result.position,
-              computedPositionData,
-              normalizedEvaluation: computedPositionData.evaluation,
-            },
-            DEPTH,
-            position.turn === Color.White ? 1 : -1
-          ),
+          score: normalization * this.score(result.position, DEPTH),
         };
       })
-      .sort(RESULTS_SORT[position.turn]);
-    const bestEvaluation = results[0].evaluation;
+      .sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+    const bestScore = results[0].score;
 
     console.log(
-      `results after ${this.counter} scores`,
-      results.map(({ move, evaluation }) => ({
+      `results after ${this.counter} scores to depth ${DEPTH}`,
+      results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
-        evaluation,
+        score,
       }))
     );
 
-    return pluck(
-      results.filter(({ evaluation }) => evaluation === bestEvaluation)
-    ).move;
+    return pluck(results.filter(({ score }) => score === bestScore)).move;
   }
 
-  score(node: Node, depth: number, normalization: -1 | 1): number {
+  score(position: Position, depth: number): number {
     this.counter++;
+
+    const computedPositionData = computeAll(position);
+
     if (depth === 0) {
-      return node.normalizedEvaluation;
+      return computedPositionData.evaluation;
     }
 
     let n = -Infinity;
 
     // handle no moves (checkmate or draw)
-    flattenMoves(node.computedPositionData.movesByPiece).forEach((move) => {
-      const result = engine.applyMove(node.position, move);
-      const computedPositionData = computeAll(result.position);
-      const m =
-        -1 *
-        this.score(
-          {
-            position: result.position,
-            computedPositionData,
-            normalizedEvaluation: computedPositionData.evaluation,
-          },
-          depth - 1,
-          normalization
-        );
+    flattenMoves(computedPositionData.movesByPiece).forEach((move) => {
+      const result = engine.applyMove(position, move);
+      const m = -1 * this.score(result.position, depth - 1);
 
       if (m > n) {
         n = m;
