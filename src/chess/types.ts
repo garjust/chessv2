@@ -76,19 +76,23 @@ export type Position = {
 
 export type AttackObject = {
   // The square being attacked for this object
-  attackedSquare: Square;
-  // The list of attackers and their resident
-  attackers: { square: Square; type: PieceType }[];
-  // If there are sliding attackers this is the set of squares the move through
-  // for the attack. A move to one of these squares blocks an attacker.
+  attacked: Square;
+  // The attacking piece
+  attacker: { square: Square; type: PieceType };
+  // If the attacker is a sliding piece this is the set of squares they move through
+  // for the attack. A move to one of these squares blocks the attacker.
   slideSquares: Square[];
+  // A piece that is skewered by the attack. If the piece is more valuable than
+  // the attacked piece this is considered a pin, otherwise it is considered
+  // a skewer.
+  // skewered?: { square: Square; type: PieceType };
 };
 
 // Data that can be computed from a position that we may want to cache because
 // computation is expensive.
 export type ComputedPositionData = {
   moves: MoveWithExtraData[];
-  checksOnSelf?: AttackObject;
+  checks: AttackObject[];
   availableCaptures: Move[];
   availableAttacks: Move[];
   availableChecks: Move[];

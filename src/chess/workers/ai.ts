@@ -25,13 +25,18 @@ class ChessComputerWorker implements IChessComputerWorker {
     }
   }
 
-  nextMove(fen: string): Promise<Move> {
+  async nextMove(fen: string): Promise<Move> {
     if (!this.#instance) {
       throw Error('no computer is loaded');
     }
 
+    console.log('sent move request');
+    const before = Date.now();
     const position = parseFEN(fen);
-    return this.#instance.nextMove(position);
+    const move = await this.#instance.nextMove(position);
+    const timing = Date.now() - before;
+    console.log(`received move after ${timing}ms`);
+    return move;
   }
 }
 

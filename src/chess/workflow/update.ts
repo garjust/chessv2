@@ -287,9 +287,10 @@ function handleSetPosition(
     return [
       {
         ...state,
-        winner: computedPositionData.checksOnSelf
-          ? flipColor(position.turn)
-          : Draw,
+        winner:
+          computedPositionData.checks.length > 0
+            ? flipColor(position.turn)
+            : Draw,
       },
       null,
     ];

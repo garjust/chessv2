@@ -139,8 +139,7 @@ const kingMoves = (
     position.castlingAvailability[color].kingside &&
     !position.pieces.get(right(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(position, flipColor(color), right(from)).attackers
-      .length === 0 &&
+    attacksOnSquare(position, flipColor(color), right(from)).length === 0 &&
     !position.pieces.get(right(from, 2))
   ) {
     squares.push(right(from, 2));
@@ -150,8 +149,7 @@ const kingMoves = (
     position.castlingAvailability[color].queenside &&
     !position.pieces.get(left(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(position, flipColor(color), left(from)).attackers.length ===
-      0 &&
+    attacksOnSquare(position, flipColor(color), left(from)).length === 0 &&
     !position.pieces.get(left(from, 2)) &&
     !position.pieces.get(left(from, 3))
   ) {
@@ -236,12 +234,8 @@ const attacksOnSquare = (
   position: Position,
   attackingColor: Color,
   square: Square
-): AttackObject => {
-  const attackObj: AttackObject = {
-    attackedSquare: square,
-    attackers: [],
-    slideSquares: [],
-  };
+): AttackObject[] => {
+  const attacks: AttackObject[] = [];
   const color = flipColor(attackingColor);
 
   const superPieceMoves = {
@@ -258,7 +252,11 @@ const attacksOnSquare = (
   // the attacked piece is a pawn.
   superPieceMoves[PieceType.Pawn].forEach((move) => {
     if (position.pieces.get(move.to)?.type === PieceType.Pawn) {
-      attackObj.attackers.push({ square: move.to, type: PieceType.Pawn });
+      attacks.push({
+        attacked: square,
+        attacker: { square: move.to, type: PieceType.Pawn },
+        slideSquares: [],
+      });
     }
   });
 
@@ -268,46 +266,58 @@ const attacksOnSquare = (
       move.capture &&
       position.pieces.get(move.to)?.type === PieceType.Knight
     ) {
-      attackObj.attackers.push({ square: move.to, type: PieceType.Knight });
+      attacks.push({
+        attacked: square,
+        attacker: { square: move.to, type: PieceType.Knight },
+        slideSquares: [],
+      });
     }
   });
 
   // Look for kings attacked by a king move.
   superPieceMoves[PieceType.King].forEach((move) => {
     if (move.capture && position.pieces.get(move.to)?.type === PieceType.King) {
-      attackObj.attackers.push({ square: move.to, type: PieceType.King });
+      attacks.push({
+        attacked: square,
+        attacker: { square: move.to, type: PieceType.King },
+        slideSquares: [],
+      });
     }
   });
 
   // Look for bishops OR queens attacked by a bishop move.
   superPieceMoves[PieceType.Bishop].forEach((move) => {
+    const piece = position.pieces.get(move.to);
+
     if (
       move.capture &&
-      (position.pieces.get(move.to)?.type === PieceType.Bishop ||
-        position.pieces.get(move.to)?.type === PieceType.Queen)
+      (piece?.type === PieceType.Bishop || piece?.type === PieceType.Queen)
     ) {
-      attackObj.attackers.push({ square: move.to, type: PieceType.Bishop });
-      attackObj.slideSquares.push(
-        ...squaresBetweenMove({ from: square, to: move.to })
-      );
+      attacks.push({
+        attacked: square,
+        attacker: { square: move.to, type: piece.type },
+        slideSquares: squaresBetweenMove({ from: square, to: move.to }),
+      });
     }
   });
 
   // Look for bishops OR queens attacked by a bishop move.
   superPieceMoves[PieceType.Rook].forEach((move) => {
+    const piece = position.pieces.get(move.to);
+
     if (
       move.capture &&
-      (position.pieces.get(move.to)?.type === PieceType.Rook ||
-        position.pieces.get(move.to)?.type === PieceType.Queen)
+      (piece?.type === PieceType.Rook || piece?.type === PieceType.Queen)
     ) {
-      attackObj.attackers.push({ square: move.to, type: PieceType.Rook });
-      attackObj.slideSquares.push(
-        ...squaresBetweenMove({ from: square, to: move.to })
-      );
+      attacks.push({
+        attacked: square,
+        attacker: { square: move.to, type: piece.type },
+        slideSquares: squaresBetweenMove({ from: square, to: move.to }),
+      });
     }
   });
 
-  return attackObj;
+  return attacks;
 };
 
 const movesForPiece = (
@@ -378,7 +388,7 @@ const movesForPosition = (
 const findAttacksOnKing = (
   position: Position,
   attackingColor: Color
-): AttackObject | undefined => {
+): AttackObject[] => {
   let king: Square | undefined;
   for (const [square, piece] of position.pieces) {
     // Find the king we want to compute attacks for.
@@ -388,28 +398,23 @@ const findAttacksOnKing = (
     }
   }
   if (!king) {
-    return;
+    return [];
   }
 
-  const attackObject = attacksOnSquare(position, attackingColor, king);
-  if (attackObject.attackers.length > 0) {
-    return attackObject;
-  } else {
-    return;
-  }
+  return attacksOnSquare(position, attackingColor, king);
 };
 
 export const computeMovementData = (
   position: Position
 ): Pick<
   ComputedPositionData,
-  | 'checksOnSelf'
   | 'moves'
+  | 'checks'
   | 'availableCaptures'
   | 'availableAttacks'
   | 'availableChecks'
 > => {
-  const checksOnSelf = findAttacksOnKing(position, flipColor(position.turn));
+  const checks = findAttacksOnKing(position, flipColor(position.turn));
 
   const allMoves: MoveWithExtraData[] = [];
   const availableCaptures: Move[] = [];
@@ -418,27 +423,28 @@ export const computeMovementData = (
 
   const movesets = movesForPosition(position, {
     color: position.turn,
-    skipCastling: Boolean(checksOnSelf),
+    skipCastling: checks.length > 0,
   });
 
   movesets.forEach(({ piece, from, moves }) => {
     // We need to prune moves when in check since only moves that remove the
     // check are legal.
-    if (checksOnSelf) {
-      if (checksOnSelf.attackers.length === 1) {
+    if (checks.length > 0) {
+      if (checks.length === 1) {
+        const check = checks[0];
         // In the case that the king is checked by a single piece we can capture
         // the piece or block the attack.
         if (piece.type !== PieceType.King) {
           moves = moves.filter(
             (move) =>
-              squaresInclude(checksOnSelf.slideSquares, move.to) ||
-              squareEquals(checksOnSelf.attackers[0].square, move.to)
+              squaresInclude(check.slideSquares, move.to) ||
+              squareEquals(check.attacker.square, move.to)
           );
         } else {
           // The king can only move out of the check or capture the checking
           // piece. The king cannot block the check.
           moves = moves.filter((move) => {
-            return !squaresInclude(checksOnSelf.slideSquares, move.to);
+            return !squaresInclude(check.slideSquares, move.to);
           });
         }
       } else {
@@ -451,7 +457,11 @@ export const computeMovementData = (
         }
         // Prune king moves that move to an attacked square.
         moves = moves.filter(
-          (move) => !squaresInclude(checksOnSelf.slideSquares, move.to)
+          (move) =>
+            !squaresInclude(
+              checks.flatMap((check) => check.slideSquares),
+              move.to
+            )
         );
       }
     }
@@ -462,7 +472,9 @@ export const computeMovementData = (
     // and then looks for attacks on the players king.
     moves = moves.filter((move) => {
       const result = applyMove(position, { from, to: move.to });
-      return !findAttacksOnKing(result.position, result.position.turn);
+      return (
+        findAttacksOnKing(result.position, result.position.turn).length === 0
+      );
     });
 
     moves.forEach((move) => {
@@ -481,8 +493,8 @@ export const computeMovementData = (
   });
 
   return {
-    checksOnSelf,
     moves: allMoves,
+    checks,
     availableCaptures,
     availableAttacks,
     availableChecks,
