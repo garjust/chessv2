@@ -1,5 +1,5 @@
 import React from 'react';
-import { State } from '../engine';
+import { State } from '../workflow';
 import { formatPosition } from '../lib/fen';
 import { useWorkflow } from './workflow';
 

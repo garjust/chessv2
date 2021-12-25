@@ -1,5 +1,5 @@
 import React from 'react';
-import { State } from '../engine';
+import { State } from '../workflow';
 import { Color } from '../types';
 import { squareGenerator, squareLabel } from '../utils';
 import './Board.css';

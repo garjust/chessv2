@@ -1,6 +1,6 @@
 import React from 'react';
-import { State } from '../engine';
-import { ChessComputerWrapped } from '../engine/state';
+import { State } from '../workflow';
+import { ChessComputerWrapped } from '../workflow/state';
 import { SquareMap } from '../square-map';
 import { Square } from '../types';
 import { squareLabel } from '../utils';

@@ -7,7 +7,7 @@ import {
   isSquareClickable,
   pieceInSquare,
   SquareOverlayType,
-} from '../engine/state';
+} from '../workflow/state';
 import {
   BOARD_SQUARE_BLACK,
   BOARD_SQUARE_CAPTURABLE,
@@ -17,7 +17,7 @@ import {
   BOARD_SQUARE_WHITE,
 } from './theme';
 import { useWorkflow } from './workflow';
-import { clickSquareAction } from '../engine/action';
+import { clickSquareAction } from '../workflow/action';
 import Piece from './Piece';
 
 export type SquareProps = {

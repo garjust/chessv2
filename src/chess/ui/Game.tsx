@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState } from '../engine';
+import init, { createState } from '../workflow';
 import { updateLogger } from '../../lib/workflow';
 import {
   flipBoardAction,
@@ -10,12 +10,15 @@ import {
   previousPositionAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
-} from '../engine/action';
+} from '../workflow/action';
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
 import { STARTING_POSITION_FEN } from '../lib/fen';
-import { runTestGame, VIENNA_GAMBIT_ACCEPTED_GAME } from '../engine/test-games';
+import {
+  runTestGame,
+  VIENNA_GAMBIT_ACCEPTED_GAME,
+} from '../workflow/test-games';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 
