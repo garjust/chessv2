@@ -34,7 +34,7 @@ import {
   ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { applyMove } from '../engines/default/move-execution';
+import engine from '../engines/default';
 import { SquareMap } from '../square-map';
 import { computeAll } from '../engines/default/computed';
 import { wrap } from 'comlink';
@@ -254,7 +254,7 @@ function handleMovePiece(
     move.promotion = PieceType.Queen;
   }
 
-  const { position } = applyMove(state.position, move);
+  const { position } = engine.applyMove(state.position, move);
 
   return [
     {

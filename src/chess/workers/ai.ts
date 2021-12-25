@@ -5,12 +5,11 @@ import {
   ChessComputer,
   ChessComputerWorker as IChessComputerWorker,
 } from '../ai/types';
-import { computeAll } from '../engines/default/computed';
 import { parseFEN } from '../lib/fen';
-import { Move } from '../types';
+import { Move, Position } from '../types';
 
 class ChessComputerWorker implements IChessComputerWorker {
-  #instance?: ChessComputer;
+  #instance?: ChessComputer<Position>;
 
   load(version: AvailableComputerVersions) {
     switch (version) {
@@ -32,8 +31,7 @@ class ChessComputerWorker implements IChessComputerWorker {
     }
 
     const position = parseFEN(fen);
-    const computedPositionData = computeAll(position);
-    return this.#instance.nextMove(position, computedPositionData);
+    return this.#instance.nextMove(position);
   }
 }
 

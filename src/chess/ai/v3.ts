@@ -1,7 +1,7 @@
 import { ChessComputer } from './types';
 import { Color, ComputedPositionData, Move, Position } from '../types';
 import { flattenMoves, moveToDirectionString } from '../utils';
-import { applyMove } from '../engines/default/move-execution';
+import engine from '../engines/default';
 import { computeAll } from '../engines/default/computed';
 
 const DEPTH = 2;
@@ -22,30 +22,25 @@ const RESULTS_SORT = {
     a.evaluation - b.evaluation,
 };
 
-export default class v3 implements ChessComputer {
+export default class v3 implements ChessComputer<Position> {
   counter = 0;
 
-  nextMove(
-    position: Position,
-    computedPositionData: ComputedPositionData
-  ): Promise<Move> {
+  nextMove(position: Position): Promise<Move> {
     this.counter = 0;
     return new Promise((resolve) =>
       setTimeout(() => {
-        resolve(this._nextMove(position, computedPositionData));
+        resolve(this._nextMove(position));
       }, 100)
     );
   }
 
-  _nextMove(
-    position: Position,
-    computedPositionData: ComputedPositionData
-  ): Move {
+  _nextMove(position: Position): Move {
+    const computedPositionData = computeAll(position);
     const moves = flattenMoves(computedPositionData.movesByPiece);
 
     const results = moves
       .map((move) => {
-        const result = applyMove(position, move);
+        const result = engine.applyMove(position, move);
         const computedPositionData = computeAll(result.position);
 
         return {
@@ -87,7 +82,7 @@ export default class v3 implements ChessComputer {
 
     // handle no moves (checkmate or draw)
     flattenMoves(node.computedPositionData.movesByPiece).forEach((move) => {
-      const result = applyMove(node.position, move);
+      const result = engine.applyMove(node.position, move);
       const computedPositionData = computeAll(result.position);
       const m =
         -1 *

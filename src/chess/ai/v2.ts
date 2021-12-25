@@ -1,5 +1,6 @@
 import { ChessComputer } from './types';
 import { ComputedPositionData, Move, MovesByPiece, Position } from '../types';
+import { computeAll } from '../engines/default/computed';
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
@@ -22,17 +23,16 @@ const flattenMoves = (mapByPiece: MovesByPiece): Move[][] => {
   return moves;
 };
 
-export default class v2 implements ChessComputer {
-  nextMove(
-    _: Position,
-    computedPositionData: ComputedPositionData
-  ): Promise<Move> {
+export default class v2 implements ChessComputer<Position> {
+  nextMove(position: Position): Promise<Move> {
     return new Promise((resolve) => {
-      resolve(this._nextMove(computedPositionData));
+      resolve(this._nextMove(position));
     });
   }
 
-  _nextMove(computedPositionData: ComputedPositionData): Move {
+  _nextMove(position: Position): Move {
+    const computedPositionData = computeAll(position);
+
     if (computedPositionData.availableChecks.length) {
       return pluck(computedPositionData.availableChecks);
     }
