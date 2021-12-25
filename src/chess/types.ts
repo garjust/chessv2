@@ -95,8 +95,6 @@ export type ComputedPositionData = {
   movesByPiece: MovesByPiece;
   totalMoves: number;
   availableCaptures: Move[];
-  // TODO: Consider removing availableAttacks and availableChecks, they are
-  // probably not optimal to compute here.
   availableAttacks: Move[];
   availableChecks: Move[];
   evaluation: number;

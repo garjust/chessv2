@@ -9,3 +9,7 @@
 
 ## TODO
 
+- Refactor `ComputedPositionData.movesByPiece` to be an array since I basically always flatten it to one for iterating over
+- Track king squares in computed data
+- Change avaialble* in computed data to be `AttackObject[]`
+- Track pins in computed data
