@@ -8,7 +8,7 @@ enum Screen {
 }
 
 const App = () => {
-  const [screen, setScreen] = useState(Screen.Debug);
+  const [screen, setScreen] = useState(Screen.Game);
 
   return (
     <div

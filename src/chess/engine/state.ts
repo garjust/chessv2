@@ -1,4 +1,4 @@
-import { ChessComputer } from '../ai/types';
+import { AvailableComputerVersions, ChessComputer } from '../ai/types';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import { SquareMap } from '../square-map';
 import {
@@ -21,7 +21,17 @@ export enum SquareOverlayType {
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
-export type Player = typeof HumanPlayer | ChessComputer;
+export type ChessComputerWrapped = {
+  ai: ChessComputer;
+  version: AvailableComputerVersions;
+  // This property is here to indicate to JSON.stringify replacer function
+  // what type of object this is to avoid serializing the ai. JSON.stringify
+  // does something to the wrapped WebWorker before it hits the replacer
+  // function that explodes.
+  __computer: true;
+};
+
+export type Player = typeof HumanPlayer | ChessComputerWrapped;
 
 export interface State {
   debugVersion?: number;

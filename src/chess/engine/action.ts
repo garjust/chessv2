@@ -1,7 +1,9 @@
 import { Color, Move, Position, Square } from '../types';
+import { ChessComputerWrapped } from './state';
 
 export enum Type {
   AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
+  ChessComputerLoaded = 'CHESS_COMPUTER_LOADED',
   ClickSquare = 'CLICK_SQUARE',
   FlipBoard = 'FLIP_BOARD',
   Initialize = 'INITIALIZE',
@@ -19,6 +21,12 @@ export enum Type {
 export declare namespace Action {
   export interface AttemptComputerMove {
     readonly type: Type.AttemptComputerMove;
+  }
+
+  export interface ChessComputerLoaded {
+    readonly type: Type.ChessComputerLoaded;
+    readonly instance: ChessComputerWrapped;
+    readonly color: Color;
   }
 
   export interface ClickSquare {
@@ -79,6 +87,7 @@ export declare namespace Action {
 
 export type Action =
   | Action.AttemptComputerMove
+  | Action.ChessComputerLoaded
   | Action.ClickSquare
   | Action.FlipBoard
   | Action.Initialize
@@ -94,6 +103,15 @@ export type Action =
 
 export const attemptComputerMoveAction = (): Action.AttemptComputerMove => ({
   type: Type.AttemptComputerMove,
+});
+
+export const chessComputerLoadedAction = (
+  instance: ChessComputerWrapped,
+  color: Color
+): Action.ChessComputerLoaded => ({
+  type: Type.ChessComputerLoaded,
+  instance,
+  color,
 });
 
 export const clickSquareAction = (square: Square): Action.ClickSquare => ({

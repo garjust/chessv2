@@ -1,5 +1,6 @@
 import React from 'react';
 import { State } from '../engine';
+import { ChessComputerWrapped } from '../engine/state';
 import { SquareMap } from '../square-map';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
@@ -22,7 +23,7 @@ const formatBitmapString = (bitmap: string): string => {
   return parts.join(':');
 };
 
-const replacer = (key: string, value: unknown) => {
+function replacer(key: string, value: unknown) {
   if (value instanceof Map || value instanceof SquareMap) {
     return `{ size ${value.size} }`;
   }
@@ -40,6 +41,13 @@ const replacer = (key: string, value: unknown) => {
     ) {
       return `{ ${squareLabel(value as Square)} }`;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((value as any).__computer) {
+      return `justin's chess computer ${
+        (value as ChessComputerWrapped).version
+      }`;
+    }
   }
 
   if (typeof value === 'symbol') {
@@ -51,7 +59,7 @@ const replacer = (key: string, value: unknown) => {
   }
 
   return value;
-};
+}
 
 const DisplayGameState = ({ style }: DisplayGameStateProps) => {
   const { rendering } = useWorkflow(render);

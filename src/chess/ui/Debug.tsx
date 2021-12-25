@@ -65,7 +65,7 @@ const Debug = () => {
       </div>
       <pre style={{ gridArea: 'log' }}>
         {log.map((line) => (
-          <div key={line}>{line}</div>
+          <div key={Math.random()}>{line}</div>
         ))}
       </pre>
     </div>

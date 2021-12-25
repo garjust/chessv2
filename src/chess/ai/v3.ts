@@ -2,22 +2,9 @@ import { ChessComputer } from './types';
 import { Color, ComputedPositionData, Move, Position } from '../types';
 import { flattenMoves, flipColor } from '../utils';
 import { applyMove } from '../lib/move-execution';
-import { evaluate } from '../lib/evaluation';
-import { computeMovementData } from '../lib/move-generation';
-import { board } from '../lib/bitmap';
+import { computeAll } from '../lib/computed';
 
 const DEPTH = 2;
-
-function computeAll(position: Position): ComputedPositionData {
-  return {
-    ...computeMovementData(position),
-    evaluation: evaluate(position),
-    bitmaps: {
-      whitePieces: board(position, { color: Color.White }),
-      blackPieces: board(position, { color: Color.Black }),
-    },
-  };
-}
 
 const pluck = <T>(array: Array<T>): T =>
   array[Math.floor(Math.random() * array.length)];
@@ -95,6 +82,7 @@ export default class v3 implements ChessComputer {
 
     let n = -Infinity;
 
+    // handle no moves (checkmate or draw)
     flattenMoves(node.computedPositionData.movesByPiece).forEach((move) => {
       const result = applyMove(node.position, move);
       const computedPositionData = computeAll(result.position);

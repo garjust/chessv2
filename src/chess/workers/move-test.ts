@@ -26,4 +26,5 @@ self.onmessage = async (
       }`
     );
   }
+  self.postMessage('--');
 };

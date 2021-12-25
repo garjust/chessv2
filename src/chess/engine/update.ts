@@ -1,13 +1,6 @@
 import { Update } from '../../lib/workflow';
-import {
-  Color,
-  ComputedPositionData,
-  Move,
-  PieceType,
-  Position,
-} from '../types';
+import { PieceType } from '../types';
 import { flattenMoves, flipColor, movesIncludes, squareEquals } from '../utils';
-import { computeMovementData } from '../lib/move-generation';
 import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
@@ -17,6 +10,7 @@ import {
   attemptComputerMoveAction,
   clickSquareAction,
   receiveComputerMoveAction,
+  chessComputerLoadedAction,
 } from './action';
 import { State, Action, Type } from './index';
 import {
@@ -27,37 +21,34 @@ import {
   checkedSquare,
   Draw,
 } from './state';
-import { evaluate } from '../lib/evaluation';
-import { v3 } from '../ai';
 import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
-import { ChessComputer } from '../ai/types';
-import { board } from '../lib/bitmap';
+import {
+  AvailableComputerVersions,
+  ChessComputer,
+  ChessComputerWorkerConstructor,
+} from '../ai/types';
 import { applyMove } from '../lib/move-execution';
 import { isPromotionPositionPawn } from '../lib/move-utils';
 import { SquareMap } from '../square-map';
+import { computeAll } from '../lib/computed';
+import { wrap } from 'comlink';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
 
-const loadComputer = (): ChessComputer => new v3();
+const COMPUTER_VERISON = 'v3';
 
-function computeAll(position: Position): ComputedPositionData {
-  return {
-    ...computeMovementData(position),
-    evaluation: evaluate(position),
-    bitmaps: {
-      whitePieces: board(position, { color: Color.White }),
-      blackPieces: board(position, { color: Color.Black }),
-      // bishops____: board(position, { pieceType: PieceType.Bishop }),
-      // kings______: board(position, { pieceType: PieceType.King }),
-      // knight_____: board(position, { pieceType: PieceType.Knight }),
-      // pawns______: board(position, { pieceType: PieceType.Pawn }),
-      // queens_____: board(position, { pieceType: PieceType.Queen }),
-      // rooks______: board(position, { pieceType: PieceType.Rook }),
-    },
-  };
-}
+const loadComputer = async (
+  version: AvailableComputerVersions
+): Promise<ChessComputer> => {
+  const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
+    new Worker(new URL('../workers/ai', import.meta.url))
+  );
+  const instance = await new ChessComputerWorkerRemote();
+  await instance.load(version);
+  return instance;
+};
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players, computedPositionData } = state;
@@ -67,7 +58,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
     return [
       state,
       from(
-        playerForTurn
+        playerForTurn.ai
           .nextMove(position, computedPositionData)
           .then((move) => receiveComputerMoveAction(move))
       ),
@@ -75,6 +66,24 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   } else {
     return [state, null];
   }
+}
+
+function handleChessComputerLoaded(
+  state: State,
+  action: Action.ChessComputerLoaded
+): Update<State, Action> {
+  const { instance, color } = action;
+
+  return [
+    {
+      ...state,
+      players: {
+        ...state.players,
+        [color]: instance,
+      },
+    },
+    attemptComputerMoveAction(),
+  ];
 }
 
 function handleClickSquare(
@@ -128,8 +137,15 @@ function handleLoadChessComputer(
   const { playingAs } = action;
 
   return [
-    { ...state, players: { ...state.players, [playingAs]: loadComputer() } },
-    attemptComputerMoveAction(),
+    state,
+    from(
+      loadComputer(COMPUTER_VERISON).then((instance) =>
+        chessComputerLoadedAction(
+          { ai: instance, version: COMPUTER_VERISON, __computer: true },
+          playingAs
+        )
+      )
+    ),
   ];
 }
 
@@ -305,6 +321,8 @@ export function update(
   switch (action.type) {
     case Type.AttemptComputerMove:
       return handleAttemptComputerMove(state);
+    case Type.ChessComputerLoaded:
+      return handleChessComputerLoaded(state, action);
     case Type.ClickSquare:
       return handleClickSquare(state, action);
     case Type.FlipBoard:
