@@ -6,6 +6,11 @@ export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
+export const PERFT_5_FEN =
+  'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8';
+export const VIENNA_GAMBIT_ACCEPTED_FEN =
+  '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w  - 1 11';
+
 const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
   b: PieceType.Bishop,
   B: PieceType.Bishop,

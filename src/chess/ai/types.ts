@@ -9,6 +9,10 @@ export interface ChessComputer {
   ): Promise<Move>;
 }
 
+export interface ChessComputerConstructor {
+  new (): ChessComputer;
+}
+
 export interface ChessComputerWorker {
   load(version: AvailableComputerVersions): void;
   // The chess computer worker provides a FEN string interface to simplify

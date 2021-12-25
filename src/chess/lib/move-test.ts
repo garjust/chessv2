@@ -1,6 +1,6 @@
 import { Position } from '../types';
 import { flattenMoves } from '../utils';
-import { STARTING_POSITION_FEN } from './fen';
+import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
 import { applyMove } from './move-execution';
 import { computeMovementData } from './move-generation';
 
@@ -10,7 +10,7 @@ export type MoveTest = {
 };
 
 export const PERFT_POSITION_5: MoveTest = {
-  fen: 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8 ',
+  fen: PERFT_5_FEN,
   counts: [44, 1486, 62379, 2103487, 89941194],
 };
 
