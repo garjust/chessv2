@@ -1,10 +1,10 @@
-import { Color, Move, Piece, Position, SlideType, Square } from '../types';
+import { Color, Move, Position, Square } from '../../types';
 import {
   isLegalSquare,
   BLACK_PAWN_STARTING_RANK,
   WHITE_PAWN_STARTING_RANK,
   squareEquals,
-} from '../utils';
+} from '../../utils';
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White

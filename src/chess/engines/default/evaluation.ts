@@ -1,4 +1,4 @@
-import { Position, PieceType, Color } from '../types';
+import { Position, PieceType, Color } from '../../types';
 
 const PieceValue: Record<PieceType, number> = Object.freeze({
   [PieceType.Bishop]: 3,

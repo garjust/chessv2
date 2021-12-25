@@ -22,11 +22,6 @@ export type Square = {
   file: number;
 };
 
-export enum SlideType {
-  Cardinal = 'CARDINAL',
-  Diagonal = 'DIAGONAL',
-}
-
 export type Move = {
   from: Square;
   to: Square;

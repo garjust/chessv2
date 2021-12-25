@@ -1,8 +1,8 @@
 import { ChessComputer } from './types';
 import { Color, ComputedPositionData, Move, Position } from '../types';
 import { flattenMoves, moveToDirectionString } from '../utils';
-import { applyMove } from '../engine/move-execution';
-import { computeAll } from '../engine/computed';
+import { applyMove } from '../engines/default/move-execution';
+import { computeAll } from '../engines/default/computed';
 
 const DEPTH = 2;
 

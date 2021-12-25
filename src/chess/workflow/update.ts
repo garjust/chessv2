@@ -28,10 +28,10 @@ import {
   ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { applyMove } from '../engine/move-execution';
-import { isPromotionPositionPawn } from '../engine/move-utils';
+import { applyMove } from '../engines/default/move-execution';
+import { isPromotionPositionPawn } from '../engines/default/move-utils';
 import { SquareMap } from '../square-map';
-import { computeAll } from '../engine/computed';
+import { computeAll } from '../engines/default/computed';
 import { wrap } from 'comlink';
 
 // eslint-disable-next-line @typescript-eslint/ban-types

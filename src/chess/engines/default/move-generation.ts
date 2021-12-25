@@ -1,4 +1,4 @@
-import { SquareMap } from '../square-map';
+import { SquareMap } from '../../square-map';
 import {
   Color,
   ComputedPositionData,
@@ -11,13 +11,13 @@ import {
   Position,
   Square,
   AttackObject,
-} from '../types';
+} from '../../types';
 import {
   isLegalSquare,
   squareEquals,
   flipColor,
   squaresInclude,
-} from '../utils';
+} from '../../utils';
 import { applyMove } from './move-execution';
 import {
   down,
