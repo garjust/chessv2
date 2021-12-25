@@ -1,4 +1,4 @@
-import { AvailableComputerVersions, ChessComputer } from '../ai/types';
+import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import { SquareMap } from '../square-map';
 import {
@@ -22,7 +22,7 @@ export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
 export type ChessComputerWrapped = {
-  ai: ChessComputer;
+  ai: ChessComputerWorker;
   version: AvailableComputerVersions;
   // This property is here to indicate to JSON.stringify replacer function
   // what type of object this is to avoid serializing the ai. JSON.stringify

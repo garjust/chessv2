@@ -6,7 +6,8 @@ import {
   ChessComputerWorker as IChessComputerWorker,
 } from '../ai/types';
 import { computeAll } from '../lib/computed';
-import { Move, Position } from '../types';
+import { parseFEN } from '../lib/fen';
+import { Move } from '../types';
 
 class ChessComputerWorker implements IChessComputerWorker {
   #instance?: ChessComputer;
@@ -25,11 +26,12 @@ class ChessComputerWorker implements IChessComputerWorker {
     }
   }
 
-  nextMove(position: Position): Promise<Move> {
+  nextMove(fen: string): Promise<Move> {
     if (!this.#instance) {
       throw Error('no computer is loaded');
     }
 
+    const position = parseFEN(fen);
     const computedPositionData = computeAll(position);
     return this.#instance.nextMove(position, computedPositionData);
   }

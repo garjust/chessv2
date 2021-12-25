@@ -1,7 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { PieceType } from '../types';
 import { flattenMoves, flipColor, movesIncludes, squareEquals } from '../utils';
-import { parseFEN, BLANK_POSITION_FEN } from '../lib/fen';
+import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
   setPositionFromFENAction,
@@ -25,7 +25,7 @@ import { from } from 'rxjs';
 import { delayOperator } from '../../lib/operators';
 import {
   AvailableComputerVersions,
-  ChessComputer,
+  ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
 import { applyMove } from '../lib/move-execution';
@@ -41,7 +41,7 @@ const COMPUTER_VERISON = 'v3';
 
 const loadComputer = async (
   version: AvailableComputerVersions
-): Promise<ChessComputer> => {
+): Promise<ChessComputerWorker> => {
   const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
     new Worker(new URL('../workers/ai', import.meta.url))
   );
@@ -59,7 +59,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
       state,
       from(
         playerForTurn.ai
-          .nextMove(position, computedPositionData)
+          .nextMove(formatPosition(position))
           .then((move) => receiveComputerMoveAction(move))
       ),
     ];

@@ -11,7 +11,9 @@ export interface ChessComputer {
 
 export interface ChessComputerWorker {
   load(version: AvailableComputerVersions): void;
-  nextMove(position: Position): Promise<Move>;
+  // The chess computer worker provides a FEN string interface to simplify
+  // copying of the position into the Worker.
+  nextMove(fen: string): Promise<Move>;
 }
 
 export interface ChessComputerWorkerConstructor {
