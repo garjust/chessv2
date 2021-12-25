@@ -1,27 +1,18 @@
 import { ChessComputer } from './types';
-import { Color, Move, Position } from '../types';
+import { Color, Position } from '../types';
 import { flattenMoves, moveToDirectionString } from '../utils';
 import engine from '../engines/default';
 import { computeAll } from '../engines/default/computed';
+import { pluck } from '../../lib/array';
 
 const DEPTH = 2;
-
-const pluck = <T>(array: Array<T>): T =>
-  array[Math.floor(Math.random() * array.length)];
 
 export default class v3 implements ChessComputer<Position> {
   counter = 0;
 
-  nextMove(position: Position): Promise<Move> {
+  nextMove(position: Position) {
     this.counter = 0;
-    return new Promise((resolve) =>
-      setTimeout(() => {
-        resolve(this._nextMove(position));
-      }, 100)
-    );
-  }
 
-  _nextMove(position: Position): Move {
     const computedPositionData = computeAll(position);
     const moves = flattenMoves(computedPositionData.movesByPiece);
 
@@ -47,7 +38,9 @@ export default class v3 implements ChessComputer<Position> {
       }))
     );
 
-    return pluck(results.filter(({ score }) => score === bestScore)).move;
+    const move = pluck(results.filter(({ score }) => score === bestScore)).move;
+
+    return Promise.resolve(move);
   }
 
   score(position: Position, depth: number): number {

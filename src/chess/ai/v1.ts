@@ -1,30 +1,24 @@
 import { ChessComputer } from './types';
-import { Move, Position } from '../types';
+import { Position } from '../types';
 import { flattenMoves } from '../utils';
 import { computeAll } from '../engines/default/computed';
-
-const pluck = <T>(array: Array<T>): T =>
-  array[Math.floor(Math.random() * array.length)];
+import { pluck } from '../../lib/array';
 
 export default class v1 implements ChessComputer<Position> {
-  nextMove(position: Position): Promise<Move> {
-    return new Promise((resolve) => {
-      resolve(this._nextMove(position));
-    });
-  }
-
-  _nextMove(position: Position): Move {
+  nextMove(position: Position) {
     const computedPositionData = computeAll(position);
 
     if (computedPositionData.availableChecks.length) {
-      return pluck(computedPositionData.availableChecks);
+      return Promise.resolve(pluck(computedPositionData.availableChecks));
     }
 
     if (computedPositionData.availableCaptures.length) {
-      return pluck(computedPositionData.availableCaptures);
+      return Promise.resolve(pluck(computedPositionData.availableCaptures));
     }
 
-    return pluck(flattenMoves(computedPositionData.movesByPiece));
+    return Promise.resolve(
+      pluck(flattenMoves(computedPositionData.movesByPiece))
+    );
   }
 
   toJSON(): string {
