@@ -13,7 +13,7 @@ import {
   AvailableComputerVersions,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { squareLabel } from '../utils';
+import { moveToDirectionString, squareLabel } from '../utils';
 import { BUTTON_CSS } from './theme';
 
 async function runMoveGenerationTest(
@@ -47,9 +47,9 @@ async function runComputerNextMoveTest(logger: Subject<string>, fen: string) {
       const move = await ai.nextMove(fen);
       const timing = Date.now() - start;
       logger.next(
-        `version=${version}; timing=${timing}ms; move=${squareLabel(
-          move.from
-        )}->${squareLabel(move.to)}`
+        `version=${version}; timing=${timing}ms; move=${moveToDirectionString(
+          move
+        )}`
       );
     })
   );

@@ -1,6 +1,6 @@
 import { ChessComputer } from './types';
 import { Color, ComputedPositionData, Move, Position } from '../types';
-import { flattenMoves, flipColor } from '../utils';
+import { flattenMoves, moveToDirectionString } from '../utils';
 import { applyMove } from '../lib/move-execution';
 import { computeAll } from '../lib/computed';
 
@@ -66,7 +66,10 @@ export default class v3 implements ChessComputer {
 
     console.log(
       `results after ${this.counter} scores`,
-      results.map((x) => x.evaluation)
+      results.map(({ move, evaluation }) => ({
+        move: moveToDirectionString(move),
+        evaluation,
+      }))
     );
 
     return pluck(

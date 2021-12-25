@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
 import init, { createState } from '../engine';
@@ -19,6 +19,9 @@ import { runTestGame, VIENNA_GAMBIT_ACCEPTED_GAME } from '../engine/test-games';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 
+const MY_TEST_POSITION =
+  'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
+
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
 
@@ -26,7 +29,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
-    emit(setPositionFromFENAction(STARTING_POSITION_FEN));
+    emit(setPositionFromFENAction(MY_TEST_POSITION));
   });
 
   function emitExampleGame(): void {

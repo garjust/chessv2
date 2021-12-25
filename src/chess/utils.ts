@@ -76,3 +76,6 @@ export const flattenMoves = (movesByPiece: MovesByPiece): Move[] => {
 
   return moves;
 };
+
+export const moveToDirectionString = (move: Move): string =>
+  `${squareLabel(move.from)}->${squareLabel(move.to)}`;
