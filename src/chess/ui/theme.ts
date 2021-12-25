@@ -32,3 +32,8 @@ export const BOARD_SQUARE_CHECK: React.CSSProperties = {
   backgroundColor: 'red',
   boxShadow: 'inset 0 0 0 1px red',
 };
+
+export const BUTTON_CSS: React.CSSProperties = {
+  padding: 16,
+  cursor: 'pointer',
+};

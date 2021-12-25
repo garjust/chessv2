@@ -17,11 +17,7 @@ import { Color } from '../types';
 import { STARTING_POSITION_FEN } from '../lib/fen';
 import { runTestGame, VIENNA_GAMBIT_ACCEPTED_GAME } from '../engine/test-games';
 import DisplayGameFEN from './DisplayGameFen';
-
-const BUTTON_CSS: CSSProperties = {
-  padding: 16,
-  cursor: 'pointer',
-};
+import { BUTTON_CSS } from './theme';
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});

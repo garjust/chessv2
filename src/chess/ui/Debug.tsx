@@ -14,11 +14,7 @@ import {
   ChessComputerWorkerConstructor,
 } from '../ai/types';
 import { squareLabel } from '../utils';
-
-const BUTTON_CSS: CSSProperties = {
-  padding: 16,
-  cursor: 'pointer',
-};
+import { BUTTON_CSS } from './theme';
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
