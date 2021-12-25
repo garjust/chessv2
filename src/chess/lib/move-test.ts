@@ -1,8 +1,8 @@
 import { Position } from '../types';
 import { flattenMoves } from '../utils';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
-import { applyMove } from './move-execution';
-import { computeMovementData } from './move-generation';
+import { applyMove } from '../engine/move-execution';
+import { computeMovementData } from '../engine/move-generation';
 
 export type MoveTest = {
   fen: string;

@@ -5,7 +5,7 @@ import {
   ChessComputer,
   ChessComputerWorker as IChessComputerWorker,
 } from '../ai/types';
-import { computeAll } from '../lib/computed';
+import { computeAll } from '../engine/computed';
 import { parseFEN } from '../lib/fen';
 import { Move } from '../types';
 

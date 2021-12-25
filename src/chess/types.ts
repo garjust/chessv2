@@ -105,16 +105,6 @@ export type ComputedPositionData = {
   availableAttacks: Move[];
   availableChecks: Move[];
   evaluation: number;
-  bitmaps: {
-    whitePieces?: bigint;
-    blackPieces?: bigint;
-    bishops____?: bigint;
-    kings______?: bigint;
-    knight_____?: bigint;
-    pawns______?: bigint;
-    queens_____?: bigint;
-    rooks______?: bigint;
-  };
 };
 
 export type SquareLabel =

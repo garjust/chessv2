@@ -66,7 +66,6 @@ const INITIAL_STATE: State = {
     availableAttacks: [],
     availableChecks: [],
     evaluation: 0,
-    bitmaps: {},
   },
 };
 
