@@ -61,12 +61,16 @@ const INITIAL_STATE: State = {
   previousPositions: [],
   position: parseFEN(BLANK_POSITION_FEN),
   computedPositionData: {
-    moves: [],
-    checks: [],
-    availableCaptures: [],
-    availableAttacks: [],
-    availableChecks: [],
-    evaluation: 0,
+    moveData: {
+      moves: [],
+      checks: [],
+      availableCaptures: [],
+      availableAttacks: [],
+      availableChecks: [],
+    },
+    evaluationData: {
+      evaluation: 0,
+    },
   },
 };
 
@@ -111,6 +115,6 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 };
 
 export const checkedSquare = (state: State): Square | undefined =>
-  state.computedPositionData.checks.length > 0
-    ? state.computedPositionData.checks[0].attacked
+  state.computedPositionData.moveData.checks.length > 0
+    ? state.computedPositionData.moveData.checks[0].attacked
     : undefined;

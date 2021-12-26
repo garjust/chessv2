@@ -1,21 +1,21 @@
 import { ChessComputer } from './types';
 import { Position } from '../types';
-import { computeAll } from '../engine/computed';
 import { pluck } from '../../lib/array';
+import engine from '../engine';
 
 export default class v1 implements ChessComputer<Position> {
   nextMove(position: Position) {
-    const computedPositionData = computeAll(position);
+    const movementData = engine.generateMovementData(position);
 
-    if (computedPositionData.availableChecks.length) {
-      return Promise.resolve(pluck(computedPositionData.availableChecks));
+    if (movementData.availableChecks.length) {
+      return Promise.resolve(pluck(movementData.availableChecks));
     }
 
-    if (computedPositionData.availableCaptures.length) {
-      return Promise.resolve(pluck(computedPositionData.availableCaptures));
+    if (movementData.availableCaptures.length) {
+      return Promise.resolve(pluck(movementData.availableCaptures));
     }
 
-    return Promise.resolve(pluck(computedPositionData.moves));
+    return Promise.resolve(pluck(movementData.moves));
   }
 
   toJSON(): string {

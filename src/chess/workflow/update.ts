@@ -35,7 +35,6 @@ import {
 } from '../ai/types';
 import engine from '../engine';
 import { SquareMap } from '../square-map';
-import { computeAll } from '../engine/computed';
 import { wrap } from 'comlink';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -156,7 +155,7 @@ function handleLoadChessComputer(
 function handleOverlaySquares(state: State): Update<State, Action> {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
-  const { position, selectedSquare, lastMove } = state;
+  const { position, selectedSquare, lastMove, computedPositionData } = state;
 
   if (lastMove) {
     squareOverlay.set(lastMove.from, SquareOverlayType.LastMove);
@@ -173,8 +172,8 @@ function handleOverlaySquares(state: State): Update<State, Action> {
 
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
-      const candidateSquares = state.computedPositionData.moves.filter((move) =>
-        squareEquals(move.from, selectedSquare)
+      const candidateSquares = computedPositionData.moveData.moves.filter(
+        (move) => squareEquals(move.from, selectedSquare)
       );
 
       candidateSquares.forEach(({ to: square }) => {
@@ -227,7 +226,7 @@ function handleMovePiece(
 ): Update<State, Action> {
   const { move } = action;
 
-  const legalMoves = state.computedPositionData.moves;
+  const legalMoves = state.computedPositionData.moveData.moves;
   if (!movesIncludes(legalMoves, move)) {
     const piece = pieceInSquare(state, move.from);
     console.log(
@@ -273,9 +272,14 @@ function handleSetPosition(
   action: Action.SetPosition
 ): Update<State, Action> {
   const { position } = action;
-  const computedPositionData = computeAll(position);
+  const moveData = engine.generateMovementData(position);
+  const evaluation = engine.evaluate(position);
 
-  state = { ...state, position, computedPositionData };
+  state = {
+    ...state,
+    position,
+    computedPositionData: { moveData, evaluationData: { evaluation } },
+  };
 
   if (position.halfMoveCount === 100) {
     return [
@@ -288,14 +292,11 @@ function handleSetPosition(
   }
 
   // Check if current player has no moves to end the game
-  if (computedPositionData.moves.length === 0) {
+  if (moveData.moves.length === 0) {
     return [
       {
         ...state,
-        winner:
-          computedPositionData.checks.length > 0
-            ? flipColor(position.turn)
-            : Draw,
+        winner: moveData.checks.length > 0 ? flipColor(position.turn) : Draw,
       },
       null,
     ];

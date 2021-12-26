@@ -397,16 +397,15 @@ const findAttacksOnKing = (
   return attacksOnSquare(position, attackingColor, king);
 };
 
-export const computeMovementData = (
+export const generateMovementData = (
   position: Position
-): Pick<
-  ComputedPositionData,
-  | 'moves'
-  | 'checks'
-  | 'availableCaptures'
-  | 'availableAttacks'
-  | 'availableChecks'
-> => {
+): {
+  moves: MoveWithExtraData[];
+  checks: AttackObject[];
+  availableCaptures: Move[];
+  availableAttacks: Move[];
+  availableChecks: Move[];
+} => {
   const checks = findAttacksOnKing(position, flipColor(position.turn));
 
   const allMoves: MoveWithExtraData[] = [];

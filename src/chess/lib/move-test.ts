@@ -1,7 +1,6 @@
 import { Position } from '../types';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
 import engine from '../engine';
-import { computeMovementData } from '../engine/move-generation';
 
 export type MoveTest = {
   fen: string;
@@ -36,7 +35,7 @@ export const run = async (
 
   let n = 0;
 
-  const movementData = computeMovementData(position);
+  const movementData = engine.generateMovementData(position);
   for (const move of movementData.moves) {
     const result = engine.applyMove(position, move);
     n += await run(result.position, depth - 1);

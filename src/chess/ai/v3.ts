@@ -2,7 +2,6 @@ import { ChessComputer } from './types';
 import { Color, Position } from '../types';
 import { moveToDirectionString } from '../utils';
 import engine from '../engine';
-import { computeAll } from '../engine/computed';
 import { pluck } from '../../lib/array';
 
 const DEPTH = 2;
@@ -13,11 +12,11 @@ export default class v3 implements ChessComputer<Position> {
   nextMove(position: Position) {
     this.counter = 0;
 
-    const computedPositionData = computeAll(position);
+    const movementData = engine.generateMovementData(position);
 
     const normalization = position.turn === Color.White ? 1 : -1;
 
-    const results = computedPositionData.moves
+    const results = movementData.moves
       .map((move) => {
         const result = engine.applyMove(position, move);
 
@@ -45,16 +44,15 @@ export default class v3 implements ChessComputer<Position> {
   score(position: Position, depth: number): number {
     this.counter++;
 
-    const computedPositionData = computeAll(position);
-
     if (depth === 0) {
-      return computedPositionData.evaluation;
+      return engine.evaluate(position);
     }
 
+    const moves = engine.generateMoves(position);
     let n = -Infinity;
 
     // handle no moves (checkmate or draw)
-    computedPositionData.moves.forEach((move) => {
+    moves.forEach((move) => {
       const result = engine.applyMove(position, move);
       const m = -1 * this.score(result.position, depth - 1);
 

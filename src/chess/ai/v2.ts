@@ -1,18 +1,18 @@
 import { ChessComputer } from './types';
 import { Piece, Position, Square } from '../types';
-import { computeAll } from '../engine/computed';
 import { pluck } from '../../lib/array';
+import engine from '../engine';
 
 export default class v2 implements ChessComputer<Position> {
   nextMove(position: Position) {
-    const computedPositionData = computeAll(position);
+    const movementData = engine.generateMovementData(position);
 
-    if (computedPositionData.availableChecks.length) {
-      return Promise.resolve(pluck(computedPositionData.availableChecks));
+    if (movementData.availableChecks.length) {
+      return Promise.resolve(pluck(movementData.availableChecks));
     }
 
-    if (computedPositionData.availableCaptures.length) {
-      return Promise.resolve(pluck(computedPositionData.availableCaptures));
+    if (movementData.availableCaptures.length) {
+      return Promise.resolve(pluck(movementData.availableCaptures));
     }
 
     const pieces: { square: Square; piece: Piece }[] = [];
@@ -23,7 +23,7 @@ export default class v2 implements ChessComputer<Position> {
     }
 
     const piece = pluck(pieces);
-    const moves = computedPositionData.moves.filter(
+    const moves = movementData.moves.filter(
       ({ from }) => from === piece.square
     );
 
