@@ -26,7 +26,6 @@ export const applyMove = (
     },
   };
   let enPassantSquare: Square | null = null;
-  let isCapture = false;
 
   let piece = pieces.get(move.from);
 
@@ -45,13 +44,11 @@ export const applyMove = (
   }
 
   // Execute the move
-  const captured = pieces.get(move.to);
+  let captured = pieces.get(move.to);
   pieces.delete(move.from);
   pieces.set(move.to, piece);
 
   if (captured) {
-    isCapture = true;
-
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
       if (squareEquals(move.to, ROOK_STARTING_SQUARES[piece.color].queenside)) {
@@ -68,12 +65,10 @@ export const applyMove = (
   if (piece.type === PieceType.Pawn) {
     if (squareEquals(position.enPassantSquare, move.to)) {
       // This is an en passant capture
-      isCapture = true;
-      if (piece.color === Color.White) {
-        pieces.delete(down(move.to));
-      } else {
-        pieces.delete(up(move.to));
-      }
+      const capturedSquare =
+        piece.color === Color.White ? down(move.to) : up(move.to);
+      captured = pieces.get(capturedSquare);
+      pieces.delete(capturedSquare);
     }
 
     if (isTwoRankMove(move)) {
@@ -129,7 +124,7 @@ export const applyMove = (
       castlingAvailability,
       enPassantSquare,
       halfMoveCount:
-        piece.type !== PieceType.Pawn && !isCapture
+        piece.type !== PieceType.Pawn && !captured
           ? position.halfMoveCount + 1
           : 0,
       fullMoveCount:
