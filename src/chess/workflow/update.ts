@@ -33,9 +33,9 @@ import {
   ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import engine from '../engines/default';
+import engine from '../engine';
 import { SquareMap } from '../square-map';
-import { computeAll } from '../engines/default/computed';
+import { computeAll } from '../engine/computed';
 import { wrap } from 'comlink';
 
 // eslint-disable-next-line @typescript-eslint/ban-types

@@ -1,6 +1,6 @@
-import { SquareMap } from '../../square-map';
-import { Color, Move, Piece, PieceType, Position, Square } from '../../types';
-import { squareEquals, ROOK_STARTING_SQUARES, flipColor } from '../../utils';
+import { SquareMap } from '../square-map';
+import { Color, Move, Piece, PieceType, Position, Square } from '../types';
+import { squareEquals, ROOK_STARTING_SQUARES, flipColor } from '../utils';
 import { down, up } from './move-utils';
 
 const isTwoRankMove = (move: Move): boolean =>

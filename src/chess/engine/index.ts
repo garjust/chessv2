@@ -1,5 +1,4 @@
-import { Position } from '../../types';
-import { Engine } from '../types';
+import { Engine, Position } from '../types';
 import { evaluate } from './evaluation';
 import { applyMove } from './move-execution';
 import { computeMovementData } from './move-generation';

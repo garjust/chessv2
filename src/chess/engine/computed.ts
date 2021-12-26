@@ -1,4 +1,4 @@
-import { ComputedPositionData, Position } from '../../types';
+import { ComputedPositionData, Position } from '../types';
 import { evaluate } from './evaluation';
 import { computeMovementData } from './move-generation';
 

@@ -1,6 +1,6 @@
 import { ChessComputer } from './types';
 import { Piece, Position, Square } from '../types';
-import { computeAll } from '../engines/default/computed';
+import { computeAll } from '../engine/computed';
 import { pluck } from '../../lib/array';
 
 export default class v2 implements ChessComputer<Position> {

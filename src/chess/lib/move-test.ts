@@ -1,7 +1,7 @@
 import { Position } from '../types';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
-import engine from '../engines/default';
-import { computeMovementData } from '../engines/default/move-generation';
+import engine from '../engine';
+import { computeMovementData } from '../engine/move-generation';
 
 export type MoveTest = {
   fen: string;

@@ -1,8 +1,8 @@
 import { ChessComputer } from './types';
 import { Color, Position } from '../types';
 import { moveToDirectionString } from '../utils';
-import engine from '../engines/default';
-import { computeAll } from '../engines/default/computed';
+import engine from '../engine';
+import { computeAll } from '../engine/computed';
 import { pluck } from '../../lib/array';
 
 const DEPTH = 2;

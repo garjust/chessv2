@@ -1,5 +1,5 @@
-import { Color, Move, Position, Square } from '../../types';
-import { isLegalSquare, squareEquals } from '../../utils';
+import { Color, Move, Position, Square } from '../types';
+import { isLegalSquare, squareEquals } from '../utils';
 
 type MoveSquareFunction = (square: Square, n: number) => Square;
 
