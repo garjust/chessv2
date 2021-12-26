@@ -88,7 +88,7 @@ const pawnMoves = (
   return squares.map((to) => ({
     from,
     to,
-    attack: findCaptures(position, { from, to }),
+    attack: findAttack(position, { from, to }),
   }));
 };
 
@@ -113,7 +113,7 @@ const knightMoves = (
     .map((to) => ({
       from,
       to,
-      attack: findCaptures(position, { from, to }),
+      attack: findAttack(position, { from, to }),
     }));
 
 const kingMoves = (
@@ -162,7 +162,7 @@ const kingMoves = (
   return squares.map((to) => ({
     from,
     to,
-    attack: findCaptures(position, { from, to }),
+    attack: findAttack(position, { from, to }),
   }));
 };
 
@@ -176,7 +176,7 @@ const bishopMoves = (
     .map((to) => ({
       from,
       to,
-      attack: findCaptures(position, { from, to }),
+      attack: findAttack(position, { from, to }),
     }));
 
 const rookMoves = (
@@ -189,7 +189,7 @@ const rookMoves = (
     .map((to) => ({
       from,
       to,
-      attack: findCaptures(position, { from, to }),
+      attack: findAttack(position, { from, to }),
     }));
 
 const queenMoves = (
@@ -201,7 +201,7 @@ const queenMoves = (
   ...rookMoves(position, color, from),
 ];
 
-const findCaptures = (
+const findAttack = (
   position: Position,
   move: Move
 ): AttackObject | undefined => {
@@ -240,33 +240,21 @@ const attacksOnSquare = (
   // the attacked piece is a pawn.
   superPieceMoves[PieceType.Pawn].forEach((move) => {
     if (move.attack && move.attack.attacker.type === PieceType.Pawn) {
-      attacks.push({
-        attacked: square,
-        attacker: { square: move.to, type: PieceType.Pawn },
-        slideSquares: [],
-      });
+      attacks.push(move.attack);
     }
   });
 
   // Look for knights attacked by a knight move.
   superPieceMoves[PieceType.Knight].forEach((move) => {
     if (move.attack && move.attack.attacker.type === PieceType.Knight) {
-      attacks.push({
-        attacked: square,
-        attacker: { square: move.to, type: PieceType.Knight },
-        slideSquares: [],
-      });
+      attacks.push(move.attack);
     }
   });
 
   // Look for kings attacked by a king move.
   superPieceMoves[PieceType.King].forEach((move) => {
     if (move.attack && move.attack.attacker.type === PieceType.King) {
-      attacks.push({
-        attacked: square,
-        attacker: { square: move.to, type: PieceType.King },
-        slideSquares: [],
-      });
+      attacks.push(move.attack);
     }
   });
 
