@@ -4,7 +4,7 @@ import { moveToDirectionString } from '../utils';
 import engine from '../engine';
 import { pluck } from '../../lib/array';
 
-const DEPTH = 2;
+const DEPTH = 3;
 
 export default class v3 implements ChessComputer<Position> {
   counter = 0;
