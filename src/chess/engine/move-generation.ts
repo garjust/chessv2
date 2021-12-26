@@ -40,7 +40,7 @@ const pawnMoves = (
   from: Square,
   { attacksOnly }: { attacksOnly: boolean }
 ): MoveWithExtraData[] => {
-  let squares: Square[] = [];
+  let squares: MoveWithExtraData[] = [];
   const opponentColor = flipColor(color);
   const advanceFn = color === Color.White ? up : down;
 
@@ -50,14 +50,14 @@ const pawnMoves = (
     isLegalSquare(advanceFn(from)) &&
     !attacksOnly
   ) {
-    squares.push(advanceFn(from));
+    squares.push({ from, to: advanceFn(from) });
 
     // Space two squares forward of the pawn when it is in it's starting rank.
     if (
       !position.pieces.get(advanceFn(from, 2)) &&
       isStartPositionPawn(color, from)
     ) {
-      squares.push(advanceFn(from, 2));
+      squares.push({ from, to: advanceFn(from, 2) });
     }
   }
 
@@ -66,13 +66,23 @@ const pawnMoves = (
     position.pieces.get(advanceFn(left(from)))?.color === opponentColor ||
     squareEquals(position.enPassantSquare, advanceFn(left(from)))
   ) {
-    squares.push(advanceFn(left(from)));
+    const square = advanceFn(left(from));
+    squares.push({
+      from,
+      to: square,
+      attack: findAttack(position, { from, to: square }),
+    });
   }
   if (
     position.pieces.get(advanceFn(right(from)))?.color === opponentColor ||
     squareEquals(position.enPassantSquare, advanceFn(right(from)))
   ) {
-    squares.push(advanceFn(right(from)));
+    const square = advanceFn(right(from));
+    squares.push({
+      from,
+      to: square,
+      attack: findAttack(position, { from, to: square }),
+    });
   }
 
   // If the pawn will promote on next advancement take the possible pawn moves
@@ -85,11 +95,7 @@ const pawnMoves = (
     );
   }
 
-  return squares.map((to) => ({
-    from,
-    to,
-    attack: findAttack(position, { from, to }),
-  }));
+  return squares;
 };
 
 const knightMoves = (
