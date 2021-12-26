@@ -9,6 +9,7 @@ import {
   Position,
   Square,
   AttackObject,
+  ComputedMovementData,
 } from '../types';
 import {
   isLegalSquare,
@@ -38,7 +39,7 @@ const pawnMoves = (
   color: Color,
   from: Square,
   { attacksOnly }: { attacksOnly: boolean }
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] => {
+): MoveWithExtraData[] => {
   let squares: Square[] = [];
   const opponentColor = flipColor(color);
   const advanceFn = color === Color.White ? up : down;
@@ -85,8 +86,9 @@ const pawnMoves = (
   }
 
   return squares.map((to) => ({
+    from,
     to,
-    ...findCaptures(position, to),
+    attack: findCaptures(position, { from, to }),
   }));
 };
 
@@ -94,7 +96,7 @@ const knightMoves = (
   position: Position,
   color: Color,
   from: Square
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] =>
+): MoveWithExtraData[] =>
   [
     up(left(from), 2),
     up(right(from), 2),
@@ -109,8 +111,9 @@ const knightMoves = (
       (to) => isLegalSquare(to) && position.pieces.get(to)?.color !== color
     )
     .map((to) => ({
+      from,
       to,
-      ...findCaptures(position, to),
+      attack: findCaptures(position, { from, to }),
     }));
 
 const kingMoves = (
@@ -118,7 +121,7 @@ const kingMoves = (
   color: Color,
   from: Square,
   { skipCastling }: { skipCastling: boolean }
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] => {
+): MoveWithExtraData[] => {
   const squares = [
     up(from),
     left(from),
@@ -157,8 +160,9 @@ const kingMoves = (
   }
 
   return squares.map((to) => ({
+    from,
     to,
-    ...findCaptures(position, to),
+    attack: findCaptures(position, { from, to }),
   }));
 };
 
@@ -166,69 +170,53 @@ const bishopMoves = (
   position: Position,
   color: Color,
   from: Square
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] =>
+): MoveWithExtraData[] =>
   [upLeft, upRight, downLeft, downRight]
     .flatMap((scanFn) => squareScanner(position, from, color, scanFn))
     .map((to) => ({
+      from,
       to,
-      ...findCaptures(position, to),
+      attack: findCaptures(position, { from, to }),
     }));
 
 const rookMoves = (
   position: Position,
   color: Color,
   from: Square
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] =>
+): MoveWithExtraData[] =>
   [up, right, left, down]
     .flatMap((scanFn) => squareScanner(position, from, color, scanFn))
     .map((to) => ({
+      from,
       to,
-      ...findCaptures(position, to),
+      attack: findCaptures(position, { from, to }),
     }));
 
 const queenMoves = (
   position: Position,
   color: Color,
   from: Square
-): Pick<MoveWithExtraData, 'to' | 'capture' | 'kingCapture'>[] => [
+): MoveWithExtraData[] => [
   ...bishopMoves(position, color, from),
   ...rookMoves(position, color, from),
 ];
 
 const findCaptures = (
   position: Position,
-  to: Square
-): { capture: boolean; kingCapture: boolean } => {
-  const targetPiece = position.pieces.get(to);
+  move: Move
+): AttackObject | undefined => {
+  const capturingPiece = position.pieces.get(move.from);
+  const targetPiece = position.pieces.get(move.to);
+  if (!targetPiece || !capturingPiece) {
+    return;
+  }
 
   return {
-    capture: Boolean(targetPiece),
-    kingCapture: Boolean(targetPiece && targetPiece.type === PieceType.King),
+    attacked: move.to,
+    attacker: { square: move.from, type: targetPiece.type },
+    slideSquares: [],
   };
 };
-
-const augmentMoveWithAttacks = (
-  position: Position,
-  piece: Piece,
-  move: Omit<MoveWithExtraData, 'attack' | 'kingAttack'>
-): MoveWithExtraData => {
-  const nextMoves = movesForPiece(position, piece, move.to, {
-    skipCastling: false,
-  });
-
-  return {
-    ...move,
-    attack: nextMoves.some(({ capture }) => capture),
-    kingAttack: nextMoves.some(({ kingCapture }) => kingCapture),
-  };
-};
-
-const augmentMovesWithAttacks = (
-  position: Position,
-  piece: Piece,
-  moves: Omit<MoveWithExtraData, 'attack' | 'kingAttack'>[]
-): MoveWithExtraData[] =>
-  moves.map((move) => augmentMoveWithAttacks(position, piece, move));
 
 const attacksOnSquare = (
   position: Position,
@@ -251,7 +239,7 @@ const attacksOnSquare = (
   // The only moves in this array will be legitimate attacks so just check
   // the attacked piece is a pawn.
   superPieceMoves[PieceType.Pawn].forEach((move) => {
-    if (position.pieces.get(move.to)?.type === PieceType.Pawn) {
+    if (move.attack && move.attack.attacker.type === PieceType.Pawn) {
       attacks.push({
         attacked: square,
         attacker: { square: move.to, type: PieceType.Pawn },
@@ -262,10 +250,7 @@ const attacksOnSquare = (
 
   // Look for knights attacked by a knight move.
   superPieceMoves[PieceType.Knight].forEach((move) => {
-    if (
-      move.capture &&
-      position.pieces.get(move.to)?.type === PieceType.Knight
-    ) {
+    if (move.attack && move.attack.attacker.type === PieceType.Knight) {
       attacks.push({
         attacked: square,
         attacker: { square: move.to, type: PieceType.Knight },
@@ -276,7 +261,7 @@ const attacksOnSquare = (
 
   // Look for kings attacked by a king move.
   superPieceMoves[PieceType.King].forEach((move) => {
-    if (move.capture && position.pieces.get(move.to)?.type === PieceType.King) {
+    if (move.attack && move.attack.attacker.type === PieceType.King) {
       attacks.push({
         attacked: square,
         attacker: { square: move.to, type: PieceType.King },
@@ -287,15 +272,14 @@ const attacksOnSquare = (
 
   // Look for bishops OR queens attacked by a bishop move.
   superPieceMoves[PieceType.Bishop].forEach((move) => {
-    const piece = position.pieces.get(move.to);
-
     if (
-      move.capture &&
-      (piece?.type === PieceType.Bishop || piece?.type === PieceType.Queen)
+      move.attack &&
+      (move.attack.attacker.type === PieceType.Bishop ||
+        move.attack.attacker.type === PieceType.Queen)
     ) {
       attacks.push({
         attacked: square,
-        attacker: { square: move.to, type: piece.type },
+        attacker: move.attack.attacker,
         slideSquares: squaresBetweenMove({ from: square, to: move.to }),
       });
     }
@@ -303,15 +287,14 @@ const attacksOnSquare = (
 
   // Look for bishops OR queens attacked by a bishop move.
   superPieceMoves[PieceType.Rook].forEach((move) => {
-    const piece = position.pieces.get(move.to);
-
     if (
-      move.capture &&
-      (piece?.type === PieceType.Rook || piece?.type === PieceType.Queen)
+      move.attack &&
+      (move.attack.attacker.type === PieceType.Rook ||
+        move.attack.attacker.type === PieceType.Queen)
     ) {
       attacks.push({
-        attacked: square,
-        attacker: { square: move.to, type: piece.type },
+        attacked: move.attack.attacked,
+        attacker: move.attack.attacker,
         slideSquares: squaresBetweenMove({ from: square, to: move.to }),
       });
     }
@@ -326,10 +309,7 @@ const movesForPiece = (
   square: Square,
   { skipCastling }: { skipCastling: boolean }
 ) => {
-  const moves: Pick<
-    MoveWithExtraData,
-    'to' | 'capture' | 'kingCapture' | 'promotion'
-  >[] = [];
+  const moves: MoveWithExtraData[] = [];
 
   switch (piece.type) {
     case PieceType.Bishop:
@@ -374,11 +354,7 @@ const movesForPosition = (
     pieceMoves.push({
       from: square,
       piece,
-      moves: augmentMovesWithAttacks(
-        position,
-        piece,
-        moves.map((move) => ({ ...move, from: square }))
-      ),
+      moves: moves.map((move) => ({ ...move, from: square })),
     });
   }
 
@@ -399,19 +375,11 @@ const findAttacksOnKing = (
 
 export const generateMovementData = (
   position: Position
-): {
-  moves: MoveWithExtraData[];
-  checks: AttackObject[];
-  availableCaptures: Move[];
-  availableAttacks: Move[];
-  availableChecks: Move[];
-} => {
+): ComputedMovementData => {
   const checks = findAttacksOnKing(position, flipColor(position.turn));
 
   const allMoves: MoveWithExtraData[] = [];
-  const availableCaptures: Move[] = [];
-  const availableAttacks: Move[] = [];
-  const availableChecks: Move[] = [];
+  const availableCaptures: MoveWithExtraData[] = [];
 
   const movesets = movesForPosition(position, {
     color: position.turn,
@@ -470,14 +438,11 @@ export const generateMovementData = (
     });
 
     moves.forEach((move) => {
-      if (move.capture) {
-        availableCaptures.push({ from, to: move.to });
-      }
       if (move.attack) {
-        availableAttacks.push({ from, to: move.to });
-      }
-      if (move.kingAttack) {
-        availableChecks.push({ from, to: move.to });
+        const piece = position.pieces.get(move.from);
+        if (piece) {
+          availableCaptures.push(move);
+        }
       }
     });
 
@@ -488,7 +453,5 @@ export const generateMovementData = (
     moves: allMoves,
     checks,
     availableCaptures,
-    availableAttacks,
-    availableChecks,
   };
 };

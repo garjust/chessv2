@@ -7,10 +7,6 @@ export default class v2 implements ChessComputer<Position> {
   nextMove(position: Position) {
     const movementData = engine.generateMovementData(position);
 
-    if (movementData.availableChecks.length) {
-      return Promise.resolve(pluck(movementData.availableChecks));
-    }
-
     if (movementData.availableCaptures.length) {
       return Promise.resolve(pluck(movementData.availableCaptures));
     }

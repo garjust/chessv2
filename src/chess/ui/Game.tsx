@@ -14,7 +14,7 @@ import {
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
-import { STARTING_POSITION_FEN } from '../lib/fen';
+import { STARTING_POSITION_FEN, VIENNA_GAMBIT_ACCEPTED_FEN } from '../lib/fen';
 import {
   runTestGame,
   VIENNA_GAMBIT_ACCEPTED_GAME,
@@ -32,7 +32,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
-    emit(setPositionFromFENAction(MY_TEST_POSITION));
+    emit(setPositionFromFENAction(VIENNA_GAMBIT_ACCEPTED_FEN));
   });
 
   function emitExampleGame(): void {

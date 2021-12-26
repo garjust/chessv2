@@ -9,5 +9,4 @@
 
 ## TODO
 
-- Change avaialble* in computed data to be `AttackObject[]` and build overlays
 - Track pins in computed data

@@ -28,17 +28,21 @@ export type Move = {
   promotion?: PieceType;
 };
 
-type CaptureMoveData = {
-  capture: boolean;
-  kingCapture: boolean;
+export type AttackObject = {
+  // The square being attacked for this object
+  attacked: Square;
+  // The attacking piece
+  attacker: { square: Square; type: PieceType };
+  // If the attacker is a sliding piece this is the set of squares they move through
+  // for the attack. A move to one of these squares blocks the attacker.
+  slideSquares: Square[];
+  // A piece that is skewered by the attack. If the piece is more valuable than
+  // the attacked piece this is considered a pin, otherwise it is considered
+  // a skewer.
+  skewered?: { square: Square; type: PieceType };
 };
 
-type AttackMoveData = {
-  attack: boolean;
-  kingAttack: boolean;
-};
-
-export type MoveWithExtraData = Move & CaptureMoveData & AttackMoveData;
+export type MoveWithExtraData = Move & { attack?: AttackObject };
 
 export type PieceMoves = {
   piece: Piece;
@@ -74,26 +78,10 @@ export type Position = {
   fullMoveCount: number;
 };
 
-export type AttackObject = {
-  // The square being attacked for this object
-  attacked: Square;
-  // The attacking piece
-  attacker: { square: Square; type: PieceType };
-  // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attacker.
-  slideSquares: Square[];
-  // A piece that is skewered by the attack. If the piece is more valuable than
-  // the attacked piece this is considered a pin, otherwise it is considered
-  // a skewer.
-  // skewered?: { square: Square; type: PieceType };
-};
-
 export type ComputedMovementData = {
   moves: MoveWithExtraData[];
   checks: AttackObject[];
-  availableCaptures: Move[];
-  availableAttacks: Move[];
-  availableChecks: Move[];
+  availableCaptures: MoveWithExtraData[];
 };
 
 // Data that can be computed from a position that we may want to cache because

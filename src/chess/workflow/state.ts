@@ -65,8 +65,6 @@ const INITIAL_STATE: State = {
       moves: [],
       checks: [],
       availableCaptures: [],
-      availableAttacks: [],
-      availableChecks: [],
     },
     evaluationData: {
       evaluation: 0,
