@@ -1,6 +1,6 @@
 import React from 'react';
 import './Square.css';
-import { Color, Piece as PieceData, Square as SquareData } from '../types';
+import { Color, Square as SquareData } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
@@ -15,6 +15,7 @@ import {
   BOARD_SQUARE_MOVABLE,
   BOARD_SQUARE_SELECTED,
   BOARD_SQUARE_WHITE,
+  BOARD_SQUARE_LAST_MOVE,
 } from './theme';
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../workflow/action';
@@ -49,17 +50,20 @@ const Square = (props: SquareProps) => {
 
   if (overlay) {
     switch (overlay) {
-      case SquareOverlayType.SelectedPiece:
-        css = { ...css, ...BOARD_SQUARE_SELECTED };
-        break;
       case SquareOverlayType.Capturable:
         css = { ...css, ...BOARD_SQUARE_CAPTURABLE };
         break;
       case SquareOverlayType.Check:
         css = { ...css, ...BOARD_SQUARE_CHECK };
         break;
+      case SquareOverlayType.LastMove:
+        css = { ...css, ...BOARD_SQUARE_LAST_MOVE };
+        break;
       case SquareOverlayType.Movable:
         css = { ...css, ...BOARD_SQUARE_MOVABLE };
+        break;
+      case SquareOverlayType.SelectedPiece:
+        css = { ...css, ...BOARD_SQUARE_SELECTED };
         break;
     }
   }

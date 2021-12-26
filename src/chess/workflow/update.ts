@@ -5,7 +5,6 @@ import {
   isPromotionPositionPawn,
   movesIncludes,
   squareEquals,
-  squareLabel,
 } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
@@ -157,7 +156,12 @@ function handleLoadChessComputer(
 function handleOverlaySquares(state: State): Update<State, Action> {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
-  const { position, selectedSquare } = state;
+  const { position, selectedSquare, lastMove } = state;
+
+  if (lastMove) {
+    squareOverlay.set(lastMove.from, SquareOverlayType.LastMove);
+    squareOverlay.set(lastMove.to, SquareOverlayType.LastMove);
+  }
 
   const check = checkedSquare(state);
   if (check) {
@@ -257,6 +261,7 @@ function handleMovePiece(
   return [
     {
       ...state,
+      lastMove: move,
       previousPositions: [...state.previousPositions, state.position],
     },
     setPositionAction(position),

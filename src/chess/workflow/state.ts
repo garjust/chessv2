@@ -7,15 +7,15 @@ import {
   Piece,
   Square,
   ComputedPositionData,
-  PieceType,
-  MoveWithExtraData,
+  Move,
 } from '../types';
 
 export enum SquareOverlayType {
-  SelectedPiece = 'SELECTED_PIECE',
-  Movable = 'MOVABLE',
   Capturable = 'CAPTURABLE',
   Check = 'CHECK',
+  LastMove = 'LAST_MOVE',
+  Movable = 'MOVABLE',
+  SelectedPiece = 'SELECTED_PIECE',
 }
 
 export const HumanPlayer = Symbol('HUMAN');
@@ -47,6 +47,7 @@ export interface State {
   position: Position;
   previousPositions: Position[];
   computedPositionData: ComputedPositionData;
+  lastMove?: Move;
 }
 
 const INITIAL_STATE: State = {
