@@ -18,6 +18,7 @@ import {
   squaresInclude,
   isStartPositionPawn,
   isPromotionPositionPawn,
+  findKing,
 } from '../../utils';
 import { applyMove } from './move-execution';
 import {
@@ -389,14 +390,7 @@ const findAttacksOnKing = (
   position: Position,
   attackingColor: Color
 ): AttackObject[] => {
-  let king: Square | undefined;
-  for (const [square, piece] of position.pieces) {
-    // Find the king we want to compute attacks for.
-    if (piece.type === PieceType.King && piece.color !== attackingColor) {
-      king = square;
-      break;
-    }
-  }
+  const king = findKing(position, flipColor(attackingColor));
   if (!king) {
     return [];
   }

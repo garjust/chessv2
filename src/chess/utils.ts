@@ -1,4 +1,4 @@
-import { Color, Move, Square, SquareLabel } from './types';
+import { Color, Move, PieceType, Position, Square, SquareLabel } from './types';
 
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
@@ -78,3 +78,17 @@ export const isPromotionPositionPawn = (
   color === Color.White
     ? square.rank === BLACK_PAWN_STARTING_RANK
     : square.rank === WHITE_PAWN_STARTING_RANK;
+
+export const findKing = (
+  position: Position,
+  color: Color
+): Square | undefined => {
+  for (const [square, piece] of position.pieces) {
+    // Find the king we want to compute attacks for.
+    if (piece.type === PieceType.King && piece.color === color) {
+      return square;
+    }
+  }
+
+  return;
+};
