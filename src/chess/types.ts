@@ -39,7 +39,10 @@ export type AttackObject = {
   // A piece that is skewered by the attack. If the piece is more valuable than
   // the attacked piece this is considered a pin, otherwise it is considered
   // a skewer.
-  skewered?: { square: Square; type: PieceType };
+  indirectAttacks?: {
+    attacked: { square: Square; type: PieceType };
+    slideSquares: Square[];
+  }[];
 };
 
 export type MoveWithExtraData = Move & { attack?: AttackObject };

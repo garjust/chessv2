@@ -1,9 +1,17 @@
-import { Color, Move, Position, Square } from '../types';
+import {
+  AttackObject,
+  Color,
+  Move,
+  MoveWithExtraData,
+  Piece,
+  Position,
+  Square,
+} from '../types';
 import { isLegalSquare, squareEquals } from '../utils';
 
 type MoveSquareFunction = (square: Square, n: number) => Square;
 
-const identitySquare = (square: Square, n = 1): Square => ({ ...square });
+const identitySquare = (square: Square, _n = 1): Square => ({ ...square });
 
 export const up = (square: Square, n = 1): Square => ({
   rank: square.rank + n,
@@ -30,49 +38,66 @@ export const downLeft = (square: Square, n = 1): Square =>
 export const downRight = (square: Square, n = 1): Square =>
   down(right(square, n), n);
 
-const scan = (
-  position: Position,
-  friendlyColor: Color,
-  scanFn: (square: Square) => Square,
-  squares: Square[]
-): Square[] => {
-  const next = scanFn(squares[squares.length - 1]);
-  if (!isLegalSquare(next)) {
-    return squares;
+const ray = (square: Square, scanFn: (square: Square) => Square): Square[] => {
+  if (!isLegalSquare(square)) {
+    return [];
+  } else {
+    return [square, ...ray(scanFn(square), scanFn)];
   }
+};
 
-  const nextPiece = position.pieces.get(next);
-  if (nextPiece) {
-    if (nextPiece.color === friendlyColor) {
-      // friend!
-      return squares;
+// [R 2 3 q 5 6 p k]
+// for right()...
+// R square
+// q square is attacked through [2,3]
+// p square is indirectly attacked through [5,6]
+// k square is indirectly attacked through []
+export const squareScanner = (
+  position: Position,
+  scanningPiece: Square & Piece,
+  scanFn: (square: Square) => Square
+): MoveWithExtraData[] => {
+  const moves: MoveWithExtraData[] = [];
+  const from = { rank: scanningPiece.rank, file: scanningPiece.file };
+  const squares = ray(scanFn(scanningPiece), scanFn);
+
+  for (const to of squares) {
+    const piece = position.pieces.get(to);
+    if (piece) {
+      if (piece.color === scanningPiece.color) {
+        // friend!
+        break;
+      } else {
+        // foe!
+        const attack: AttackObject = {
+          attacked: to,
+          attacker: {
+            square: from,
+            type: scanningPiece.type,
+          },
+          slideSquares: moves.map(({ to }) => to),
+          indirectAttacks: [],
+        };
+
+        // look for more stuff for attack
+
+        moves.push({ from, to, attack });
+        break;
+      }
     } else {
-      // foe!
-      return [...squares, next];
+      // empty square!
+      moves.push({ from, to });
     }
   }
 
-  // empty! keep scanning!
-  return scan(position, friendlyColor, scanFn, [...squares, next]);
-};
-
-export const squareScanner = (
-  position: Position,
-  square: Square,
-  friendlyColor: Color,
-  scanFn: (square: Square) => Square
-): Square[] => {
-  return scan(position, friendlyColor, scanFn, [square]).slice(1);
+  return moves;
 };
 
 // Assumes a move for a bishop, rook, or queen.
-
 const unitMoveSquareFunction = ({ from, to }: Move): MoveSquareFunction => {
   let rankFn: MoveSquareFunction = identitySquare;
   let fileFn: MoveSquareFunction = identitySquare;
 
-  //   // diagonal?
-  //   // cardinal?
   if (from.file - to.file < 0) {
     fileFn = right;
   } else if (from.file - to.file > 0) {

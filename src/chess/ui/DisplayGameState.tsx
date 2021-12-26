@@ -2,8 +2,8 @@ import React from 'react';
 import { State } from '../workflow';
 import { ChessComputerWrapped } from '../workflow/state';
 import { SquareMap } from '../square-map';
-import { Square } from '../types';
-import { squareLabel } from '../utils';
+import { Move, Square } from '../types';
+import { moveToDirectionString, squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
 
 export type DisplayGameStateProps = {
@@ -24,6 +24,13 @@ const formatBitmapString = (bitmap: string): string => {
 };
 
 function replacer(key: string, value: unknown) {
+  if (key === 'moves') {
+    console.log(
+      'moves',
+      (value as Move[]).map((move) => moveToDirectionString(move))
+    );
+  }
+
   if (value instanceof Map || value instanceof SquareMap) {
     return `{ size ${value.size} }`;
   }

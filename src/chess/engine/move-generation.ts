@@ -1,6 +1,5 @@
 import {
   Color,
-  ComputedPositionData,
   Move,
   MoveWithExtraData,
   PieceMoves,
@@ -31,7 +30,6 @@ import {
   downLeft,
   downRight,
   squareScanner,
-  squaresBetweenMove,
 } from './move-utils';
 
 const pawnMoves = (
@@ -177,26 +175,18 @@ const bishopMoves = (
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
-  [upLeft, upRight, downLeft, downRight]
-    .flatMap((scanFn) => squareScanner(position, from, color, scanFn))
-    .map((to) => ({
-      from,
-      to,
-      attack: findAttack(position, { from, to }),
-    }));
+  [upLeft, upRight, downLeft, downRight].flatMap((scanFn) =>
+    squareScanner(position, { ...from, color, type: PieceType.Bishop }, scanFn)
+  );
 
 const rookMoves = (
   position: Position,
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
-  [up, right, left, down]
-    .flatMap((scanFn) => squareScanner(position, from, color, scanFn))
-    .map((to) => ({
-      from,
-      to,
-      attack: findAttack(position, { from, to }),
-    }));
+  [up, right, left, down].flatMap((scanFn) =>
+    squareScanner(position, { ...from, color, type: PieceType.Rook }, scanFn)
+  );
 
 const queenMoves = (
   position: Position,
@@ -232,65 +222,41 @@ const attacksOnSquare = (
   const attacks: AttackObject[] = [];
   const color = flipColor(attackingColor);
 
-  const superPieceMoves = {
-    [PieceType.King]: kingMoves(position, color, square, {
+  // Generate the moves for a super piece of the defending color
+  // on the target square.
+  const superPieceMoves = [
+    kingMoves(position, color, square, {
       skipCastling: true,
     }),
-    [PieceType.Bishop]: bishopMoves(position, color, square),
-    [PieceType.Rook]: rookMoves(position, color, square),
-    [PieceType.Knight]: knightMoves(position, color, square),
-    [PieceType.Pawn]: pawnMoves(position, color, square, { attacksOnly: true }),
-  };
+    bishopMoves(position, color, square),
+    rookMoves(position, color, square),
+    knightMoves(position, color, square),
+    pawnMoves(position, color, square, { attacksOnly: true }),
+  ].flat();
 
-  // The only moves in this array will be legitimate attacks so just check
-  // the attacked piece is a pawn.
-  superPieceMoves[PieceType.Pawn].forEach((move) => {
-    if (move.attack && move.attack.attacker.type === PieceType.Pawn) {
-      attacks.push(move.attack);
-    }
-  });
-
-  // Look for knights attacked by a knight move.
-  superPieceMoves[PieceType.Knight].forEach((move) => {
-    if (move.attack && move.attack.attacker.type === PieceType.Knight) {
-      attacks.push(move.attack);
-    }
-  });
-
-  // Look for kings attacked by a king move.
-  superPieceMoves[PieceType.King].forEach((move) => {
-    if (move.attack && move.attack.attacker.type === PieceType.King) {
-      attacks.push(move.attack);
-    }
-  });
-
-  // Look for bishops OR queens attacked by a bishop move.
-  superPieceMoves[PieceType.Bishop].forEach((move) => {
-    if (
-      move.attack &&
-      (move.attack.attacker.type === PieceType.Bishop ||
-        move.attack.attacker.type === PieceType.Queen)
-    ) {
-      attacks.push({
-        attacked: square,
-        attacker: move.attack.attacker,
-        slideSquares: squaresBetweenMove({ from: square, to: move.to }),
-      });
-    }
-  });
-
-  // Look for bishops OR queens attacked by a bishop move.
-  superPieceMoves[PieceType.Rook].forEach((move) => {
-    if (
-      move.attack &&
-      (move.attack.attacker.type === PieceType.Rook ||
-        move.attack.attacker.type === PieceType.Queen)
-    ) {
-      attacks.push({
-        attacked: move.attack.attacked,
-        attacker: move.attack.attacker,
-        slideSquares: squaresBetweenMove({ from: square, to: move.to }),
-      });
+  // Go through each move looking for attacks. An attack is valid if
+  // the attacking and attacked piece are the same type.
+  //
+  // Note: treat bishops and rooks as queens as well
+  superPieceMoves.forEach((move) => {
+    if (move.attack) {
+      const piece = position.pieces.get(move.to);
+      if (
+        move.attack.attacker.type === PieceType.Bishop ||
+        move.attack.attacker.type === PieceType.Queen
+      ) {
+        if (
+          piece &&
+          (piece.type === move.attack.attacker.type ||
+            piece.type === PieceType.Queen)
+        ) {
+          attacks.push(move.attack);
+        }
+      } else {
+        if (piece && piece.type === move.attack.attacker.type) {
+          attacks.push(move.attack);
+        }
+      }
     }
   });
 

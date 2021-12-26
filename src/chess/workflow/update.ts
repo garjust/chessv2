@@ -54,7 +54,7 @@ const loadComputer = async (
 };
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
-  const { position, players, computedPositionData } = state;
+  const { position, players } = state;
   const playerForTurn = players[position.turn];
 
   if (playerForTurn !== HumanPlayer) {
