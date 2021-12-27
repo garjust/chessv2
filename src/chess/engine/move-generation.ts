@@ -68,7 +68,11 @@ const pawnMoves = (
     squares.push({
       from,
       to: square,
-      attack: findAttack(position, { from, to: square }),
+      attack: {
+        attacker: { square: from, type: PieceType.Pawn },
+        attacked: square,
+        slideSquares: [],
+      },
     });
   }
   if (
@@ -79,7 +83,11 @@ const pawnMoves = (
     squares.push({
       from,
       to: square,
-      attack: findAttack(position, { from, to: square }),
+      attack: {
+        attacker: { square: from, type: PieceType.Pawn },
+        attacked: square,
+        slideSquares: [],
+      },
     });
   }
 
@@ -114,11 +122,22 @@ const knightMoves = (
     .filter(
       (to) => isLegalSquare(to) && position.pieces.get(to)?.color !== color
     )
-    .map((to) => ({
-      from,
-      to,
-      attack: findAttack(position, { from, to }),
-    }));
+    .map((to) => {
+      let attack: AttackObject | undefined;
+      if (position.pieces.get(to)) {
+        attack = {
+          attacker: { square: from, type: PieceType.Knight },
+          attacked: to,
+          slideSquares: [],
+        };
+      }
+
+      return {
+        from,
+        to,
+        attack,
+      };
+    });
 
 const kingMoves = (
   position: Position,
@@ -163,11 +182,22 @@ const kingMoves = (
     squares.push(left(from, 2));
   }
 
-  return squares.map((to) => ({
-    from,
-    to,
-    attack: findAttack(position, { from, to }),
-  }));
+  return squares.map((to) => {
+    let attack: AttackObject | undefined;
+    if (position.pieces.get(to)) {
+      attack = {
+        attacker: { square: from, type: PieceType.King },
+        attacked: to,
+        slideSquares: [],
+      };
+    }
+
+    return {
+      from,
+      to,
+      attack,
+    };
+  });
 };
 
 const bishopMoves = (
@@ -196,23 +226,6 @@ const queenMoves = (
   ...bishopMoves(position, color, from),
   ...rookMoves(position, color, from),
 ];
-
-const findAttack = (
-  position: Position,
-  move: Move
-): AttackObject | undefined => {
-  const capturingPiece = position.pieces.get(move.from);
-  const targetPiece = position.pieces.get(move.to);
-  if (!targetPiece || !capturingPiece) {
-    return;
-  }
-
-  return {
-    attacked: move.to,
-    attacker: { square: move.from, type: targetPiece.type },
-    slideSquares: [],
-  };
-};
 
 const attacksOnSquare = (
   position: Position,
