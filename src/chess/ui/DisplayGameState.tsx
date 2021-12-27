@@ -24,12 +24,12 @@ const formatBitmapString = (bitmap: string): string => {
 };
 
 function replacer(key: string, value: unknown) {
-  if (key === 'moves') {
-    console.log(
-      'moves',
-      (value as Move[]).map((move) => moveToDirectionString(move))
-    );
-  }
+  // if (key === 'moves') {
+  //   console.log(
+  //     'moves',
+  //     (value as Move[]).map((move) => moveToDirectionString(move))
+  //   );
+  // }
 
   if (value instanceof Map || value instanceof SquareMap) {
     return `{ size ${value.size} }`;
