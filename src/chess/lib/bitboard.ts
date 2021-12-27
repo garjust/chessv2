@@ -1,4 +1,4 @@
-import { SquareBitmask, ZERO } from './bitmap-def';
+import { SquareBitmask, ZERO } from './bitboard-def';
 import { Color, PieceType, Position, Square } from '../types';
 import { labelToSquare, squareLabel } from '../utils';
 

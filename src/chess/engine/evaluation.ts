@@ -1,6 +1,6 @@
 import { Position, PieceType, Color } from '../types';
 
-const PieceValue: Record<PieceType, number> = Object.freeze({
+export const PieceValue: Record<PieceType, number> = Object.freeze({
   [PieceType.Bishop]: 3,
   [PieceType.King]: Infinity,
   [PieceType.Knight]: 3,
