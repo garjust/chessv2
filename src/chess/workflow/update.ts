@@ -40,7 +40,7 @@ import { wrap } from 'comlink';
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
 
-const COMPUTER_VERISON = 'v3';
+const COMPUTER_VERISON: AvailableComputerVersions = 'v4';
 
 const loadComputer = async (
   version: AvailableComputerVersions

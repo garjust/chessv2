@@ -1,6 +1,5 @@
 import {
   Color,
-  Move,
   MoveWithExtraData,
   PieceMoves,
   Piece,

@@ -7,8 +7,8 @@ import { pluck } from '../../lib/array';
 const DEPTH = 3;
 
 // Algorithm:
-// - simple negamax search
-export default class v3 implements ChessComputer<Position> {
+// - simple alpha-beta negamax search
+export default class v4 implements ChessComputer<Position> {
   moveCounter = 0;
   evaluationCounter = 0;
 
@@ -77,6 +77,6 @@ export default class v3 implements ChessComputer<Position> {
   }
 
   toJSON(): string {
-    return 'justins chess computer v3';
+    return 'justins chess computer v4';
   }
 }

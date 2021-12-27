@@ -12,17 +12,7 @@ class ChessComputerWorker implements IChessComputerWorker {
   #instance?: ChessComputer<Position>;
 
   load(version: AvailableComputerVersions) {
-    switch (version) {
-      case 'v1':
-        this.#instance = new ComputerRegistry.v1();
-        break;
-      case 'v2':
-        this.#instance = new ComputerRegistry.v2();
-        break;
-      case 'v3':
-        this.#instance = new ComputerRegistry.v3();
-        break;
-    }
+    this.#instance = new ComputerRegistry[version]();
   }
 
   async nextMove(fen: string): Promise<Move> {

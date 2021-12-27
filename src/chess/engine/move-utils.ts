@@ -1,6 +1,5 @@
 import {
   AttackObject,
-  Color,
   Move,
   MoveWithExtraData,
   Piece,
@@ -48,12 +47,6 @@ const rayGenerator = function* (
   }
 };
 
-// [R 2 3 q 5 6 p k]
-// for right()...
-// R square
-// q square is attacked through [2,3]
-// p square is indirectly attacked through [5,6]
-// k square is indirectly attacked through []
 export const squareScanner = (
   position: Position,
   scanningPiece: Square & Piece,
@@ -80,7 +73,13 @@ export const squareScanner = (
           indirectAttacks: [],
         };
 
-        // look for more stuff for attack
+        // TODO: find indirectAttacks (forms of pins)
+        // [R 2 3 q 5 6 p k]
+        // for right()...
+        // R square
+        // q square is attacked through [2,3]
+        // p square is indirectly attacked through [5,6]
+        // k square is indirectly attacked through []
 
         moves.push({ from, to, attack });
         break;

@@ -3,6 +3,8 @@ import { Position } from '../types';
 import { pluck } from '../../lib/array';
 import engine from '../engine';
 
+// Algorithm:
+// - pick a random move
 export default class v1 implements ChessComputer<Position> {
   nextMove(position: Position) {
     const movementData = engine.generateMovementData(position);

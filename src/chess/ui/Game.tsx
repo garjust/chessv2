@@ -14,16 +14,17 @@ import {
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
-import { STARTING_POSITION_FEN, VIENNA_GAMBIT_ACCEPTED_FEN } from '../lib/fen';
+import {
+  STARTING_POSITION_FEN,
+  VIENNA_OPENING_FEN,
+  VIENNA_GAMBIT_ACCEPTED_FEN,
+} from '../lib/fen';
 import {
   runTestGame,
   VIENNA_GAMBIT_ACCEPTED_GAME,
 } from '../workflow/test-games';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
-
-const MY_TEST_POSITION =
-  'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {});
@@ -32,7 +33,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
-    emit(setPositionFromFENAction(VIENNA_GAMBIT_ACCEPTED_FEN));
+    emit(setPositionFromFENAction(VIENNA_OPENING_FEN));
   });
 
   function emitExampleGame(): void {

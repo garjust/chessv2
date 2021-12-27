@@ -9,4 +9,4 @@
 
 ## TODO
 
-- Track pins in computed data
+- Find pings in `squareScanner` function
