@@ -263,11 +263,21 @@ const attacksOnSquare = (
           (piece.type === move.attack.attacker.type ||
             piece.type === PieceType.Queen)
         ) {
-          attacks.push(move.attack);
+          // We need to reverse the super piece move to find the real attack.
+          attacks.push({
+            attacked: move.attack.attacker.square,
+            attacker: { square: move.attack.attacked, type: piece.type },
+            slideSquares: move.attack.slideSquares,
+          });
         }
       } else {
         if (piece && piece.type === move.attack.attacker.type) {
-          attacks.push(move.attack);
+          // We need to reverse the super piece move to find the real attack.
+          attacks.push({
+            attacked: move.attack.attacker.square,
+            attacker: { square: move.attack.attacked, type: piece.type },
+            slideSquares: move.attack.slideSquares,
+          });
         }
       }
     }
