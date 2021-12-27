@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
 import { ComputerRegistry } from '../ai';
 import { STARTING_POSITION_FEN, VIENNA_GAMBIT_ACCEPTED_FEN } from '../lib/fen';
@@ -13,7 +13,7 @@ import {
   AvailableComputerVersions,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { moveToDirectionString, squareLabel } from '../utils';
+import { moveToDirectionString } from '../utils';
 import { BUTTON_CSS } from './theme';
 
 async function runMoveGenerationTest(

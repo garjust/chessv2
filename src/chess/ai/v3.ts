@@ -4,7 +4,7 @@ import { moveToDirectionString } from '../utils';
 import engine from '../engine';
 import { pluck } from '../../lib/array';
 
-const DEPTH = 3;
+const DEPTH = 4;
 
 // Algorithm:
 // - simple negamax search
@@ -21,7 +21,7 @@ export default class v3 implements ChessComputer<Position> {
     );
 
     console.log(
-      `results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
+      `v3 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
         score,

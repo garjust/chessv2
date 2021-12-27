@@ -4,7 +4,7 @@ import { moveToDirectionString } from '../utils';
 import engine from '../engine';
 import { pluck } from '../../lib/array';
 
-const DEPTH = 3;
+const DEPTH = 4;
 
 // Algorithm:
 // - simple alpha-beta negamax search
@@ -21,7 +21,7 @@ export default class v4 implements ChessComputer<Position> {
     );
 
     console.log(
-      `results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
+      `v4 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
         score,
@@ -46,34 +46,41 @@ export default class v4 implements ChessComputer<Position> {
 
       return {
         move,
-        score: -1 * this.score(result.position, depth - 1),
+        score: -1 * this.score(result.position, depth - 1, -Infinity, Infinity),
       };
     });
   }
 
-  score(position: Position, depth: number): number {
+  score(
+    position: Position,
+    depth: number,
+    alpha: number,
+    beta: number
+  ): number {
     if (depth === 0) {
       this.evaluationCounter++;
       const evaluation = engine.evaluate(position);
       return position.turn === Color.White ? evaluation : -1 * evaluation;
     }
 
-    let max = -Infinity;
-
     const moves = engine.generateMoves(position);
     this.moveCounter += moves.length;
 
-    // handle no moves (checkmate or draw)
-    moves.forEach((move) => {
+    for (const move of moves) {
       const result = engine.applyMove(position, move);
-      const x = -1 * this.score(result.position, depth - 1);
+      const x =
+        -1 * this.score(result.position, depth - 1, beta * -1, alpha * -1);
 
-      if (x > max) {
-        max = x;
+      if (x >= beta) {
+        return beta;
       }
-    });
 
-    return max;
+      if (x > alpha) {
+        alpha = x;
+      }
+    }
+
+    return alpha;
   }
 
   toJSON(): string {
