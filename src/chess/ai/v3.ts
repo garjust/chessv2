@@ -1,12 +1,10 @@
 import { ChessComputer } from './types';
-import { Color, Position } from '../types';
+import { Color, Move, Position } from '../types';
 import { moveToDirectionString } from '../utils';
 import engine from '../engine';
 import { pluck } from '../../lib/array';
 
 const DEPTH = 3;
-
-type EvaluationNormal = -1 | 1;
 
 export default class v3 implements ChessComputer<Position> {
   scoreCounter = 0;
@@ -16,23 +14,9 @@ export default class v3 implements ChessComputer<Position> {
     this.scoreCounter = 0;
     this.moveGenerationCounter = 0;
 
-    const movementData = engine.generateMovementData(position);
-    this.moveGenerationCounter++;
-
-    const normalization = position.turn === Color.White ? 1 : -1;
-
-    const results = movementData.moves
-      .map((move) => {
-        const result = engine.applyMove(position, move);
-
-        return {
-          move,
-          score:
-            normalization *
-            this.score(result.position, normalization, DEPTH - 1),
-        };
-      })
-      .sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+    const results = this.rootScores(position, DEPTH).sort(
+      (a: { score: number }, b: { score: number }) => b.score - a.score
+    );
 
     console.log(
       `results after ${this.scoreCounter} scores to depth ${DEPTH}; (${this.moveGenerationCounter} move generations)`,
@@ -48,32 +32,47 @@ export default class v3 implements ChessComputer<Position> {
     return Promise.resolve(move);
   }
 
-  evaluate(position: Position, normalization: EvaluationNormal): number {
-    return engine.evaluate(position) * normalization;
+  // evaluate(position: Position, normalization: EvaluationNormal): number {
+  //   return engine.evaluate(position) * normalization;
+  // }
+
+  rootScores(
+    position: Position,
+    depth: number
+  ): { move: Move; score: number }[] {
+    const movementData = engine.generateMovementData(position);
+    this.moveGenerationCounter++;
+
+    return movementData.moves.map((move) => {
+      const result = engine.applyMove(position, move);
+
+      return {
+        move,
+        score: -1 * this.score(result.position, depth - 1),
+      };
+    });
   }
 
-  score(
-    position: Position,
-    normalization: EvaluationNormal,
-    depth: number
-  ): number {
+  score(position: Position, depth: number): number {
     this.scoreCounter++;
 
     if (depth === 0) {
-      return this.evaluate(position, normalization);
+      const evaluation = engine.evaluate(position);
+      return position.turn === Color.White ? evaluation : -1 * evaluation;
     }
+
+    let max = -Infinity;
 
     const moves = engine.generateMoves(position);
     this.moveGenerationCounter++;
-    let max = -Infinity;
 
     // handle no moves (checkmate or draw)
     moves.forEach((move) => {
       const result = engine.applyMove(position, move);
-      const m = -1 * this.score(result.position, normalization, depth - 1);
+      const x = -1 * this.score(result.position, depth - 1);
 
-      if (m > max) {
-        max = m;
+      if (x > max) {
+        max = x;
       }
     });
 
