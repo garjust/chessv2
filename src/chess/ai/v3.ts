@@ -4,22 +4,22 @@ import { moveToDirectionString } from '../utils';
 import engine from '../engine';
 import { pluck } from '../../lib/array';
 
-const DEPTH = 3;
+const DEPTH = 4;
 
 export default class v3 implements ChessComputer<Position> {
-  scoreCounter = 0;
-  moveGenerationCounter = 0;
+  moveCounter = 0;
+  evaluationCounter = 0;
 
   nextMove(position: Position) {
-    this.scoreCounter = 0;
-    this.moveGenerationCounter = 0;
+    this.moveCounter = 0;
+    this.evaluationCounter = 0;
 
     const results = this.rootScores(position, DEPTH).sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
     console.log(
-      `results after ${this.scoreCounter} scores to depth ${DEPTH}; (${this.moveGenerationCounter} move generations)`,
+      `results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
         score,
@@ -40,10 +40,10 @@ export default class v3 implements ChessComputer<Position> {
     position: Position,
     depth: number
   ): { move: Move; score: number }[] {
-    const movementData = engine.generateMovementData(position);
-    this.moveGenerationCounter++;
+    const moves = engine.generateMoves(position);
+    this.moveCounter += moves.length;
 
-    return movementData.moves.map((move) => {
+    return moves.map((move) => {
       const result = engine.applyMove(position, move);
 
       return {
@@ -54,9 +54,8 @@ export default class v3 implements ChessComputer<Position> {
   }
 
   score(position: Position, depth: number): number {
-    this.scoreCounter++;
-
     if (depth === 0) {
+      this.evaluationCounter++;
       const evaluation = engine.evaluate(position);
       return position.turn === Color.White ? evaluation : -1 * evaluation;
     }
@@ -64,7 +63,7 @@ export default class v3 implements ChessComputer<Position> {
     let max = -Infinity;
 
     const moves = engine.generateMoves(position);
-    this.moveGenerationCounter++;
+    this.moveCounter += moves.length;
 
     // handle no moves (checkmate or draw)
     moves.forEach((move) => {
