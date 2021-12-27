@@ -38,11 +38,13 @@ export const downLeft = (square: Square, n = 1): Square =>
 export const downRight = (square: Square, n = 1): Square =>
   down(right(square, n), n);
 
-const ray = (square: Square, scanFn: (square: Square) => Square): Square[] => {
-  if (!isLegalSquare(square)) {
-    return [];
-  } else {
-    return [square, ...ray(scanFn(square), scanFn)];
+const rayGenerator = function* (
+  square: Square,
+  scanFn: (square: Square) => Square
+) {
+  while (isLegalSquare(square)) {
+    yield square;
+    square = scanFn(square);
   }
 };
 
@@ -59,9 +61,8 @@ export const squareScanner = (
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
   const from = { rank: scanningPiece.rank, file: scanningPiece.file };
-  const squares = ray(scanFn(scanningPiece), scanFn);
 
-  for (const to of squares) {
+  for (const to of rayGenerator(scanFn(scanningPiece), scanFn)) {
     const piece = position.pieces.get(to);
     if (piece) {
       if (piece.color === scanningPiece.color) {
