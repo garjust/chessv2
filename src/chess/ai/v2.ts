@@ -1,5 +1,5 @@
 import { ChessComputer } from './types';
-import { Piece, Position, Square } from '../types';
+import { Move, Piece, PieceType, Position, Square } from '../types';
 import { pluck } from '../../lib/array';
 import engine from '../engine';
 
@@ -18,12 +18,28 @@ export default class v2 implements ChessComputer<Position> {
       }
     }
 
-    const piece = pluck(pieces);
-    const moves = movementData.moves.filter(
-      ({ from }) => from === piece.square
-    );
+    let move: Move | undefined;
+    const types = [
+      PieceType.Bishop,
+      PieceType.King,
+      PieceType.Knight,
+      PieceType.Pawn,
+      PieceType.Queen,
+      PieceType.Rook,
+    ];
 
-    return Promise.resolve(pluck(moves));
+    while (move === undefined) {
+      const type = pluck(types);
+      const moves = movementData.moves.filter(({ from }) => {
+        return position.pieces.get(from)?.type === type;
+      });
+
+      if (moves.length) {
+        move = pluck(moves);
+      }
+    }
+
+    return Promise.resolve(move);
   }
 
   toJSON(): string {
