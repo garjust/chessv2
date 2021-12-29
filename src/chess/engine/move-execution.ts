@@ -4,11 +4,11 @@ import {
   Move,
   Piece,
   PieceType,
-  Position,
   Square,
 } from '../types';
 import { squareEquals, ROOK_STARTING_SQUARES, flipColor } from '../utils';
 import { down, up } from './move-utils';
+import { Position } from './position';
 
 export type MoveResult = {
   move: Move;
@@ -116,6 +116,9 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
 
   // King move special handling.
   if (piece.type === PieceType.King) {
+    // Update extra state
+    position.kings[piece.color] = move.to;
+
     // The king moved, no more castling.
     position.castlingAvailability[piece.color].queenside = false;
     position.castlingAvailability[piece.color].kingside = false;
@@ -189,6 +192,9 @@ export const undoMove = (position: Position, result: MoveResult): void => {
 
   // If the king move is a castle we need to move the corresponding rook back.
   if (piece.type === PieceType.King) {
+    // Update extra state
+    position.kings[piece.color] = move.from;
+
     if (Math.abs(move.from.file - move.to.file) === 2) {
       if (move.from.file - move.to.file > 0) {
         // queenside

@@ -11,3 +11,11 @@
 
 - Track king square
 - Find pins in `squareScanner` function
+- Change `Square` type to be integer?
+
+
+
+Board representation?
+
+- applyMove reads and sets pieces by square
+- generateMoves iterates all pieces

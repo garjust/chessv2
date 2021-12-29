@@ -4,7 +4,6 @@ import {
   PieceMoves,
   Piece,
   PieceType,
-  Position,
   Square,
   AttackObject,
   ComputedMovementData,
@@ -16,7 +15,6 @@ import {
   squaresInclude,
   isStartPositionPawn,
   isPromotionPositionPawn,
-  findKing,
 } from '../utils';
 import { applyMove, undoMove } from './move-execution';
 import {
@@ -30,6 +28,7 @@ import {
   downRight,
   squareScanner,
 } from './move-utils';
+import { Position } from './position';
 
 const pawnMoves = (
   position: Position,
@@ -347,7 +346,7 @@ const findAttacksOnKing = (
   position: Position,
   attackingColor: Color
 ): AttackObject[] => {
-  const king = findKing(position, flipColor(attackingColor));
+  const king = position.kings[flipColor(attackingColor)];
   if (!king) {
     return [];
   }
