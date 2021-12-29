@@ -1,5 +1,5 @@
 import { Color, Position as ExternalPosition, Square } from '../types';
-import { findKing } from '../utils';
+import { copyPosition, findKing } from '../utils';
 
 export type Position = ExternalPosition & {
   kings: {
@@ -8,7 +8,7 @@ export type Position = ExternalPosition & {
   };
 };
 
-export const convertToInternal = (position: ExternalPosition): Position => {
+const convertToInternal = (position: ExternalPosition): Position => {
   const whiteKing = findKing(position, Color.White);
   const blackKing = findKing(position, Color.Black);
 
@@ -19,3 +19,28 @@ export const convertToInternal = (position: ExternalPosition): Position => {
 
   return { ...position, kings };
 };
+
+const convertToExternal = (position: Position): ExternalPosition => {
+  const {
+    pieces,
+    turn,
+    castlingAvailability,
+    enPassantSquare,
+    halfMoveCount,
+    fullMoveCount,
+  } = position;
+  return {
+    pieces,
+    turn,
+    castlingAvailability,
+    enPassantSquare,
+    halfMoveCount,
+    fullMoveCount,
+  };
+};
+
+export const copyToInternal = (position: ExternalPosition): Position =>
+  convertToInternal(copyPosition(position));
+
+export const copyToExternal = (position: Position): ExternalPosition =>
+  copyPosition(convertToExternal(position));

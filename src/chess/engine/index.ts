@@ -4,20 +4,18 @@ import {
   Move,
   Piece,
   Position as ExternalPosition,
-  Square,
 } from '../types';
-import { copyPosition } from '../utils';
 import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMovementData } from './move-generation';
-import { Position, convertToInternal } from './position';
+import { Position, copyToInternal, copyToExternal } from './position';
 
 export default class Engine {
   #position: Position;
   #moveStack: MoveResult[] = [];
 
   constructor(position: ExternalPosition) {
-    this.#position = convertToInternal(copyPosition(position));
+    this.#position = copyToInternal(position);
   }
 
   applyMove(move: Move): Piece | undefined {
@@ -54,23 +52,29 @@ export default class Engine {
   }
 
   get position(): ExternalPosition {
-    return copyPosition(this.#position);
+    return copyToExternal(this.#position);
   }
 }
 
 export const ImmutableEngine = {
   applyMove(position: ExternalPosition, move: Move) {
-    const copy = copyPosition(position);
-    const result = applyMove(convertToInternal(copy), move);
-    return { position: Object.freeze(copy), captured: result.captured };
+    const engine = new Engine(position);
+    const captured = engine.applyMove(move);
+    return {
+      position: Object.freeze(engine.position),
+      captured,
+    };
   },
-  evaluate,
+  evaluate(position: ExternalPosition) {
+    const engine = new Engine(position);
+    return engine.evaluate();
+  },
   generateMoves(position: ExternalPosition) {
-    const copy = copyPosition(position);
-    return generateMovementData(convertToInternal(copy)).moves;
+    const engine = new Engine(position);
+    return engine.generateMovementData().moves;
   },
   generateMovementData(position: ExternalPosition) {
-    const copy = copyPosition(position);
-    return generateMovementData(convertToInternal(copy));
+    const engine = new Engine(position);
+    return engine.generateMovementData();
   },
 };
