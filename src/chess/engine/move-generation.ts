@@ -240,7 +240,7 @@ const attacksOnSquare = (
       const piece = position.pieces.get(move.to);
       if (
         move.attack.attacker.type === PieceType.Bishop ||
-        move.attack.attacker.type === PieceType.Queen
+        move.attack.attacker.type === PieceType.Rook
       ) {
         if (
           piece &&
