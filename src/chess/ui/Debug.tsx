@@ -90,14 +90,14 @@ const Debug = () => {
 
         <button
           style={BUTTON_CSS}
-          onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5, 3)}
+          onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5)}
         >
           Move generation test PERFT_5
         </button>
 
         <button
           style={BUTTON_CSS}
-          onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING, 3)}
+          onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING)}
         >
           Move generation test vienna
         </button>

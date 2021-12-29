@@ -1,5 +1,7 @@
 import { PERFT_5_FEN, STARTING_POSITION_FEN, VIENNA_OPENING_FEN } from './fen';
 import Engine from '../engine';
+import { Move } from '../types';
+import { moveToDirectionString } from '../utils';
 
 export type MoveTest = {
   fen: string;
@@ -29,7 +31,7 @@ export const isCountCorrectForDepthFromStart = (
   return test.counts[depth - 1] === count;
 };
 
-export const run = async (engine: Engine, depth: number): Promise<number> => {
+const search = (engine: Engine, depth: number): number => {
   if (depth === 0) {
     return 1;
   }
@@ -39,9 +41,32 @@ export const run = async (engine: Engine, depth: number): Promise<number> => {
   const movementData = engine.generateMovementData();
   for (const move of movementData.moves) {
     engine.applyMove(move);
-    n += await run(engine, depth - 1);
+    n += search(engine, depth - 1);
     engine.undoLastMove();
   }
 
   return n;
+};
+
+export const run = (engine: Engine, depth: number, debug = false): number => {
+  if (depth === 0) {
+    return 1;
+  }
+
+  const counts: { move: Move; n: number }[] = [];
+
+  const movementData = engine.generateMovementData();
+  for (const move of movementData.moves) {
+    engine.applyMove(move);
+    counts.push({ move, n: search(engine, depth - 1) });
+    engine.undoLastMove();
+  }
+
+  if (debug) {
+    counts.forEach(({ move, n }) => {
+      console.log(moveToDirectionString(move), n);
+    });
+  }
+
+  return counts.reduce((sum, { n }) => sum + n, 0);
 };
