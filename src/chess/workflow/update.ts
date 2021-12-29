@@ -13,7 +13,6 @@ import {
   overlaySquaresAction,
   setPositionAction,
   attemptComputerMoveAction,
-  clickSquareAction,
   receiveComputerMoveAction,
   chessComputerLoadedAction,
 } from './action';
@@ -27,7 +26,6 @@ import {
   Draw,
 } from './state';
 import { from } from 'rxjs';
-import { delayOperator } from '../../lib/operators';
 import {
   AvailableComputerVersions,
   ChessComputerWorker,
@@ -207,13 +205,7 @@ function handleReceiveComputerMove(
   action: Action.ReceiveComputerMove
 ): Update<State, Action> {
   const { move } = action;
-
-  return [
-    state,
-    from([clickSquareAction(move.from), clickSquareAction(move.to)]).pipe(
-      delayOperator(400)
-    ),
-  ];
+  return [state, movePieceAction(move)];
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
