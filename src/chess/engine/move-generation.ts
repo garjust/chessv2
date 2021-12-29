@@ -18,7 +18,7 @@ import {
   isPromotionPositionPawn,
   findKing,
 } from '../utils';
-import { applyMove } from './move-execution';
+import { applyMove, undoMove } from './move-execution';
 import {
   down,
   left,
@@ -414,9 +414,9 @@ export const generateMovementData = (
     // and then looks for attacks on the players king.
     moves = moves.filter((move) => {
       const result = applyMove(position, { from, to: move.to });
-      return (
-        findAttacksOnKing(result.position, result.position.turn).length === 0
-      );
+      const attackCount = findAttacksOnKing(position, position.turn).length;
+      undoMove(position, result);
+      return attackCount === 0;
     });
 
     moves.forEach((move) => {

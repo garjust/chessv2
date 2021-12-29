@@ -23,12 +23,12 @@ export const copyPosition = (position: Position): Position => {
     enPassantSquare = { ...position.enPassantSquare };
   }
 
-  return Object.freeze({
+  return {
     pieces,
     turn: position.turn,
     castlingAvailability,
     enPassantSquare,
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,
-  });
+  };
 };

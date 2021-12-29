@@ -9,6 +9,5 @@
 
 ## TODO
 
-- Implement undoLastMove & refactor applyMove to mutate position
 - Track king square
 - Find pins in `squareScanner` function

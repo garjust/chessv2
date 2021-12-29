@@ -1,4 +1,3 @@
-import { threadId } from 'worker_threads';
 import {
   Color,
   ComputedMovementData,
@@ -9,12 +8,12 @@ import {
 } from '../types';
 import { copyPosition } from './copy';
 import { evaluate } from './evaluation';
-import { applyMove } from './move-execution';
+import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMovementData } from './move-generation';
 
 export default class Engine {
   #position: Position;
-  #positionStack: Position[] = [];
+  #moveStack: MoveResult[] = [];
 
   // kings: {
   //   [Color.White]: Square;
@@ -26,16 +25,15 @@ export default class Engine {
   }
 
   applyMove(move: Move): Piece | undefined {
-    const { position, captured } = applyMove(this.#position, move);
-    this.#positionStack.push(this.#position);
-    this.#position = position;
-    return captured;
+    const result = applyMove(this.#position, move);
+    this.#moveStack.push(result);
+    return result.captured?.piece;
   }
 
   undoLastMove() {
-    const lastPosition = this.#positionStack.pop();
-    if (lastPosition) {
-      this.#position = lastPosition;
+    const moveResult = this.#moveStack.pop();
+    if (moveResult) {
+      undoMove(this.#position, moveResult);
     } else {
       throw Error('no last move to undo');
     }
@@ -65,8 +63,14 @@ export default class Engine {
 }
 
 export const ImmutableEngine = {
-  applyMove,
+  applyMove(position: Position, move: Move) {
+    const copy = Object.freeze(copyPosition(position));
+    const result = applyMove(copy, move);
+    return { position: copy, captured: result.captured };
+  },
   evaluate,
-  generateMoves: (position: Position) => generateMovementData(position).moves,
+  generateMoves(position: Position) {
+    return generateMovementData(position).moves;
+  },
   generateMovementData,
 };
