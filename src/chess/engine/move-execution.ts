@@ -88,10 +88,10 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   if (captured) {
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
-      if (move.to === ROOK_STARTING_SQUARES[piece.color].queenside) {
-        position.castlingAvailability[piece.color].queenside = false;
-      } else if (move.to === ROOK_STARTING_SQUARES[piece.color].kingside) {
-        position.castlingAvailability[piece.color].kingside = false;
+      if (move.to === ROOK_STARTING_SQUARES[captured.color].queenside) {
+        position.castlingAvailability[captured.color].queenside = false;
+      } else if (move.to === ROOK_STARTING_SQUARES[captured.color].kingside) {
+        position.castlingAvailability[captured.color].kingside = false;
       }
     }
   }

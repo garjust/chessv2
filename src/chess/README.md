@@ -10,3 +10,4 @@
 ## TODO
 
 - Find pins in `squareScanner` function
+- Throw away bad check logic for pruning moves, way too slow
