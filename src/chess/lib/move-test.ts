@@ -1,6 +1,6 @@
 import { Position } from '../types';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
-import engine from '../engine';
+import { ImmutableEngine } from '../engine';
 
 export type MoveTest = {
   fen: string;
@@ -35,9 +35,9 @@ export const run = async (
 
   let n = 0;
 
-  const movementData = engine.generateMovementData(position);
+  const movementData = ImmutableEngine.generateMovementData(position);
   for (const move of movementData.moves) {
-    const result = engine.applyMove(position, move);
+    const result = ImmutableEngine.applyMove(position, move);
     n += await run(result.position, depth - 1);
   }
 

@@ -31,7 +31,7 @@ import {
   ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import engine from '../engine';
+import { ImmutableEngine } from '../engine';
 import { SquareMap } from '../square-map';
 import { wrap } from 'comlink';
 
@@ -126,8 +126,6 @@ function handleInitialize(
   _state: State,
   action: Action.Initialize
 ): Update<State, Action> {
-  const { playingAs } = action;
-
   return [createState({}), setPositionFromFENAction(BLANK_POSITION_FEN)];
 }
 
@@ -247,7 +245,7 @@ function handleMovePiece(
     move.promotion = PieceType.Queen;
   }
 
-  const { position } = engine.applyMove(state.position, move);
+  const { position } = ImmutableEngine.applyMove(state.position, move);
 
   return [
     {
@@ -264,8 +262,8 @@ function handleSetPosition(
   action: Action.SetPosition
 ): Update<State, Action> {
   const { position } = action;
-  const moveData = engine.generateMovementData(position);
-  const evaluation = engine.evaluate(position);
+  const moveData = ImmutableEngine.generateMovementData(position);
+  const evaluation = ImmutableEngine.evaluate(position);
 
   state = {
     ...state,

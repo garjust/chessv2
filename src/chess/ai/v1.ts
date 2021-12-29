@@ -1,13 +1,13 @@
 import { ChessComputer } from './types';
 import { Position } from '../types';
 import { pluck } from '../../lib/array';
-import engine from '../engine';
+import { ImmutableEngine } from '../engine';
 
 // Algorithm:
 // - pick a random move
 export default class v1 implements ChessComputer<Position> {
   nextMove(position: Position) {
-    const movementData = engine.generateMovementData(position);
+    const movementData = ImmutableEngine.generateMovementData(position);
 
     if (movementData.availableCaptures.length) {
       return Promise.resolve(pluck(movementData.availableCaptures));

@@ -1,7 +1,7 @@
 import { ChessComputer } from './types';
 import { Color, Move, Position } from '../types';
 import { moveToDirectionString } from '../utils';
-import engine from '../engine';
+import { ImmutableEngine } from '../engine';
 import { pluck } from '../../lib/array';
 
 const DEPTH = 4;
@@ -38,11 +38,11 @@ export default class v3 implements ChessComputer<Position> {
     position: Position,
     depth: number
   ): { move: Move; score: number }[] {
-    const moves = engine.generateMoves(position);
+    const moves = ImmutableEngine.generateMoves(position);
     this.moveCounter += moves.length;
 
     return moves.map((move) => {
-      const result = engine.applyMove(position, move);
+      const result = ImmutableEngine.applyMove(position, move);
 
       return {
         move,
@@ -54,18 +54,18 @@ export default class v3 implements ChessComputer<Position> {
   score(position: Position, depth: number): number {
     if (depth === 0) {
       this.evaluationCounter++;
-      const evaluation = engine.evaluate(position);
+      const evaluation = ImmutableEngine.evaluate(position);
       return position.turn === Color.White ? evaluation : -1 * evaluation;
     }
 
     let max = -Infinity;
 
-    const moves = engine.generateMoves(position);
+    const moves = ImmutableEngine.generateMoves(position);
     this.moveCounter += moves.length;
 
     // handle no moves (checkmate or draw)
     moves.forEach((move) => {
-      const result = engine.applyMove(position, move);
+      const result = ImmutableEngine.applyMove(position, move);
       const x = -1 * this.score(result.position, depth - 1);
 
       if (x > max) {

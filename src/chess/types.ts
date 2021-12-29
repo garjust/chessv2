@@ -96,12 +96,6 @@ export type ComputedPositionData = {
   };
 };
 
-export interface Engine<P> {
-  applyMove(position: P, move: Move): { position: P; captured?: Piece };
-  evaluate(position: P): number;
-  generateMoves(position: P): Move[];
-}
-
 export type SquareLabel =
   | 'a1'
   | 'a2'
