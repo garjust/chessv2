@@ -9,7 +9,6 @@ import {
   ComputedPositionData,
   Move,
 } from '../types';
-import { squareEquals } from '../utils';
 
 export enum SquareOverlayType {
   Capturable = 'CAPTURABLE',
@@ -84,7 +83,7 @@ export const pieceInSquare = (
 ): Piece | undefined => state.position.pieces.get(square);
 
 export const squareIsSelected = (state: State, square: Square) =>
-  squareEquals(state.selectedSquare, square);
+  state.selectedSquare === square;
 
 export const squareOverlay = (state: State, square: Square) =>
   state.squareOverlay?.get(square);

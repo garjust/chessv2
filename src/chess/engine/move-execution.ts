@@ -7,7 +7,6 @@ import {
   Square,
 } from '../types';
 import {
-  squareEquals,
   ROOK_STARTING_SQUARES,
   flipColor,
   isStartPositionPawn,
@@ -89,11 +88,9 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   if (captured) {
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
-      if (squareEquals(move.to, ROOK_STARTING_SQUARES[piece.color].queenside)) {
+      if (move.to === ROOK_STARTING_SQUARES[piece.color].queenside) {
         position.castlingAvailability[piece.color].queenside = false;
-      } else if (
-        squareEquals(move.to, ROOK_STARTING_SQUARES[piece.color].kingside)
-      ) {
+      } else if (move.to === ROOK_STARTING_SQUARES[piece.color].kingside) {
         position.castlingAvailability[piece.color].kingside = false;
       }
     }
@@ -101,7 +98,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
 
   // En passant pawn move handling.
   if (piece.type === PieceType.Pawn) {
-    if (squareEquals(position.enPassantSquare, move.to)) {
+    if (position.enPassantSquare === move.to) {
       // This is an en passant capture
       const capturedSquare =
         piece.color === Color.White ? down(move.to) : up(move.to);
@@ -158,11 +155,9 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
 
   // If the moved piece is a rook update castling state.
   if (piece.type === PieceType.Rook) {
-    if (squareEquals(move.from, ROOK_STARTING_SQUARES[piece.color].queenside)) {
+    if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
       position.castlingAvailability[piece.color].queenside = false;
-    } else if (
-      squareEquals(move.from, ROOK_STARTING_SQUARES[piece.color].kingside)
-    ) {
+    } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
       position.castlingAvailability[piece.color].kingside = false;
     }
   }

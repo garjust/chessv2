@@ -10,7 +10,6 @@ import {
 } from '../types';
 import {
   isLegalSquare,
-  squareEquals,
   flipColor,
   squaresInclude,
   isStartPositionPawn,
@@ -60,7 +59,7 @@ const pawnMoves = (
   if (
     leftCaptureSquare % 8 !== 7 &&
     (position.pieces.get(leftCaptureSquare)?.color === opponentColor ||
-      squareEquals(position.enPassantSquare, leftCaptureSquare))
+      position.enPassantSquare === leftCaptureSquare)
   ) {
     squares.push({
       from,
@@ -75,7 +74,7 @@ const pawnMoves = (
   if (
     rightCaptureSquare % 8 !== 0 &&
     (position.pieces.get(rightCaptureSquare)?.color === opponentColor ||
-      squareEquals(position.enPassantSquare, rightCaptureSquare))
+      position.enPassantSquare === rightCaptureSquare)
   ) {
     squares.push({
       from,
@@ -366,7 +365,7 @@ export const generateMovementData = (
           moves = moves.filter(
             (move) =>
               squaresInclude(check.slideSquares, move.to) ||
-              squareEquals(check.attacker.square, move.to)
+              check.attacker.square === move.to
           );
         } else {
           // The king can only move out of the check or capture the checking

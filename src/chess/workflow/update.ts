@@ -1,11 +1,6 @@
 import { Update } from '../../lib/workflow';
 import { PieceType } from '../types';
-import {
-  flipColor,
-  isPromotionPositionPawn,
-  movesIncludes,
-  squareEquals,
-} from '../utils';
+import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
@@ -95,7 +90,7 @@ function handleClickSquare(
   const { position } = state;
 
   if (state.selectedSquare) {
-    if (squareEquals(state.selectedSquare, square)) {
+    if (state.selectedSquare === square) {
       return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
     }
 
@@ -169,7 +164,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
       const candidateSquares = computedPositionData.moveData.moves.filter(
-        (move) => squareEquals(move.from, selectedSquare)
+        (move) => move.from === selectedSquare
       );
 
       candidateSquares.forEach(({ to: square }) => {

@@ -56,16 +56,11 @@ export const squareGenerator = function* () {
   }
 };
 
-export const squareEquals = (
-  a: Nullable<Square>,
-  b: Nullable<Square>
-): boolean => a === b;
-
 export const squaresInclude = (squares: Square[], square: Square): boolean =>
-  squares.some((x) => squareEquals(x, square));
+  squares.includes(square);
 
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
-  Boolean(a && b && squareEquals(a.from, b.from) && squareEquals(a.to, b.to));
+  Boolean(a && b && a.from === b.from && a.to === b.to);
 
 export const movesIncludes = (moves: Move[], move: Move): boolean =>
   moves.some((x) => moveEquals(x, move));

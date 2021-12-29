@@ -6,7 +6,7 @@ import {
   Position,
   Square,
 } from '../types';
-import { isLegalSquare, squareEquals } from '../utils';
+import { isLegalSquare } from '../utils';
 
 // type MoveSquareFunction = (square: Square, n: number) => Square;
 
