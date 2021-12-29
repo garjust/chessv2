@@ -5,6 +5,7 @@ import {
   Piece,
   PieceType,
   Position,
+  RankFile,
   Square,
   SquareLabel,
 } from './types';
@@ -14,35 +15,38 @@ export const BLACK_PAWN_STARTING_RANK = 6;
 
 export const ROOK_STARTING_SQUARES = Object.freeze({
   [Color.White]: {
-    queenside: { rank: 0, file: 0 },
-    kingside: { rank: 0, file: 7 },
+    queenside: 0,
+    kingside: 7,
   },
   [Color.Black]: {
-    queenside: { rank: 7, file: 0 },
-    kingside: { rank: 7, file: 7 },
+    queenside: 56,
+    kingside: 63,
   },
 });
 
-const SQUARE_LABEL_LOOKUP: SquareLabel[][] = [
-  ['a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'],
-  ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'],
-  ['a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3'],
-  ['a4', 'b4', 'c4', 'd4', 'e4', 'f4', 'g4', 'h4'],
-  ['a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5'],
-  ['a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6'],
-  ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'],
-  ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'],
+/* eslint-disable prettier/prettier */
+const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
+  'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
+  'a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2',
+  'a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3',
+  'a4', 'b4', 'c4', 'd4', 'e4', 'f4', 'g4', 'h4',
+  'a5', 'b5', 'c5', 'd5', 'e5', 'f5', 'g5', 'h5',
+  'a6', 'b6', 'c6', 'd6', 'e6', 'f6', 'g6', 'h6',
+  'a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7',
+  'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8',
 ];
+/* eslint-enable prettier/prettier */
 
 type Nullable<T> = T | undefined | null;
 
-export const squareLabel = ({ rank, file }: Square): SquareLabel =>
-  SQUARE_LABEL_LOOKUP[rank][file];
+export const rankFileToSquare = ({ rank, file }: RankFile): Square =>
+  rank * 8 + file;
 
-export const labelToSquare = ([file, rank]: string): Square => ({
-  file: file.charCodeAt(0) - 97,
-  rank: Number(rank) - 1,
-});
+export const squareLabel = (square: Square): SquareLabel =>
+  SQUARE_LABEL_LOOKUP[square];
+
+export const labelToSquare = (label: SquareLabel): Square =>
+  SQUARE_LABEL_LOOKUP.indexOf(label);
 
 export const squareGenerator = function* () {
   for (let rank = 0; rank < 8; rank++) {
@@ -55,7 +59,7 @@ export const squareGenerator = function* () {
 export const squareEquals = (
   a: Nullable<Square>,
   b: Nullable<Square>
-): boolean => Boolean(a && b && a.file === b.file && a.rank === b.rank);
+): boolean => a === b;
 
 export const squaresInclude = (squares: Square[], square: Square): boolean =>
   squares.some((x) => squareEquals(x, square));
@@ -66,8 +70,8 @@ export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
 export const movesIncludes = (moves: Move[], move: Move): boolean =>
   moves.some((x) => moveEquals(x, move));
 
-export const isLegalSquare = ({ rank, file }: Square): boolean =>
-  rank >= 0 && rank < 8 && file >= 0 && file < 8;
+export const isLegalSquare = (square: Square): boolean =>
+  square >= 0 && square < 64;
 
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
@@ -77,8 +81,10 @@ export const moveToDirectionString = (move: Move): string =>
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White
-    ? square.rank === WHITE_PAWN_STARTING_RANK
-    : square.rank === BLACK_PAWN_STARTING_RANK;
+    ? square >= 8 * WHITE_PAWN_STARTING_RANK &&
+      square < 8 * WHITE_PAWN_STARTING_RANK + 8
+    : square >= 8 * BLACK_PAWN_STARTING_RANK &&
+      square < 8 * BLACK_PAWN_STARTING_RANK + 8;
 
 export const isPromotionPositionPawn = (
   color: Color,
@@ -116,16 +122,11 @@ export const copyPosition = (position: Position): Position => {
     },
   };
 
-  let enPassantSquare: Square | null = null;
-  if (position.enPassantSquare) {
-    enPassantSquare = { ...position.enPassantSquare };
-  }
-
   return {
     pieces,
     turn: position.turn,
     castlingAvailability,
-    enPassantSquare,
+    enPassantSquare: position.enPassantSquare,
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,
   };

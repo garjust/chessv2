@@ -18,16 +18,12 @@ import {
 } from '../utils';
 import { applyMove, undoMove } from './move-execution';
 import {
-  down,
-  left,
-  right,
-  up,
-  upLeft,
-  upRight,
-  downLeft,
-  downRight,
-  squareScanner,
-} from './move-utils';
+  BISHOP_LOOKUP,
+  KING_LOOKUP,
+  KNIGHT_LOOKUP,
+  ROOK_LOOKUP,
+} from './move-lookup';
+import { down, left, right, up, rayScanner } from './move-utils';
 import { Position } from './position';
 
 const pawnMoves = (
@@ -57,33 +53,36 @@ const pawnMoves = (
     }
   }
 
+  const leftCaptureSquare = advanceFn(left(from));
+  const rightCaptureSquare = advanceFn(right(from));
+
   // Pawn captures diagonally.
   if (
-    position.pieces.get(advanceFn(left(from)))?.color === opponentColor ||
-    squareEquals(position.enPassantSquare, advanceFn(left(from)))
+    leftCaptureSquare % 8 !== 7 &&
+    (position.pieces.get(leftCaptureSquare)?.color === opponentColor ||
+      squareEquals(position.enPassantSquare, leftCaptureSquare))
   ) {
-    const square = advanceFn(left(from));
     squares.push({
       from,
-      to: square,
+      to: leftCaptureSquare,
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
-        attacked: square,
+        attacked: leftCaptureSquare,
         slideSquares: [],
       },
     });
   }
   if (
-    position.pieces.get(advanceFn(right(from)))?.color === opponentColor ||
-    squareEquals(position.enPassantSquare, advanceFn(right(from)))
+    rightCaptureSquare % 8 !== 0 &&
+    (position.pieces.get(rightCaptureSquare)?.color === opponentColor ||
+      squareEquals(position.enPassantSquare, rightCaptureSquare))
   ) {
-    const square = advanceFn(right(from));
     squares.push({
       from,
-      to: square,
+      to: rightCaptureSquare,
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
-        attacked: square,
+        attacked: rightCaptureSquare,
         slideSquares: [],
       },
     });
@@ -107,19 +106,8 @@ const knightMoves = (
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
-  [
-    up(left(from), 2),
-    up(right(from), 2),
-    left(up(from), 2),
-    left(down(from), 2),
-    down(left(from), 2),
-    down(right(from), 2),
-    right(up(from), 2),
-    right(down(from), 2),
-  ]
-    .filter(
-      (to) => isLegalSquare(to) && position.pieces.get(to)?.color !== color
-    )
+  KNIGHT_LOOKUP[from]
+    .filter((to) => position.pieces.get(to)?.color !== color)
     .map((to) => {
       let attack: AttackObject | undefined;
       if (position.pieces.get(to)) {
@@ -143,17 +131,8 @@ const kingMoves = (
   from: Square,
   { skipCastling }: { skipCastling: boolean }
 ): MoveWithExtraData[] => {
-  const squares = [
-    up(from),
-    left(from),
-    right(from),
-    down(from),
-    upLeft(from),
-    upRight(from),
-    downLeft(from),
-    downRight(from),
-  ].filter(
-    (to) => isLegalSquare(to) && position.pieces.get(to)?.color !== color
+  const squares = KING_LOOKUP[from].filter(
+    (to) => position.pieces.get(to)?.color !== color
   );
 
   // Check if castling is possible and there are no pieces between the king
@@ -203,8 +182,12 @@ const bishopMoves = (
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
-  [upLeft, upRight, downLeft, downRight].flatMap((scanFn) =>
-    squareScanner(position, { ...from, color, type: PieceType.Bishop }, scanFn)
+  BISHOP_LOOKUP[from].flatMap((ray) =>
+    rayScanner(
+      position,
+      { square: from, piece: { color, type: PieceType.Bishop } },
+      ray
+    )
   );
 
 const rookMoves = (
@@ -212,8 +195,12 @@ const rookMoves = (
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
-  [up, right, left, down].flatMap((scanFn) =>
-    squareScanner(position, { ...from, color, type: PieceType.Rook }, scanFn)
+  ROOK_LOOKUP[from].flatMap((ray) =>
+    rayScanner(
+      position,
+      { square: from, piece: { color, type: PieceType.Rook } },
+      ray
+    )
   );
 
 const queenMoves = (

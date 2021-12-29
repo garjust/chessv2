@@ -1,6 +1,6 @@
 import React from 'react';
 import './Square.css';
-import { Color, Square as SquareData } from '../types';
+import { Color } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
@@ -23,27 +23,28 @@ import Piece from './Piece';
 
 export type SquareProps = {
   color: Color;
-} & SquareData;
+  square: number;
+};
 
 const makeRender =
-  ({ rank, file }: Pick<SquareProps, 'rank' | 'file'>) =>
+  ({ square }: Pick<SquareProps, 'square'>) =>
   (state: State) => ({
-    piece: pieceInSquare(state, { rank, file }),
-    overlay: state.squareOverlay?.get({ rank, file }),
-    isClickable: isSquareClickable(state, { rank, file }),
+    piece: pieceInSquare(state, square),
+    overlay: state.squareOverlay?.get(square),
+    isClickable: isSquareClickable(state, square),
     displaySquareLabels: state.displaySquareLabels,
   });
 
 const Square = (props: SquareProps) => {
   const { rendering, emit } = useWorkflow(makeRender(props));
 
-  const { rank, file, color } = props;
+  const { square, color } = props;
   const { piece, overlay, isClickable, displaySquareLabels } = rendering;
 
   let css: React.CSSProperties = {
     position: 'relative',
     cursor: isClickable ? 'pointer' : 'inherit',
-    gridArea: squareLabel({ rank, file }),
+    gridArea: squareLabel(square),
     backgroundColor:
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
   };
@@ -72,9 +73,7 @@ const Square = (props: SquareProps) => {
     <div
       className="square"
       style={css}
-      onClick={() =>
-        isClickable ? emit(clickSquareAction({ rank, file })) : null
-      }
+      onClick={() => (isClickable ? emit(clickSquareAction(square)) : null)}
       tabIndex={0}
     >
       {piece !== undefined ? (
@@ -87,7 +86,7 @@ const Square = (props: SquareProps) => {
           opacity: displaySquareLabels ? 1 : 0,
         }}
       >
-        {squareLabel({ rank, file })}
+        {squareLabel(square)}
       </span>
     </div>
   );

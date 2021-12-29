@@ -15,10 +15,10 @@ self.onmessage = async (
   const { test, toDepth } = message.data;
 
   const position = parseFEN(test.fen);
-  const engine = new Engine(position);
 
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
+    const engine = new Engine(position);
     const count = await run(engine, i);
     const timing = Date.now() - start;
     const passed = isCountCorrectForDepthFromStart(i, count, test);

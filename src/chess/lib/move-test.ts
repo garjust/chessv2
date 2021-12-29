@@ -1,4 +1,4 @@
-import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
+import { PERFT_5_FEN, STARTING_POSITION_FEN, VIENNA_OPENING_FEN } from './fen';
 import Engine from '../engine';
 
 export type MoveTest = {
@@ -14,6 +14,11 @@ export const PERFT_POSITION_5: MoveTest = {
 export const STARTING_POSITION: MoveTest = {
   fen: STARTING_POSITION_FEN,
   counts: [20, 400, 8902, 197281, 4865609, 119060324],
+};
+
+export const VIENNA_OPENING: MoveTest = {
+  fen: VIENNA_OPENING_FEN,
+  counts: [27, 966, 27249],
 };
 
 export const isCountCorrectForDepthFromStart = (

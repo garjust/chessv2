@@ -6,7 +6,12 @@ import {
   PieceType,
   Square,
 } from '../types';
-import { squareEquals, ROOK_STARTING_SQUARES, flipColor } from '../utils';
+import {
+  squareEquals,
+  ROOK_STARTING_SQUARES,
+  flipColor,
+  isStartPositionPawn,
+} from '../utils';
 import { down, up } from './move-utils';
 import { Position } from './position';
 
@@ -21,11 +26,21 @@ export type MoveResult = {
   };
 };
 
-const isTwoRankMove = (move: Move): boolean =>
-  Math.abs(move.from.rank - move.to.rank) === 2;
+const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
+  if (
+    piece.type !== PieceType.Pawn ||
+    !isStartPositionPawn(piece.color, move.from)
+  ) {
+    return false;
+  }
+
+  return piece.color === Color.White
+    ? move.to >= 24 && move.from < 32
+    : move.to >= 32 && move.from < 40;
+};
 
 export const applyMove = (position: Position, move: Move): MoveResult => {
-  const { pieces, enPassantSquare } = position;
+  const { pieces } = position;
   let piece = position.pieces.get(move.from);
 
   if (!piece) {
@@ -48,16 +63,10 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
           queenside: position.castlingAvailability[Color.Black].queenside,
         },
       },
-      enPassantSquare: position.enPassantSquare
-        ? { ...position.enPassantSquare }
-        : null,
+      enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
     },
   };
-
-  // Null out the en passant square before possibly assigning it to a new
-  // square.
-  position.enPassantSquare = null;
 
   // If the move is a pawn promoting it will have the promotion property set.
   // In this case swap out the piece before executing the move so we only insert
@@ -92,7 +101,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
 
   // En passant pawn move handling.
   if (piece.type === PieceType.Pawn) {
-    if (squareEquals(enPassantSquare, move.to)) {
+    if (squareEquals(position.enPassantSquare, move.to)) {
       // This is an en passant capture
       const capturedSquare =
         piece.color === Color.White ? down(move.to) : up(move.to);
@@ -107,11 +116,13 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       }
       pieces.delete(capturedSquare);
     }
+  }
 
-    if (isTwoRankMove(move)) {
-      position.enPassantSquare =
-        move.from.rank === 1 ? up(move.from) : down(move.from);
-    }
+  if (isTwoSquarePawnMove(piece, move)) {
+    position.enPassantSquare =
+      piece.color === Color.White ? up(move.from) : down(move.from);
+  } else {
+    position.enPassantSquare = null;
   }
 
   // King move special handling.
@@ -124,26 +135,24 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     position.castlingAvailability[piece.color].kingside = false;
 
     // If the king move is a castle we need to move the corresponding rook.
-    if (Math.abs(move.from.file - move.to.file) === 2) {
-      if (move.from.file - move.to.file > 0) {
-        // queenside
-        const rookFromSquare = { rank: move.from.rank, file: 0 };
-        const rookToSquare = { rank: move.from.rank, file: 3 };
-        position.pieces.delete(rookFromSquare);
-        position.pieces.set(rookToSquare, {
-          color: piece.color,
-          type: PieceType.Rook,
-        });
-      } else {
-        // kingside
-        const rookFromSquare = { rank: move.from.rank, file: 7 };
-        const rookToSquare = { rank: move.from.rank, file: 5 };
-        position.pieces.delete(rookFromSquare);
-        position.pieces.set(rookToSquare, {
-          color: piece.color,
-          type: PieceType.Rook,
-        });
-      }
+    if (move.from - move.to === 2) {
+      // queenside
+      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].queenside;
+      const rookToSquare = piece.color === Color.White ? 3 : 59;
+      position.pieces.delete(rookFromSquare);
+      position.pieces.set(rookToSquare, {
+        color: piece.color,
+        type: PieceType.Rook,
+      });
+    } else if (move.from - move.to === -2) {
+      // kingside
+      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].kingside;
+      const rookToSquare = piece.color === Color.White ? 5 : 61;
+      position.pieces.delete(rookFromSquare);
+      position.pieces.set(rookToSquare, {
+        color: piece.color,
+        type: PieceType.Rook,
+      });
     }
   }
 
@@ -195,26 +204,24 @@ export const undoMove = (position: Position, result: MoveResult): void => {
     // Update extra state
     position.kings[piece.color] = move.from;
 
-    if (Math.abs(move.from.file - move.to.file) === 2) {
-      if (move.from.file - move.to.file > 0) {
-        // queenside
-        const rookFromSquare = { rank: move.from.rank, file: 0 };
-        const rookToSquare = { rank: move.from.rank, file: 3 };
-        position.pieces.delete(rookToSquare);
-        position.pieces.set(rookFromSquare, {
-          color: piece.color,
-          type: PieceType.Rook,
-        });
-      } else {
-        // kingside
-        const rookFromSquare = { rank: move.from.rank, file: 7 };
-        const rookToSquare = { rank: move.from.rank, file: 5 };
-        position.pieces.delete(rookToSquare);
-        position.pieces.set(rookFromSquare, {
-          color: piece.color,
-          type: PieceType.Rook,
-        });
-      }
+    if (move.from - move.to === 2) {
+      // queenside
+      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].queenside;
+      const rookToSquare = piece.color === Color.White ? 3 : 59;
+      position.pieces.delete(rookToSquare);
+      position.pieces.set(rookFromSquare, {
+        color: piece.color,
+        type: PieceType.Rook,
+      });
+    } else if (move.from - move.to === -2) {
+      // kingside
+      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].kingside;
+      const rookToSquare = piece.color === Color.White ? 5 : 61;
+      position.pieces.delete(rookToSquare);
+      position.pieces.set(rookFromSquare, {
+        color: piece.color,
+        type: PieceType.Rook,
+      });
     }
   }
 

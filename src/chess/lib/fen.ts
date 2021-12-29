@@ -1,6 +1,13 @@
 import { SquareMap } from '../square-map';
-import { Color, Piece, PieceType, Position, Square } from '../types';
-import { squareLabel, labelToSquare } from '../utils';
+import {
+  Color,
+  Piece,
+  PieceType,
+  Position,
+  Square,
+  SquareLabel,
+} from '../types';
+import { squareLabel, labelToSquare, rankFileToSquare } from '../utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
@@ -81,13 +88,10 @@ const pieceMapFromFenPieces = (fenPieces: string): SquareMap<Piece> => {
       case 'Q':
       case 'r':
       case 'R':
-        pieces.set(
-          { rank, file },
-          {
-            color: fenPieceToColor(char),
-            type: FEN_PIECE_TO_PIECE_TYPE[char],
-          }
-        );
+        pieces.set(rankFileToSquare({ rank, file }), {
+          color: fenPieceToColor(char),
+          type: FEN_PIECE_TO_PIECE_TYPE[char],
+        });
         // Advance the file after placing a piece.
         file += 1;
     }
@@ -104,7 +108,7 @@ const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
   for (let rank = 7; rank >= 0; rank--) {
     emptyCounter = 0;
     for (let file = 0; file < 8; file++) {
-      const piece = pieces.get({ rank, file });
+      const piece = pieces.get(rankFileToSquare({ rank, file }));
       if (piece) {
         if (emptyCounter > 0) {
           str += String(emptyCounter);
@@ -148,7 +152,9 @@ export const parseFEN = (fenString: string): Position => {
       },
     }),
     enPassantSquare:
-      enPassantSquare !== '-' ? labelToSquare(enPassantSquare) : null,
+      enPassantSquare !== '-'
+        ? labelToSquare(enPassantSquare as SquareLabel)
+        : null,
     halfMoveCount: Number(halfMoveClock),
     fullMoveCount: Number(fullMoveNumber),
   });

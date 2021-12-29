@@ -1,7 +1,7 @@
 import React from 'react';
 import { State } from '../workflow';
 import { Color } from '../types';
-import { squareGenerator, squareLabel } from '../utils';
+import { rankFileToSquare, squareGenerator, squareLabel } from '../utils';
 import './Board.css';
 import Square from './Square';
 import { useWorkflow } from './workflow';
@@ -21,13 +21,12 @@ const Board = ({ squareSize, style }: BoardProps) => {
   const { boardOrientation } = rendering;
 
   const squares: JSX.Element[] = [];
-  for (const { rank, file } of squareGenerator()) {
+  for (const square of squareGenerator()) {
     squares.push(
       <Square
-        key={squareLabel({ rank, file })}
-        rank={rank}
-        file={file}
-        color={(rank + file) % 2 == 0 ? Color.Black : Color.White}
+        key={rankFileToSquare(square)}
+        square={rankFileToSquare(square)}
+        color={(square.rank + square.file) % 2 == 0 ? Color.Black : Color.White}
       />
     );
   }

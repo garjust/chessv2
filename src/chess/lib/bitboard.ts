@@ -1,5 +1,5 @@
 import { SquareBitmask, ZERO } from './bitboard-def';
-import { Color, PieceType, Position, Square } from '../types';
+import { Color, PieceType, Position, Square, SquareLabel } from '../types';
 import { labelToSquare, squareLabel } from '../utils';
 
 export type Bitboard = bigint;
@@ -27,7 +27,7 @@ export const board = (
 export const toSquares = (bitboard: Bitboard): Square[] =>
   Object.entries(SquareBitmask).reduce((squares, [label, long]) => {
     if ((bitboard & long) === long) {
-      squares.push(labelToSquare(label));
+      squares.push(labelToSquare(label as SquareLabel));
     }
 
     return squares;

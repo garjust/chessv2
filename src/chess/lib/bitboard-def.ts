@@ -1,3 +1,5 @@
+import { SquareLabel } from '../types';
+
 export const ZERO = BigInt(0b0);
 
 const a1 = BigInt(0b1);
@@ -71,7 +73,7 @@ const g8 =
 const h8 =
   BigInt(0b1000000000000000000000000000000000000000000000000000000000000000);
 
-export const SquareBitmask: Record<string, bigint> = Object.freeze({
+export const SquareBitmask: Record<SquareLabel, bigint> = Object.freeze({
   a1,
   a2,
   a3,

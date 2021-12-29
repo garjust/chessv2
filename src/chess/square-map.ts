@@ -1,5 +1,5 @@
 import { Square } from './types';
-import { isLegalSquare } from './utils';
+import { isLegalSquare, rankFileToSquare } from './utils';
 
 export class SquareMap<T> implements Map<Square, T> {
   #map: T[];
@@ -13,8 +13,8 @@ export class SquareMap<T> implements Map<Square, T> {
   }
 
   delete(key: Square): boolean {
-    const exists = this.#map[key.rank * 8 + key.file] !== undefined;
-    delete this.#map[key.rank * 8 + key.file];
+    const exists = this.#map[key] !== undefined;
+    delete this.#map[key];
     return exists;
   }
 
@@ -30,15 +30,15 @@ export class SquareMap<T> implements Map<Square, T> {
       return undefined;
     }
 
-    return this.#map[key.rank * 8 + key.file];
+    return this.#map[key];
   }
 
   has(key: Square): boolean {
-    return this.#map[key.rank * 8 + key.file] !== undefined;
+    return this.#map[key] !== undefined;
   }
 
   set(key: Square, value: T): this {
-    this.#map[key.rank * 8 + key.file] = value;
+    this.#map[key] = value;
     return this;
   }
 
@@ -46,7 +46,8 @@ export class SquareMap<T> implements Map<Square, T> {
     let counter = 0;
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
-        counter += this.#map[rank * 8 + file] !== undefined ? 1 : 0;
+        counter +=
+          this.#map[rankFileToSquare({ rank, file })] !== undefined ? 1 : 0;
       }
     }
     return counter;
@@ -58,10 +59,13 @@ export class SquareMap<T> implements Map<Square, T> {
     return (function* entriesGenerator() {
       for (let rank = 0; rank < 8; rank++) {
         for (let file = 0; file < 8; file++) {
-          const value = map[rank * 8 + file];
+          const value = map[rankFileToSquare({ rank, file })];
 
           if (value !== undefined) {
-            const tuple: [Square, T] = [{ rank, file }, value];
+            const tuple: [Square, T] = [
+              rankFileToSquare({ rank, file }),
+              value,
+            ];
             yield tuple;
           }
         }
@@ -75,10 +79,10 @@ export class SquareMap<T> implements Map<Square, T> {
     return (function* () {
       for (let rank = 0; rank < 8; rank++) {
         for (let file = 0; file < 8; file++) {
-          const value = map[rank * 8 + file];
+          const value = map[rankFileToSquare({ rank, file })];
 
           if (value !== undefined) {
-            yield { rank, file };
+            yield rankFileToSquare({ rank, file });
           }
         }
       }
@@ -91,7 +95,7 @@ export class SquareMap<T> implements Map<Square, T> {
     return (function* () {
       for (let rank = 0; rank < 8; rank++) {
         for (let file = 0; file < 8; file++) {
-          const value = map[rank * 8 + file];
+          const value = map[rankFileToSquare({ rank, file })];
           if (value !== undefined) {
             yield value;
           }

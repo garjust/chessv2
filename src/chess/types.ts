@@ -27,8 +27,9 @@ export type Piece = {
   color: Color;
 };
 
-// export type Square = number;
-export type Square = {
+export type Square = number;
+
+export type RankFile = {
   rank: number;
   file: number;
 };
