@@ -1,5 +1,5 @@
-import { Position } from '../types';
+import { MutablePosition } from './types';
 
-export const evaluate = (position: Position): number => {
+export const evaluate = (position: MutablePosition): number => {
   return 0;
 };

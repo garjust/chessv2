@@ -2,7 +2,7 @@ import { SquareBitmask, ZERO } from './bitboard-def';
 import { Color, PieceType, Position, Square } from '../types';
 import { labelToSquare, squareLabel } from '../utils';
 
-type Bitboard = bigint;
+export type Bitboard = bigint;
 
 export const board = (
   position: Position,
