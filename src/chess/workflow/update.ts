@@ -95,7 +95,7 @@ function handleClickSquare(
   const { square } = action;
   const { position } = state;
 
-  if (state.selectedSquare) {
+  if (state.selectedSquare !== undefined) {
     if (state.selectedSquare === square) {
       return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
     }
@@ -164,7 +164,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     squareOverlay.set(check, SquareOverlayType.Check);
   }
 
-  if (selectedSquare) {
+  if (selectedSquare !== undefined) {
     squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
 
     const piece = pieceInSquare(state, selectedSquare);

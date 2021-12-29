@@ -104,7 +104,7 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
     return false;
   }
 
-  if (state.selectedSquare) {
+  if (state.selectedSquare !== undefined) {
     return true;
   }
 
