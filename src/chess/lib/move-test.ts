@@ -1,6 +1,5 @@
-import { Position } from '../types';
 import { PERFT_5_FEN, STARTING_POSITION_FEN } from './fen';
-import { ImmutableEngine } from '../engine';
+import Engine from '../engine';
 
 export type MoveTest = {
   fen: string;
@@ -25,20 +24,18 @@ export const isCountCorrectForDepthFromStart = (
   return test.counts[depth - 1] === count;
 };
 
-export const run = async (
-  position: Position,
-  depth: number
-): Promise<number> => {
+export const run = async (engine: Engine, depth: number): Promise<number> => {
   if (depth === 0) {
     return 1;
   }
 
   let n = 0;
 
-  const movementData = ImmutableEngine.generateMovementData(position);
+  const movementData = engine.generateMovementData();
   for (const move of movementData.moves) {
-    const result = ImmutableEngine.applyMove(position, move);
-    n += await run(result.position, depth - 1);
+    engine.applyMove(move);
+    n += await run(engine, depth - 1);
+    engine.undoLastMove();
   }
 
   return n;

@@ -1,7 +1,7 @@
 import { ChessComputer } from './types';
 import { Color, Move, Position } from '../types';
 import { moveToDirectionString } from '../utils';
-import { ImmutableEngine } from '../engine';
+import Engine from '../engine';
 import { pluck } from '../../lib/array';
 
 const DEPTH = 4;
@@ -13,10 +13,12 @@ export default class v4 implements ChessComputer<Position> {
   evaluationCounter = 0;
 
   nextMove(position: Position) {
+    const engine = new Engine(position);
+
     this.moveCounter = 0;
     this.evaluationCounter = 0;
 
-    const results = this.rootScores(position, DEPTH).sort(
+    const results = this.rootScores(engine, DEPTH).sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
@@ -34,42 +36,34 @@ export default class v4 implements ChessComputer<Position> {
     return Promise.resolve(move);
   }
 
-  rootScores(
-    position: Position,
-    depth: number
-  ): { move: Move; score: number }[] {
-    const moves = ImmutableEngine.generateMoves(position);
+  rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
+    const moves = engine.generateMoves();
     this.moveCounter += moves.length;
 
     return moves.map((move) => {
-      const result = ImmutableEngine.applyMove(position, move);
-
-      return {
+      engine.applyMove(move);
+      const result = {
         move,
-        score: -1 * this.score(result.position, depth - 1, -Infinity, Infinity),
+        score: -1 * this.score(engine, depth - 1, -Infinity, Infinity),
       };
+      engine.undoLastMove();
+      return result;
     });
   }
 
-  score(
-    position: Position,
-    depth: number,
-    alpha: number,
-    beta: number
-  ): number {
+  score(engine: Engine, depth: number, alpha: number, beta: number): number {
     if (depth === 0) {
       this.evaluationCounter++;
-      const evaluation = ImmutableEngine.evaluate(position);
-      return position.turn === Color.White ? evaluation : -1 * evaluation;
+      return engine.evaluateNormalized();
     }
 
-    const moves = ImmutableEngine.generateMoves(position);
+    const moves = engine.generateMoves();
     this.moveCounter += moves.length;
 
     for (const move of moves) {
-      const result = ImmutableEngine.applyMove(position, move);
-      const x =
-        -1 * this.score(result.position, depth - 1, beta * -1, alpha * -1);
+      engine.applyMove(move);
+      const x = -1 * this.score(engine, depth - 1, beta * -1, alpha * -1);
+      engine.undoLastMove();
 
       if (x >= beta) {
         return beta;

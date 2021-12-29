@@ -3,6 +3,15 @@ export enum Color {
   Black = 'BLACK',
 }
 
+// const White = 0b01000;
+// const Black = 0b10000;
+// const Bishop = 0b000001;
+// const King = 0b000010;
+// const Knight = 0b000011;
+// const Pawn = 0b000100;
+// const Queen = 0b000101;
+// const Rook = 0b000110;
+
 export enum PieceType {
   Bishop = 'BISHOP',
   King = 'KING',

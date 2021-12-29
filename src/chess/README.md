@@ -9,4 +9,6 @@
 
 ## TODO
 
-- Find pings in `squareScanner` function
+- Implement undoLastMove & refactor applyMove to mutate position
+- Track king square
+- Find pins in `squareScanner` function

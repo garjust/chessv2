@@ -1,14 +1,15 @@
 import { ChessComputer } from './types';
 import { Move, Piece, PieceType, Position, Square } from '../types';
 import { pluck } from '../../lib/array';
-import { ImmutableEngine } from '../engine';
+import Engine from '../engine';
 
 // Algorithm:
 // - pick a random move of a random piece type, because some pieces have move
 // moves than others
 export default class v2 implements ChessComputer<Position> {
   nextMove(position: Position) {
-    const movementData = ImmutableEngine.generateMovementData(position);
+    const engine = new Engine(position);
+    const movementData = engine.generateMovementData();
 
     if (movementData.availableCaptures.length) {
       return Promise.resolve(pluck(movementData.availableCaptures));
