@@ -1,6 +1,11 @@
 import { Update } from '../../lib/workflow';
 import { PieceType } from '../types';
-import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
+import {
+  flipColor,
+  isPromotionPositionPawn,
+  movesIncludes,
+  squareLabel,
+} from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
@@ -19,6 +24,7 @@ import {
   HumanPlayer,
   checkedSquare,
   Draw,
+  SquareLabel,
 } from './state';
 import { from } from 'rxjs';
 import {
@@ -301,7 +307,22 @@ function handleSetPositionFromFEN(
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
-  return [{ ...state, displaySquareLabels: !state.displaySquareLabels }, null];
+  const { squareLabels } = state;
+
+  let nextLabel: SquareLabel;
+  switch (squareLabels) {
+    case SquareLabel.None:
+      nextLabel = SquareLabel.Square;
+      break;
+    case SquareLabel.Square:
+      nextLabel = SquareLabel.Index;
+      break;
+    case SquareLabel.Index:
+      nextLabel = SquareLabel.None;
+      break;
+  }
+
+  return [{ ...state, squareLabels: nextLabel }, null];
 }
 
 export function update(

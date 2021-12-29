@@ -10,6 +10,12 @@ import {
   Move,
 } from '../types';
 
+export enum SquareLabel {
+  None = 'NONE',
+  Index = 'INDEX',
+  Square = 'SQUARE',
+}
+
 export enum SquareOverlayType {
   Capturable = 'CAPTURABLE',
   Check = 'CHECK',
@@ -36,7 +42,7 @@ export type Player = typeof HumanPlayer | ChessComputerWrapped;
 export interface State {
   debugVersion?: number;
   boardOrientation: Color;
-  displaySquareLabels: boolean;
+  squareLabels: SquareLabel;
   players: {
     [Color.White]: Player;
     [Color.Black]: Player;
@@ -53,7 +59,7 @@ export interface State {
 const INITIAL_STATE: State = {
   debugVersion: 0,
   boardOrientation: Color.White,
-  displaySquareLabels: false,
+  squareLabels: SquareLabel.None,
   players: {
     [Color.White]: HumanPlayer,
     [Color.Black]: HumanPlayer,

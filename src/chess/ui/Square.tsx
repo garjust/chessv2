@@ -7,6 +7,7 @@ import {
   isSquareClickable,
   pieceInSquare,
   SquareOverlayType,
+  SquareLabel,
 } from '../workflow/state';
 import {
   BOARD_SQUARE_BLACK,
@@ -32,14 +33,14 @@ const makeRender =
     piece: pieceInSquare(state, square),
     overlay: state.squareOverlay?.get(square),
     isClickable: isSquareClickable(state, square),
-    displaySquareLabels: state.displaySquareLabels,
+    squareLabels: state.squareLabels,
   });
 
 const Square = (props: SquareProps) => {
   const { rendering, emit } = useWorkflow(makeRender(props));
 
   const { square, color } = props;
-  const { piece, overlay, isClickable, displaySquareLabels } = rendering;
+  const { piece, overlay, isClickable, squareLabels } = rendering;
 
   let css: React.CSSProperties = {
     position: 'relative',
@@ -69,6 +70,13 @@ const Square = (props: SquareProps) => {
     }
   }
 
+  let label: string | null = null;
+  if (squareLabels === SquareLabel.Index) {
+    label = square.toString();
+  } else if (squareLabels === SquareLabel.Square) {
+    label = squareLabel(square);
+  }
+
   return (
     <div
       className="square"
@@ -76,18 +84,17 @@ const Square = (props: SquareProps) => {
       onClick={() => (isClickable ? emit(clickSquareAction(square)) : null)}
       tabIndex={0}
     >
-      {piece !== undefined ? (
-        <Piece type={piece.type} color={piece.color} />
+      {piece ? <Piece type={piece.type} color={piece.color} /> : null}
+      {label ? (
+        <span
+          style={{
+            position: 'absolute',
+            left: 0,
+          }}
+        >
+          {label}
+        </span>
       ) : null}
-      <span
-        style={{
-          position: 'absolute',
-          left: 0,
-          opacity: displaySquareLabels ? 1 : 0,
-        }}
-      >
-        {squareLabel(square)}
-      </span>
     </div>
   );
 };
