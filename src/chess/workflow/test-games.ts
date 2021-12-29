@@ -3,8 +3,9 @@ import { clickSquareAction } from './action';
 import { labelToSquare } from '../utils';
 import { Action } from '.';
 import { delayOperator } from '../../lib/operators';
+import { SquareLabel } from '../types';
 
-type TestGameMoveSet = [string, string][];
+type TestGameMoveSet = [SquareLabel, SquareLabel][];
 
 export const VIENNA_GAMBIT_ACCEPTED_GAME: TestGameMoveSet = [
   ['e2', 'e4'],

@@ -83,10 +83,7 @@ export const isStartPositionPawn = (color: Color, square: Square): boolean =>
 export const isPromotionPositionPawn = (
   color: Color,
   square: Square
-): boolean =>
-  color === Color.White
-    ? square.rank === BLACK_PAWN_STARTING_RANK
-    : square.rank === WHITE_PAWN_STARTING_RANK;
+): boolean => isStartPositionPawn(flipColor(color), square);
 
 export const findKing = (
   position: Position,
