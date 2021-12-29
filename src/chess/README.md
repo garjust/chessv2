@@ -9,7 +9,6 @@
 
 ## TODO
 
-- Track king square
 - Find pins in `squareScanner` function
 - Change `Square` type to be integer?
 
