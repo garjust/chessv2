@@ -48,9 +48,9 @@ export type AttackObject = {
   // If the attacker is a sliding piece this is the set of squares they move through
   // for the attack. A move to one of these squares blocks the attacker.
   slideSquares: Square[];
-  // A piece that is skewered by the attack. If the piece is more valuable than
-  // the attacked piece this is considered a pin, otherwise it is considered
-  // a skewer.
+  // A piece that is attacked through the attacked square. If the piece is
+  // more valuable than the attacked piece this is considered a pin, otherwise
+  // it is considered a skewer.
   indirectAttacks?: {
     attacked: { square: Square; type: PieceType };
     slideSquares: Square[];

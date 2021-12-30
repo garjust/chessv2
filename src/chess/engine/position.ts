@@ -1,10 +1,25 @@
-import { Color, Position as ExternalPosition, Square } from '../types';
+import {
+  AttackObject,
+  Color,
+  Position as ExternalPosition,
+  Square,
+} from '../types';
 import { copyPosition, findKing } from '../utils';
 
 export type Position = ExternalPosition & {
   kings: {
     [Color.White]?: Square;
     [Color.Black]?: Square;
+  };
+
+  attacked: {
+    [Color.White]: Square[];
+    [Color.Black]: Square[];
+  };
+
+  pinsToKing: {
+    [Color.White]: Map<Square, AttackObject>;
+    [Color.Black]: Map<Square, AttackObject>;
   };
 };
 
@@ -16,8 +31,16 @@ const convertToInternal = (position: ExternalPosition): Position => {
     [Color.White]: whiteKing,
     [Color.Black]: blackKing,
   };
+  const attacked = {
+    [Color.White]: [],
+    [Color.Black]: [],
+  };
+  const pinsToKing = {
+    [Color.White]: new Map<Square, AttackObject>(),
+    [Color.Black]: new Map<Square, AttackObject>(),
+  };
 
-  return { ...position, kings };
+  return { ...position, kings, attacked, pinsToKing };
 };
 
 const convertToExternal = (position: Position): ExternalPosition => {

@@ -370,9 +370,14 @@ export const generateMovementData = (
         } else {
           // The king can only move out of the check or capture the checking
           // piece. The king cannot block the check.
-          moves = moves.filter((move) => {
-            return !squaresInclude(check.slideSquares, move.to);
-          });
+          moves = moves.filter(
+            (move) =>
+              !squaresInclude(
+                check.slideSquares,
+                // position.attacked[flipColor(position.turn)],
+                move.to
+              )
+          );
         }
       } else {
         // In the case that the king is checked by multiple pieces (can only be 2)
@@ -387,6 +392,7 @@ export const generateMovementData = (
           (move) =>
             !squaresInclude(
               checks.flatMap((check) => check.slideSquares),
+              // position.attacked[flipColor(position.turn)],
               move.to
             )
         );
@@ -397,11 +403,30 @@ export const generateMovementData = (
     //
     // This strategy computes an entirely new position after the candidate move
     // and then looks for attacks on the players king.
+    // moves = moves.filter((move) => {
+    //   const result = applyMove(position, { from, to: move.to });
+    //   const attackCount = findAttacksOnKing(position, position.turn).length;
+    //   undoMove(position, result);
+    //   return attackCount === 0;
+    // });
+    // Only worry about pinned pieces
     moves = moves.filter((move) => {
-      const result = applyMove(position, { from, to: move.to });
-      const attackCount = findAttacksOnKing(position, position.turn).length;
-      undoMove(position, result);
-      return attackCount === 0;
+      const pin = position.pinsToKing[position.turn].get(move.from);
+      if (!pin) {
+        return true;
+      }
+
+      if (pin.slideSquares.includes(move.to)) {
+        return true;
+      }
+      if (
+        pin.indirectAttacks &&
+        pin.indirectAttacks[0].slideSquares.includes(move.to)
+      ) {
+        return true;
+      }
+
+      return false;
     });
 
     moves.forEach((move) => {
