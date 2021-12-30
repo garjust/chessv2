@@ -11,8 +11,29 @@ import {
   flipColor,
   isStartPositionPawn,
 } from '../utils';
+import { pinsToSquare } from './move-generation';
 import { down, up } from './move-utils';
-import { Position } from './types';
+import { KingSquares, Pin, Pins, Position } from './types';
+
+const findPinsOnKings = (pieces: Map<Square, Piece>, kings: KingSquares) => {
+  const whiteKing = kings[Color.White];
+  const blackKing = kings[Color.Black];
+
+  let whitePins;
+  let blackPins;
+
+  if (whiteKing) {
+    whitePins = pinsToSquare(pieces, whiteKing, Color.White);
+  }
+  if (blackKing) {
+    blackPins = pinsToSquare(pieces, blackKing, Color.Black);
+  }
+
+  return {
+    [Color.White]: whitePins ? whitePins : new Map<Square, Pin>(),
+    [Color.Black]: blackPins ? blackPins : new Map<Square, Pin>(),
+  };
+};
 
 export type MoveResult = {
   move: Move;
@@ -22,6 +43,7 @@ export type MoveResult = {
     halfMoveCount: number;
     castlingAvailability: CastlingAvailability;
     enPassantSquare: Square | null;
+    pinsToKing: Pins;
   };
 };
 
@@ -64,6 +86,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       },
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
+      pinsToKing: position.pinsToKing,
     },
   };
 
@@ -172,6 +195,10 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   }
   position.turn = flipColor(position.turn);
 
+  // Just stupidly recompute the pins for now. If we mutate instead we can't
+  // persist in previousState of the move result.
+  position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
+
   return result;
 };
 
@@ -228,4 +255,5 @@ export const undoMove = (position: Position, result: MoveResult): void => {
   position.castlingAvailability = result.previousState.castlingAvailability;
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
+  position.pinsToKing = result.previousState.pinsToKing;
 };

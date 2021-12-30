@@ -18,6 +18,7 @@ import {
   STARTING_POSITION_FEN,
   VIENNA_OPENING_FEN,
   VIENNA_GAMBIT_ACCEPTED_FEN,
+  PERFT_5_FEN,
 } from '../lib/fen';
 import {
   runTestGame,
@@ -33,7 +34,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
-    emit(setPositionFromFENAction(VIENNA_GAMBIT_ACCEPTED_FEN));
+    emit(setPositionFromFENAction(VIENNA_OPENING_FEN));
   });
 
   function emitExampleGame(): void {

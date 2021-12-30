@@ -77,7 +77,9 @@ export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
 export const moveToDirectionString = (move: Move): string =>
-  `${squareLabel(move.from)}->${squareLabel(move.to)}`;
+  move.promotion
+    ? `${squareLabel(move.from)}->${squareLabel(move.to)}(${move.promotion})`
+    : `${squareLabel(move.from)}->${squareLabel(move.to)}`;
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White

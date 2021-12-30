@@ -18,7 +18,6 @@ import {
   isPromotionPositionPawn,
   isSlider,
 } from '../utils';
-import { applyMove, undoMove } from './move-execution';
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
@@ -155,6 +154,7 @@ const kingMoves = (
     attacksOnSquare(pieces, flipColor(color), right(from), {
       enPassantSquare,
       castlingAvailability,
+      skip: [from],
     }).length === 0 &&
     !pieces.get(right(from, 2))
   ) {
@@ -168,6 +168,7 @@ const kingMoves = (
     attacksOnSquare(pieces, flipColor(color), left(from), {
       enPassantSquare,
       castlingAvailability,
+      skip: [from],
     }).length === 0 &&
     !pieces.get(left(from, 2)) &&
     !pieces.get(left(from, 3))
@@ -196,36 +197,41 @@ const kingMoves = (
 const bishopMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
+  { skip = [] }: { skip: Square[] }
 ): MoveWithExtraData[] =>
   BISHOP_LOOKUP[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
-      ray
+      ray,
+      { skip }
     )
   );
 
 const rookMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
+  { skip = [] }: { skip: Square[] }
 ): MoveWithExtraData[] =>
   ROOK_LOOKUP[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Rook } },
-      ray
+      ray,
+      { skip }
     )
   );
 
 const queenMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
+  options: { skip: Square[] }
 ): MoveWithExtraData[] => [
-  ...bishopMoves(pieces, color, from),
-  ...rookMoves(pieces, color, from),
+  ...bishopMoves(pieces, color, from, options),
+  ...rookMoves(pieces, color, from, options),
 ];
 
 const attacksOnSquare = (
@@ -235,9 +241,11 @@ const attacksOnSquare = (
   {
     enPassantSquare,
     castlingAvailability,
+    skip,
   }: {
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
+    skip: Square[];
   }
 ): AttackObject[] => {
   const attacks: AttackObject[] = [];
@@ -251,8 +259,8 @@ const attacksOnSquare = (
       enPassantSquare,
       castlingAvailability,
     }),
-    bishopMoves(pieces, color, square),
-    rookMoves(pieces, color, square),
+    bishopMoves(pieces, color, square, { skip }),
+    rookMoves(pieces, color, square, { skip }),
     knightMoves(pieces, color, square),
     pawnMoves(pieces, color, square, {
       attacksOnly: true,
@@ -317,7 +325,7 @@ const movesForPiece = (
 
   switch (piece.type) {
     case PieceType.Bishop:
-      moves.push(...bishopMoves(pieces, piece.color, square));
+      moves.push(...bishopMoves(pieces, piece.color, square, { skip: [] }));
       break;
     case PieceType.King:
       moves.push(
@@ -340,10 +348,10 @@ const movesForPiece = (
       );
       break;
     case PieceType.Queen:
-      moves.push(...queenMoves(pieces, piece.color, square));
+      moves.push(...queenMoves(pieces, piece.color, square, { skip: [] }));
       break;
     case PieceType.Rook:
-      moves.push(...rookMoves(pieces, piece.color, square));
+      moves.push(...rookMoves(pieces, piece.color, square, { skip: [] }));
       break;
   }
 
@@ -397,7 +405,10 @@ const findAttacksOnKing = (
     return [];
   }
 
-  return attacksOnSquare(pieces, attackingColor, king, options);
+  return attacksOnSquare(pieces, attackingColor, king, {
+    ...options,
+    skip: [king],
+  });
 };
 
 export const pinsToSquare = (
@@ -407,8 +418,11 @@ export const pinsToSquare = (
 ) => {
   const pins = new SquareMap<Pin>();
 
-  const rays = [...BISHOP_LOOKUP[square], ...ROOK_LOOKUP[square]];
-  for (const ray of rays) {
+  const rays = [
+    ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
+    ...ROOK_LOOKUP[square].map((ray) => ({ type: PieceType.Rook, ray })),
+  ];
+  for (const { type, ray } of rays) {
     // looking for a white piece then a black slider.
     const friendlyPieces: Square[] = [];
     const openSquares: Square[] = [];
@@ -428,7 +442,11 @@ export const pinsToSquare = (
       }
     }
 
-    if (opponentPiece && isSlider(opponentPiece.piece.type)) {
+    if (
+      opponentPiece &&
+      (opponentPiece.piece.type === type ||
+        opponentPiece.piece.type === PieceType.Queen)
+    ) {
       // We found a pin or sliding attack on the king!
       if (friendlyPieces.length === 1) {
         // With exactly one piece this is a standard pin to the king, which is
@@ -524,31 +542,30 @@ export const generateMovementData = (
 
     // We need to prune moves that result in a check on ourselves.
     //
-    // This strategy computes an entirely new position after the candidate move
-    // and then looks for attacks on the players king.
-    // moves = moves.filter((move) => {
-    //   const result = applyMove(position, { from, to: move.to });
-    //   const attackCount = findAttacksOnKing(
-    //     position.pieces,
-    //     kings,
-    //     position.turn,
-    //     {
-    //       enPassantSquare: position.enPassantSquare,
-    //       castlingAvailability: position.castlingAvailability,
-    //     }
-    //   ).length;
-    //   undoMove(position, result);
-    //   return attackCount === 0;
-    // });
-    // Only worry about pinned pieces
+    // To do this we track pieces that are pinned to the king as well as
+    // looking at king moves.
+    const king = kings[color];
     moves = moves.filter((move) => {
-      const pin = pinsToKing[color].get(move.from);
-      if (!pin) {
-        return true;
-      }
+      if (move.from === king) {
+        // This is a king move, verify the destination square is not attacked.
+        return (
+          attacksOnSquare(pieces, flipColor(color), move.to, {
+            enPassantSquare: position.enPassantSquare,
+            castlingAvailability: position.castlingAvailability,
+            skip: [king],
+          }).length === 0
+        );
+      } else {
+        const pin = pinsToKing[color].get(move.from);
+        if (!pin) {
+          return true;
+        }
 
-      // We are dealing with a pinned piece.
-      return pin.legalMoveSquares.includes(move.to);
+        // We are dealing with a pinned piece.
+        return (
+          pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker
+        );
+      }
     });
 
     moves.forEach((move) => {

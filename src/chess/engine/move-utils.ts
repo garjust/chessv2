@@ -28,65 +28,53 @@ export const downRight = (square: Square, n = 1): Square => square - 7 * n;
 export const rayScanner = (
   pieces: Map<Square, Piece>,
   scanningPiece: { square: Square; piece: Piece },
-  ray: Square[]
+  ray: Square[],
+  { skip = [] }: { skip: Square[] }
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
   const from = scanningPiece.square;
 
   let attack: AttackObject | undefined;
-  let indirectAttackSquares: Square[] = [];
+  const indirectAttackSquares: Square[] = [];
 
   for (const to of ray) {
+    if (skip.includes(to)) {
+      moves.push({ from, to });
+      continue;
+    }
+
     const piece = pieces.get(to);
 
-    if (attack) {
-      // Once an attack is set we are looking for pins.
-      if (piece) {
-        if (piece.color === scanningPiece.piece.color) {
-          // friend!
-          break;
-        } else {
-          // foe!
-          attack.indirectAttacks?.push({
-            attacked: { square: to, type: piece.type },
-            slideSquares: [...indirectAttackSquares],
-          });
-          indirectAttackSquares = [];
-        }
+    if (piece) {
+      if (piece.color === scanningPiece.piece.color) {
+        // friend!
+        break;
       } else {
-        indirectAttackSquares.push(to);
+        // foe!
+        attack = {
+          attacked: to,
+          attacker: {
+            square: from,
+            type: scanningPiece.piece.type,
+          },
+          slideSquares: moves.map(({ to }) => to),
+          indirectAttacks: [],
+        };
+
+        // TODO: find indirectAttacks (forms of pins)
+        // [R 2 3 q 5 6 p k]
+        // for right()...
+        // R square
+        // q square is attacked through [2,3]
+        // p square is indirectly attacked through [5,6]
+        // k square is indirectly attacked through []
+
+        moves.push({ from, to, attack });
+        break;
       }
     } else {
-      if (piece) {
-        if (piece.color === scanningPiece.piece.color) {
-          // friend!
-          break;
-        } else {
-          // foe!
-          attack = {
-            attacked: to,
-            attacker: {
-              square: from,
-              type: scanningPiece.piece.type,
-            },
-            slideSquares: moves.map(({ to }) => to),
-            indirectAttacks: [],
-          };
-
-          // TODO: find indirectAttacks (forms of pins)
-          // [R 2 3 q 5 6 p k]
-          // for right()...
-          // R square
-          // q square is attacked through [2,3]
-          // p square is indirectly attacked through [5,6]
-          // k square is indirectly attacked through []
-
-          moves.push({ from, to, attack });
-        }
-      } else {
-        // empty square!
-        moves.push({ from, to });
-      }
+      // empty square!
+      moves.push({ from, to });
     }
   }
 
