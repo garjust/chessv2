@@ -56,6 +56,11 @@ export const squareGenerator = function* () {
   }
 };
 
+export const isSlider = (type?: PieceType): boolean =>
+  type === PieceType.Bishop ||
+  type === PieceType.Queen ||
+  type === PieceType.Rook;
+
 export const squaresInclude = (squares: Square[], square: Square): boolean =>
   squares.includes(square);
 

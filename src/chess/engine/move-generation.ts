@@ -1,3 +1,4 @@
+import { SquareMap } from '../square-map';
 import {
   Color,
   MoveWithExtraData,
@@ -7,6 +8,7 @@ import {
   Square,
   AttackObject,
   ComputedMovementData,
+  CastlingAvailability,
 } from '../types';
 import {
   isLegalSquare,
@@ -14,6 +16,7 @@ import {
   squaresInclude,
   isStartPositionPawn,
   isPromotionPositionPawn,
+  isSlider,
 } from '../utils';
 import { applyMove, undoMove } from './move-execution';
 import {
@@ -23,13 +26,16 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
-import { Position } from './position';
+import { KingSquares, Pin, Pins, Position } from './types';
 
 const pawnMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-  { attacksOnly }: { attacksOnly: boolean }
+  {
+    attacksOnly,
+    enPassantSquare,
+  }: { attacksOnly: boolean; enPassantSquare: Square | null }
 ): MoveWithExtraData[] => {
   let squares: MoveWithExtraData[] = [];
   const opponentColor = flipColor(color);
@@ -37,17 +43,14 @@ const pawnMoves = (
 
   // Space forward of the pawn.
   if (
-    !position.pieces.get(advanceFn(from)) &&
+    !pieces.get(advanceFn(from)) &&
     isLegalSquare(advanceFn(from)) &&
     !attacksOnly
   ) {
     squares.push({ from, to: advanceFn(from) });
 
     // Space two squares forward of the pawn when it is in it's starting rank.
-    if (
-      !position.pieces.get(advanceFn(from, 2)) &&
-      isStartPositionPawn(color, from)
-    ) {
+    if (!pieces.get(advanceFn(from, 2)) && isStartPositionPawn(color, from)) {
       squares.push({ from, to: advanceFn(from, 2) });
     }
   }
@@ -58,8 +61,8 @@ const pawnMoves = (
   // Pawn captures diagonally.
   if (
     leftCaptureSquare % 8 !== 7 &&
-    (position.pieces.get(leftCaptureSquare)?.color === opponentColor ||
-      position.enPassantSquare === leftCaptureSquare)
+    (pieces.get(leftCaptureSquare)?.color === opponentColor ||
+      enPassantSquare === leftCaptureSquare)
   ) {
     squares.push({
       from,
@@ -73,8 +76,8 @@ const pawnMoves = (
   }
   if (
     rightCaptureSquare % 8 !== 0 &&
-    (position.pieces.get(rightCaptureSquare)?.color === opponentColor ||
-      position.enPassantSquare === rightCaptureSquare)
+    (pieces.get(rightCaptureSquare)?.color === opponentColor ||
+      enPassantSquare === rightCaptureSquare)
   ) {
     squares.push({
       from,
@@ -101,15 +104,15 @@ const pawnMoves = (
 };
 
 const knightMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
   KNIGHT_LOOKUP[from]
-    .filter((to) => position.pieces.get(to)?.color !== color)
+    .filter((to) => pieces.get(to)?.color !== color)
     .map((to) => {
       let attack: AttackObject | undefined;
-      if (position.pieces.get(to)) {
+      if (pieces.get(to)) {
         attack = {
           attacker: { square: from, type: PieceType.Knight },
           attacked: to,
@@ -125,42 +128,56 @@ const knightMoves = (
     });
 
 const kingMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-  { skipCastling }: { skipCastling: boolean }
+  {
+    skipCastling,
+    enPassantSquare,
+    castlingAvailability,
+  }: {
+    skipCastling: boolean;
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ): MoveWithExtraData[] => {
   const squares = KING_LOOKUP[from].filter(
-    (to) => position.pieces.get(to)?.color !== color
+    (to) => pieces.get(to)?.color !== color
   );
 
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
   if (
     !skipCastling &&
-    position.castlingAvailability[color].kingside &&
-    !position.pieces.get(right(from)) &&
+    castlingAvailability[color].kingside &&
+    !pieces.get(right(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(position, flipColor(color), right(from)).length === 0 &&
-    !position.pieces.get(right(from, 2))
+    attacksOnSquare(pieces, flipColor(color), right(from), {
+      enPassantSquare,
+      castlingAvailability,
+    }).length === 0 &&
+    !pieces.get(right(from, 2))
   ) {
     squares.push(right(from, 2));
   }
   if (
     !skipCastling &&
-    position.castlingAvailability[color].queenside &&
-    !position.pieces.get(left(from)) &&
+    castlingAvailability[color].queenside &&
+    !pieces.get(left(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(position, flipColor(color), left(from)).length === 0 &&
-    !position.pieces.get(left(from, 2)) &&
-    !position.pieces.get(left(from, 3))
+    attacksOnSquare(pieces, flipColor(color), left(from), {
+      enPassantSquare,
+      castlingAvailability,
+    }).length === 0 &&
+    !pieces.get(left(from, 2)) &&
+    !pieces.get(left(from, 3))
   ) {
     squares.push(left(from, 2));
   }
 
   return squares.map((to) => {
     let attack: AttackObject | undefined;
-    if (position.pieces.get(to)) {
+    if (pieces.get(to)) {
       attack = {
         attacker: { square: from, type: PieceType.King },
         attacked: to,
@@ -177,44 +194,51 @@ const kingMoves = (
 };
 
 const bishopMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
   BISHOP_LOOKUP[from].flatMap((ray) =>
     rayScanner(
-      position,
+      pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
       ray
     )
   );
 
 const rookMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square
 ): MoveWithExtraData[] =>
   ROOK_LOOKUP[from].flatMap((ray) =>
     rayScanner(
-      position,
+      pieces,
       { square: from, piece: { color, type: PieceType.Rook } },
       ray
     )
   );
 
 const queenMoves = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   color: Color,
   from: Square
 ): MoveWithExtraData[] => [
-  ...bishopMoves(position, color, from),
-  ...rookMoves(position, color, from),
+  ...bishopMoves(pieces, color, from),
+  ...rookMoves(pieces, color, from),
 ];
 
 const attacksOnSquare = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   attackingColor: Color,
-  square: Square
+  square: Square,
+  {
+    enPassantSquare,
+    castlingAvailability,
+  }: {
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ): AttackObject[] => {
   const attacks: AttackObject[] = [];
   const color = flipColor(attackingColor);
@@ -222,13 +246,18 @@ const attacksOnSquare = (
   // Generate the moves for a super piece of the defending color
   // on the target square.
   const superPieceMoves = [
-    kingMoves(position, color, square, {
+    kingMoves(pieces, color, square, {
       skipCastling: true,
+      enPassantSquare,
+      castlingAvailability,
     }),
-    bishopMoves(position, color, square),
-    rookMoves(position, color, square),
-    knightMoves(position, color, square),
-    pawnMoves(position, color, square, { attacksOnly: true }),
+    bishopMoves(pieces, color, square),
+    rookMoves(pieces, color, square),
+    knightMoves(pieces, color, square),
+    pawnMoves(pieces, color, square, {
+      attacksOnly: true,
+      enPassantSquare: enPassantSquare,
+    }),
   ].flat();
 
   // Go through each move looking for attacks. An attack is valid if
@@ -237,7 +266,7 @@ const attacksOnSquare = (
   // Note: treat bishops and rooks as queens as well
   superPieceMoves.forEach((move) => {
     if (move.attack) {
-      const piece = position.pieces.get(move.to);
+      const piece = pieces.get(move.to);
       if (
         move.attack.attacker.type === PieceType.Bishop ||
         move.attack.attacker.type === PieceType.Rook
@@ -271,33 +300,50 @@ const attacksOnSquare = (
 };
 
 const movesForPiece = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   piece: Piece,
   square: Square,
-  { skipCastling }: { skipCastling: boolean }
+  {
+    skipCastling,
+    enPassantSquare,
+    castlingAvailability,
+  }: {
+    skipCastling: boolean;
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ) => {
   const moves: MoveWithExtraData[] = [];
 
   switch (piece.type) {
     case PieceType.Bishop:
-      moves.push(...bishopMoves(position, piece.color, square));
+      moves.push(...bishopMoves(pieces, piece.color, square));
       break;
     case PieceType.King:
-      moves.push(...kingMoves(position, piece.color, square, { skipCastling }));
+      moves.push(
+        ...kingMoves(pieces, piece.color, square, {
+          skipCastling,
+          enPassantSquare,
+          castlingAvailability,
+        })
+      );
       break;
     case PieceType.Knight:
-      moves.push(...knightMoves(position, piece.color, square));
+      moves.push(...knightMoves(pieces, piece.color, square));
       break;
     case PieceType.Pawn:
       moves.push(
-        ...pawnMoves(position, piece.color, square, { attacksOnly: false })
+        ...pawnMoves(pieces, piece.color, square, {
+          attacksOnly: false,
+          enPassantSquare,
+        })
       );
       break;
     case PieceType.Queen:
-      moves.push(...queenMoves(position, piece.color, square));
+      moves.push(...queenMoves(pieces, piece.color, square));
       break;
     case PieceType.Rook:
-      moves.push(...rookMoves(position, piece.color, square));
+      moves.push(...rookMoves(pieces, piece.color, square));
       break;
   }
 
@@ -305,19 +351,28 @@ const movesForPiece = (
 };
 
 const movesForPosition = (
-  position: Position,
-  options: { color?: Color; skipCastling?: boolean }
+  pieces: Map<Square, Piece>,
+  options: {
+    color?: Color;
+    skipCastling?: boolean;
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ): PieceMoves[] => {
   const pieceMoves: PieceMoves[] = [];
 
-  const color = options.color;
+  const { color, enPassantSquare, castlingAvailability } = options;
   const skipCastling = options.skipCastling ?? false;
 
-  for (const [square, piece] of position.pieces.entries()) {
+  for (const [square, piece] of pieces.entries()) {
     if (color && piece.color !== color) {
       continue;
     }
-    const moves = movesForPiece(position, piece, square, { skipCastling });
+    const moves = movesForPiece(pieces, piece, square, {
+      skipCastling,
+      enPassantSquare,
+      castlingAvailability,
+    });
     pieceMoves.push({
       from: square,
       piece,
@@ -329,28 +384,96 @@ const movesForPosition = (
 };
 
 const findAttacksOnKing = (
-  position: Position,
-  attackingColor: Color
+  pieces: Map<Square, Piece>,
+  kings: KingSquares,
+  attackingColor: Color,
+  options: {
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ): AttackObject[] => {
-  const king = position.kings[flipColor(attackingColor)];
+  const king = kings[flipColor(attackingColor)];
   if (!king) {
     return [];
   }
 
-  return attacksOnSquare(position, attackingColor, king);
+  return attacksOnSquare(pieces, attackingColor, king, options);
+};
+
+export const pinsToSquare = (
+  pieces: Map<Square, Piece>,
+  square: Square,
+  color: Color
+) => {
+  const pins = new SquareMap<Pin>();
+
+  const rays = [...BISHOP_LOOKUP[square], ...ROOK_LOOKUP[square]];
+  for (const ray of rays) {
+    // looking for a white piece then a black slider.
+    const friendlyPieces: Square[] = [];
+    const openSquares: Square[] = [];
+    let opponentPiece: { square: Square; piece: Piece } | undefined;
+
+    for (const square of ray) {
+      const piece = pieces.get(square);
+      if (piece) {
+        if (piece.color === color) {
+          friendlyPieces.push(square);
+        } else {
+          opponentPiece = { square, piece };
+          break;
+        }
+      } else {
+        openSquares.push(square);
+      }
+    }
+
+    if (opponentPiece && isSlider(opponentPiece.piece.type)) {
+      // We found a pin or sliding attack on the king!
+      if (friendlyPieces.length === 1) {
+        // With exactly one piece this is a standard pin to the king, which is
+        // what we care about for move generation.
+        pins.set(friendlyPieces[0], {
+          pinned: friendlyPieces[0],
+          attacker: opponentPiece.square,
+          legalMoveSquares: openSquares,
+        });
+      }
+    }
+  }
+
+  return pins;
 };
 
 export const generateMovementData = (
-  position: Position
+  pieces: Map<Square, Piece>,
+  color: Color,
+  position: Position,
+  {
+    pinsToKing,
+    kings,
+    enPassantSquare,
+    castlingAvailability,
+  }: {
+    pinsToKing: Pins;
+    kings: KingSquares;
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
 ): ComputedMovementData => {
-  const checks = findAttacksOnKing(position, flipColor(position.turn));
+  const checks = findAttacksOnKing(pieces, kings, flipColor(color), {
+    enPassantSquare,
+    castlingAvailability,
+  });
 
   const allMoves: MoveWithExtraData[] = [];
   const availableCaptures: MoveWithExtraData[] = [];
 
-  const movesets = movesForPosition(position, {
-    color: position.turn,
+  const movesets = movesForPosition(pieces, {
+    color,
     skipCastling: checks.length > 0,
+    enPassantSquare,
+    castlingAvailability,
   });
 
   movesets.forEach(({ piece, from, moves }) => {
@@ -403,35 +526,24 @@ export const generateMovementData = (
     //
     // This strategy computes an entirely new position after the candidate move
     // and then looks for attacks on the players king.
-    // moves = moves.filter((move) => {
-    //   const result = applyMove(position, { from, to: move.to });
-    //   const attackCount = findAttacksOnKing(position, position.turn).length;
-    //   undoMove(position, result);
-    //   return attackCount === 0;
-    // });
-    // Only worry about pinned pieces
     moves = moves.filter((move) => {
-      const pin = position.pinsToKing[position.turn].get(move.from);
-      if (!pin) {
-        return true;
-      }
-
-      if (pin.slideSquares.includes(move.to)) {
-        return true;
-      }
-      if (
-        pin.indirectAttacks &&
-        pin.indirectAttacks[0].slideSquares.includes(move.to)
-      ) {
-        return true;
-      }
-
-      return false;
+      const result = applyMove(position, { from, to: move.to });
+      const attackCount = findAttacksOnKing(
+        position.pieces,
+        kings,
+        position.turn,
+        {
+          enPassantSquare: position.enPassantSquare,
+          castlingAvailability: position.castlingAvailability,
+        }
+      ).length;
+      undoMove(position, result);
+      return attackCount === 0;
     });
 
     moves.forEach((move) => {
       if (move.attack) {
-        const piece = position.pieces.get(move.from);
+        const piece = pieces.get(move.from);
         if (piece) {
           availableCaptures.push(move);
         }

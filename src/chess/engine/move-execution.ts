@@ -12,7 +12,7 @@ import {
   isStartPositionPawn,
 } from '../utils';
 import { down, up } from './move-utils';
-import { Position } from './position';
+import { Position } from './types';
 
 export type MoveResult = {
   move: Move;

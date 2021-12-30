@@ -8,7 +8,8 @@ import {
 import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMovementData } from './move-generation';
-import { Position, copyToInternal, copyToExternal } from './position';
+import { copyToInternal, copyToExternal } from './position';
+import { Position } from './types';
 
 export default class Engine {
   #position: Position;
@@ -48,7 +49,17 @@ export default class Engine {
   }
 
   generateMovementData(): ComputedMovementData {
-    return generateMovementData(this.#position);
+    return generateMovementData(
+      this.#position.pieces,
+      this.#position.turn,
+      this.#position,
+      {
+        pinsToKing: this.#position.pinsToKing,
+        kings: this.#position.kings,
+        enPassantSquare: this.#position.enPassantSquare,
+        castlingAvailability: this.#position.castlingAvailability,
+      }
+    );
   }
 
   get position(): ExternalPosition {

@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { PieceType } from '../types';
+import { Color, PieceType } from '../types';
 import {
   flipColor,
   isPromotionPositionPawn,

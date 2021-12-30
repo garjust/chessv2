@@ -1,12 +1,6 @@
-import {
-  AttackObject,
-  Move,
-  MoveWithExtraData,
-  Piece,
-  Position,
-  Square,
-} from '../types';
+import { AttackObject, Move, MoveWithExtraData, Piece, Square } from '../types';
 import { isLegalSquare } from '../utils';
+import { Position } from './types';
 
 // type MoveSquareFunction = (square: Square, n: number) => Square;
 
@@ -32,7 +26,7 @@ export const downRight = (square: Square, n = 1): Square => square - 7 * n;
 // };
 
 export const rayScanner = (
-  position: Position,
+  pieces: Map<Square, Piece>,
   scanningPiece: { square: Square; piece: Piece },
   ray: Square[]
 ): MoveWithExtraData[] => {
@@ -43,7 +37,7 @@ export const rayScanner = (
   let indirectAttackSquares: Square[] = [];
 
   for (const to of ray) {
-    const piece = position.pieces.get(to);
+    const piece = pieces.get(to);
 
     if (attack) {
       // Once an attack is set we are looking for pins.
@@ -95,11 +89,6 @@ export const rayScanner = (
       }
     }
   }
-
-  console.log(
-    'attacks',
-    moves.map((move) => move.attack)
-  );
 
   return moves;
 };
