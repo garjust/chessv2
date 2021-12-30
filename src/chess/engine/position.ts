@@ -1,31 +1,21 @@
-import {
-  AttackObject,
-  Color,
-  Position as ExternalPosition,
-  Square,
-} from '../types';
+import { Color, Position as ExternalPosition, Square } from '../types';
 import { copyPosition, findKing } from '../utils';
-
-export type Position = ExternalPosition & {
-  kings: {
-    [Color.White]?: Square;
-    [Color.Black]?: Square;
-  };
-
-  attacked: {
-    [Color.White]: Square[];
-    [Color.Black]: Square[];
-  };
-
-  pinsToKing: {
-    [Color.White]: Map<Square, AttackObject>;
-    [Color.Black]: Map<Square, AttackObject>;
-  };
-};
+import { pinsToSquare } from './move-generation';
+import { Pin, Position } from './types';
 
 const convertToInternal = (position: ExternalPosition): Position => {
   const whiteKing = findKing(position, Color.White);
   const blackKing = findKing(position, Color.Black);
+
+  let whitePins;
+  let blackPins;
+
+  if (whiteKing) {
+    whitePins = pinsToSquare(position.pieces, whiteKing, Color.White);
+  }
+  if (blackKing) {
+    blackPins = pinsToSquare(position.pieces, blackKing, Color.Black);
+  }
 
   const kings = {
     [Color.White]: whiteKing,
@@ -36,8 +26,8 @@ const convertToInternal = (position: ExternalPosition): Position => {
     [Color.Black]: [],
   };
   const pinsToKing = {
-    [Color.White]: new Map<Square, AttackObject>(),
-    [Color.Black]: new Map<Square, AttackObject>(),
+    [Color.White]: whitePins ? whitePins : new Map<Square, Pin>(),
+    [Color.Black]: blackPins ? blackPins : new Map<Square, Pin>(),
   };
 
   return { ...position, kings, attacked, pinsToKing };

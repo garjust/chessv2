@@ -526,19 +526,29 @@ export const generateMovementData = (
     //
     // This strategy computes an entirely new position after the candidate move
     // and then looks for attacks on the players king.
+    // moves = moves.filter((move) => {
+    //   const result = applyMove(position, { from, to: move.to });
+    //   const attackCount = findAttacksOnKing(
+    //     position.pieces,
+    //     kings,
+    //     position.turn,
+    //     {
+    //       enPassantSquare: position.enPassantSquare,
+    //       castlingAvailability: position.castlingAvailability,
+    //     }
+    //   ).length;
+    //   undoMove(position, result);
+    //   return attackCount === 0;
+    // });
+    // Only worry about pinned pieces
     moves = moves.filter((move) => {
-      const result = applyMove(position, { from, to: move.to });
-      const attackCount = findAttacksOnKing(
-        position.pieces,
-        kings,
-        position.turn,
-        {
-          enPassantSquare: position.enPassantSquare,
-          castlingAvailability: position.castlingAvailability,
-        }
-      ).length;
-      undoMove(position, result);
-      return attackCount === 0;
+      const pin = pinsToKing[color].get(move.from);
+      if (!pin) {
+        return true;
+      }
+
+      // We are dealing with a pinned piece.
+      return pin.legalMoveSquares.includes(move.to);
     });
 
     moves.forEach((move) => {
