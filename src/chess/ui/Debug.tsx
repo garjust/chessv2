@@ -76,9 +76,9 @@ const Debug = () => {
       <div
         style={{
           gridArea: 'buttons',
-          display: 'grid',
+          display: 'flex',
+          flexDirection: 'column',
           gap: 16,
-          gridTemplateColumns: 'auto',
         }}
       >
         <button
