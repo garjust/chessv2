@@ -80,6 +80,18 @@ for (const { rank, file } of squareGenerator()) {
 // For each square, all squares for all rays which intersect it.
 const KING_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
 
+// For each square, all squares for all rays which intersect it in a sparse
+// array format. This allows array index lookup (square as index) instead of
+// searching the rays.
+const KING_RAY_BITARRAYS_FLAT: boolean[][] = KING_RAYS_FLAT.map((flatRays) => {
+  const array = Array(64);
+  flatRays.forEach((x) => (array[x] = true));
+  return array;
+});
+
+// For each square, all squares for all rays which intersect it in bitboard
+// format. unfortunately bigints are quite slow so bit operations are much
+// slower than expected.
 const KING_RAY_BITBOARDS_FLAT: bigint[] = KING_RAYS_FLAT.map((flatRays) =>
   fromSquares(flatRays)
 );
@@ -92,5 +104,6 @@ export {
   ROOK_LOOKUP,
   KING_RAYS,
   KING_RAYS_FLAT,
+  KING_RAY_BITARRAYS_FLAT,
   KING_RAY_BITBOARDS_FLAT,
 };

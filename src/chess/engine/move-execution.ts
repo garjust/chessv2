@@ -12,7 +12,7 @@ import {
   isStartPositionPawn,
 } from '../utils';
 import { pinsToSquare } from './move-generation';
-import { KING_RAYS_FLAT } from './move-lookup';
+import { KING_RAY_BITARRAYS_FLAT } from './move-lookup';
 import { down, up } from './move-utils';
 import { KingSquares, Pin, Pins, Position } from './types';
 
@@ -79,8 +79,8 @@ const updatePins = (
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      KING_RAYS_FLAT[playingKing].includes(move.to) ||
-      KING_RAYS_FLAT[playingKing].includes(move.from)
+      KING_RAY_BITARRAYS_FLAT[playingKing][move.from] ||
+      KING_RAY_BITARRAYS_FLAT[playingKing][move.to]
     ) {
       pins[currentMove] = pinsToSquare(pieces, playingKing, currentMove);
     }
@@ -93,8 +93,8 @@ const updatePins = (
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      KING_RAYS_FLAT[opponentKing].includes(move.to) ||
-      KING_RAYS_FLAT[opponentKing].includes(move.from)
+      KING_RAY_BITARRAYS_FLAT[opponentKing][move.from] ||
+      KING_RAY_BITARRAYS_FLAT[opponentKing][move.to]
     ) {
       pins[flipColor(currentMove)] = pinsToSquare(
         pieces,
