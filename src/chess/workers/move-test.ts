@@ -19,7 +19,7 @@ self.onmessage = async (
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
     const engine = new Engine(position);
-    const count = await run(engine, i, i == 5);
+    const count = await run(engine, i);
     const timing = Date.now() - start;
     const passed = isCountCorrectForDepthFromStart(i, count, test);
     self.postMessage(

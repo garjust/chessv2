@@ -57,8 +57,8 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
   }
 
   return piece.color === Color.White
-    ? move.to >= 24 && move.from < 32
-    : move.to >= 32 && move.from < 40;
+    ? move.to >= 24 && move.to < 32
+    : move.to >= 32 && move.to < 40;
 };
 
 const updatePins = (
