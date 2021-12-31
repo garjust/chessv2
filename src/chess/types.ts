@@ -43,7 +43,7 @@ export type Pin = {
 
 export type AttackObject = {
   // The square being attacked for this object
-  attacked: Square;
+  attacked: { square: Square; type: PieceType };
   // The attacking piece
   attacker: { square: Square; type: PieceType };
   // If the attacker is a sliding piece this is the set of squares they move through

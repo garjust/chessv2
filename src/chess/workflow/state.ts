@@ -118,5 +118,5 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 
 export const checkedSquare = (state: State): Square | undefined =>
   state.computedPositionData.moveData.checks.length > 0
-    ? state.computedPositionData.moveData.checks[0].attacked
+    ? state.computedPositionData.moveData.checks[0].attacked.square
     : undefined;

@@ -35,7 +35,7 @@ export const rayScanner = (
       } else {
         // foe!
         attack = {
-          attacked: to,
+          attacked: { square: to, type: piece.type },
           attacker: {
             square: from,
             type: scanningPiece.piece.type,

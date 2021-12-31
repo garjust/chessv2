@@ -56,10 +56,14 @@ const pawnMoves = (
   const leftCaptureSquare = advanceFn(left(from));
   const rightCaptureSquare = advanceFn(right(from));
 
+  const leftCapturePiece = pieces.get(leftCaptureSquare);
+  const rightCapturePiece = pieces.get(rightCaptureSquare);
+
   // Pawn captures diagonally.
   if (
     leftCaptureSquare % 8 !== 7 &&
-    (pieces.get(leftCaptureSquare)?.color === opponentColor ||
+    leftCapturePiece &&
+    (leftCapturePiece?.color === opponentColor ||
       enPassantSquare === leftCaptureSquare)
   ) {
     squares.push({
@@ -67,14 +71,15 @@ const pawnMoves = (
       to: leftCaptureSquare,
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
-        attacked: leftCaptureSquare,
+        attacked: { square: leftCaptureSquare, type: leftCapturePiece?.type },
         slideSquares: [],
       },
     });
   }
   if (
     rightCaptureSquare % 8 !== 0 &&
-    (pieces.get(rightCaptureSquare)?.color === opponentColor ||
+    rightCapturePiece &&
+    (rightCapturePiece?.color === opponentColor ||
       enPassantSquare === rightCaptureSquare)
   ) {
     squares.push({
@@ -82,7 +87,7 @@ const pawnMoves = (
       to: rightCaptureSquare,
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
-        attacked: rightCaptureSquare,
+        attacked: { square: rightCaptureSquare, type: rightCapturePiece?.type },
         slideSquares: [],
       },
     });
@@ -110,10 +115,11 @@ const knightMoves = (
     .filter((to) => pieces.get(to)?.color !== color)
     .map((to) => {
       let attack: AttackObject | undefined;
-      if (pieces.get(to)) {
+      const piece = pieces.get(to);
+      if (piece) {
         attack = {
           attacker: { square: from, type: PieceType.Knight },
-          attacked: to,
+          attacked: { square: to, type: piece.type },
           slideSquares: [],
         };
       }
@@ -171,10 +177,11 @@ const kingMoves = (
 
   return squares.map((to) => {
     let attack: AttackObject | undefined;
-    if (pieces.get(to)) {
+    const piece = pieces.get(to);
+    if (piece) {
       attack = {
         attacker: { square: from, type: PieceType.King },
-        attacked: to,
+        attacked: { square: to, type: piece.type },
         slideSquares: [],
       };
     }
@@ -276,8 +283,8 @@ export const attacksOnSquare = (
         ) {
           // We need to reverse the super piece move to find the real attack.
           attacks.push({
-            attacked: move.attack.attacker.square,
-            attacker: { square: move.attack.attacked, type: piece.type },
+            attacked: move.attack.attacker,
+            attacker: move.attack.attacked,
             slideSquares: move.attack.slideSquares,
           });
         }
@@ -285,8 +292,8 @@ export const attacksOnSquare = (
         if (piece && piece.type === move.attack.attacker.type) {
           // We need to reverse the super piece move to find the real attack.
           attacks.push({
-            attacked: move.attack.attacker.square,
-            attacker: { square: move.attack.attacked, type: piece.type },
+            attacked: move.attack.attacker,
+            attacker: move.attack.attacked,
             slideSquares: move.attack.slideSquares,
           });
         }

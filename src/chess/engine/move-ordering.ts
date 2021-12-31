@@ -1,4 +1,5 @@
 import { ComputedMovementData, Move, MoveWithExtraData } from '../types';
+import { PieceValue } from './evaluation';
 
 // Descending sort.
 const SORT_FN = (
@@ -11,6 +12,12 @@ const moveWeight = (move: MoveWithExtraData): number => {
 
   if (move.attack) {
     n += 1;
+    if (
+      PieceValue[move.attack.attacked.type] >
+      PieceValue[move.attack.attacker.type]
+    ) {
+      n += 5;
+    }
   }
   if (move.promotion) {
     n += 10;
