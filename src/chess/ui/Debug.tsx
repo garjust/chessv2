@@ -20,7 +20,7 @@ import { BUTTON_CSS } from './theme';
 async function runMoveGenerationTest(
   logger: Subject<string>,
   test: MoveTest,
-  toDepth = 4
+  toDepth = 5
 ) {
   const worker = new Worker(new URL('../workers/move-test', import.meta.url));
 
