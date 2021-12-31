@@ -1,5 +1,5 @@
 import { ChessComputer } from './types';
-import { Color, Move, Position } from '../types';
+import { Move, Position } from '../types';
 import { moveToDirectionString } from '../utils';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
