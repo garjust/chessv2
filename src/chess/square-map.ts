@@ -2,19 +2,19 @@ import { Square } from './types';
 import { isLegalSquare, rankFileToSquare } from './utils';
 
 export class SquareMap<T> implements Map<Square, T> {
-  #map: T[];
+  map: T[];
 
   constructor() {
-    this.#map = Array(64);
+    this.map = Array(64);
   }
 
   clear(): void {
-    this.#map = Array(64);
+    this.map = Array(64);
   }
 
   delete(key: Square): boolean {
-    const exists = this.#map[key] !== undefined;
-    delete this.#map[key];
+    const exists = this.map[key] !== undefined;
+    delete this.map[key];
     return exists;
   }
 
@@ -30,15 +30,15 @@ export class SquareMap<T> implements Map<Square, T> {
       return undefined;
     }
 
-    return this.#map[key];
+    return this.map[key];
   }
 
   has(key: Square): boolean {
-    return this.#map[key] !== undefined;
+    return this.map[key] !== undefined;
   }
 
   set(key: Square, value: T): this {
-    this.#map[key] = value;
+    this.map[key] = value;
     return this;
   }
 
@@ -47,14 +47,14 @@ export class SquareMap<T> implements Map<Square, T> {
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
         counter +=
-          this.#map[rankFileToSquare({ rank, file })] !== undefined ? 1 : 0;
+          this.map[rankFileToSquare({ rank, file })] !== undefined ? 1 : 0;
       }
     }
     return counter;
   }
 
   entries(): IterableIterator<[Square, T]> {
-    const map = this.#map;
+    const map = this.map;
 
     return (function* entriesGenerator() {
       for (let rank = 0; rank < 8; rank++) {
@@ -74,7 +74,7 @@ export class SquareMap<T> implements Map<Square, T> {
   }
 
   keys(): IterableIterator<Square> {
-    const map = this.#map;
+    const map = this.map;
 
     return (function* () {
       for (let rank = 0; rank < 8; rank++) {
@@ -90,7 +90,7 @@ export class SquareMap<T> implements Map<Square, T> {
   }
 
   values(): IterableIterator<T> {
-    const map = this.#map;
+    const map = this.map;
 
     return (function* () {
       for (let rank = 0; rank < 8; rank++) {
