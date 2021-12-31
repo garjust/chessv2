@@ -11,9 +11,10 @@ import {
   flipColor,
   isStartPositionPawn,
 } from '../utils';
+import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import { KingPins, Position } from './types';
+import { KingChecks, KingPins, Position } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -24,6 +25,7 @@ export type MoveResult = {
     castlingAvailability: CastlingAvailability;
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
+    checks: KingChecks;
   };
 };
 
@@ -67,6 +69,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
+      checks: { ...position.checks },
     },
   };
 
@@ -173,6 +176,22 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     move,
     piece
   );
+  // NOTE: Re-enable this when up to date check data is needed for move ordering
+  // or evaluation. This adds check calculation to the leaf nodes of a move
+  // search, while currently check calculation only happens in nodes of depth
+  // N-1 in the search.
+  // updateChecksOnKings(
+  //   position.checks,
+  //   position.pieces,
+  //   position.kings,
+  //   position.turn,
+  //   move,
+  //   piece,
+  //   {
+  //     enPassantSquare: position.enPassantSquare,
+  //     castlingAvailability: position.castlingAvailability,
+  //   }
+  // );
 
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
@@ -241,4 +260,5 @@ export const undoMove = (position: Position, result: MoveResult): void => {
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
   position.pinsToKing = result.previousState.pinsToKing;
+  position.checks = result.previousState.checks;
 };

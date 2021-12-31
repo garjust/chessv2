@@ -57,7 +57,9 @@ const KNIGHT_LOOKUP: Square[][] = [];
 const KING_LOOKUP: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
+
 const KING_RAYS: { type: PieceType; ray: Square[] }[][] = [];
+const SUPER_PIECE_LOOKUP: Square[][] = [];
 
 for (const { rank, file } of squareGenerator()) {
   const square = rankFileToSquare({ rank, file });
@@ -75,6 +77,13 @@ for (const { rank, file } of squareGenerator()) {
     ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
     ...ROOK_LOOKUP[square].map((ray) => ({ type: PieceType.Rook, ray })),
   ];
+
+  SUPER_PIECE_LOOKUP[square] = [
+    ...BISHOP_LOOKUP[square].flat(),
+    ...ROOK_LOOKUP[square].flat(),
+    ...KNIGHT_LOOKUP[square],
+    ...KING_LOOKUP[square],
+  ];
 }
 
 // For each square, all squares for all rays which intersect it.
@@ -83,9 +92,9 @@ const KING_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
 // For each square, all squares for all rays which intersect it in a sparse
 // array format. This allows array index lookup (square as index) instead of
 // searching the rays.
-const KING_RAY_BITARRAYS_FLAT: boolean[][] = KING_RAYS_FLAT.map((flatRays) => {
+const KING_RAY_BITARRAYS_FLAT: boolean[][] = KING_RAYS_FLAT.map((squares) => {
   const array = Array(64);
-  flatRays.forEach((x) => (array[x] = true));
+  squares.forEach((x) => (array[x] = true));
   return array;
 });
 
@@ -95,6 +104,12 @@ const KING_RAY_BITARRAYS_FLAT: boolean[][] = KING_RAYS_FLAT.map((flatRays) => {
 const KING_RAY_BITBOARDS_FLAT: bigint[] = KING_RAYS_FLAT.map((flatRays) =>
   fromSquares(flatRays)
 );
+
+const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map((squares) => {
+  const array = Array(64);
+  squares.forEach((x) => (array[x] = true));
+  return array;
+});
 
 export {
   BISHOP_LOOKUP,
@@ -106,4 +121,5 @@ export {
   KING_RAYS_FLAT,
   KING_RAY_BITARRAYS_FLAT,
   KING_RAY_BITBOARDS_FLAT,
+  SUPER_PIECE_BITARRAYS,
 };

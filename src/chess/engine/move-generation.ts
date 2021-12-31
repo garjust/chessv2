@@ -23,7 +23,7 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
-import { KingSquares, KingPins, Position } from './types';
+import { KingSquares, KingPins, Position, KingChecks } from './types';
 
 const pawnMoves = (
   pieces: Map<Square, Piece>,
@@ -232,7 +232,7 @@ const queenMoves = (
   ...rookMoves(pieces, color, from, options),
 ];
 
-const attacksOnSquare = (
+export const attacksOnSquare = (
   pieces: Map<Square, Piece>,
   attackingColor: Color,
   square: Square,
@@ -420,22 +420,28 @@ export const generateMovementData = (
     castlingAvailability,
   }: {
     pinsToKing: KingPins;
+    checks: KingChecks;
     kings: KingSquares;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
   }
 ): ComputedMovementData => {
-  const checks = findAttacksOnKing(pieces, kings, flipColor(color), {
-    enPassantSquare,
-    castlingAvailability,
-  });
+  let checksForPlayer: AttackObject[] = [];
+  const king = kings[color];
+  if (king) {
+    checksForPlayer = attacksOnSquare(pieces, flipColor(color), king, {
+      enPassantSquare,
+      castlingAvailability,
+      skip: [king],
+    });
+  }
 
   const allMoves: MoveWithExtraData[] = [];
   const availableCaptures: MoveWithExtraData[] = [];
 
   const movesets = movesForPosition(pieces, {
     color,
-    skipCastling: checks.length > 0,
+    skipCastling: checksForPlayer.length > 0,
     enPassantSquare,
     castlingAvailability,
   });
@@ -443,9 +449,9 @@ export const generateMovementData = (
   movesets.forEach(({ piece, from, moves }) => {
     // We need to prune moves when in check since only moves that remove the
     // check are legal.
-    if (checks.length > 0) {
-      if (checks.length === 1) {
-        const check = checks[0];
+    if (checksForPlayer.length > 0) {
+      if (checksForPlayer.length === 1) {
+        const check = checksForPlayer[0];
         // In the case that the king is checked by a single piece we can capture
         // the piece or block the attack.
         if (piece.type !== PieceType.King) {
@@ -478,7 +484,7 @@ export const generateMovementData = (
         moves = moves.filter(
           (move) =>
             !squaresInclude(
-              checks.flatMap((check) => check.slideSquares),
+              checksForPlayer.flatMap((check) => check.slideSquares),
               // position.attacked[flipColor(position.turn)],
               move.to
             )
@@ -528,7 +534,7 @@ export const generateMovementData = (
 
   return {
     moves: allMoves,
-    checks,
+    checks: checksForPlayer,
     availableCaptures,
   };
 };

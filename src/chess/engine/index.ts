@@ -55,6 +55,7 @@ export default class Engine {
       this._position,
       {
         pinsToKing: this._position.pinsToKing,
+        checks: this._position.checks,
         kings: this._position.kings,
         enPassantSquare: this._position.enPassantSquare,
         castlingAvailability: this._position.castlingAvailability,
