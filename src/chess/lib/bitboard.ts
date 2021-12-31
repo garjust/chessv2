@@ -1,6 +1,5 @@
 import { SquareBitmask, ZERO } from './bitboard-def';
-import { Color, PieceType, Position, Square, SquareLabel } from '../types';
-import { labelToSquare, squareLabel } from '../utils';
+import { Color, PieceType, Position, Square } from '../types';
 
 export type Bitboard = bigint;
 
@@ -18,23 +17,20 @@ export const board = (
       continue;
     }
 
-    n = n | SquareBitmask[squareLabel(square)];
+    n = n | SquareBitmask[square];
   }
 
   return n;
 };
 
 export const toSquares = (bitboard: Bitboard): Square[] =>
-  Object.entries(SquareBitmask).reduce((squares, [label, long]) => {
+  SquareBitmask.reduce((squares, long, square) => {
     if ((bitboard & long) === long) {
-      squares.push(labelToSquare(label as SquareLabel));
+      squares.push(square);
     }
 
     return squares;
   }, [] as Square[]);
 
 export const fromSquares = (squares: Square[]): Bitboard =>
-  squares.reduce(
-    (n, square) => n | SquareBitmask[squareLabel(square)],
-    BigInt(0b0)
-  );
+  squares.reduce((n, square) => n | SquareBitmask[square], BigInt(0b0));

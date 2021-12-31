@@ -5,6 +5,7 @@ import { SquareMap } from '../square-map';
 import { Move, Square } from '../types';
 import { moveToDirectionString, squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
+import { formatBitboard } from '../lib/bitboard-def';
 
 export type DisplayGameStateProps = {
   style?: React.CSSProperties;
@@ -13,15 +14,6 @@ export type DisplayGameStateProps = {
 const render = (state: State) => ({
   state,
 });
-
-const formatBitmapString = (bitmap: string): string => {
-  const parts: string[] = [];
-  for (let i = 0; i < 64; i += 8) {
-    parts.push(bitmap.slice(i, i + 8));
-  }
-
-  return parts.join(':');
-};
 
 function replacer(key: string, value: unknown) {
   // if (key === 'moves') {
@@ -62,7 +54,7 @@ function replacer(key: string, value: unknown) {
   }
 
   if (typeof value === 'bigint') {
-    return formatBitmapString(value.toString(2).padStart(64, '0'));
+    return formatBitboard(value);
   }
 
   return value;

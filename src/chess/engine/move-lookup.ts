@@ -1,3 +1,4 @@
+import { fromSquares } from '../lib/bitboard';
 import { PieceType, RankFile, Square } from '../types';
 import { rankFileToSquare, squareGenerator } from '../utils';
 import {
@@ -79,6 +80,10 @@ for (const { rank, file } of squareGenerator()) {
 // For each square, all squares for all rays which intersect it.
 const KING_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
 
+const KING_RAY_BITBOARDS_FLAT: bigint[] = KING_RAYS_FLAT.map((flatRays) =>
+  fromSquares(flatRays)
+);
+
 export {
   BISHOP_LOOKUP,
   KING_LOOKUP,
@@ -87,4 +92,5 @@ export {
   ROOK_LOOKUP,
   KING_RAYS,
   KING_RAYS_FLAT,
+  KING_RAY_BITBOARDS_FLAT,
 };
