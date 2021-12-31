@@ -24,6 +24,17 @@ export const ROOK_STARTING_SQUARES = Object.freeze({
   },
 });
 
+export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
+  [Color.White]: {
+    kingside: false,
+    queenside: false,
+  },
+  [Color.Black]: {
+    kingside: false,
+    queenside: false,
+  },
+});
+
 /* eslint-disable prettier/prettier */
 const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
   'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
