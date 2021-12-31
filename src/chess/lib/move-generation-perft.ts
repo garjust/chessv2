@@ -81,8 +81,9 @@ export const run = (
   test: MoveTest,
   toDepth: number,
   debug: boolean
-) => {
+): boolean => {
   const position = parseFEN(test.fen);
+  const results: { depth: number; passed: boolean }[] = [];
 
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
@@ -99,6 +100,9 @@ export const run = (
         1000
       ).toPrecision(5)}μs/node)`
     );
+    results.push({ depth: i, passed });
   }
   logger('--');
+
+  return results.every((result) => result.passed);
 };

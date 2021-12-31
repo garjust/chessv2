@@ -1,4 +1,3 @@
-import { render, screen } from '@testing-library/react';
 import { SquareBitmask, ZERO } from '../../lib/bitboard-def';
 import { Move } from '../../types';
 import {
