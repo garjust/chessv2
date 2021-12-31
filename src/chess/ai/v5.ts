@@ -24,7 +24,7 @@ export default class v4 implements ChessComputer<Position> {
     );
 
     console.log(
-      `v4 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
+      `v5 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
         score,
