@@ -21,6 +21,7 @@ import {
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
+  KING_RAYS,
   KNIGHT_LOOKUP,
   ROOK_LOOKUP,
 } from './move-lookup';
@@ -417,11 +418,8 @@ export const pinsToSquare = (
   color: Color
 ) => {
   const pins = new SquareMap<Pin>();
+  const rays = KING_RAYS[square];
 
-  const rays = [
-    ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
-    ...ROOK_LOOKUP[square].map((ray) => ({ type: PieceType.Rook, ray })),
-  ];
   for (const { type, ray } of rays) {
     // looking for a white piece then a black slider.
     const friendlyPieces: Square[] = [];
@@ -454,7 +452,7 @@ export const pinsToSquare = (
         pins.set(friendlyPieces[0], {
           pinned: friendlyPieces[0],
           attacker: opponentPiece.square,
-          legalMoveSquares: openSquares,
+          legalMoveSquares: [...openSquares, ...friendlyPieces],
         });
       }
     }

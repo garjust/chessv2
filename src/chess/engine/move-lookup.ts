@@ -1,4 +1,4 @@
-import { RankFile, Square } from '../types';
+import { PieceType, RankFile, Square } from '../types';
 import { rankFileToSquare, squareGenerator } from '../utils';
 import {
   up,
@@ -55,6 +55,8 @@ const BISHOP_LOOKUP: Square[][][] = [];
 const KNIGHT_LOOKUP: Square[][] = [];
 const KING_LOOKUP: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
+const QUEEN_LOOKUP: Square[][][] = [];
+const KING_RAYS: { type: PieceType; ray: Square[] }[][] = [];
 
 for (const { rank, file } of squareGenerator()) {
   const square = rankFileToSquare({ rank, file });
@@ -62,6 +64,27 @@ for (const { rank, file } of squareGenerator()) {
   KING_LOOKUP[square] = kingMoves({ rank, file });
   KNIGHT_LOOKUP[square] = knightMoves({ rank, file });
   ROOK_LOOKUP[square] = rookMoves({ rank, file });
+
+  QUEEN_LOOKUP[square] = [
+    ...bishopMoves({ rank, file }),
+    ...rookMoves({ rank, file }),
+  ];
+
+  KING_RAYS[square] = [
+    ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
+    ...ROOK_LOOKUP[square].map((ray) => ({ type: PieceType.Rook, ray })),
+  ];
 }
 
-export { BISHOP_LOOKUP, KING_LOOKUP, KNIGHT_LOOKUP, ROOK_LOOKUP };
+// For each square, all squares for all rays which intersect it.
+const KING_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
+
+export {
+  BISHOP_LOOKUP,
+  KING_LOOKUP,
+  KNIGHT_LOOKUP,
+  QUEEN_LOOKUP,
+  ROOK_LOOKUP,
+  KING_RAYS,
+  KING_RAYS_FLAT,
+};

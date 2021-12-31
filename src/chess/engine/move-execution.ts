@@ -12,6 +12,7 @@ import {
   isStartPositionPawn,
 } from '../utils';
 import { pinsToSquare } from './move-generation';
+import { KING_RAYS_FLAT } from './move-lookup';
 import { down, up } from './move-utils';
 import { KingSquares, Pin, Pins, Position } from './types';
 
@@ -185,6 +186,18 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     }
   }
 
+  // updatePins(
+  //   move,
+  //   piece,
+  //   position.pieces,
+  //   position.kings,
+  //   position.pinsToKing,
+  //   position.turn
+  // );
+  // Just stupidly recompute the pins for now. If we mutate instead we can't
+  // persist in previousState of the move result.
+  position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
+
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
   }
@@ -195,9 +208,13 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   }
   position.turn = flipColor(position.turn);
 
-  // Just stupidly recompute the pins for now. If we mutate instead we can't
-  // persist in previousState of the move result.
-  position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
+  // console.log(
+  //   'pins',
+  //   'white',
+  //   JSON.stringify(Array.from(position.pinsToKing.WHITE.values()), null, 2),
+  //   'black',
+  //   JSON.stringify(Array.from(position.pinsToKing.BLACK.values()), null, 2)
+  // );
 
   return result;
 };
@@ -256,4 +273,6 @@ export const undoMove = (position: Position, result: MoveResult): void => {
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
   position.pinsToKing = result.previousState.pinsToKing;
+
+  // console.log('undoMove pins', position.pinsToKing);
 };
