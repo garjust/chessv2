@@ -1,4 +1,3 @@
-import { SquareMap } from '../square-map';
 import {
   Color,
   MoveWithExtraData,
@@ -25,7 +24,7 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
-import { KingSquares, Pin, Pins, Position } from './types';
+import { KingSquares, KingPins, Position } from './types';
 
 const pawnMoves = (
   pieces: Map<Square, Piece>,
@@ -411,55 +410,6 @@ const findAttacksOnKing = (
   });
 };
 
-export const pinsToSquare = (
-  pieces: Map<Square, Piece>,
-  square: Square,
-  color: Color
-) => {
-  const pins = new SquareMap<Pin>();
-  const rays = KING_RAYS[square];
-
-  for (const { type, ray } of rays) {
-    // looking for a white piece then a black slider.
-    const friendlyPieces: Square[] = [];
-    const openSquares: Square[] = [];
-    let opponentPiece: { square: Square; piece: Piece } | undefined;
-
-    for (const square of ray) {
-      const piece = pieces.get(square);
-      if (piece) {
-        if (piece.color === color) {
-          friendlyPieces.push(square);
-        } else {
-          opponentPiece = { square, piece };
-          break;
-        }
-      } else {
-        openSquares.push(square);
-      }
-    }
-
-    if (
-      opponentPiece &&
-      (opponentPiece.piece.type === type ||
-        opponentPiece.piece.type === PieceType.Queen)
-    ) {
-      // We found a pin or sliding attack on the king!
-      if (friendlyPieces.length === 1) {
-        // With exactly one piece this is a standard pin to the king, which is
-        // what we care about for move generation.
-        pins.set(friendlyPieces[0], {
-          pinned: friendlyPieces[0],
-          attacker: opponentPiece.square,
-          legalMoveSquares: [...openSquares, ...friendlyPieces],
-        });
-      }
-    }
-  }
-
-  return pins;
-};
-
 export const generateMovementData = (
   pieces: Map<Square, Piece>,
   color: Color,
@@ -470,7 +420,7 @@ export const generateMovementData = (
     enPassantSquare,
     castlingAvailability,
   }: {
-    pinsToKing: Pins;
+    pinsToKing: KingPins;
     kings: KingSquares;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;

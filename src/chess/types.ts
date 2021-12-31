@@ -40,6 +40,12 @@ export type Move = {
   promotion?: PieceType;
 };
 
+export type Pin = {
+  pinned: Square;
+  attacker: Square;
+  legalMoveSquares: Square[];
+};
+
 export type AttackObject = {
   // The square being attacked for this object
   attacked: Square;

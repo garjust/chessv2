@@ -11,30 +11,9 @@ import {
   flipColor,
   isStartPositionPawn,
 } from '../utils';
-import { pinsToSquare } from './move-generation';
-import { KING_RAY_BITARRAYS_FLAT } from './move-lookup';
 import { down, up } from './move-utils';
-import { KingSquares, Pin, Pins, Position } from './types';
-
-const findPinsOnKings = (pieces: Map<Square, Piece>, kings: KingSquares) => {
-  const whiteKing = kings[Color.White];
-  const blackKing = kings[Color.Black];
-
-  let whitePins;
-  let blackPins;
-
-  if (whiteKing) {
-    whitePins = pinsToSquare(pieces, whiteKing, Color.White);
-  }
-  if (blackKing) {
-    blackPins = pinsToSquare(pieces, blackKing, Color.Black);
-  }
-
-  return {
-    [Color.White]: whitePins ? whitePins : new Map<Square, Pin>(),
-    [Color.Black]: blackPins ? blackPins : new Map<Square, Pin>(),
-  };
-};
+import { updatePinsOnKings } from './pins';
+import { KingPins, Position } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -44,7 +23,7 @@ export type MoveResult = {
     halfMoveCount: number;
     castlingAvailability: CastlingAvailability;
     enPassantSquare: Square | null;
-    pinsToKing: Pins;
+    pinsToKing: KingPins;
   };
 };
 
@@ -59,50 +38,6 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
   return piece.color === Color.White
     ? move.to >= 24 && move.to < 32
     : move.to >= 32 && move.to < 40;
-};
-
-const updatePins = (
-  move: Move,
-  piece: Piece,
-  pieces: Map<Square, Piece>,
-  kings: KingSquares,
-  pins: Pins,
-  currentMove: Color
-) => {
-  const playingKing = kings[currentMove];
-  const opponentKing = kings[flipColor(currentMove)];
-
-  if (playingKing) {
-    // If the moved piece is the king, recalcuate pins on it.
-    //
-    // If the moved piece does not enter or leave the king's rays nothing
-    // needs to be computed.
-    if (
-      piece.type === PieceType.King ||
-      KING_RAY_BITARRAYS_FLAT[playingKing][move.from] ||
-      KING_RAY_BITARRAYS_FLAT[playingKing][move.to]
-    ) {
-      pins[currentMove] = pinsToSquare(pieces, playingKing, currentMove);
-    }
-  }
-
-  if (opponentKing) {
-    // If the moved piece is the king, recalcuate pins on it.
-    //
-    // If the moved piece does not enter or leave the king's rays nothing
-    // needs to be computed.
-    if (
-      piece.type === PieceType.King ||
-      KING_RAY_BITARRAYS_FLAT[opponentKing][move.from] ||
-      KING_RAY_BITARRAYS_FLAT[opponentKing][move.to]
-    ) {
-      pins[flipColor(currentMove)] = pinsToSquare(
-        pieces,
-        opponentKing,
-        flipColor(currentMove)
-      );
-    }
-  }
 };
 
 export const applyMove = (position: Position, move: Move): MoveResult => {
@@ -230,17 +165,14 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     }
   }
 
-  updatePins(
-    move,
-    piece,
+  updatePinsOnKings(
+    position.pinsToKing,
     position.pieces,
     position.kings,
-    position.pinsToKing,
-    position.turn
+    position.turn,
+    move,
+    piece
   );
-  // Just stupidly recompute the pins for now. If we mutate instead we can't
-  // persist in previousState of the move result.
-  // position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
 
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
