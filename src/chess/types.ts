@@ -55,7 +55,6 @@ export type MoveWithExtraData = Move & { attack?: AttackObject };
 
 export type PieceMoves = {
   piece: Piece;
-  from: Square;
   moves: MoveWithExtraData[];
 };
 

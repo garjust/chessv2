@@ -366,7 +366,6 @@ const movesForPosition = (
       castlingAvailability,
     });
     pieceMoves.push({
-      from: square,
       piece,
       moves: moves.map((move) => ({ ...move, from: square })),
     });
@@ -412,7 +411,7 @@ export const generateMovementData = (
         : castlingAvailability,
   });
 
-  movesets.forEach(({ piece, from, moves }) => {
+  movesets.forEach(({ piece, moves }) => {
     // We need to prune moves when in check since only moves that remove the
     // check are legal.
     if (checksForPlayer.length > 0) {
