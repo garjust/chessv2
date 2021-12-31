@@ -44,10 +44,9 @@ export class SquareMap<T> implements Map<Square, T> {
 
   get size() {
     let counter = 0;
-    for (let rank = 0; rank < 8; rank++) {
-      for (let file = 0; file < 8; file++) {
-        counter +=
-          this.map[rankFileToSquare({ rank, file })] !== undefined ? 1 : 0;
+    for (let i = 0; i < 64; i++) {
+      if (this.map[i] !== undefined) {
+        counter++;
       }
     }
     return counter;
@@ -57,17 +56,12 @@ export class SquareMap<T> implements Map<Square, T> {
     const map = this.map;
 
     return (function* entriesGenerator() {
-      for (let rank = 0; rank < 8; rank++) {
-        for (let file = 0; file < 8; file++) {
-          const value = map[rankFileToSquare({ rank, file })];
+      for (let i = 0; i < 64; i++) {
+        const value = map[i];
 
-          if (value !== undefined) {
-            const tuple: [Square, T] = [
-              rankFileToSquare({ rank, file }),
-              value,
-            ];
-            yield tuple;
-          }
+        if (value !== undefined) {
+          const tuple: [Square, T] = [i, value];
+          yield tuple;
         }
       }
     })();
@@ -77,13 +71,11 @@ export class SquareMap<T> implements Map<Square, T> {
     const map = this.map;
 
     return (function* () {
-      for (let rank = 0; rank < 8; rank++) {
-        for (let file = 0; file < 8; file++) {
-          const value = map[rankFileToSquare({ rank, file })];
+      for (let i = 0; i < 64; i++) {
+        const value = map[i];
 
-          if (value !== undefined) {
-            yield rankFileToSquare({ rank, file });
-          }
+        if (value !== undefined) {
+          yield i;
         }
       }
     })();
@@ -93,12 +85,11 @@ export class SquareMap<T> implements Map<Square, T> {
     const map = this.map;
 
     return (function* () {
-      for (let rank = 0; rank < 8; rank++) {
-        for (let file = 0; file < 8; file++) {
-          const value = map[rankFileToSquare({ rank, file })];
-          if (value !== undefined) {
-            yield value;
-          }
+      for (let i = 0; i < 64; i++) {
+        const value = map[i];
+
+        if (value !== undefined) {
+          yield value;
         }
       }
     })();

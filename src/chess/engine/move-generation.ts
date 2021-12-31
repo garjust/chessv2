@@ -19,7 +19,6 @@ import {
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
-  KING_RAYS,
   KNIGHT_LOOKUP,
   ROOK_LOOKUP,
 } from './move-lookup';
