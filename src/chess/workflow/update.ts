@@ -1,11 +1,6 @@
 import { Update } from '../../lib/workflow';
-import { Color, PieceType } from '../types';
-import {
-  flipColor,
-  isPromotionPositionPawn,
-  movesIncludes,
-  squareLabel,
-} from '../utils';
+import { PieceType } from '../types';
+import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
@@ -182,31 +177,6 @@ function handleOverlaySquares(state: State): Update<State, Action> {
       });
     }
   }
-
-  // let pins = pinsToKing(
-  //   position.pieces,
-  //   { [Color.White]: 3, [Color.Black]: 58 },
-  //   Color.White
-  // );
-  // for (const pin of pins.values()) {
-  //   squareOverlay.set(pin.pinned, SquareOverlayType.Capturable);
-  //   squareOverlay.set(pin.attacker, SquareOverlayType.SelectedPiece);
-  //   pin.legalMoveSquares.forEach((square) =>
-  //     squareOverlay.set(square, SquareOverlayType.Movable)
-  //   );
-  // }
-  // pins = pinsToKing(
-  //   position.pieces,
-  //   { [Color.White]: 3, [Color.Black]: 58 },
-  //   Color.Black
-  // );
-  // for (const pin of pins.values()) {
-  //   squareOverlay.set(pin.pinned, SquareOverlayType.Capturable);
-  //   squareOverlay.set(pin.attacker, SquareOverlayType.SelectedPiece);
-  //   pin.legalMoveSquares.forEach((square) =>
-  //     squareOverlay.set(square, SquareOverlayType.Movable)
-  //   );
-  // }
 
   return [{ ...state, squareOverlay }, null];
 }

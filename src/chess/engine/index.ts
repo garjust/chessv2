@@ -71,6 +71,7 @@ export const ImmutableEngine = {
   applyMove(position: ExternalPosition, move: Move) {
     const engine = new Engine(position);
     const captured = engine.applyMove(move);
+
     return {
       position: Object.freeze(engine.position),
       captured,

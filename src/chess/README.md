@@ -8,6 +8,3 @@
 - `workflow/` The workflow which controls the game
 
 ## TODO
-
-- Find pins in `squareScanner` function
-- Throw away bad check logic for pruning moves, way too slow

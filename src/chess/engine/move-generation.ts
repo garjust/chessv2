@@ -16,7 +16,6 @@ import {
   squaresInclude,
   isStartPositionPawn,
   isPromotionPositionPawn,
-  isSlider,
 } from '../utils';
 import {
   BISHOP_LOOKUP,

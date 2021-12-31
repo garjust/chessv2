@@ -61,6 +61,50 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
     : move.to >= 32 && move.from < 40;
 };
 
+const updatePins = (
+  move: Move,
+  piece: Piece,
+  pieces: Map<Square, Piece>,
+  kings: KingSquares,
+  pins: Pins,
+  currentMove: Color
+) => {
+  const playingKing = kings[currentMove];
+  const opponentKing = kings[flipColor(currentMove)];
+
+  if (playingKing) {
+    // If the moved piece is the king, recalcuate pins on it.
+    //
+    // If the moved piece does not enter or leave the king's rays nothing
+    // needs to be computed.
+    if (
+      piece.type === PieceType.King ||
+      KING_RAYS_FLAT[playingKing].includes(move.to) ||
+      KING_RAYS_FLAT[playingKing].includes(move.from)
+    ) {
+      pins[currentMove] = pinsToSquare(pieces, playingKing, currentMove);
+    }
+  }
+
+  if (opponentKing) {
+    // If the moved piece is the king, recalcuate pins on it.
+    //
+    // If the moved piece does not enter or leave the king's rays nothing
+    // needs to be computed.
+    if (
+      piece.type === PieceType.King ||
+      KING_RAYS_FLAT[opponentKing].includes(move.to) ||
+      KING_RAYS_FLAT[opponentKing].includes(move.from)
+    ) {
+      pins[flipColor(currentMove)] = pinsToSquare(
+        pieces,
+        opponentKing,
+        flipColor(currentMove)
+      );
+    }
+  }
+};
+
 export const applyMove = (position: Position, move: Move): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
@@ -87,7 +131,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       },
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
-      pinsToKing: position.pinsToKing,
+      pinsToKing: { ...position.pinsToKing },
     },
   };
 
@@ -186,17 +230,17 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     }
   }
 
-  // updatePins(
-  //   move,
-  //   piece,
-  //   position.pieces,
-  //   position.kings,
-  //   position.pinsToKing,
-  //   position.turn
-  // );
+  updatePins(
+    move,
+    piece,
+    position.pieces,
+    position.kings,
+    position.pinsToKing,
+    position.turn
+  );
   // Just stupidly recompute the pins for now. If we mutate instead we can't
   // persist in previousState of the move result.
-  position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
+  // position.pinsToKing = findPinsOnKings(position.pieces, position.kings);
 
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
@@ -207,14 +251,6 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     position.halfMoveCount = 0;
   }
   position.turn = flipColor(position.turn);
-
-  // console.log(
-  //   'pins',
-  //   'white',
-  //   JSON.stringify(Array.from(position.pinsToKing.WHITE.values()), null, 2),
-  //   'black',
-  //   JSON.stringify(Array.from(position.pinsToKing.BLACK.values()), null, 2)
-  // );
 
   return result;
 };
@@ -273,6 +309,4 @@ export const undoMove = (position: Position, result: MoveResult): void => {
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
   position.pinsToKing = result.previousState.pinsToKing;
-
-  // console.log('undoMove pins', position.pinsToKing);
 };

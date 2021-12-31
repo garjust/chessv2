@@ -34,7 +34,7 @@ const Game = () => {
 
   useEffect(() => {
     emit(initializeAction(Color.White));
-    emit(setPositionFromFENAction(VIENNA_GAMBIT_ACCEPTED_FEN));
+    emit(setPositionFromFENAction(PERFT_5_FEN));
   });
 
   function emitExampleGame(): void {
