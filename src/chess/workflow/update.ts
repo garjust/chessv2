@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { PieceType } from '../types';
+import { Color, PieceType } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
@@ -30,6 +30,7 @@ import {
 import { ImmutableEngine } from '../engine';
 import { SquareMap } from '../square-map';
 import { wrap } from 'comlink';
+import { play, Sound } from '../ui/audio';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
@@ -241,7 +242,15 @@ function handleMovePiece(
     move.promotion = PieceType.Queen;
   }
 
-  const { position } = ImmutableEngine.applyMove(state.position, move);
+  const { position, captured } = ImmutableEngine.applyMove(
+    state.position,
+    move
+  );
+  if (captured) {
+    play(Sound.Capture);
+  } else {
+    play(Sound.Move);
+  }
 
   return [
     {
@@ -268,6 +277,7 @@ function handleSetPosition(
   };
 
   if (position.halfMoveCount === 100) {
+    play(Sound.Draw);
     return [
       {
         ...state,
@@ -278,14 +288,27 @@ function handleSetPosition(
   }
 
   // Check if current player has no moves to end the game
-  if (moveData.moves.length === 0) {
+  if (position.pieces.size > 0 && moveData.moves.length === 0) {
+    const winner = moveData.checks.length > 0 ? flipColor(position.turn) : Draw;
+    if (winner === Draw) {
+      play(Sound.Draw);
+    } else if (winner === Color.White) {
+      play(Sound.Win);
+    } else if (winner === Color.Black) {
+      play(Sound.Lose);
+    }
+
     return [
       {
         ...state,
-        winner: moveData.checks.length > 0 ? flipColor(position.turn) : Draw,
+        winner,
       },
       overlaySquaresAction(),
     ];
+  }
+
+  if (moveData.checks.length > 0) {
+    play(Sound.Check);
   }
 
   return [state, from([overlaySquaresAction(), attemptComputerMoveAction()])];
