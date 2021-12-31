@@ -49,18 +49,13 @@ export default class Engine {
   }
 
   generateMovementData(): ComputedMovementData {
-    return generateMovementData(
-      this._position.pieces,
-      this._position.turn,
-      this._position,
-      {
-        pinsToKing: this._position.pinsToKing,
-        checks: this._position.checks,
-        kings: this._position.kings,
-        enPassantSquare: this._position.enPassantSquare,
-        castlingAvailability: this._position.castlingAvailability,
-      }
-    );
+    return generateMovementData(this._position.pieces, this._position.turn, {
+      pinsToKing: this._position.pinsToKing,
+      checks: this._position.checks,
+      kings: this._position.kings,
+      enPassantSquare: this._position.enPassantSquare,
+      castlingAvailability: this._position.castlingAvailability,
+    });
   }
 
   get position(): ExternalPosition {

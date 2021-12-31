@@ -412,7 +412,6 @@ const findAttacksOnKing = (
 export const generateMovementData = (
   pieces: Map<Square, Piece>,
   color: Color,
-  position: Position,
   {
     pinsToKing,
     kings,
@@ -467,7 +466,7 @@ export const generateMovementData = (
             (move) =>
               !squaresInclude(
                 check.slideSquares,
-                // position.attacked[flipColor(position.turn)],
+                // attacked[flipColor(color)],
                 move.to
               )
           );
@@ -485,7 +484,7 @@ export const generateMovementData = (
           (move) =>
             !squaresInclude(
               checksForPlayer.flatMap((check) => check.slideSquares),
-              // position.attacked[flipColor(position.turn)],
+              // attacked[flipColor(color)],
               move.to
             )
         );
@@ -502,8 +501,8 @@ export const generateMovementData = (
         // This is a king move, verify the destination square is not attacked.
         return (
           attacksOnSquare(pieces, flipColor(color), move.to, {
-            enPassantSquare: position.enPassantSquare,
-            castlingAvailability: position.castlingAvailability,
+            enPassantSquare: enPassantSquare,
+            castlingAvailability: castlingAvailability,
             skip: [king],
           }).length === 0
         );
