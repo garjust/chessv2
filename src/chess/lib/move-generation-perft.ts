@@ -1,4 +1,9 @@
-import { PERFT_5_FEN, STARTING_POSITION_FEN, VIENNA_OPENING_FEN } from './fen';
+import {
+  parseFEN,
+  PERFT_5_FEN,
+  STARTING_POSITION_FEN,
+  VIENNA_OPENING_FEN,
+} from './fen';
 import Engine from '../engine';
 import { Move } from '../types';
 import { moveToDirectionString } from '../utils';
@@ -48,7 +53,7 @@ const search = (engine: Engine, depth: number): number => {
   return n;
 };
 
-export const run = (engine: Engine, depth: number, debug = false): number => {
+const searchRoot = (engine: Engine, depth: number, debug: boolean): number => {
   if (depth === 0) {
     return 1;
   }
@@ -69,4 +74,31 @@ export const run = (engine: Engine, depth: number, debug = false): number => {
   }
 
   return counts.reduce((sum, { n }) => sum + n, 0);
+};
+
+export const run = (
+  logger: (message: string) => void,
+  test: MoveTest,
+  toDepth: number,
+  debug: boolean
+) => {
+  const position = parseFEN(test.fen);
+
+  for (let i = 1; i <= toDepth; i++) {
+    const start = Date.now();
+    const engine = new Engine(position);
+    const count = searchRoot(engine, i, debug);
+    const timing = Date.now() - start;
+    const passed = isCountCorrectForDepthFromStart(i, count, test);
+
+    logger(
+      `depth=${i}; passed=${
+        passed ? 'yes' : 'no'
+      }; count=${count}; timing=${timing}ms (${(
+        (timing / count) *
+        1000
+      ).toPrecision(5)}μs/node)`
+    );
+  }
+  logger('--');
 };

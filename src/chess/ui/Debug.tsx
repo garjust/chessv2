@@ -7,7 +7,7 @@ import {
   PERFT_POSITION_5,
   STARTING_POSITION,
   VIENNA_OPENING,
-} from '../lib/move-test';
+} from '../lib/move-generation-perft';
 import './Debug.css';
 import { wrap } from 'comlink';
 import {
@@ -22,12 +22,14 @@ async function runMoveGenerationTest(
   test: MoveTest,
   toDepth = 5
 ) {
-  const worker = new Worker(new URL('../workers/move-test', import.meta.url));
+  const worker = new Worker(
+    new URL('../workers/move-generation-perft', import.meta.url)
+  );
 
   worker.onmessage = (message: MessageEvent<string>) => {
     logger.next(message.data);
   };
-  worker.postMessage({ test, toDepth });
+  worker.postMessage({ test, toDepth, debug: false });
 }
 
 async function runComputerNextMoveTest(logger: Subject<string>, fen: string) {
@@ -85,35 +87,35 @@ const Debug = () => {
           style={BUTTON_CSS}
           onClick={() => runMoveGenerationTest(logger, STARTING_POSITION)}
         >
-          Move generation test
+          Move generation perft
         </button>
 
         <button
           style={BUTTON_CSS}
           onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5)}
         >
-          Move generation test PERFT_5
+          Move generation perft PERFT_5
         </button>
 
         <button
           style={BUTTON_CSS}
           onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING)}
         >
-          Move generation test vienna
+          Move generation perft VIENNA
         </button>
 
         <button
           style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION_FEN)}
         >
-          Move AI speed test
+          Move AI perft
         </button>
 
         <button
           style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING_FEN)}
         >
-          Move AI speed test for vienna
+          Move AI perft vienna
         </button>
       </div>
       <pre style={{ gridArea: 'log' }}>
