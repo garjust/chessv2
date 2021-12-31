@@ -3,15 +3,6 @@ export enum Color {
   Black = 'BLACK',
 }
 
-// const White = BigInt(0b01000);
-// const Black = BigInt(0b10000);
-// const Bishop = BigInt(0b000001);
-// const King = BigInt(0b000010);
-// const Knight = BigInt(0b000011);
-// const Pawn = BigInt(0b000100);
-// const Queen = BigInt(0b000101);
-// const Rook = BigInt(0b000110);
-
 export enum PieceType {
   Bishop = 'BISHOP',
   King = 'KING',
@@ -41,8 +32,12 @@ export type Move = {
 };
 
 export type Pin = {
+  // The square with the pinned or skewered piece.
   pinned: Square;
+  // The square of the attacker creating the pin.
   attacker: Square;
+  // Legal squares the pinned piece can move to. This includes it's
+  // resident square.
   legalMoveSquares: Square[];
 };
 
@@ -54,13 +49,6 @@ export type AttackObject = {
   // If the attacker is a sliding piece this is the set of squares they move through
   // for the attack. A move to one of these squares blocks the attacker.
   slideSquares: Square[];
-  // A piece that is attacked through the attacked square. If the piece is
-  // more valuable than the attacked piece this is considered a pin, otherwise
-  // it is considered a skewer.
-  indirectAttacks?: {
-    attacked: { square: Square; type: PieceType };
-    slideSquares: Square[];
-  }[];
 };
 
 export type MoveWithExtraData = Move & { attack?: AttackObject };
