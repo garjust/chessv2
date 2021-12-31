@@ -1,6 +1,6 @@
 import { Move } from '../types';
 
-export type AvailableComputerVersions = 'v1' | 'v2' | 'v3' | 'v4';
+export type AvailableComputerVersions = 'v1' | 'v2' | 'v3' | 'v4' | 'v5';
 
 export interface ChessComputer<P> {
   nextMove(position: P): Promise<Move>;
