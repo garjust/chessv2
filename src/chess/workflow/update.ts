@@ -284,7 +284,7 @@ function handleSetPosition(
         ...state,
         winner: moveData.checks.length > 0 ? flipColor(position.turn) : Draw,
       },
-      null,
+      overlaySquaresAction(),
     ];
   }
 
