@@ -18,6 +18,7 @@ const moveWeight = (move: MoveWithExtraData): number => {
 
   if (move.attack) {
     n += Math.max(
+      10,
       10 *
         (PieceValue[move.attack.attacked.type] -
           PieceValue[move.attack.attacker.type])
@@ -30,8 +31,8 @@ const moveWeight = (move: MoveWithExtraData): number => {
   return n;
 };
 
-export const orderMoves = (moveData: ComputedMovementData): Move[] => {
-  return moveData.moves
+export const orderMoves = (moves: MoveWithExtraData[]): Move[] => {
+  return moves
     .map((move) => ({ move, weight: moveWeight(move) }))
     .sort(SORT_FN)
     .map(({ move }) => move);

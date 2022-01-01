@@ -9,6 +9,7 @@ const DEPTH = 4;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search
+// - search through captures
 export default class v4 implements ChessComputer<Position> {
   moveCounter = 0;
   evaluationCounter = 0;
@@ -24,7 +25,7 @@ export default class v4 implements ChessComputer<Position> {
     );
 
     console.log(
-      `v5 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
+      `v6 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
         move: moveToDirectionString(move),
         score,
@@ -55,7 +56,7 @@ export default class v4 implements ChessComputer<Position> {
   score(engine: Engine, depth: number, alpha: number, beta: number): number {
     if (depth === 0) {
       this.evaluationCounter++;
-      return engine.evaluateNormalized();
+      return this.scoreCaptures(engine, alpha, beta);
     }
 
     const moves = orderMoves(engine.generateMovementData().moves);
@@ -78,7 +79,39 @@ export default class v4 implements ChessComputer<Position> {
     return alpha;
   }
 
+  scoreCaptures(engine: Engine, alpha: number, beta: number): number {
+    this.evaluationCounter++;
+    const evaluation = engine.evaluateNormalized();
+    if (evaluation >= beta) {
+      return beta;
+    }
+    if (evaluation > alpha) {
+      alpha = evaluation;
+    }
+
+    const moves = orderMoves(
+      engine.generateMovementData().moves.filter((move) => move.attack)
+    );
+    this.moveCounter += moves.length;
+
+    for (const move of moves) {
+      engine.applyMove(move);
+      const x = -1 * this.scoreCaptures(engine, beta * -1, alpha * -1);
+      engine.undoLastMove();
+
+      if (x >= beta) {
+        return beta;
+      }
+
+      if (x > alpha) {
+        alpha = x;
+      }
+    }
+
+    return alpha;
+  }
+
   toJSON(): string {
-    return 'justins chess computer v5';
+    return 'justins chess computer v6';
   }
 }

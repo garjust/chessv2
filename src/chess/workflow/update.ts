@@ -35,7 +35,7 @@ import { play, Sound } from '../ui/audio';
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {};
 
-const COMPUTER_VERISON: AvailableComputerVersions = 'v5';
+const COMPUTER_VERISON: AvailableComputerVersions = 'v6';
 
 const loadComputer = async (
   version: AvailableComputerVersions
