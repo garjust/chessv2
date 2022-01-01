@@ -8,3 +8,5 @@
 - `workflow/` The workflow which controls the game
 
 ## TODO
+
+- Decrease weight of moves to squares attacked by pawns

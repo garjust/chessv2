@@ -18,14 +18,13 @@ const moveWeight = (move: MoveWithExtraData): number => {
 
   if (move.attack) {
     n += Math.max(
-      5,
       10 *
         (PieceValue[move.attack.attacked.type] -
           PieceValue[move.attack.attacker.type])
     );
   }
   if (move.promotion) {
-    n += 50;
+    n += PieceValue[move.promotion];
   }
 
   return n;
