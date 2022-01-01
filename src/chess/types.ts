@@ -89,7 +89,6 @@ export type Position = {
 export type ComputedMovementData = {
   moves: MoveWithExtraData[];
   checks: AttackObject[];
-  availableCaptures: MoveWithExtraData[];
 };
 
 // Data that can be computed from a position that we may want to cache because

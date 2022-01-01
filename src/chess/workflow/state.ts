@@ -70,7 +70,6 @@ const INITIAL_STATE: State = {
     moveData: {
       moves: [],
       checks: [],
-      availableCaptures: [],
     },
     evaluationData: {
       evaluation: 0,
@@ -120,3 +119,6 @@ export const checkedSquare = (state: State): Square | undefined =>
   state.computedPositionData.moveData.checks.length > 0
     ? state.computedPositionData.moveData.checks[0].attacked.square
     : undefined;
+
+export const availableCaptures = (state: State): Move[] =>
+  state.computedPositionData.moveData.moves.filter((move) => move.attack);

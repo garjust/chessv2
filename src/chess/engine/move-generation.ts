@@ -419,7 +419,6 @@ export const generateMovementData = (
   }
 
   const allMoves: MoveWithExtraData[] = [];
-  const availableCaptures: MoveWithExtraData[] = [];
 
   const movesets = movesForPosition(pieces, {
     color,
@@ -503,21 +502,11 @@ export const generateMovementData = (
       }
     });
 
-    moves.forEach((move) => {
-      if (move.attack) {
-        const piece = pieces.get(move.from);
-        if (piece) {
-          availableCaptures.push(move);
-        }
-      }
-    });
-
     allMoves.push(...moves);
   });
 
   return {
     moves: allMoves,
     checks: checksForPlayer,
-    availableCaptures,
   };
 };
