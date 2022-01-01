@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
 import { ComputerRegistry } from '../ai';
-import { STARTING_POSITION_FEN, VIENNA_OPENING_FEN } from '../lib/fen';
+import {
+  PERFT_5_FEN,
+  STARTING_POSITION_FEN,
+  VIENNA_OPENING_FEN,
+} from '../lib/fen';
 import {
   MoveTest,
   PERFT_POSITION_5,
@@ -113,9 +117,16 @@ const Debug = () => {
 
         <button
           style={BUTTON_CSS}
+          onClick={() => runComputerNextMoveTest(logger, PERFT_5_FEN)}
+        >
+          Move AI perft PERFT_5
+        </button>
+
+        <button
+          style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING_FEN)}
         >
-          Move AI perft vienna
+          Move AI perft VIENNA
         </button>
       </div>
       <pre style={{ gridArea: 'log' }}>
