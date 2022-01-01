@@ -1,6 +1,6 @@
 import React from 'react';
 import './Square.css';
-import { Color } from '../types';
+import { Color, PieceType } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
@@ -21,6 +21,7 @@ import {
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../workflow/action';
 import Piece from './Piece';
+import { HEATMAPS } from '../lib/heatmaps';
 
 export type SquareProps = {
   color: Color;
@@ -69,6 +70,13 @@ const Square = (props: SquareProps) => {
         break;
     }
   }
+
+  // const value = HEATMAPS[PieceType.Rook][Color.White][square];
+  // css = {
+  //   ...css,
+  //   ...BOARD_SQUARE_SELECTED,
+  //   filter: `saturate(${(value + 10) / 10})`,
+  // };
 
   let label: string | null = null;
   if (squareLabels === SquareLabel.Index) {

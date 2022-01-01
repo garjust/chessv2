@@ -22,7 +22,7 @@ export const rayScanner = (
 
   for (const to of ray) {
     if (skip.includes(to)) {
-      moves.push({ from, to });
+      moves.push({ from, to, piece: scanningPiece.piece });
       continue;
     }
 
@@ -43,12 +43,12 @@ export const rayScanner = (
           slideSquares: moves.map(({ to }) => to),
         };
 
-        moves.push({ from, to, attack });
+        moves.push({ from, to, piece: scanningPiece.piece, attack });
         break;
       }
     } else {
       // empty square!
-      moves.push({ from, to });
+      moves.push({ from, to, piece: scanningPiece.piece });
     }
   }
 

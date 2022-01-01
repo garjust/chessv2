@@ -1,5 +1,6 @@
 import { ComputedMovementData, Move, MoveWithExtraData } from '../types';
 import { PieceValue } from './evaluation';
+import { HEATMAPS } from '../lib/heatmaps';
 
 // Descending sort.
 const SORT_FN = (
@@ -10,9 +11,12 @@ const SORT_FN = (
 const moveWeight = (move: MoveWithExtraData): number => {
   let n = 0;
 
-  if (move.attack) {
-    n += 1;
+  // const heatmapFrom = HEATMAPS[move.piece.type][move.piece.color][move.from];
+  const heatmapTo = HEATMAPS[move.piece.type][move.piece.color][move.to];
 
+  n += heatmapTo;
+
+  if (move.attack) {
     n += Math.max(
       5,
       10 *
@@ -21,7 +25,7 @@ const moveWeight = (move: MoveWithExtraData): number => {
     );
   }
   if (move.promotion) {
-    n += 100;
+    n += 50;
   }
 
   return n;

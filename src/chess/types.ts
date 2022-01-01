@@ -51,7 +51,7 @@ export type AttackObject = {
   slideSquares: Square[];
 };
 
-export type MoveWithExtraData = Move & { attack?: AttackObject };
+export type MoveWithExtraData = Move & { piece: Piece; attack?: AttackObject };
 
 export type PieceMoves = {
   piece: Piece;

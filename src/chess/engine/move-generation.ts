@@ -45,11 +45,19 @@ const pawnMoves = (
     isLegalSquare(advanceFn(from)) &&
     !attacksOnly
   ) {
-    squares.push({ from, to: advanceFn(from) });
+    squares.push({
+      from,
+      to: advanceFn(from),
+      piece: { type: PieceType.Pawn, color },
+    });
 
     // Space two squares forward of the pawn when it is in it's starting rank.
     if (!pieces.get(advanceFn(from, 2)) && isStartPositionPawn(color, from)) {
-      squares.push({ from, to: advanceFn(from, 2) });
+      squares.push({
+        from,
+        to: advanceFn(from, 2),
+        piece: { type: PieceType.Pawn, color },
+      });
     }
   }
 
@@ -69,6 +77,7 @@ const pawnMoves = (
     squares.push({
       from,
       to: leftCaptureSquare,
+      piece: { type: PieceType.Pawn, color },
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
         attacked: { square: leftCaptureSquare, type: leftCapturePiece?.type },
@@ -85,6 +94,7 @@ const pawnMoves = (
     squares.push({
       from,
       to: rightCaptureSquare,
+      piece: { type: PieceType.Pawn, color },
       attack: {
         attacker: { square: from, type: PieceType.Pawn },
         attacked: { square: rightCaptureSquare, type: rightCapturePiece?.type },
@@ -127,6 +137,7 @@ const knightMoves = (
       return {
         from,
         to,
+        piece: { type: PieceType.Knight, color },
         attack,
       };
     });
@@ -189,6 +200,7 @@ const kingMoves = (
     return {
       from,
       to,
+      piece: { type: PieceType.King, color },
       attack,
     };
   });
