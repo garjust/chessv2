@@ -3,10 +3,16 @@ import { PieceValue } from './evaluation';
 import { HEATMAPS } from '../lib/heatmaps';
 
 // Descending sort.
-const SORT_FN = (
-  { weight: a }: { weight: number },
-  { weight: b }: { weight: number }
-) => b - a;
+const SORT_FN = (a: MoveWithExtraData, b: MoveWithExtraData) => {
+  if (!a.weight) {
+    a.weight = moveWeight(a);
+  }
+  if (!b.weight) {
+    b.weight = moveWeight(b);
+  }
+
+  return b.weight - a.weight;
+};
 
 const moveWeight = (move: MoveWithExtraData): number => {
   let n = 0;
@@ -32,8 +38,5 @@ const moveWeight = (move: MoveWithExtraData): number => {
 };
 
 export const orderMoves = (moves: MoveWithExtraData[]): Move[] => {
-  return moves
-    .map((move) => ({ move, weight: moveWeight(move) }))
-    .sort(SORT_FN)
-    .map(({ move }) => move);
+  return moves.sort(SORT_FN);
 };
