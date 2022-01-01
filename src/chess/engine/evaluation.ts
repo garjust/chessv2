@@ -1,4 +1,5 @@
-import { Position, PieceType, Color } from '../types';
+import { Position, PieceType, Color, Piece, Square } from '../types';
+import { HEATMAPS } from '../lib/heatmaps';
 
 export const PieceValue: Record<PieceType, number> = Object.freeze({
   [PieceType.Bishop]: 3,
@@ -11,30 +12,23 @@ export const PieceValue: Record<PieceType, number> = Object.freeze({
 
 const modifier = (color: Color) => (color === Color.White ? 1 : -1);
 
+const squareValue = (square: Square, piece: Piece): number =>
+  HEATMAPS[piece.type][piece.color][square] / 20;
+
 export const evaluate = (position: Position): number => {
   let evaluation = 0;
 
-  let whiteKing = false;
-  let blackKing = false;
-
-  for (const [, piece] of position.pieces) {
+  for (const [square, piece] of position.pieces) {
     if (piece.type === PieceType.King) {
-      if (piece.color === Color.White) {
-        whiteKing = true;
-      }
-      if (piece.color === Color.Black) {
-        blackKing = true;
-      }
       continue;
     }
-    evaluation += PieceValue[piece.type] * modifier(piece.color);
+    evaluation +=
+      PieceValue[piece.type] *
+      modifier(piece.color) *
+      squareValue(square, piece);
   }
 
-  if (!whiteKing) {
-    return -Infinity;
-  } else if (!blackKing) {
-    return Infinity;
-  }
+  evaluation += 0.5 * modifier(position.turn);
 
   return evaluation;
 };
