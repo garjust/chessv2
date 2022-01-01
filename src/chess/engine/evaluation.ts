@@ -13,7 +13,7 @@ export const PieceValue: Record<PieceType, number> = Object.freeze({
 const modifier = (color: Color) => (color === Color.White ? 1 : -1);
 
 const squareValue = (square: Square, piece: Piece): number =>
-  HEATMAPS[piece.type][piece.color][square] / 20;
+  HEATMAPS[piece.type][piece.color][square] / 10;
 
 export const evaluate = (position: Position): number => {
   let evaluation = 0;
@@ -23,9 +23,8 @@ export const evaluate = (position: Position): number => {
       continue;
     }
     evaluation +=
-      PieceValue[piece.type] *
-      modifier(piece.color) *
-      squareValue(square, piece);
+      (PieceValue[piece.type] + squareValue(square, piece)) *
+      modifier(piece.color);
   }
 
   evaluation += 0.5 * modifier(position.turn);

@@ -23,6 +23,10 @@ function replacer(key: string, value: unknown) {
   //   );
   // }
 
+  if (key === 'evaluation') {
+    return (value as number).toPrecision(6);
+  }
+
   if (value instanceof Map || value instanceof SquareMap) {
     return `{ size ${value.size} }`;
   }
