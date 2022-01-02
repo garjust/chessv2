@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Subject } from 'rxjs';
+import { Observer, Subject } from 'rxjs';
 import { ComputerRegistry } from '../ai';
 import {
   PERFT_5_FEN,
@@ -36,7 +36,26 @@ async function runMoveGenerationTest(
   worker.postMessage({ test, toDepth, debug: false });
 }
 
-async function runComputerNextMoveTest(logger: Subject<string>, fen: string) {
+async function runSingleComputerNextMoveTest(logger: Observer<string>) {
+  const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
+    new Worker(new URL('../workers/ai', import.meta.url))
+  );
+  const instance = await new ChessComputerWorkerRemote();
+  await instance.load('v6');
+
+  const fens = [STARTING_POSITION_FEN, VIENNA_OPENING_FEN, PERFT_5_FEN];
+
+  for (const fen of fens) {
+    const start = Date.now();
+    const move = await instance.nextMove(fen);
+    const timing = Date.now() - start;
+    logger.next(
+      `version=${'v6'}; timing=${timing}ms; move=${moveToDirectionString(move)}`
+    );
+  }
+}
+
+async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
   const computers = await Promise.all(
     Object.keys(ComputerRegistry).map(async (version) => {
       const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
@@ -126,6 +145,13 @@ const Debug = () => {
           onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING_FEN)}
         >
           Move AI perft VIENNA
+        </button>
+
+        <button
+          style={BUTTON_CSS}
+          onClick={() => runSingleComputerNextMoveTest(logger)}
+        >
+          Single Move AI perft
         </button>
       </div>
       <pre style={{ gridArea: 'log' }}>

@@ -1,6 +1,5 @@
 import Engine from '..';
 import { parseFEN, PERFT_5_FEN } from '../../lib/fen';
-import { Move, MoveWithExtraData } from '../../types';
 import { orderMoves } from '../move-ordering';
 
 const N = 100_000;

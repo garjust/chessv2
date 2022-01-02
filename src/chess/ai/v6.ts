@@ -55,7 +55,6 @@ export default class v4 implements ChessComputer<Position> {
 
   score(engine: Engine, depth: number, alpha: number, beta: number): number {
     if (depth === 0) {
-      this.evaluationCounter++;
       return this.scoreCaptures(engine, alpha, beta);
     }
 
