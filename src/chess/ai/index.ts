@@ -9,8 +9,8 @@ export const ComputerRegistry: Record<
   AvailableComputerVersions,
   ChessComputerConstructor<Position>
 > = Object.freeze({
-  v3: v3,
-  v4: v4,
-  v5: v5,
   v6: v6,
+  v5: v5,
+  v4: v4,
+  v3: v3,
 });

@@ -48,18 +48,17 @@ async function runComputerNextMoveTest(logger: Subject<string>, fen: string) {
     })
   );
 
-  await Promise.all(
-    computers.map(async ({ ai, version }) => {
-      const start = Date.now();
-      const move = await ai.nextMove(fen);
-      const timing = Date.now() - start;
-      logger.next(
-        `version=${version}; timing=${timing}ms; move=${moveToDirectionString(
-          move
-        )}`
-      );
-    })
-  );
+  for (const { version, ai } of computers) {
+    const start = Date.now();
+    const move = await ai.nextMove(fen);
+    const timing = Date.now() - start;
+    logger.next(
+      `version=${version}; timing=${timing}ms; move=${moveToDirectionString(
+        move
+      )}`
+    );
+  }
+
   logger.next('--');
 }
 
