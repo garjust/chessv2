@@ -1,7 +1,7 @@
 import React from 'react';
 import { State } from '../workflow';
 import { Color } from '../types';
-import { rankFileToSquare, squareGenerator, squareLabel } from '../utils';
+import { rankFileToSquare, squareGenerator } from '../utils';
 import './Board.css';
 import Square from './Square';
 import { useWorkflow } from './workflow';

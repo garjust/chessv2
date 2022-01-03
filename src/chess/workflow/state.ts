@@ -1,5 +1,8 @@
 import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
-import { isMoveInFile } from '../engine/move-utils';
+import {
+  allAttackedSquares,
+  allAttackedSquaresFromMoves,
+} from '../engine/attacks';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import { SquareMap } from '../square-map';
 import {
@@ -9,7 +12,6 @@ import {
   Square,
   ComputedPositionData,
   Move,
-  PieceType,
 } from '../types';
 
 export enum SquareLabel {
@@ -128,11 +130,17 @@ export const availableCaptures = (state: State): Move[] =>
 export const attackOverlay = (state: State): SquareMap<SquareOverlayType> => {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
-  for (const move of state.computedPositionData.moveData.moves) {
-    if (move.piece.type === PieceType.Pawn && isMoveInFile(move)) {
-      continue;
+  const attackMap = allAttackedSquares(state.position.pieces, Color.White, {
+    enPassantSquare: state.position.enPassantSquare,
+  });
+  // const attackMap = allAttackedSquaresFromMoves(
+  //   state.computedPositionData.moveData.moves
+  // );
+
+  for (const [square, attacked] of attackMap) {
+    if (attacked) {
+      squareOverlay.set(square, SquareOverlayType.Check);
     }
-    squareOverlay.set(move.to, SquareOverlayType.Check);
   }
 
   return squareOverlay;

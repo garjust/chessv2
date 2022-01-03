@@ -1,5 +1,18 @@
-import { Color, Piece, PieceType, Square, AttackObject } from '../types';
-import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
+import { SquareMap } from '../square-map';
+import {
+  Color,
+  Piece,
+  PieceType,
+  Square,
+  AttackObject,
+  MoveWithExtraData,
+} from '../types';
+import {
+  flipColor,
+  CASTLING_AVAILABILITY_BLOCKED,
+  squareGenerator,
+} from '../utils';
+import { isMoveInFile } from './move-utils';
 import {
   bishopMoves,
   kingMoves,
@@ -75,6 +88,47 @@ export const attacksOnSquare = (
         }
       }
     }
+  }
+
+  return attacks;
+};
+
+export const allAttackedSquares = (
+  pieces: Map<Square, Piece>,
+  attackingColor: Color,
+  {
+    enPassantSquare,
+  }: {
+    enPassantSquare: Square | null;
+  }
+): Map<Square, boolean> => {
+  const attacks: Map<Square, boolean> = new SquareMap<boolean>();
+
+  for (let square = 0; square < 64; square++) {
+    attacks.set(
+      square,
+      attacksOnSquare(pieces, attackingColor, square, {
+        enPassantSquare,
+        skip: [],
+      }).length > 0
+    );
+  }
+
+  return attacks;
+};
+
+// Flawed, misses pawn captures when no piece is in pawn capture square
+// misses attacks on own pieces, which count.
+export const allAttackedSquaresFromMoves = (
+  moves: MoveWithExtraData[]
+): Map<Square, boolean> => {
+  const attacks: Map<Square, boolean> = new SquareMap<boolean>();
+
+  for (const move of moves) {
+    if (move.piece.type === PieceType.Pawn && isMoveInFile(move)) {
+      continue;
+    }
+    attacks.set(move.to, true);
   }
 
   return attacks;
