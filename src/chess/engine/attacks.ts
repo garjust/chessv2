@@ -7,11 +7,7 @@ import {
   AttackObject,
   MoveWithExtraData,
 } from '../types';
-import {
-  flipColor,
-  CASTLING_AVAILABILITY_BLOCKED,
-  squareGenerator,
-} from '../utils';
+import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
 import { isMoveInFile } from './move-utils';
 import {
   bishopMoves,

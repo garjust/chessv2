@@ -23,7 +23,7 @@ import {
   queenMoves,
   rookMoves,
 } from './piece-movement';
-import { KingSquares, KingPins, KingChecks } from './types';
+import { KingSquares, KingPins, KingChecks, AttackedSquares } from './types';
 
 const movesForPiece = (
   pieces: Map<Square, Piece>,
@@ -111,6 +111,7 @@ export const generateMovementData = (
     enPassantSquare,
     castlingAvailability,
   }: {
+    attackedSquares: AttackedSquares;
     pinsToKing: KingPins;
     checks: KingChecks;
     kings: KingSquares;
@@ -159,11 +160,8 @@ export const generateMovementData = (
           // piece. The king cannot block the check.
           legalMoves = moves.filter(
             (move) =>
-              !squaresInclude(
-                check.slideSquares,
-                // attacked[flipColor(color)],
-                move.to
-              )
+              // !attackedSquares[flipColor(color)].get(move.to)
+              !squaresInclude(check.slideSquares, move.to)
           );
         }
       } else {
@@ -177,9 +175,9 @@ export const generateMovementData = (
         // Prune king moves that move to an attacked square.
         legalMoves = moves.filter(
           (move) =>
+            // !attackedSquares[flipColor(color)].get(move.to)
             !squaresInclude(
               checksForPlayer.flatMap((check) => check.slideSquares),
-              // attacked[flipColor(color)],
               move.to
             )
         );
@@ -194,6 +192,7 @@ export const generateMovementData = (
     legalMoves = moves.filter((move) => {
       if (move.from === king) {
         // This is a king move, verify the destination square is not attacked.
+        // return !attackedSquares[flipColor(color)].get(move.to);
         return (
           attacksOnSquare(pieces, flipColor(color), move.to, {
             enPassantSquare: enPassantSquare,

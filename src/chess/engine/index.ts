@@ -50,6 +50,7 @@ export default class Engine {
 
   generateMovementData(): ComputedMovementData {
     return generateMovementData(this._position.pieces, this._position.turn, {
+      attackedSquares: this._position.attackedSquares,
       pinsToKing: this._position.pinsToKing,
       checks: this._position.checks,
       kings: this._position.kings,

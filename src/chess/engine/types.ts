@@ -21,13 +21,14 @@ export type KingChecks = {
   [Color.Black]: AttackObject[];
 };
 
+export type AttackedSquares = {
+  [Color.White]: Map<Square, boolean>;
+  [Color.Black]: Map<Square, boolean>;
+};
+
 export type Position = ExternalPosition & {
   kings: KingSquares;
+  attackedSquares: AttackedSquares;
   pinsToKing: KingPins;
   checks: KingChecks;
-
-  attacked: {
-    [Color.White]: Square[];
-    [Color.Black]: Square[];
-  };
 };
