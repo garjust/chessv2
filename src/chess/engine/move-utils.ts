@@ -1,4 +1,4 @@
-import { AttackObject, MoveWithExtraData, Piece, Square } from '../types';
+import { AttackObject, Move, MoveWithExtraData, Piece, Square } from '../types';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;
@@ -8,6 +8,15 @@ export const upLeft = (square: Square, n = 1): Square => square + 7 * n;
 export const upRight = (square: Square, n = 1): Square => square + 9 * n;
 export const downLeft = (square: Square, n = 1): Square => square - 9 * n;
 export const downRight = (square: Square, n = 1): Square => square - 7 * n;
+
+export const isMoveUp = (move: Move): boolean =>
+  move.from < move.to && isMoveInFile(move);
+
+export const isMoveDown = (move: Move): boolean =>
+  move.from > move.to && isMoveInFile(move);
+
+export const isMoveInFile = (move: Move): boolean =>
+  (move.from - move.to) % 8 === 0;
 
 export const rayScanner = (
   pieces: Map<Square, Piece>,

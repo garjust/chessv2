@@ -41,9 +41,9 @@ const pawnMoves = (
 
   // Space forward of the pawn.
   if (
-    !pieces.get(advanceFn(from)) &&
+    !attacksOnly &&
     isLegalSquare(advanceFn(from)) &&
-    !attacksOnly
+    !pieces.get(advanceFn(from))
   ) {
     squares.push({
       from,
