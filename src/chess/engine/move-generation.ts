@@ -431,7 +431,9 @@ export const generateMovementData = (
         : castlingAvailability,
   });
 
-  movesets.forEach(({ piece, moves }) => {
+  for (const { piece, moves } of movesets) {
+    let legalMoves: MoveWithExtraData[];
+
     // We need to prune moves when in check since only moves that remove the
     // check are legal.
     if (checksForPlayer.length > 0) {
@@ -440,7 +442,7 @@ export const generateMovementData = (
         // In the case that the king is checked by a single piece we can capture
         // the piece or block the attack.
         if (piece.type !== PieceType.King) {
-          moves = moves.filter(
+          legalMoves = moves.filter(
             (move) =>
               squaresInclude(check.slideSquares, move.to) ||
               check.attacker.square === move.to
@@ -448,7 +450,7 @@ export const generateMovementData = (
         } else {
           // The king can only move out of the check or capture the checking
           // piece. The king cannot block the check.
-          moves = moves.filter(
+          legalMoves = moves.filter(
             (move) =>
               !squaresInclude(
                 check.slideSquares,
@@ -463,10 +465,10 @@ export const generateMovementData = (
 
         // Prune all moves if the piece is not the king.
         if (piece.type !== PieceType.King) {
-          moves = [];
+          legalMoves = [];
         }
         // Prune king moves that move to an attacked square.
-        moves = moves.filter(
+        legalMoves = moves.filter(
           (move) =>
             !squaresInclude(
               checksForPlayer.flatMap((check) => check.slideSquares),
@@ -482,7 +484,7 @@ export const generateMovementData = (
     // To do this we track pieces that are pinned to the king as well as
     // looking at king moves.
     const king = kings[color];
-    moves = moves.filter((move) => {
+    legalMoves = moves.filter((move) => {
       if (move.from === king) {
         // This is a king move, verify the destination square is not attacked.
         return (
@@ -504,8 +506,8 @@ export const generateMovementData = (
       }
     });
 
-    allMoves.push(...moves);
-  });
+    allMoves.push(...legalMoves);
+  }
 
   return {
     moves: allMoves,
