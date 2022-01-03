@@ -7,7 +7,7 @@ import {
   Square,
 } from '../types';
 import { flipColor } from '../utils';
-import { attacksOnSquare } from './move-generation';
+import { attacksOnSquare } from './attacks';
 import { SUPER_PIECE_BITARRAYS } from './move-lookup';
 import { KingChecks, KingSquares } from './types';
 
