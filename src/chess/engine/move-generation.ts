@@ -275,43 +275,45 @@ export const attacksOnSquare = (
       attacksOnly: true,
       enPassantSquare: enPassantSquare,
     }),
-  ].flat();
+  ];
 
   // Go through each move looking for attacks. An attack is valid if
   // the attacking and attacked piece are the same type.
   //
   // Note: treat bishops and rooks as queens as well
-  superPieceMoves.forEach((move) => {
-    if (move.attack) {
-      const piece = pieces.get(move.to);
-      if (
-        move.attack.attacker.type === PieceType.Bishop ||
-        move.attack.attacker.type === PieceType.Rook
-      ) {
+  for (const movesByPieceType of superPieceMoves) {
+    for (const move of movesByPieceType) {
+      if (move.attack) {
+        const piece = pieces.get(move.to);
         if (
-          piece &&
-          (piece.type === move.attack.attacker.type ||
-            piece.type === PieceType.Queen)
+          move.attack.attacker.type === PieceType.Bishop ||
+          move.attack.attacker.type === PieceType.Rook
         ) {
-          // We need to reverse the super piece move to find the real attack.
-          attacks.push({
-            attacked: move.attack.attacker,
-            attacker: move.attack.attacked,
-            slideSquares: move.attack.slideSquares,
-          });
-        }
-      } else {
-        if (piece && piece.type === move.attack.attacker.type) {
-          // We need to reverse the super piece move to find the real attack.
-          attacks.push({
-            attacked: move.attack.attacker,
-            attacker: move.attack.attacked,
-            slideSquares: move.attack.slideSquares,
-          });
+          if (
+            piece &&
+            (piece.type === move.attack.attacker.type ||
+              piece.type === PieceType.Queen)
+          ) {
+            // We need to reverse the super piece move to find the real attack.
+            attacks.push({
+              attacked: move.attack.attacker,
+              attacker: move.attack.attacked,
+              slideSquares: move.attack.slideSquares,
+            });
+          }
+        } else {
+          if (piece && piece.type === move.attack.attacker.type) {
+            // We need to reverse the super piece move to find the real attack.
+            attacks.push({
+              attacked: move.attack.attacker,
+              attacker: move.attack.attacked,
+              slideSquares: move.attack.slideSquares,
+            });
+          }
         }
       }
     }
-  });
+  }
 
   return attacks;
 };
