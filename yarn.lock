@@ -5192,6 +5192,11 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
+fast-sort@^3.1.1:
+  version "3.1.1"
+  resolved "https://artifactory.global.square/artifactory/api/npm/square-npm/fast-sort/-/fast-sort-3.1.1.tgz#fce2e09b46920f279a1e4d78adb37cb59d0429a0"
+  integrity sha1-/OLgm0aSDyeaHk14rbN8tZ0EKaA=
+
 fastq@^1.6.0:
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/fastq/-/fastq-1.10.1.tgz#8b8f2ac8bf3632d67afcd65dac248d5fdc45385e"

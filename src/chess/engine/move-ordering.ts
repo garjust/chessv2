@@ -1,18 +1,7 @@
-import { ComputedMovementData, Move, MoveWithExtraData } from '../types';
+import { Move, MoveWithExtraData } from '../types';
 import { PieceValue } from './evaluation';
 import { HEATMAPS } from '../lib/heatmaps';
-
-// Descending sort.
-const SORT_FN = (a: MoveWithExtraData, b: MoveWithExtraData) => {
-  if (!a.weight) {
-    a.weight = moveWeight(a);
-  }
-  if (!b.weight) {
-    b.weight = moveWeight(b);
-  }
-
-  return b.weight - a.weight;
-};
+import { sort } from 'fast-sort';
 
 const moveWeight = (move: MoveWithExtraData): number => {
   let n = 0;
@@ -36,6 +25,14 @@ const moveWeight = (move: MoveWithExtraData): number => {
   return n;
 };
 
+const sortBy = (move: MoveWithExtraData) => {
+  if (!move.weight) {
+    move.weight = moveWeight(move);
+  }
+
+  return move.weight;
+};
+
 export const orderMoves = (moves: MoveWithExtraData[]): Move[] => {
-  return moves.sort(SORT_FN);
+  return sort(moves).desc(sortBy);
 };
