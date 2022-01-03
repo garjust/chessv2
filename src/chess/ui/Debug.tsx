@@ -53,6 +53,8 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
       `version=${'v6'}; timing=${timing}ms; move=${moveToDirectionString(move)}`
     );
   }
+
+  logger.next('--');
 }
 
 async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {

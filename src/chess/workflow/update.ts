@@ -20,6 +20,7 @@ import {
   checkedSquare,
   Draw,
   SquareLabel,
+  attackOverlay,
 } from './state';
 import { from } from 'rxjs';
 import {
@@ -179,7 +180,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     }
   }
 
-  return [{ ...state, squareOverlay }, null];
+  return [{ ...state, squareOverlay: attackOverlay(state) }, null];
 }
 
 function handlePreviousPosition(state: State): Update<State, Action> {
