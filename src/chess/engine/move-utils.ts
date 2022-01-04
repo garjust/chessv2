@@ -1,4 +1,11 @@
-import { AttackObject, Move, MoveWithExtraData, Piece, Square } from '../types';
+import {
+  AttackObject,
+  Move,
+  MoveWithExtraData,
+  Piece,
+  Square,
+  SquareControlObject,
+} from '../types';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;
@@ -58,6 +65,31 @@ export const rayScanner = (
     } else {
       // empty square!
       moves.push({ from, to, piece: scanningPiece.piece });
+    }
+  }
+
+  return moves;
+};
+
+export const rayControlScanner = (
+  pieces: Map<Square, Piece>,
+  scanningPiece: { square: Square; piece: Piece },
+  ray: Square[]
+): SquareControlObject[] => {
+  const moves: SquareControlObject[] = [];
+  const from = scanningPiece.square;
+
+  for (const to of ray) {
+    moves.push({
+      attacker: { square: from, type: scanningPiece.piece.type },
+      square: to,
+      slideSquares: moves.map(({ square }) => square),
+    });
+
+    const piece = pieces.get(to);
+    if (piece) {
+      // Stop scanning if we hit a piece of either colour
+      break;
     }
   }
 

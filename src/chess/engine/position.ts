@@ -1,6 +1,12 @@
-import { Color, Position as ExternalPosition, Square } from '../types';
+import { SquareMap } from '../square-map';
+import {
+  Color,
+  Position as ExternalPosition,
+  Square,
+  SquareControlObject,
+} from '../types';
 import { copyPosition, findKing } from '../utils';
-import { allAttackedSquares } from './attacks';
+import { allAttackedSquares, allPieceAttacks } from './attacks';
 import { findChecksOnKings } from './checks';
 import { findPinsOnKings } from './pins';
 import { KingSquares, Position } from './types';
@@ -13,13 +19,14 @@ const convertToInternal = (position: ExternalPosition): Position => {
     [Color.Black]: blackKing,
   };
 
+  const pieceAttacks = {
+    [Color.White]: allPieceAttacks(position.pieces, Color.White),
+    [Color.Black]: allPieceAttacks(position.pieces, Color.Black),
+  };
+
   const attackedSquares = {
-    [Color.White]: allAttackedSquares(position.pieces, Color.White, {
-      enPassantSquare: position.enPassantSquare,
-    }),
-    [Color.Black]: allAttackedSquares(position.pieces, Color.Black, {
-      enPassantSquare: position.enPassantSquare,
-    }),
+    [Color.White]: allAttackedSquares(position.pieces, Color.White),
+    [Color.Black]: allAttackedSquares(position.pieces, Color.Black),
   };
 
   const pinsToKing = findPinsOnKings(position.pieces, kings);
@@ -29,7 +36,14 @@ const convertToInternal = (position: ExternalPosition): Position => {
     castlingAvailability: position.castlingAvailability,
   });
 
-  return { ...position, kings, attackedSquares, checks, pinsToKing };
+  return {
+    ...position,
+    kings,
+    pieceAttacks,
+    attackedSquares,
+    checks,
+    pinsToKing,
+  };
 };
 
 const convertToExternal = (position: Position): ExternalPosition => {

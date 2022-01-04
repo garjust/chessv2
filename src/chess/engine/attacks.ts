@@ -5,17 +5,21 @@ import {
   PieceType,
   Square,
   AttackObject,
-  MoveWithExtraData,
+  Move,
+  SquareControlObject,
 } from '../types';
-import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
-import { isMoveInFile } from './move-utils';
+import { flipColor, CASTLING_AVAILABILITY_BLOCKED, isSlider } from '../utils';
+import { QUEEN_LOOKUP } from './move-lookup';
 import {
   bishopMoves,
   kingMoves,
   knightMoves,
   pawnMoves,
+  queenMoves,
   rookMoves,
 } from './piece-movement';
+import { forPiece } from './piece-movement-control';
+import { AttackedSquares, PieceAttacks } from './types';
 
 export const attacksOnSquare = (
   pieces: Map<Square, Piece>,
@@ -89,43 +93,143 @@ export const attacksOnSquare = (
   return attacks;
 };
 
-export const allAttackedSquares = (
+export const allPieceAttacks = (
   pieces: Map<Square, Piece>,
-  attackingColor: Color,
-  {
-    enPassantSquare,
-  }: {
-    enPassantSquare: Square | null;
-  }
-): Map<Square, boolean> => {
-  const attacks: Map<Square, boolean> = new SquareMap<boolean>();
+  attackingColor: Color
+): Map<Square, SquareControlObject[]> => {
+  const pieceAttacks: Map<Square, SquareControlObject[]> = new SquareMap<
+    SquareControlObject[]
+  >();
 
   for (let square = 0; square < 64; square++) {
-    attacks.set(
-      square,
-      attacksOnSquare(pieces, attackingColor, square, {
-        enPassantSquare,
-        skip: [],
-      }).length > 0
-    );
+    pieceAttacks.set(square, []);
   }
 
-  return attacks;
+  for (let square = 0; square < 64; square++) {
+    const attacks = attacksOnSquare(pieces, attackingColor, square, {
+      enPassantSquare: null,
+      skip: [],
+    });
+
+    for (const attack of attacks) {
+      const attackersObjects = pieceAttacks.get(attack.attacker.square);
+      if (!attackersObjects) {
+        throw Error('cant be possible');
+      }
+
+      attackersObjects.push({
+        square,
+        attacker: attack.attacker,
+        slideSquares: attack.slideSquares,
+      });
+    }
+  }
+
+  return pieceAttacks;
 };
 
-// Flawed, misses pawn captures when no piece is in pawn capture square
-// misses attacks on own pieces, which count.
-export const allAttackedSquaresFromMoves = (
-  moves: MoveWithExtraData[]
-): Map<Square, boolean> => {
-  const attacks: Map<Square, boolean> = new SquareMap<boolean>();
+export const allAttackedSquares = (
+  pieces: Map<Square, Piece>,
+  attackingColor: Color
+): Map<Square, number> => {
+  const attackedSquares: Map<Square, number> = new SquareMap<number>();
 
-  for (const move of moves) {
-    if (move.piece.type === PieceType.Pawn && isMoveInFile(move)) {
-      continue;
-    }
-    attacks.set(move.to, true);
+  for (let square = 0; square < 64; square++) {
+    attackedSquares.set(square, 0);
+
+    const attacks = attacksOnSquare(pieces, attackingColor, square, {
+      enPassantSquare: null,
+      skip: [],
+    });
+
+    attackedSquares.set(square, attacks.length);
   }
 
-  return attacks;
+  return attackedSquares;
+};
+
+const addAttacks = (
+  attackedSquares: AttackedSquares,
+  pieceAttacks: PieceAttacks,
+  color: Color,
+  square: Square,
+  squares: SquareControlObject[]
+) => {
+  for (const squareControl of squares) {
+    attackedSquares[color].set(
+      squareControl.square,
+      (attackedSquares[color].get(squareControl.square) ?? 0) + 1
+    );
+  }
+  pieceAttacks[color].set(square, squares);
+};
+
+const removeAttacks = (
+  attackedSquares: AttackedSquares,
+  pieceAttacks: PieceAttacks,
+  color: Color,
+  square: Square
+) => {
+  const squares = pieceAttacks[color].get(square) ?? [];
+
+  for (const squareControl of squares) {
+    attackedSquares[color].set(
+      squareControl.square,
+      (attackedSquares[color].get(squareControl.square) ?? 0) - 1
+    );
+  }
+  pieceAttacks[color].set(square, []);
+};
+
+export const updateAttackedSquares = (
+  attackedSquares: AttackedSquares,
+  pieceAttacks: PieceAttacks,
+  pieces: Map<Square, Piece>,
+  move: Move,
+  movedPiece: Piece
+) => {
+  const opponentColor = flipColor(movedPiece.color);
+
+  removeAttacks(attackedSquares, pieceAttacks, movedPiece.color, move.from);
+  removeAttacks(attackedSquares, pieceAttacks, opponentColor, move.to);
+
+  // Find the squares that are now attacked by the moved piece.
+  const newAttacks: SquareControlObject[] = forPiece(
+    movedPiece,
+    pieces,
+    move.to
+  );
+  addAttacks(
+    attackedSquares,
+    pieceAttacks,
+    movedPiece.color,
+    move.to,
+    newAttacks
+  );
+
+  // Find sliding pieces affected by the moved piece.
+  for (const [square, piece] of pieces) {
+    if (isSlider(piece.type)) {
+      if (
+        QUEEN_LOOKUP[square].flat().includes(move.to) ||
+        QUEEN_LOOKUP[square].flat().includes(move.from)
+      ) {
+        removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
+
+        const newAttacks: SquareControlObject[] = forPiece(
+          movedPiece,
+          pieces,
+          move.to
+        );
+
+        addAttacks(
+          attackedSquares,
+          pieceAttacks,
+          piece.color,
+          square,
+          newAttacks
+        );
+      }
+    }
+  }
 };

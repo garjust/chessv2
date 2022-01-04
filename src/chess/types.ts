@@ -47,7 +47,16 @@ export type AttackObject = {
   // The attacking piece
   attacker: { square: Square; type: PieceType };
   // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attacker.
+  // for the attack. A move to one of these squares blocks the attack.
+  slideSquares: Square[];
+};
+
+export type SquareControlObject = {
+  square: Square;
+  // The attacking piece
+  attacker: { square: Square; type: PieceType };
+  // If the attacker is a sliding piece this is the set of squares they move through
+  // for the attack. A move to one of these squares blocks the attack.
   slideSquares: Square[];
 };
 

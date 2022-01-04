@@ -1,8 +1,5 @@
 import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
-import {
-  allAttackedSquares,
-  allAttackedSquaresFromMoves,
-} from '../engine/attacks';
+import { allAttackedSquares } from '../engine/attacks';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import { SquareMap } from '../square-map';
 import {
@@ -130,15 +127,10 @@ export const availableCaptures = (state: State): Move[] =>
 export const attackOverlay = (state: State): SquareMap<SquareOverlayType> => {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
-  const attackMap = allAttackedSquares(state.position.pieces, Color.White, {
-    enPassantSquare: state.position.enPassantSquare,
-  });
-  // const attackMap = allAttackedSquaresFromMoves(
-  //   state.computedPositionData.moveData.moves
-  // );
+  const attackMap = allAttackedSquares(state.position.pieces, Color.White);
 
-  for (const [square, attacked] of attackMap) {
-    if (attacked) {
+  for (const [square, attackerCount] of attackMap) {
+    if (attackerCount > 0) {
       squareOverlay.set(square, SquareOverlayType.Check);
     }
   }
