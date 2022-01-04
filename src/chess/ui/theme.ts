@@ -8,6 +8,11 @@ export const PIECE_WHITE_STROKE = 'black';
 export const PIECE_BLACK_FILL = 'black';
 export const PIECE_BLACK_STROKE = 'white';
 
+export const BOARD_SQUARE_ATTACKED: React.CSSProperties = {
+  backgroundColor: 'rgba(229, 60, 60, 0.8)',
+  boxShadow: 'inset 0 0 8px 2px rgb(229, 60, 60)',
+};
+
 export const BOARD_SQUARE_CAPTURABLE: React.CSSProperties = {
   backgroundColor: 'rgba(199, 83, 141, 0.8)',
   boxShadow: 'inset 0 0 8px 2px rgb(199, 83, 141)',

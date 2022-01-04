@@ -274,6 +274,7 @@ function handleSetPosition(
     ...state,
     position,
     computedPositionData: { moveData, evaluationData: { evaluation } },
+    attackMap: engine._position.attackedSquares[Color.White],
   };
 
   if (position.halfMoveCount === 100) {

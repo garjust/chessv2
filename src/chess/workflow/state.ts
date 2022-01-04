@@ -55,6 +55,7 @@ export interface State {
   previousPositions: Position[];
   computedPositionData: ComputedPositionData;
   lastMove?: Move;
+  attackMap: Map<Square, number>;
 }
 
 const INITIAL_STATE: State = {
@@ -76,6 +77,7 @@ const INITIAL_STATE: State = {
       evaluation: 0,
     },
   },
+  attackMap: new SquareMap<number>(),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -127,11 +129,9 @@ export const availableCaptures = (state: State): Move[] =>
 export const attackOverlay = (state: State): SquareMap<SquareOverlayType> => {
   const squareOverlay = new SquareMap<SquareOverlayType>();
 
-  const attackMap = allAttackedSquares(state.position.pieces, Color.White);
-
-  for (const [square, attackerCount] of attackMap) {
+  for (const [square, attackerCount] of state.attackMap) {
     if (attackerCount > 0) {
-      squareOverlay.set(square, SquareOverlayType.Check);
+      squareOverlay.set(square, SquareOverlayType.LastMove);
     }
   }
 
