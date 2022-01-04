@@ -28,13 +28,14 @@ import {
   ChessComputerWorker,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { ImmutableEngine } from '../engine';
+import Engine from '../engine';
 import { SquareMap } from '../square-map';
 import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type Context = {};
+export type Context = {
+  engine: Engine;
+};
 
 const COMPUTER_VERISON: AvailableComputerVersions = 'v6';
 
@@ -180,20 +181,19 @@ function handleOverlaySquares(state: State): Update<State, Action> {
     }
   }
 
-  return [{ ...state, squareOverlay: attackOverlay(state) }, null];
+  return [{ ...state, squareOverlay }, null];
 }
 
-function handlePreviousPosition(state: State): Update<State, Action> {
-  let previousPositions = state.previousPositions;
-  let work: Action | null = null;
+function handlePreviousPosition(
+  state: State,
+  { engine }: Context
+): Update<State, Action> {
+  engine.undoLastMove();
 
-  const position = previousPositions[state.previousPositions.length - 1];
-  if (position) {
-    previousPositions = previousPositions.slice(0, -1);
-    work = setPositionAction(position);
-  }
-
-  return [{ ...state, previousPositions, selectedSquare: undefined }, work];
+  return [
+    { ...state, selectedSquare: undefined },
+    setPositionAction(engine.position),
+  ];
 }
 
 function handleReceiveComputerMove(
@@ -210,7 +210,8 @@ function handleResetOverlay(state: State): Update<State, Action> {
 
 function handleMovePiece(
   state: State,
-  action: Action.MovePiece
+  action: Action.MovePiece,
+  { engine }: Context
 ): Update<State, Action> {
   const { move } = action;
 
@@ -243,10 +244,7 @@ function handleMovePiece(
     move.promotion = PieceType.Queen;
   }
 
-  const { position, captured } = ImmutableEngine.applyMove(
-    state.position,
-    move
-  );
+  const captured = engine.applyMove(move);
   if (captured) {
     play(Sound.Capture);
   } else {
@@ -259,17 +257,18 @@ function handleMovePiece(
       lastMove: move,
       previousPositions: [...state.previousPositions, state.position],
     },
-    setPositionAction(position),
+    setPositionAction(engine.position),
   ];
 }
 
 function handleSetPosition(
   state: State,
-  action: Action.SetPosition
+  action: Action.SetPosition,
+  { engine }: Context
 ): Update<State, Action> {
   const { position } = action;
-  const moveData = ImmutableEngine.generateMovementData(position);
-  const evaluation = ImmutableEngine.evaluate(position);
+  const moveData = engine.generateMovementData();
+  const evaluation = engine.evaluate();
 
   state = {
     ...state,
@@ -317,12 +316,13 @@ function handleSetPosition(
 
 function handleSetPositionFromFEN(
   state: State,
-  action: Action.SetPositionFromFEN
+  action: Action.SetPositionFromFEN,
+  { engine }: Context
 ): Update<State, Action> {
-  return [
-    { ...state, winner: undefined },
-    setPositionAction(parseFEN(action.fenString)),
-  ];
+  const position = parseFEN(action.fenString);
+  engine.position = position;
+
+  return [{ ...state, winner: undefined }, setPositionAction(position)];
 }
 
 function handleToggleSquareLabels(state: State): Update<State, Action> {
@@ -347,7 +347,7 @@ function handleToggleSquareLabels(state: State): Update<State, Action> {
 export function update(
   state: State,
   action: Action,
-  _context: Context
+  context: Context
 ): Update<State, Action> {
   if (state.debugVersion != undefined) {
     state = { ...state, debugVersion: state.debugVersion + 1 };
@@ -369,17 +369,17 @@ export function update(
     case Type.OverlaySquares:
       return handleOverlaySquares(state);
     case Type.PreviousPosition:
-      return handlePreviousPosition(state);
+      return handlePreviousPosition(state, context);
     case Type.ReceiveComputerMove:
       return handleReceiveComputerMove(state, action);
     case Type.ResetOverlay:
       return handleResetOverlay(state);
     case Type.MovePiece:
-      return handleMovePiece(state, action);
+      return handleMovePiece(state, action, context);
     case Type.SetPosition:
-      return handleSetPosition(state, action);
+      return handleSetPosition(state, action, context);
     case Type.SetPositionFromFEN:
-      return handleSetPositionFromFEN(state, action);
+      return handleSetPositionFromFEN(state, action, context);
     case Type.ToggleSquareLabels:
       return handleToggleSquareLabels(state);
   }

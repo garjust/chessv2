@@ -19,6 +19,7 @@ import {
   VIENNA_OPENING_FEN,
   VIENNA_GAMBIT_ACCEPTED_FEN,
   PERFT_5_FEN,
+  parseFEN,
 } from '../lib/fen';
 import {
   runTestGame,
@@ -26,9 +27,12 @@ import {
 } from '../workflow/test-games';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
+import Engine from '../engine';
 
 const Game = () => {
-  const { states, emit, updates } = init(createState(), {});
+  const { states, emit, updates } = init(createState(), {
+    engine: new Engine(parseFEN(STARTING_POSITION_FEN)),
+  });
 
   updates.subscribe(updateLogger('Chess'));
 

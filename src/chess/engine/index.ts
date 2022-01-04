@@ -62,6 +62,11 @@ export default class Engine {
   get position(): ExternalPosition {
     return copyToExternal(this._position);
   }
+
+  set position(position: ExternalPosition) {
+    this._position = copyToInternal(position);
+    this._moveStack = [];
+  }
 }
 
 export const ImmutableEngine = {
