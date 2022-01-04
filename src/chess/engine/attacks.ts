@@ -9,7 +9,7 @@ import {
   SquareControlObject,
 } from '../types';
 import { flipColor, CASTLING_AVAILABILITY_BLOCKED, isSlider } from '../utils';
-import { QUEEN_LOOKUP } from './move-lookup';
+import { BISHOP_LOOKUP, QUEEN_LOOKUP, ROOK_LOOKUP } from './move-lookup';
 import {
   bishopMoves,
   kingMoves,
@@ -209,17 +209,35 @@ export const updateAttackedSquares = (
 
   // Find sliding pieces affected by the moved piece.
   for (const [square, piece] of pieces) {
+    let isIncident = false;
+
     if (isSlider(piece.type)) {
-      if (
-        QUEEN_LOOKUP[square].flat().includes(move.to) ||
-        QUEEN_LOOKUP[square].flat().includes(move.from)
-      ) {
+      switch (piece.type) {
+        case PieceType.Bishop:
+          isIncident =
+            BISHOP_LOOKUP[square].flat().includes(move.to) ||
+            BISHOP_LOOKUP[square].flat().includes(move.from);
+          break;
+        case PieceType.Rook:
+          isIncident =
+            ROOK_LOOKUP[square].flat().includes(move.to) ||
+            ROOK_LOOKUP[square].flat().includes(move.from);
+          break;
+        case PieceType.Queen:
+          isIncident =
+            QUEEN_LOOKUP[square].flat().includes(move.to) ||
+            QUEEN_LOOKUP[square].flat().includes(move.from);
+
+          break;
+      }
+
+      if (isIncident) {
         removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
 
         const newAttacks: SquareControlObject[] = forPiece(
-          movedPiece,
+          piece,
           pieces,
-          move.to
+          square
         );
 
         addAttacks(

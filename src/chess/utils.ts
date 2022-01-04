@@ -67,7 +67,9 @@ export const squareGenerator = function* () {
   }
 };
 
-export const isSlider = (type?: PieceType): boolean =>
+export const isSlider = (
+  type?: PieceType
+): type is PieceType.Bishop | PieceType.Rook | PieceType.Queen =>
   type === PieceType.Bishop ||
   type === PieceType.Queen ||
   type === PieceType.Rook;
