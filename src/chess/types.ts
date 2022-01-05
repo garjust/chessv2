@@ -66,11 +66,6 @@ export type MoveWithExtraData = Move & {
   weight?: number;
 };
 
-export type PieceMoves = {
-  piece: Piece;
-  moves: MoveWithExtraData[];
-};
-
 export type CastlingAvailability = {
   [Color.White]: {
     kingside: boolean;

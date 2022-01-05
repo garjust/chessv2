@@ -1,7 +1,6 @@
 import {
   Color,
   MoveWithExtraData,
-  PieceMoves,
   Piece,
   PieceType,
   Square,
@@ -92,8 +91,8 @@ const movesForPosition = (
     castlingAvailability: CastlingAvailability;
     pieceAttacks: PieceAttacks;
   }
-): PieceMoves[] => {
-  const pieceMoves: PieceMoves[] = [];
+): MoveWithExtraData[] => {
+  const moves: MoveWithExtraData[] = [];
 
   const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
     options;
@@ -102,18 +101,16 @@ const movesForPosition = (
     if (color && piece.color !== color) {
       continue;
     }
-    const moves = movesForPiece(pieces, piece, square, {
-      enPassantSquare,
-      castlingAvailability,
-      pieceAttacks,
-    });
-    pieceMoves.push({
-      piece,
-      moves: moves.map((move) => ({ ...move, from: square })),
-    });
+    moves.push(
+      ...movesForPiece(pieces, piece, square, {
+        enPassantSquare,
+        castlingAvailability,
+        pieceAttacks,
+      })
+    );
   }
 
-  return pieceMoves;
+  return moves;
 };
 
 const movesForPositionFromAttacks = (
@@ -124,8 +121,8 @@ const movesForPositionFromAttacks = (
     castlingAvailability: CastlingAvailability;
     pieceAttacks: PieceAttacks;
   }
-): PieceMoves[] => {
-  const pieceMoves: PieceMoves[] = [];
+): MoveWithExtraData[] => {
+  const moves: MoveWithExtraData[] = [];
 
   const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
     options;
@@ -135,7 +132,6 @@ const movesForPositionFromAttacks = (
       continue;
     }
 
-    const moves: MoveWithExtraData[] = [];
     const attacks = pieceAttacks[piece.color].get(square) ?? [];
 
     for (const squareControl of attacks) {
@@ -190,14 +186,9 @@ const movesForPositionFromAttacks = (
         })
       );
     }
-
-    pieceMoves.push({
-      piece,
-      moves,
-    });
   }
 
-  return pieceMoves;
+  return moves;
 };
 
 const moveResolvesCheck = (
@@ -327,10 +318,8 @@ export const generateMovementData = (
     });
   }
 
-  const allMoves: MoveWithExtraData[] = [];
-
-  // const movesets = movesForPositionFromAttacks(pieces, {
-  const movesets = movesForPosition(pieces, {
+  // let moves = movesForPositionFromAttacks(pieces, {
+  const moves = movesForPosition(pieces, {
     color,
     enPassantSquare,
     castlingAvailability:
@@ -340,34 +329,32 @@ export const generateMovementData = (
     pieceAttacks,
   });
 
-  for (const { piece, moves } of movesets) {
-    if (king) {
-      for (const move of moves) {
-        if (checksForPlayer.length > 0) {
-          if (!moveResolvesCheck(checksForPlayer, move, { ignoreKing: true })) {
-            continue;
-          }
-        }
-        if (
-          !noCheckFromMove(
-            pieces,
-            color,
-            king,
-            move,
-            pinsToKing[color]
-            // attackedSquares[flipColor(color)]
-          )
-        ) {
-          continue;
-        }
+  if (king) {
+    for (let i = moves.length - 1; i >= 0; i--) {
+      const move = moves[i];
 
-        allMoves.push(move);
+      if (checksForPlayer.length > 0) {
+        if (!moveResolvesCheck(checksForPlayer, move, { ignoreKing: true })) {
+          moves.splice(i, 1);
+        }
+      }
+      if (
+        !noCheckFromMove(
+          pieces,
+          color,
+          king,
+          move,
+          pinsToKing[color]
+          // attackedSquares[flipColor(color)]
+        )
+      ) {
+        moves.splice(i, 1);
       }
     }
   }
 
   return {
-    moves: allMoves,
+    moves,
     checks: checksForPlayer,
   };
 };
