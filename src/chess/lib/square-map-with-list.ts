@@ -1,5 +1,5 @@
-import { Square } from './types';
-import { isLegalSquare } from './utils';
+import { Square } from '../types';
+import { isLegalSquare } from '../utils';
 
 const entriesIterator = function* <T>(array: { square: Square; item: T }[]) {
   for (const { square, item } of array) {

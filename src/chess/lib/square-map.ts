@@ -1,5 +1,5 @@
-import { Square } from './types';
-import { isLegalSquare } from './utils';
+import { Square } from '../types';
+import { isLegalSquare } from '../utils';
 
 const iterator = function* <T>(array: T[]) {
   for (let i = 0; i < 64; i++) {

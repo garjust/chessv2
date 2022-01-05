@@ -395,6 +395,18 @@ export const generateMovementData = (
         legalMoves,
         pinsToKing[color]
       );
+      //   legalMoves = pruneMovesInCheckWithAttackMap(
+      //     checksForPlayer,
+      //     attackedSquares[flipColor(color)],
+      //     piece,
+      //     legalMoves
+      //   );
+      //   legalMoves = pruneChecksWithAttackMap(
+      //     king,
+      //     legalMoves,
+      //     attackedSquares[flipColor(color)],
+      //     pinsToKing[color]
+      //   );
     }
 
     allMoves.push(...legalMoves);

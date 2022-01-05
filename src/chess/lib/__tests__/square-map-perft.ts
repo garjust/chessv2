@@ -1,7 +1,7 @@
-import { parseFEN, VIENNA_OPENING_FEN } from '../lib/fen';
+import { parseFEN, VIENNA_OPENING_FEN } from '../fen';
 import { SquareMap } from '../square-map';
 import { SquareMapWithList } from '../square-map-with-list';
-import { Square } from '../types';
+import { Square } from '../../types';
 
 const N = 10_000;
 
