@@ -1,8 +1,8 @@
 import { SquareBitmask, ZERO } from '../../lib/bitboard-def';
 import { Move } from '../../types';
 import {
-  KING_RAYS_FLAT,
-  KING_RAY_BITARRAYS_FLAT,
+  QUEEN_RAYS_FLAT,
+  QUEEN_RAY_BITARRAYS,
   KING_RAY_BITBOARDS_FLAT,
 } from '../move-lookup';
 
@@ -54,8 +54,8 @@ function bitboard(move: Move) {
 function arrayIncludes(move: Move) {
   let counter = 0;
   for (let i = 0; i < N; i++) {
-    KING_RAYS_FLAT[KING].includes(move.from) ||
-    KING_RAYS_FLAT[KING].includes(move.to)
+    QUEEN_RAYS_FLAT[KING].includes(move.from) ||
+    QUEEN_RAYS_FLAT[KING].includes(move.to)
       ? counter++
       : counter;
   }
@@ -65,7 +65,7 @@ function arrayIncludes(move: Move) {
 function arraySome(move: Move) {
   let counter = 0;
   for (let i = 0; i < N; i++) {
-    KING_RAYS_FLAT[KING].some((x) => x === move.from || x === move.to)
+    QUEEN_RAYS_FLAT[KING].some((x) => x === move.from || x === move.to)
       ? counter++
       : counter;
   }
@@ -75,8 +75,7 @@ function arraySome(move: Move) {
 function arrayLookup(move: Move) {
   let counter = 0;
   for (let i = 0; i < N; i++) {
-    KING_RAY_BITARRAYS_FLAT[KING][move.from] ||
-    KING_RAY_BITARRAYS_FLAT[KING][move.to]
+    QUEEN_RAY_BITARRAYS[KING][move.from] || QUEEN_RAY_BITARRAYS[KING][move.to]
       ? counter++
       : counter;
   }

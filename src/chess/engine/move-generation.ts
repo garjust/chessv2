@@ -32,9 +32,11 @@ const movesForPiece = (
   {
     enPassantSquare,
     castlingAvailability,
+    pieceAttacks,
   }: {
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
+    pieceAttacks: PieceAttacks;
   }
 ) => {
   const moves: MoveWithExtraData[] = [];
@@ -46,8 +48,10 @@ const movesForPiece = (
     case PieceType.King:
       moves.push(
         ...kingMoves(pieces, piece.color, square, {
+          castlingOnly: false,
           enPassantSquare,
           castlingAvailability,
+          pieceAttacks,
         })
       );
       break;
@@ -58,6 +62,7 @@ const movesForPiece = (
       moves.push(
         ...pawnMoves(pieces, piece.color, square, {
           attacksOnly: false,
+          advanceOnly: false,
           enPassantSquare,
         })
       );
@@ -79,11 +84,13 @@ const movesForPosition = (
     color?: Color;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
+    pieceAttacks: PieceAttacks;
   }
 ): PieceMoves[] => {
   const pieceMoves: PieceMoves[] = [];
 
-  const { color, enPassantSquare, castlingAvailability } = options;
+  const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
+    options;
 
   for (const [square, piece] of pieces.entries()) {
     if (color && piece.color !== color) {
@@ -92,6 +99,7 @@ const movesForPosition = (
     const moves = movesForPiece(pieces, piece, square, {
       enPassantSquare,
       castlingAvailability,
+      pieceAttacks,
     });
     pieceMoves.push({
       piece,
@@ -102,16 +110,103 @@ const movesForPosition = (
   return pieceMoves;
 };
 
+const movesForPositionFromAttacks = (
+  pieces: Map<Square, Piece>,
+  pieceAttacks: PieceAttacks,
+  options: {
+    color?: Color;
+    enPassantSquare: Square | null;
+    castlingAvailability: CastlingAvailability;
+  }
+): PieceMoves[] => {
+  const pieceMoves: PieceMoves[] = [];
+
+  const { color, enPassantSquare, castlingAvailability } = options;
+
+  for (const [square, piece] of pieces.entries()) {
+    if (color && piece.color !== color) {
+      continue;
+    }
+
+    const moves: MoveWithExtraData[] = [];
+    const attacks = pieceAttacks[piece.color].get(square) ?? [];
+
+    for (const squareControl of attacks) {
+      const attackedPiece = pieces.get(squareControl.square);
+
+      // Get rid of attacks on own-pieces.
+      if (attackedPiece && attackedPiece.color === color) {
+        continue;
+      }
+
+      if (piece.type === PieceType.Pawn) {
+        // The only pawn moves here are capturing moves, so make sure they
+        // are actually captures.
+        if (!attackedPiece && squareControl.square !== enPassantSquare) {
+          continue;
+        }
+      }
+
+      moves.push({
+        from: squareControl.attacker.square,
+        to: squareControl.square,
+        piece,
+        attack: attackedPiece
+          ? {
+              attacked: {
+                square: squareControl.square,
+                type: attackedPiece.type,
+              },
+              attacker: { square, type: piece.type },
+              slideSquares: squareControl.slideSquares,
+            }
+          : undefined,
+      });
+    }
+
+    if (piece.type === PieceType.King) {
+      // Add castling moves
+      moves.push(
+        ...kingMoves(pieces, piece.color, square, {
+          castlingOnly: true,
+          enPassantSquare,
+          castlingAvailability,
+          pieceAttacks,
+        })
+      );
+    } else if (piece.type === PieceType.Pawn) {
+      // Add advance moves.
+      moves.push(
+        ...pawnMoves(pieces, piece.color, square, {
+          attacksOnly: false,
+          advanceOnly: true,
+          enPassantSquare,
+        })
+      );
+    }
+
+    pieceMoves.push({
+      piece,
+      moves,
+    });
+  }
+
+  return pieceMoves;
+};
+
 export const generateMovementData = (
   pieces: Map<Square, Piece>,
   color: Color,
   {
+    attackedSquares,
+    pieceAttacks,
     pinsToKing,
     kings,
     enPassantSquare,
     castlingAvailability,
   }: {
     attackedSquares: AttackedSquares;
+    pieceAttacks: PieceAttacks;
     pinsToKing: KingPins;
     checks: KingChecks;
     kings: KingSquares;

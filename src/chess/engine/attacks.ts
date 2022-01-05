@@ -9,7 +9,14 @@ import {
   SquareControlObject,
 } from '../types';
 import { flipColor, CASTLING_AVAILABILITY_BLOCKED, isSlider } from '../utils';
-import { BISHOP_LOOKUP, QUEEN_LOOKUP, ROOK_LOOKUP } from './move-lookup';
+import {
+  BISHOP_LOOKUP,
+  BISHOP_RAY_BITARRAYS,
+  QUEEN_LOOKUP,
+  QUEEN_RAY_BITARRAYS,
+  ROOK_LOOKUP,
+  ROOK_RAY_BITARRAYS,
+} from './move-lookup';
 import {
   bishopMoves,
   kingMoves,
@@ -40,13 +47,19 @@ export const attacksOnSquare = (
   // on the target square.
   const superPieceMoves = [
     kingMoves(pieces, color, square, {
+      castlingOnly: false,
       enPassantSquare,
       castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
+      pieceAttacks: {
+        [Color.White]: new SquareMap<SquareControlObject[]>(),
+        [Color.Black]: new SquareMap<SquareControlObject[]>(),
+      },
     }),
     bishopMoves(pieces, color, square, { skip }),
     rookMoves(pieces, color, square, { skip }),
     knightMoves(pieces, color, square),
     pawnMoves(pieces, color, square, {
+      advanceOnly: false,
       attacksOnly: true,
       enPassantSquare: enPassantSquare,
     }),
@@ -215,18 +228,18 @@ export const updateAttackedSquares = (
       switch (piece.type) {
         case PieceType.Bishop:
           isIncident =
-            BISHOP_LOOKUP[square].flat().includes(move.to) ||
-            BISHOP_LOOKUP[square].flat().includes(move.from);
+            BISHOP_RAY_BITARRAYS[square][move.from] ||
+            BISHOP_RAY_BITARRAYS[square][move.to];
           break;
         case PieceType.Rook:
           isIncident =
-            ROOK_LOOKUP[square].flat().includes(move.to) ||
-            ROOK_LOOKUP[square].flat().includes(move.from);
+            ROOK_RAY_BITARRAYS[square][move.from] ||
+            ROOK_RAY_BITARRAYS[square][move.to];
           break;
         case PieceType.Queen:
           isIncident =
-            QUEEN_LOOKUP[square].flat().includes(move.to) ||
-            QUEEN_LOOKUP[square].flat().includes(move.from);
+            QUEEN_RAY_BITARRAYS[square][move.from] ||
+            QUEEN_RAY_BITARRAYS[square][move.to];
 
           break;
       }

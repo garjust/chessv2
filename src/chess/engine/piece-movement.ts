@@ -13,7 +13,6 @@ import {
   isStartPositionPawn,
   isPromotionPositionPawn,
 } from '../utils';
-import { attacksOnSquare } from './attacks';
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
@@ -21,6 +20,7 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
+import { PieceAttacks } from './types';
 
 export const pawnMoves = (
   pieces: Map<Square, Piece>,
@@ -28,8 +28,13 @@ export const pawnMoves = (
   from: Square,
   {
     attacksOnly,
+    advanceOnly,
     enPassantSquare,
-  }: { attacksOnly: boolean; enPassantSquare: Square | null }
+  }: {
+    attacksOnly: boolean;
+    advanceOnly: boolean;
+    enPassantSquare: Square | null;
+  }
 ): MoveWithExtraData[] => {
   let squares: MoveWithExtraData[] = [];
   const opponentColor = flipColor(color);
@@ -57,46 +62,51 @@ export const pawnMoves = (
     }
   }
 
-  const leftCaptureSquare = advanceFn(left(from));
-  const rightCaptureSquare = advanceFn(right(from));
-
-  const leftCapturePiece = pieces.get(leftCaptureSquare);
-  const rightCapturePiece = pieces.get(rightCaptureSquare);
-
   // Pawn captures diagonally.
-  if (
-    leftCaptureSquare % 8 !== 7 &&
-    leftCapturePiece &&
-    (leftCapturePiece?.color === opponentColor ||
-      enPassantSquare === leftCaptureSquare)
-  ) {
-    squares.push({
-      from,
-      to: leftCaptureSquare,
-      piece: { type: PieceType.Pawn, color },
-      attack: {
-        attacker: { square: from, type: PieceType.Pawn },
-        attacked: { square: leftCaptureSquare, type: leftCapturePiece?.type },
-        slideSquares: [],
-      },
-    });
-  }
-  if (
-    rightCaptureSquare % 8 !== 0 &&
-    rightCapturePiece &&
-    (rightCapturePiece?.color === opponentColor ||
-      enPassantSquare === rightCaptureSquare)
-  ) {
-    squares.push({
-      from,
-      to: rightCaptureSquare,
-      piece: { type: PieceType.Pawn, color },
-      attack: {
-        attacker: { square: from, type: PieceType.Pawn },
-        attacked: { square: rightCaptureSquare, type: rightCapturePiece?.type },
-        slideSquares: [],
-      },
-    });
+  if (!advanceOnly) {
+    const leftCaptureSquare = advanceFn(left(from));
+    const rightCaptureSquare = advanceFn(right(from));
+
+    const leftCapturePiece = pieces.get(leftCaptureSquare);
+    const rightCapturePiece = pieces.get(rightCaptureSquare);
+
+    if (
+      leftCaptureSquare % 8 !== 7 &&
+      leftCapturePiece &&
+      (leftCapturePiece?.color === opponentColor ||
+        enPassantSquare === leftCaptureSquare)
+    ) {
+      squares.push({
+        from,
+        to: leftCaptureSquare,
+        piece: { type: PieceType.Pawn, color },
+        attack: {
+          attacker: { square: from, type: PieceType.Pawn },
+          attacked: { square: leftCaptureSquare, type: leftCapturePiece?.type },
+          slideSquares: [],
+        },
+      });
+    }
+    if (
+      rightCaptureSquare % 8 !== 0 &&
+      rightCapturePiece &&
+      (rightCapturePiece?.color === opponentColor ||
+        enPassantSquare === rightCaptureSquare)
+    ) {
+      squares.push({
+        from,
+        to: rightCaptureSquare,
+        piece: { type: PieceType.Pawn, color },
+        attack: {
+          attacker: { square: from, type: PieceType.Pawn },
+          attacked: {
+            square: rightCaptureSquare,
+            type: rightCapturePiece?.type,
+          },
+          slideSquares: [],
+        },
+      });
+    }
   }
 
   // If the pawn will promote on next advancement take the possible pawn moves
@@ -143,16 +153,20 @@ export const kingMoves = (
   color: Color,
   from: Square,
   {
+    castlingOnly,
     enPassantSquare,
     castlingAvailability,
+    pieceAttacks,
   }: {
+    castlingOnly: boolean;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
+    pieceAttacks: PieceAttacks;
   }
 ): MoveWithExtraData[] => {
-  const squares = KING_LOOKUP[from].filter(
-    (to) => pieces.get(to)?.color !== color
-  );
+  const squares = castlingOnly
+    ? []
+    : KING_LOOKUP[from].filter((to) => pieces.get(to)?.color !== color);
 
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
@@ -160,10 +174,7 @@ export const kingMoves = (
     castlingAvailability[color].kingside &&
     !pieces.get(right(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(pieces, flipColor(color), right(from), {
-      enPassantSquare,
-      skip: [from],
-    }).length === 0 &&
+    pieceAttacks[flipColor(color)].get(right(from))?.length === 0 &&
     !pieces.get(right(from, 2))
   ) {
     squares.push(right(from, 2));
@@ -172,10 +183,7 @@ export const kingMoves = (
     castlingAvailability[color].queenside &&
     !pieces.get(left(from)) &&
     // Also check nothing is attacking the square being castled through
-    attacksOnSquare(pieces, flipColor(color), left(from), {
-      enPassantSquare,
-      skip: [from],
-    }).length === 0 &&
+    pieceAttacks[flipColor(color)].get(left(from))?.length === 0 &&
     !pieces.get(left(from, 2)) &&
     !pieces.get(left(from, 3))
   ) {

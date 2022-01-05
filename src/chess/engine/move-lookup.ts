@@ -86,30 +86,53 @@ for (const { rank, file } of squareGenerator()) {
   ];
 }
 
-// For each square, all squares for all rays which intersect it.
-const KING_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
+// Flat ray lists
+//
+// For each square, all squares for rays which intersect it.
+const BISHOP_RAYS_FLAT: Square[][] = BISHOP_LOOKUP.map((raySet) =>
+  raySet.flat()
+);
+const ROOK_RAYS_FLAT: Square[][] = ROOK_LOOKUP.map((raySet) => raySet.flat());
+const QUEEN_RAYS_FLAT: Square[][] = [...BISHOP_RAYS_FLAT, ...ROOK_RAYS_FLAT];
 
-// For each square, all squares for all rays which intersect it in a sparse
-// array format. This allows array index lookup (square as index) instead of
-// searching the rays.
-const KING_RAY_BITARRAYS_FLAT: boolean[][] = KING_RAYS_FLAT.map((squares) => {
+// Flat Bitarrays
+//
+// For each square, all squares for rays which intersect it in a sparse
+// array format. This allows array index lookup (square as index) to determine
+// if a square intersects any of the rays.
+export const BISHOP_RAY_BITARRAYS: boolean[][] = BISHOP_RAYS_FLAT.map(
+  (squares) => {
+    const array = Array(64);
+    squares.forEach((x) => (array[x] = true));
+    return array;
+  }
+);
+export const ROOK_RAY_BITARRAYS: boolean[][] = ROOK_RAYS_FLAT.map((squares) => {
   const array = Array(64);
   squares.forEach((x) => (array[x] = true));
   return array;
 });
+export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
+  (squares) => {
+    const array = Array(64);
+    squares.forEach((x) => (array[x] = true));
+    return array;
+  }
+);
+export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
+  (squares) => {
+    const array = Array(64);
+    squares.forEach((x) => (array[x] = true));
+    return array;
+  }
+);
 
 // For each square, all squares for all rays which intersect it in bitboard
 // format. unfortunately bigints are quite slow so bit operations are much
 // slower than expected.
-const KING_RAY_BITBOARDS_FLAT: bigint[] = KING_RAYS_FLAT.map((flatRays) =>
+const KING_RAY_BITBOARDS_FLAT: bigint[] = QUEEN_RAYS_FLAT.map((flatRays) =>
   fromSquares(flatRays)
 );
-
-const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map((squares) => {
-  const array = Array(64);
-  squares.forEach((x) => (array[x] = true));
-  return array;
-});
 
 export {
   BISHOP_LOOKUP,
@@ -117,9 +140,7 @@ export {
   KNIGHT_LOOKUP,
   QUEEN_LOOKUP,
   ROOK_LOOKUP,
+  QUEEN_RAYS_FLAT,
   KING_RAYS,
-  KING_RAYS_FLAT,
-  KING_RAY_BITARRAYS_FLAT,
   KING_RAY_BITBOARDS_FLAT,
-  SUPER_PIECE_BITARRAYS,
 };

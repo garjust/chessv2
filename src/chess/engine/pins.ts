@@ -1,7 +1,7 @@
 import { SquareMap } from '../square-map';
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
 import { flipColor } from '../utils';
-import { KING_RAYS, KING_RAY_BITARRAYS_FLAT } from './move-lookup';
+import { KING_RAYS, QUEEN_RAY_BITARRAYS } from './move-lookup';
 import { KingSquares, KingPins } from './types';
 
 const pinsToSquare = (
@@ -94,8 +94,8 @@ export const updatePinsOnKings = (
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      KING_RAY_BITARRAYS_FLAT[playingKing][move.from] ||
-      KING_RAY_BITARRAYS_FLAT[playingKing][move.to]
+      QUEEN_RAY_BITARRAYS[playingKing][move.from] ||
+      QUEEN_RAY_BITARRAYS[playingKing][move.to]
     ) {
       pins[currentMove] = pinsToSquare(pieces, playingKing, currentMove);
     }
@@ -108,8 +108,8 @@ export const updatePinsOnKings = (
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      KING_RAY_BITARRAYS_FLAT[opponentKing][move.from] ||
-      KING_RAY_BITARRAYS_FLAT[opponentKing][move.to]
+      QUEEN_RAY_BITARRAYS[opponentKing][move.from] ||
+      QUEEN_RAY_BITARRAYS[opponentKing][move.to]
     ) {
       pins[flipColor(currentMove)] = pinsToSquare(
         pieces,
