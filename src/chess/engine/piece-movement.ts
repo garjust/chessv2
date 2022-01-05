@@ -154,12 +154,10 @@ export const kingMoves = (
   from: Square,
   {
     castlingOnly,
-    enPassantSquare,
     castlingAvailability,
     pieceAttacks,
   }: {
     castlingOnly: boolean;
-    enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
     pieceAttacks: PieceAttacks;
   }

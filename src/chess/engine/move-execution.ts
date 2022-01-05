@@ -11,6 +11,7 @@ import {
   flipColor,
   isStartPositionPawn,
 } from '../utils';
+import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
@@ -176,6 +177,14 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     move,
     piece
   );
+  // updateAttackedSquares(
+  //   position.attackedSquares,
+  //   position.pieceAttacks,
+  //   position.pieces,
+  //   move,
+  //   piece
+  // );
+
   // NOTE: Re-enable this when up to date check data is needed for move ordering
   // or evaluation. This adds check calculation to the leaf nodes of a move
   // search, while currently check calculation only happens in nodes of depth
@@ -250,6 +259,14 @@ export const undoMove = (position: Position, result: MoveResult): void => {
       });
     }
   }
+
+  // updateAttackedSquares(
+  //   position.attackedSquares,
+  //   position.pieceAttacks,
+  //   position.pieces,
+  //   move,
+  //   piece
+  // );
 
   // Undo rest of the position state.
   if (position.turn === Color.White) {

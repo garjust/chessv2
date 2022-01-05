@@ -10,6 +10,7 @@
 ## TODO
 
 - Decrease weight of moves to squares attacked by pawns
+- King pinned to square being castled through is now a legal move again in kingMoves of piece-movement-control.ts
 
 ### Attack Maps
 

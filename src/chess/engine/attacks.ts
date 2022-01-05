@@ -48,7 +48,6 @@ export const attacksOnSquare = (
   const superPieceMoves = [
     kingMoves(pieces, color, square, {
       castlingOnly: false,
-      enPassantSquare,
       castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
       pieceAttacks: {
         [Color.White]: new SquareMap<SquareControlObject[]>(),
