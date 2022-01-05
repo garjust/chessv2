@@ -244,7 +244,7 @@ const pruneMovesInCheck = (
     }
   }
 
-  throw Error('getting here is not possible');
+  return moves;
 };
 
 const pruneMovesInCheckWithAttackMap = (
@@ -284,7 +284,7 @@ const pruneMovesInCheckWithAttackMap = (
     }
   }
 
-  throw Error('getting here is not possible');
+  return moves;
 };
 
 const pruneChecks = (

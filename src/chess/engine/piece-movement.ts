@@ -13,6 +13,7 @@ import {
   isStartPositionPawn,
   isPromotionPositionPawn,
 } from '../utils';
+import { attacksOnSquare } from './attacks';
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
@@ -172,7 +173,11 @@ export const kingMoves = (
     castlingAvailability[color].kingside &&
     !pieces.get(right(from)) &&
     // Also check nothing is attacking the square being castled through
-    pieceAttacks[flipColor(color)].get(right(from))?.length === 0 &&
+    // pieceAttacks[flipColor(color)].get(right(from))?.length === 0 &&
+    attacksOnSquare(pieces, flipColor(color), right(from), {
+      enPassantSquare: null,
+      skip: [from],
+    }).length === 0 &&
     !pieces.get(right(from, 2))
   ) {
     squares.push(right(from, 2));
@@ -181,7 +186,11 @@ export const kingMoves = (
     castlingAvailability[color].queenside &&
     !pieces.get(left(from)) &&
     // Also check nothing is attacking the square being castled through
-    pieceAttacks[flipColor(color)].get(left(from))?.length === 0 &&
+    // pieceAttacks[flipColor(color)].get(left(from))?.length === 0 &&
+    attacksOnSquare(pieces, flipColor(color), left(from), {
+      enPassantSquare: null,
+      skip: [from],
+    }).length === 0 &&
     !pieces.get(left(from, 2)) &&
     !pieces.get(left(from, 3))
   ) {
