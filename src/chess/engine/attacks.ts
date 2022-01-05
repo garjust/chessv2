@@ -1,4 +1,3 @@
-import { SquareMap } from '../square-map';
 import {
   Color,
   Piece,
@@ -50,8 +49,8 @@ export const attacksOnSquare = (
       castlingOnly: false,
       castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
       pieceAttacks: {
-        [Color.White]: new SquareMap<SquareControlObject[]>(),
-        [Color.Black]: new SquareMap<SquareControlObject[]>(),
+        [Color.White]: new Map<Square, SquareControlObject[]>(),
+        [Color.Black]: new Map<Square, SquareControlObject[]>(),
       },
     }),
     bishopMoves(pieces, color, square, { skip }),
@@ -109,9 +108,7 @@ export const allPieceAttacks = (
   pieces: Map<Square, Piece>,
   attackingColor: Color
 ): Map<Square, SquareControlObject[]> => {
-  const pieceAttacks: Map<Square, SquareControlObject[]> = new SquareMap<
-    SquareControlObject[]
-  >();
+  const pieceAttacks = new Map<Square, SquareControlObject[]>();
 
   for (let square = 0; square < 64; square++) {
     pieceAttacks.set(square, []);
@@ -144,7 +141,7 @@ export const allAttackedSquares = (
   pieces: Map<Square, Piece>,
   attackingColor: Color
 ): Map<Square, number> => {
-  const attackedSquares: Map<Square, number> = new SquareMap<number>();
+  const attackedSquares = new Map<Square, number>();
 
   for (let square = 0; square < 64; square++) {
     attackedSquares.set(square, 0);

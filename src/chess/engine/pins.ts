@@ -1,4 +1,3 @@
-import { SquareMap } from '../square-map';
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
 import { flipColor } from '../utils';
 import { KING_RAYS, QUEEN_RAY_BITARRAYS } from './move-lookup';
@@ -9,7 +8,7 @@ const pinsToSquare = (
   square: Square,
   color: Color
 ) => {
-  const pins = new SquareMap<Pin>();
+  const pins = new Map<Square, Pin>();
   const rays = KING_RAYS[square];
 
   for (const { type, ray } of rays) {

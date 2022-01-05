@@ -1,4 +1,3 @@
-import { SquareMap } from '../square-map';
 import {
   Color,
   Piece,
@@ -52,8 +51,8 @@ const pieceToFenPiece = (piece: Piece): string =>
 const fenPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
 
-const pieceMapFromFenPieces = (fenPieces: string): SquareMap<Piece> => {
-  const pieces = new SquareMap<Piece>();
+const pieceMapFromFenPieces = (fenPieces: string): Map<Square, Piece> => {
+  const pieces = new Map<Square, Piece>();
 
   let rank = 7;
   let file = 0;

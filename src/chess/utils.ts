@@ -1,4 +1,3 @@
-import { SquareMap } from './square-map';
 import {
   Color,
   Move,
@@ -121,7 +120,7 @@ export const findKing = (
 };
 
 export const copyPosition = (position: Position): Position => {
-  const pieces = new SquareMap<Piece>();
+  const pieces = new Map<Square, Piece>();
   for (const [key, value] of position.pieces) {
     pieces.set(key, value);
   }

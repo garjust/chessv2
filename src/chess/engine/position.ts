@@ -1,10 +1,4 @@
-import { SquareMap } from '../square-map';
-import {
-  Color,
-  Position as ExternalPosition,
-  Square,
-  SquareControlObject,
-} from '../types';
+import { Color, Position as ExternalPosition } from '../types';
 import { copyPosition, findKing } from '../utils';
 import { allAttackedSquares, allPieceAttacks } from './attacks';
 import { findChecksOnKings } from './checks';

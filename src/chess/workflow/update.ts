@@ -1,5 +1,5 @@
 import { Update } from '../../lib/workflow';
-import { Color, PieceType } from '../types';
+import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
 import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
 import {
@@ -29,7 +29,6 @@ import {
   ChessComputerWorkerConstructor,
 } from '../ai/types';
 import Engine from '../engine';
-import { SquareMap } from '../square-map';
 import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
 
@@ -148,7 +147,7 @@ function handleLoadChessComputer(
 }
 
 function handleOverlaySquares(state: State): Update<State, Action> {
-  const squareOverlay = new SquareMap<SquareOverlayType>();
+  const squareOverlay = new Map<Square, SquareOverlayType>();
 
   const { position, selectedSquare, lastMove, computedPositionData } = state;
 

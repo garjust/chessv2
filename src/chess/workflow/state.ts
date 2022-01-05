@@ -1,7 +1,6 @@
 import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
 import { allAttackedSquares } from '../engine/attacks';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
-import { SquareMap } from '../square-map';
 import {
   Color,
   Position,
@@ -50,7 +49,7 @@ export interface State {
   };
   winner?: Color | typeof Draw;
   selectedSquare?: Square;
-  squareOverlay?: SquareMap<SquareOverlayType>;
+  squareOverlay?: Map<Square, SquareOverlayType>;
   position: Position;
   previousPositions: Position[];
   computedPositionData: ComputedPositionData;
@@ -77,7 +76,7 @@ const INITIAL_STATE: State = {
       evaluation: 0,
     },
   },
-  attackMap: new SquareMap<number>(),
+  attackMap: new Map<Square, number>(),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -126,8 +125,8 @@ export const checkedSquare = (state: State): Square | undefined =>
 export const availableCaptures = (state: State): Move[] =>
   state.computedPositionData.moveData.moves.filter((move) => move.attack);
 
-export const attackOverlay = (state: State): SquareMap<SquareOverlayType> => {
-  const squareOverlay = new SquareMap<SquareOverlayType>();
+export const attackOverlay = (state: State): Map<Square, SquareOverlayType> => {
+  const squareOverlay = new Map<Square, SquareOverlayType>();
 
   for (const [square, attackerCount] of state.attackMap) {
     if (attackerCount > 0) {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { State } from '../workflow';
 import { ChessComputerWrapped } from '../workflow/state';
-import { SquareMap } from '../square-map';
 import { Move, Square } from '../types';
 import { moveToDirectionString, squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
@@ -27,7 +26,7 @@ function replacer(key: string, value: unknown) {
     return (value as number).toPrecision(6);
   }
 
-  if (value instanceof Map || value instanceof SquareMap) {
+  if (value instanceof Map) {
     return `{ size ${value.size} }`;
   }
 
