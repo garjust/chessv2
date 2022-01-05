@@ -205,54 +205,12 @@ const pruneMovesInCheck = (
   piece: Piece,
   moves: MoveWithExtraData[]
 ): MoveWithExtraData[] => {
-  // We need to prune moves when in check since only moves that remove the
-  // check are legal.
-  if (checks.length > 0) {
-    if (checks.length === 1) {
-      const check = checks[0];
-      // In the case that the king is checked by a single piece we can capture
-      // the piece or block the attack.
-      if (piece.type !== PieceType.King) {
-        return moves.filter(
-          (move) =>
-            squaresInclude(check.slideSquares, move.to) ||
-            check.attacker.square === move.to
-        );
-      } else {
-        // The king can only move out of the check or capture the checking
-        // piece. The king cannot block the check.
-        return moves.filter(
-          (move) => !squaresInclude(check.slideSquares, move.to)
-        );
-      }
-    } else {
-      // In the case that the king is checked by multiple pieces (can only be 2)
-      // the king must move.
-
-      // Prune all moves if the piece is not the king.
-      if (piece.type !== PieceType.King) {
-        return [];
-      }
-      // Prune king moves that move to an attacked square.
-      return moves.filter(
-        (move) =>
-          !squaresInclude(
-            checks.flatMap((check) => check.slideSquares),
-            move.to
-          )
-      );
-    }
+  // If the moving piece is a king all it's moves should be retained. Moves
+  // into an attacked square are pruned elsewhere.
+  if (piece.type === PieceType.King) {
+    return moves;
   }
 
-  return moves;
-};
-
-const pruneMovesInCheckWithAttackMap = (
-  checks: AttackObject[],
-  attackMap: Map<Square, number>,
-  piece: Piece,
-  moves: MoveWithExtraData[]
-): MoveWithExtraData[] => {
   // We need to prune moves when in check since only moves that remove the
   // check are legal.
   if (checks.length > 0) {
@@ -260,27 +218,15 @@ const pruneMovesInCheckWithAttackMap = (
       const check = checks[0];
       // In the case that the king is checked by a single piece we can capture
       // the piece or block the attack.
-      if (piece.type !== PieceType.King) {
-        return moves.filter(
-          (move) =>
-            squaresInclude(check.slideSquares, move.to) ||
-            check.attacker.square === move.to
-        );
-      } else {
-        // The king can only move out of the check or capture the checking
-        // piece. The king cannot block the check.
-        return moves.filter((move) => attackMap.get(move.to) === 0);
-      }
+      return moves.filter(
+        (move) =>
+          squaresInclude(check.slideSquares, move.to) ||
+          check.attacker.square === move.to
+      );
     } else {
       // In the case that the king is checked by multiple pieces (can only be 2)
       // the king must move.
-
-      // Prune all moves if the piece is not the king.
-      if (piece.type !== PieceType.King) {
-        return [];
-      }
-      // Prune king moves that move to an attacked square.
-      return moves.filter((move) => attackMap.get(move.to) === 0);
+      return [];
     }
   }
 
@@ -395,18 +341,12 @@ export const generateMovementData = (
         legalMoves,
         pinsToKing[color]
       );
-      //   legalMoves = pruneMovesInCheckWithAttackMap(
-      //     checksForPlayer,
-      //     attackedSquares[flipColor(color)],
-      //     piece,
-      //     legalMoves
-      //   );
-      //   legalMoves = pruneChecksWithAttackMap(
-      //     king,
-      //     legalMoves,
-      //     attackedSquares[flipColor(color)],
-      //     pinsToKing[color]
-      //   );
+      // legalMoves = pruneChecksWithAttackMap(
+      //   king,
+      //   legalMoves,
+      //   attackedSquares[flipColor(color)],
+      //   pinsToKing[color]
+      // );
     }
 
     allMoves.push(...legalMoves);
