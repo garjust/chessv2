@@ -200,47 +200,71 @@ const movesForPositionFromAttacks = (
   return pieceMoves;
 };
 
-const pruneMovesInCheck = (
+const moveResolvesCheck = (
   checks: AttackObject[],
-  piece: Piece,
-  moves: MoveWithExtraData[]
-): MoveWithExtraData[] => {
+  move: MoveWithExtraData,
+  { ignoreKing }: { ignoreKing: boolean }
+): boolean => {
   // If the moving piece is a king all it's moves should be retained. Moves
   // into an attacked square are pruned elsewhere.
-  if (piece.type === PieceType.King) {
-    return moves;
+  if (ignoreKing && move.piece.type === PieceType.King) {
+    return true;
   }
 
   // We need to prune moves when in check since only moves that remove the
   // check are legal.
-  if (checks.length > 0) {
-    if (checks.length === 1) {
-      const check = checks[0];
-      // In the case that the king is checked by a single piece we can capture
-      // the piece or block the attack.
-      return moves.filter(
-        (move) =>
-          squaresInclude(check.slideSquares, move.to) ||
-          check.attacker.square === move.to
-      );
-    } else {
-      // In the case that the king is checked by multiple pieces (can only be 2)
-      // the king must move.
-      return [];
-    }
+  if (checks.length === 1) {
+    const check = checks[0];
+    // In the case that the king is checked by a single piece we can capture
+    // the piece or block the attack.
+    return (
+      squaresInclude(check.slideSquares, move.to) ||
+      check.attacker.square === move.to
+    );
+  } else if (checks.length === 2) {
+    // In the case that the king is checked by multiple pieces (can only be 2)
+    // the king must move.
+    return false;
+  } else {
+    throw Error(`called with ${checks.length} not exactly 1 or 2 checks`);
   }
-
-  return moves;
 };
 
-const pruneChecks = (
+const pruneMovesInCheck = (
+  checks: AttackObject[],
+  moves: MoveWithExtraData[]
+): MoveWithExtraData[] => {
+  return moves.filter((move) =>
+    moveResolvesCheck(checks, move, { ignoreKing: true })
+  );
+};
+
+const noCheckFromMove = (
   pieces: Map<Square, Piece>,
   color: Color,
   king: Square,
-  moves: MoveWithExtraData[],
-  pins: Map<Square, Pin>
-) => {
-  return moves.filter((move) => {
+  move: MoveWithExtraData,
+  pins: Map<Square, Pin>,
+  attackMap?: Map<Square, number>
+): boolean => {
+  // We need to prune moves that result in a check on ourselves.
+  //
+  // To do this we track pieces that are pinned to the king as well as
+  // looking at king moves.
+  if (attackMap) {
+    if (move.from === king) {
+      // This is a king move, verify the destination square is not attacked.
+      return attackMap.get(move.to) === 0;
+    } else {
+      const pin = pins.get(move.from);
+      if (!pin) {
+        return true;
+      }
+
+      // We are dealing with a pinned piece.
+      return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
+    }
+  } else {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
       return (
@@ -258,33 +282,20 @@ const pruneChecks = (
       // We are dealing with a pinned piece.
       return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
     }
-  });
+  }
 };
 
-const pruneChecksWithAttackMap = (
+const pruneChecks = (
+  pieces: Map<Square, Piece>,
+  color: Color,
   king: Square,
   moves: MoveWithExtraData[],
-  attackMap: Map<Square, number>,
-  pins: Map<Square, Pin>
+  pins: Map<Square, Pin>,
+  attackMap?: Map<Square, number>
 ) => {
-  // We need to prune moves that result in a check on ourselves.
-  //
-  // To do this we track pieces that are pinned to the king as well as
-  // looking at king moves.
-  return moves.filter((move) => {
-    if (move.from === king) {
-      // This is a king move, verify the destination square is not attacked.
-      return attackMap.get(move.to) === 0;
-    } else {
-      const pin = pins.get(move.from);
-      if (!pin) {
-        return true;
-      }
-
-      // We are dealing with a pinned piece.
-      return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
-    }
-  });
+  return moves.filter((move) =>
+    noCheckFromMove(pieces, color, king, move, pins, attackMap)
+  );
 };
 
 export const generateMovementData = (
@@ -330,26 +341,29 @@ export const generateMovementData = (
   });
 
   for (const { piece, moves } of movesets) {
-    let legalMoves: MoveWithExtraData[] = moves;
-
     if (king) {
-      legalMoves = pruneMovesInCheck(checksForPlayer, piece, legalMoves);
-      legalMoves = pruneChecks(
-        pieces,
-        color,
-        king,
-        legalMoves,
-        pinsToKing[color]
-      );
-      // legalMoves = pruneChecksWithAttackMap(
-      //   king,
-      //   legalMoves,
-      //   attackedSquares[flipColor(color)],
-      //   pinsToKing[color]
-      // );
-    }
+      for (const move of moves) {
+        if (checksForPlayer.length > 0) {
+          if (!moveResolvesCheck(checksForPlayer, move, { ignoreKing: true })) {
+            continue;
+          }
+        }
+        if (
+          !noCheckFromMove(
+            pieces,
+            color,
+            king,
+            move,
+            pinsToKing[color]
+            // attackedSquares[flipColor(color)]
+          )
+        ) {
+          continue;
+        }
 
-    allMoves.push(...legalMoves);
+        allMoves.push(move);
+      }
+    }
   }
 
   return {

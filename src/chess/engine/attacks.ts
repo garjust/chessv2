@@ -7,13 +7,10 @@ import {
   Move,
   SquareControlObject,
 } from '../types';
-import { flipColor, CASTLING_AVAILABILITY_BLOCKED, isSlider } from '../utils';
+import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
 import {
-  BISHOP_LOOKUP,
   BISHOP_RAY_BITARRAYS,
-  QUEEN_LOOKUP,
   QUEEN_RAY_BITARRAYS,
-  ROOK_LOOKUP,
   ROOK_RAY_BITARRAYS,
 } from './move-lookup';
 import {
@@ -21,7 +18,6 @@ import {
   kingMoves,
   knightMoves,
   pawnMoves,
-  queenMoves,
   rookMoves,
 } from './piece-movement';
 import { forPiece } from './piece-movement-control';
@@ -220,43 +216,38 @@ export const updateAttackedSquares = (
   for (const [square, piece] of pieces) {
     let isIncident = false;
 
-    if (isSlider(piece.type)) {
-      switch (piece.type) {
-        case PieceType.Bishop:
-          isIncident =
-            BISHOP_RAY_BITARRAYS[square][move.from] ||
-            BISHOP_RAY_BITARRAYS[square][move.to];
-          break;
-        case PieceType.Rook:
-          isIncident =
-            ROOK_RAY_BITARRAYS[square][move.from] ||
-            ROOK_RAY_BITARRAYS[square][move.to];
-          break;
-        case PieceType.Queen:
-          isIncident =
-            QUEEN_RAY_BITARRAYS[square][move.from] ||
-            QUEEN_RAY_BITARRAYS[square][move.to];
+    switch (piece.type) {
+      case PieceType.Bishop:
+        isIncident =
+          BISHOP_RAY_BITARRAYS[square][move.from] ||
+          BISHOP_RAY_BITARRAYS[square][move.to];
+        break;
+      case PieceType.Rook:
+        isIncident =
+          ROOK_RAY_BITARRAYS[square][move.from] ||
+          ROOK_RAY_BITARRAYS[square][move.to];
+        break;
+      case PieceType.Queen:
+        isIncident =
+          QUEEN_RAY_BITARRAYS[square][move.from] ||
+          QUEEN_RAY_BITARRAYS[square][move.to];
+        break;
+      default:
+        break;
+    }
 
-          break;
-      }
+    if (isIncident) {
+      removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
 
-      if (isIncident) {
-        removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
+      const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
 
-        const newAttacks: SquareControlObject[] = forPiece(
-          piece,
-          pieces,
-          square
-        );
-
-        addAttacks(
-          attackedSquares,
-          pieceAttacks,
-          piece.color,
-          square,
-          newAttacks
-        );
-      }
+      addAttacks(
+        attackedSquares,
+        pieceAttacks,
+        piece.color,
+        square,
+        newAttacks
+      );
     }
   }
 };
