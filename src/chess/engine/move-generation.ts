@@ -176,7 +176,6 @@ const movesForPositionFromAttacks = (
       moves.push(
         ...kingMoves(pieces, piece.color, square, {
           castlingOnly: true,
-          enPassantSquare,
           castlingAvailability,
           pieceAttacks,
         })

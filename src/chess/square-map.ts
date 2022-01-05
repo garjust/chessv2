@@ -1,5 +1,16 @@
 import { Square } from './types';
-import { isLegalSquare, rankFileToSquare } from './utils';
+import { isLegalSquare } from './utils';
+
+const iterator = function* <T>(array: T[]) {
+  for (let i = 0; i < 64; i++) {
+    const value = array[i];
+
+    if (value !== undefined) {
+      const tuple: [Square, T] = [i, value];
+      yield tuple;
+    }
+  }
+};
 
 export class SquareMap<T> implements Map<Square, T> {
   map: T[];
@@ -53,18 +64,7 @@ export class SquareMap<T> implements Map<Square, T> {
   }
 
   entries(): IterableIterator<[Square, T]> {
-    const map = this.map;
-
-    return (function* entriesGenerator() {
-      for (let i = 0; i < 64; i++) {
-        const value = map[i];
-
-        if (value !== undefined) {
-          const tuple: [Square, T] = [i, value];
-          yield tuple;
-        }
-      }
-    })();
+    return iterator(this.map);
   }
 
   keys(): IterableIterator<Square> {
