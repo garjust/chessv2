@@ -93,7 +93,7 @@ const BISHOP_RAYS_FLAT: Square[][] = BISHOP_LOOKUP.map((raySet) =>
   raySet.flat()
 );
 const ROOK_RAYS_FLAT: Square[][] = ROOK_LOOKUP.map((raySet) => raySet.flat());
-const QUEEN_RAYS_FLAT: Square[][] = [...BISHOP_RAYS_FLAT, ...ROOK_RAYS_FLAT];
+const QUEEN_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
 
 // Flat Bitarrays
 //
@@ -119,6 +119,7 @@ export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
     return array;
   }
 );
+
 export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
   (squares) => {
     const array = Array(64);
