@@ -18,7 +18,7 @@ import {
   AvailableComputerVersions,
   ChessComputerWorkerConstructor,
 } from '../ai/types';
-import { moveToDirectionString } from '../utils';
+import { moveString } from '../utils';
 import { BUTTON_CSS } from './theme';
 
 async function runMoveGenerationTest(
@@ -50,7 +50,7 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
     const move = await instance.nextMove(fen);
     const timing = Date.now() - start;
     logger.next(
-      `version=${'v6'}; timing=${timing}ms; move=${moveToDirectionString(move)}`
+      `version=${'v6'}; timing=${timing}ms; move=${moveString(move)}`
     );
   }
 
@@ -74,9 +74,7 @@ async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
     const move = await ai.nextMove(fen);
     const timing = Date.now() - start;
     logger.next(
-      `version=${version}; timing=${timing}ms; move=${moveToDirectionString(
-        move
-      )}`
+      `version=${version}; timing=${timing}ms; move=${moveString(move)}`
     );
   }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { State } from '../workflow';
 import { ChessComputerWrapped } from '../workflow/state';
 import { Move, Square } from '../types';
-import { moveToDirectionString, squareLabel } from '../utils';
+import { moveString, squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
 import { formatBitboard } from '../lib/bitboard-def';
 
@@ -18,7 +18,7 @@ function replacer(key: string, value: unknown) {
   // if (key === 'moves') {
   //   console.log(
   //     'moves',
-  //     (value as Move[]).map((move) => moveToDirectionString(move))
+  //     (value as Move[]).map((move) => moveString(move))
   //   );
   // }
 

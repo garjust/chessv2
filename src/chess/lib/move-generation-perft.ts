@@ -5,7 +5,7 @@ import {
   VIENNA_OPENING_FEN,
 } from './fen';
 import Engine from '../engine';
-import { moveToDirectionString } from '../utils';
+import { moveString } from '../utils';
 
 export type MoveTest = {
   fen: string;
@@ -68,7 +68,7 @@ export const searchRoot = (
   const moves = engine.generateMoves();
   for (const move of moves) {
     engine.applyMove(move);
-    counts[moveToDirectionString(move, '')] = search(engine, depth - 1);
+    counts[moveString(move, '')] = search(engine, depth - 1);
     engine.undoLastMove();
   }
 

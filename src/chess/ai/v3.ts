@@ -1,6 +1,6 @@
 import { ChessComputer } from './types';
 import { Move, Position } from '../types';
-import { moveToDirectionString } from '../utils';
+import { moveString } from '../utils';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
 
@@ -25,7 +25,7 @@ export default class v3 implements ChessComputer<Position> {
     console.log(
       `v3 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
       results.map(({ move, score }) => ({
-        move: moveToDirectionString(move),
+        move: moveString(move),
         score,
       }))
     );

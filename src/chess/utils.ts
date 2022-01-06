@@ -35,6 +35,30 @@ export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
   },
 });
 
+export const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
+  b: PieceType.Bishop,
+  B: PieceType.Bishop,
+  k: PieceType.King,
+  K: PieceType.King,
+  n: PieceType.Knight,
+  N: PieceType.Knight,
+  p: PieceType.Pawn,
+  P: PieceType.Pawn,
+  q: PieceType.Queen,
+  Q: PieceType.Queen,
+  r: PieceType.Rook,
+  R: PieceType.Rook,
+});
+
+export const PIECE_TYPE_TO_FEN_PIECE = Object.freeze({
+  [PieceType.Bishop]: 'b',
+  [PieceType.King]: 'k',
+  [PieceType.Knight]: 'n',
+  [PieceType.Pawn]: 'p',
+  [PieceType.Queen]: 'q',
+  [PieceType.Rook]: 'r',
+});
+
 const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
   ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'] as SquareLabel[],
   ['a7', 'b7', 'c7', 'd7', 'e7', 'f7', 'g7', 'h7'] as SquareLabel[],
@@ -89,25 +113,32 @@ export const isLegalSquare = (square: Square): boolean =>
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
-const pieceTypeToMoveStringCharacter = (type: PromotionOption): string => {
-  switch (type) {
-    case PieceType.Bishop:
-      return 'b';
-    case PieceType.Knight:
-      return 'n';
-    case PieceType.Queen:
-      return 'q';
-    case PieceType.Rook:
-      return 'r';
-  }
-};
+const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
+  PIECE_TYPE_TO_FEN_PIECE[type];
 
-export const moveToDirectionString = (move: Move, delimiter = '->'): string =>
+export const moveString = (move: Move, delimiter = ''): string =>
   move.promotion
     ? `${squareLabel(move.from)}${delimiter}${squareLabel(
         move.to
       )}${pieceTypeToMoveStringCharacter(move.promotion)}`
     : `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}`;
+
+export const moveFromString = (moveString: string): Move => {
+  const from = moveString.slice(0, 2) as SquareLabel;
+  const to = moveString.slice(2, 4) as SquareLabel;
+  const promotion = moveString.slice(4, 5) as 'n' | 'b' | 'q' | 'r';
+
+  const move: Move = {
+    from: labelToSquare(from),
+    to: labelToSquare(to),
+  };
+
+  if (promotion.length > 0) {
+    move.promotion = FEN_PIECE_TO_PIECE_TYPE[promotion] as PromotionOption;
+  }
+
+  return move;
+};
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White

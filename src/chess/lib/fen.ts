@@ -1,12 +1,11 @@
+import { Color, Piece, Position, Square, SquareLabel } from '../types';
 import {
-  Color,
-  Piece,
-  PieceType,
-  Position,
-  Square,
-  SquareLabel,
-} from '../types';
-import { squareLabel, labelToSquare, rankFileToSquare } from '../utils';
+  squareLabel,
+  labelToSquare,
+  rankFileToSquare,
+  PIECE_TYPE_TO_FEN_PIECE,
+  FEN_PIECE_TO_PIECE_TYPE,
+} from '../utils';
 
 export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 export const STARTING_POSITION_FEN =
@@ -18,30 +17,6 @@ export const VIENNA_GAMBIT_ACCEPTED_FEN =
   '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w  - 1 11';
 export const VIENNA_OPENING_FEN =
   'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
-
-const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
-  b: PieceType.Bishop,
-  B: PieceType.Bishop,
-  k: PieceType.King,
-  K: PieceType.King,
-  n: PieceType.Knight,
-  N: PieceType.Knight,
-  p: PieceType.Pawn,
-  P: PieceType.Pawn,
-  q: PieceType.Queen,
-  Q: PieceType.Queen,
-  r: PieceType.Rook,
-  R: PieceType.Rook,
-});
-
-const PIECE_TYPE_TO_FEN_PIECE = Object.freeze({
-  [PieceType.Bishop]: 'b',
-  [PieceType.King]: 'k',
-  [PieceType.Knight]: 'n',
-  [PieceType.Pawn]: 'p',
-  [PieceType.Queen]: 'q',
-  [PieceType.Rook]: 'R',
-});
 
 const pieceToFenPiece = (piece: Piece): string =>
   piece.color === Color.White
