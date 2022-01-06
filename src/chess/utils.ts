@@ -88,10 +88,12 @@ export const isLegalSquare = (square: Square): boolean =>
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
-export const moveToDirectionString = (move: Move): string =>
+export const moveToDirectionString = (move: Move, delimiter = '->'): string =>
   move.promotion
-    ? `${squareLabel(move.from)}->${squareLabel(move.to)}(${move.promotion})`
-    : `${squareLabel(move.from)}->${squareLabel(move.to)}`;
+    ? `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}(${
+        move.promotion
+      })`
+    : `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}`;
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White
