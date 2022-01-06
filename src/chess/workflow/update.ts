@@ -1,7 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN, formatPosition } from '../lib/fen';
+import { parseFEN, formatPosition, STARTING_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
   overlaySquaresAction,
@@ -20,11 +20,7 @@ import {
   SquareOverlayCategory,
 } from './state';
 import { from } from 'rxjs';
-import {
-  AvailableComputerVersions,
-  ChessComputerWorker,
-  ChessComputerWorkerConstructor,
-} from '../ai/types';
+import { AvailableComputerVersions } from '../ai/types';
 import Engine from '../engine';
 import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
@@ -33,6 +29,7 @@ import {
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
+import { loadComputer, loadEngine } from '../workers';
 
 export type Context = {
   engine: Engine;
@@ -40,16 +37,7 @@ export type Context = {
 
 const COMPUTER_VERISON: AvailableComputerVersions = 'v6';
 
-const loadComputer = async (
-  version: AvailableComputerVersions
-): Promise<ChessComputerWorker> => {
-  const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
-    new Worker(new URL('../workers/ai', import.meta.url))
-  );
-  const instance = await new ChessComputerWorkerRemote();
-  await instance.load(version);
-  return instance;
-};
+(window as any).LOAD_ENGINE = () => loadEngine(parseFEN(STARTING_POSITION_FEN));
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;
