@@ -25,7 +25,7 @@ export const STARTING_POSITION: MoveTest = {
 
 export const VIENNA_OPENING: MoveTest = {
   fen: VIENNA_OPENING_FEN,
-  counts: [27, 966, 27249],
+  counts: [27, 966, 27249, 951936, 28181171, 982980787],
 };
 
 export const isCountCorrectForDepthFromStart = (
@@ -99,7 +99,7 @@ export const run = (
 
     logger(
       `depth=${i}; passed=${
-        passed ? 'yes' : 'no'
+        passed ? 'yes' : 'no '
       }; count=${NUMBER_FORMATTR.format(count)}; timing=${timing}ms (${(
         (timing / count) *
         1000

@@ -40,6 +40,7 @@ export const pawnMoves = (
   let squares: MoveWithExtraData[] = [];
   const opponentColor = flipColor(color);
   const advanceFn = color === Color.White ? up : down;
+  const opponentAdvanceFn = color === Color.White ? down : up;
 
   // Space forward of the pawn.
   if (
@@ -68,14 +69,18 @@ export const pawnMoves = (
     const leftCaptureSquare = advanceFn(left(from));
     const rightCaptureSquare = advanceFn(right(from));
 
-    const leftCapturePiece = pieces.get(leftCaptureSquare);
-    const rightCapturePiece = pieces.get(rightCaptureSquare);
+    const leftCapturePiece =
+      leftCaptureSquare === enPassantSquare
+        ? pieces.get(opponentAdvanceFn(enPassantSquare))
+        : pieces.get(leftCaptureSquare);
+    const rightCapturePiece =
+      rightCaptureSquare === enPassantSquare
+        ? pieces.get(opponentAdvanceFn(enPassantSquare))
+        : pieces.get(rightCaptureSquare);
 
     if (
       leftCaptureSquare % 8 !== 7 &&
-      leftCapturePiece &&
-      (leftCapturePiece?.color === opponentColor ||
-        enPassantSquare === leftCaptureSquare)
+      leftCapturePiece?.color === opponentColor
     ) {
       squares.push({
         from,
@@ -83,16 +88,14 @@ export const pawnMoves = (
         piece: { type: PieceType.Pawn, color },
         attack: {
           attacker: { square: from, type: PieceType.Pawn },
-          attacked: { square: leftCaptureSquare, type: leftCapturePiece?.type },
+          attacked: { square: leftCaptureSquare, type: leftCapturePiece.type },
           slideSquares: [],
         },
       });
     }
     if (
       rightCaptureSquare % 8 !== 0 &&
-      rightCapturePiece &&
-      (rightCapturePiece?.color === opponentColor ||
-        enPassantSquare === rightCaptureSquare)
+      rightCapturePiece?.color === opponentColor
     ) {
       squares.push({
         from,
@@ -102,7 +105,7 @@ export const pawnMoves = (
           attacker: { square: from, type: PieceType.Pawn },
           attacked: {
             square: rightCaptureSquare,
-            type: rightCapturePiece?.type,
+            type: rightCapturePiece.type,
           },
           slideSquares: [],
         },
