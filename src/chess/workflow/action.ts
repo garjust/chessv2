@@ -7,7 +7,6 @@ export enum Type {
   ChessComputerLoaded = 'CHESS_COMPUTER_LOADED',
   ClickSquare = 'CLICK_SQUARE',
   FlipBoard = 'FLIP_BOARD',
-  Initialize = 'INITIALIZE',
   LoadChessComputer = 'LOAD_CHESS_COMPUTER',
   MovePiece = 'MOVE_PIECE',
   OverlaySquares = 'OVERLAY_SQUARES',
@@ -41,11 +40,6 @@ export declare namespace Action {
 
   export interface FlipBoard {
     readonly type: Type.FlipBoard;
-  }
-
-  export interface Initialize {
-    readonly type: Type.Initialize;
-    readonly playingAs: Color;
   }
 
   export interface LoadChessComputer {
@@ -96,7 +90,6 @@ export type Action =
   | Action.ChessComputerLoaded
   | Action.ClickSquare
   | Action.FlipBoard
-  | Action.Initialize
   | Action.LoadChessComputer
   | Action.OverlaySquares
   | Action.PreviousPosition
@@ -131,11 +124,6 @@ export const clickSquareAction = (square: Square): Action.ClickSquare => ({
 
 export const flipBoardAction = (): Action.FlipBoard => ({
   type: Type.FlipBoard,
-});
-
-export const initializeAction = (playingAs: Color): Action.Initialize => ({
-  type: Type.Initialize,
-  playingAs,
 });
 
 export const loadChessComputerAction = (

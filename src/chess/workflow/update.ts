@@ -1,10 +1,9 @@
 import { Update } from '../../lib/workflow';
 import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN, BLANK_POSITION_FEN, formatPosition } from '../lib/fen';
+import { parseFEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
-  setPositionFromFENAction,
   overlaySquaresAction,
   setPositionAction,
   attemptComputerMoveAction,
@@ -14,7 +13,6 @@ import {
 import { State, Action, Type } from './index';
 import {
   SquareOverlayType,
-  createState,
   pieceInSquare,
   HumanPlayer,
   Draw,
@@ -146,13 +144,6 @@ function handleFlipBoard(state: State): Update<State, Action> {
   const newOrientation = flipColor(state.boardOrientation);
 
   return [{ ...state, boardOrientation: newOrientation }, null];
-}
-
-function handleInitialize(
-  _state: State,
-  action: Action.Initialize
-): Update<State, Action> {
-  return [createState({}), setPositionFromFENAction(BLANK_POSITION_FEN)];
 }
 
 function handleLoadChessComputer(
@@ -382,8 +373,6 @@ export function update(
       return handleClickSquare(state, action);
     case Type.FlipBoard:
       return handleFlipBoard(state);
-    case Type.Initialize:
-      return handleInitialize(state, action);
     case Type.LoadChessComputer:
       return handleLoadChessComputer(state, action);
     case Type.OverlaySquares:

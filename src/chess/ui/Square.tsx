@@ -59,7 +59,6 @@ const Square = (props: SquareProps) => {
   if (showHeatmap) {
     const value = DEFAULT_HEATMAP[square];
     const adjusted = value / 10;
-    console.log('values:', value, adjusted);
     css = {
       ...css,
       ...BOARD_SQUARE_SELECTED,
