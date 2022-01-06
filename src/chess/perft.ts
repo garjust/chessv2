@@ -5,14 +5,19 @@ import Engine from './engine';
 
 const DEBUG = false;
 
-const [, , depth, fen, moves] = argv;
+const [, , depth, fen, movesString] = argv;
 if (DEBUG) {
-  console.log('args', depth, fen, moves);
+  console.log('args', depth, fen, movesString);
 }
 
 const position = parseFEN(fen);
 if (DEBUG) {
   console.log('parsed position', position);
+}
+
+const moveList = movesString.split(' ');
+if (DEBUG) {
+  console.log('parsed moves', moveList);
 }
 
 const engine = new Engine(position);
