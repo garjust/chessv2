@@ -78,6 +78,9 @@ function handleChangeOverlay(state: State): Update<State, Action> {
       nextCategory = SquareOverlayCategory.AttacksForBlack;
       break;
     case SquareOverlayCategory.AttacksForBlack:
+      nextCategory = SquareOverlayCategory.Heatmap;
+      break;
+    case SquareOverlayCategory.Heatmap:
       nextCategory = SquareOverlayCategory.Play;
       break;
   }

@@ -1,4 +1,5 @@
-import { Square } from '../types';
+import { HEATMAPS } from '../lib/heatmaps';
+import { Color, PieceType, Square } from '../types';
 import {
   State,
   checkedSquare,
@@ -6,10 +7,10 @@ import {
   pieceInSquare,
 } from './state';
 
-export function setOverlayForPlay(
+export const setOverlayForPlay = (
   map: Map<Square, SquareOverlayType>,
   state: State
-): void {
+): void => {
   const { position, selectedSquare, lastMove, moves } = state;
 
   if (lastMove) {
@@ -40,15 +41,15 @@ export function setOverlayForPlay(
       });
     }
   }
-}
+};
 
-export function setOverlayForAttacks(
+export const setOverlayForAttacks = (
   map: Map<Square, SquareOverlayType>,
   attacks: Map<Square, number>
-) {
+) => {
   for (const [square, count] of attacks) {
     if (count > 0) {
       map.set(square, SquareOverlayType.Attacked);
     }
   }
-}
+};

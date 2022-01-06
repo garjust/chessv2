@@ -1,6 +1,6 @@
 import React from 'react';
 import './Square.css';
-import { Color } from '../types';
+import { Color, PieceType } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
@@ -8,6 +8,7 @@ import {
   pieceInSquare,
   SquareLabel,
   SquareOverlayType,
+  showHeatmap,
 } from '../workflow/state';
 import {
   BOARD_SQUARE_BLACK,
@@ -22,6 +23,9 @@ import {
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../workflow/action';
 import Piece from './Piece';
+import { HEATMAPS } from '../lib/heatmaps';
+
+const DEFAULT_HEATMAP = HEATMAPS[PieceType.Knight][Color.White];
 
 export type SquareProps = {
   color: Color;
@@ -35,13 +39,14 @@ const makeRender =
     overlay: state.squareOverlay?.get(square),
     isClickable: isSquareClickable(state, square),
     squareLabels: state.squareLabels,
+    showHeatmap: showHeatmap(state),
   });
 
 const Square = (props: SquareProps) => {
   const { rendering, emit } = useWorkflow(makeRender(props));
 
   const { square, color } = props;
-  const { piece, overlay, isClickable, squareLabels } = rendering;
+  const { piece, overlay, isClickable, squareLabels, showHeatmap } = rendering;
 
   let css: React.CSSProperties = {
     position: 'relative',
@@ -51,7 +56,16 @@ const Square = (props: SquareProps) => {
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
   };
 
-  if (overlay) {
+  if (showHeatmap) {
+    const value = DEFAULT_HEATMAP[square];
+    const adjusted = value / 10;
+    console.log('values:', value, adjusted);
+    css = {
+      ...css,
+      ...BOARD_SQUARE_SELECTED,
+      filter: `saturate(${adjusted})`,
+    };
+  } else if (overlay) {
     switch (overlay) {
       case SquareOverlayType.Attacked:
         css = { ...css, ...BOARD_SQUARE_ATTACKED };
@@ -73,13 +87,6 @@ const Square = (props: SquareProps) => {
         break;
     }
   }
-
-  // const value = HEATMAPS[PieceType.Rook][Color.White][square];
-  // css = {
-  //   ...css,
-  //   ...BOARD_SQUARE_SELECTED,
-  //   filter: `saturate(${(value + 10) / 10})`,
-  // };
 
   let label: string | null = null;
   if (squareLabels === SquareLabel.Index) {

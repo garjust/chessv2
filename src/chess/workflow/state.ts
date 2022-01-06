@@ -29,6 +29,7 @@ export enum SquareOverlayCategory {
   Play = 'PLAY',
   AttacksForWhite = 'ATTACKS_FOR_WHITE',
   AttacksForBlack = 'ATTACKS_FOR_BLACK',
+  Heatmap = 'HEATMAP',
 }
 
 export const HumanPlayer = Symbol('HUMAN');
@@ -125,3 +126,6 @@ export const checkedSquare = (state: State): Square | undefined =>
 
 export const availableCaptures = (state: State): Move[] =>
   state.moves.filter((move) => move.attack);
+
+export const showHeatmap = (state: State) =>
+  state.overlayCategory === SquareOverlayCategory.Heatmap;
