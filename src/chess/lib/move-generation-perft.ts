@@ -55,7 +55,7 @@ const search = (engine: Engine, depth: number): number => {
   return n;
 };
 
-const searchRoot = (
+export const searchRoot = (
   engine: Engine,
   depth: number
 ): { counter: number; counts: Record<string, number> } => {

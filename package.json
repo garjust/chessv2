@@ -8,7 +8,7 @@
     "build:perft": "webpack-cli -c perft/webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js .",
     "test": "react-scripts test",
-    "test:perft": "./script/perft.sh \"4\" \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"moves\"",
+    "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\"",
     "eject": "react-scripts eject"
   },
   "dependencies": {

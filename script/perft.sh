@@ -1,1 +1,1 @@
-node perft/dist/main.js $1 $2 $3
+node perft/dist/main.js $1 "$2" $3
