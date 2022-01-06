@@ -25,10 +25,16 @@ export type RankFile = {
   file: number;
 };
 
+export type PromotionOption =
+  | PieceType.Bishop
+  | PieceType.Knight
+  | PieceType.Queen
+  | PieceType.Rook;
+
 export type Move = {
   from: Square;
   to: Square;
-  promotion?: PieceType;
+  promotion?: PromotionOption;
 };
 
 export type Pin = {

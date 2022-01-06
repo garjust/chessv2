@@ -4,6 +4,7 @@ import {
   Piece,
   PieceType,
   Position,
+  PromotionOption,
   RankFile,
   Square,
   SquareLabel,
@@ -88,11 +89,24 @@ export const isLegalSquare = (square: Square): boolean =>
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
+const pieceTypeToMoveStringCharacter = (type: PromotionOption): string => {
+  switch (type) {
+    case PieceType.Bishop:
+      return 'b';
+    case PieceType.Knight:
+      return 'n';
+    case PieceType.Queen:
+      return 'q';
+    case PieceType.Rook:
+      return 'r';
+  }
+};
+
 export const moveToDirectionString = (move: Move, delimiter = '->'): string =>
   move.promotion
-    ? `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}(${
-        move.promotion
-      })`
+    ? `${squareLabel(move.from)}${delimiter}${squareLabel(
+        move.to
+      )}${pieceTypeToMoveStringCharacter(move.promotion)}`
     : `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}`;
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>

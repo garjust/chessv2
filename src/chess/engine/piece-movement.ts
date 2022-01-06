@@ -6,6 +6,7 @@ import {
   Square,
   AttackObject,
   CastlingAvailability,
+  PromotionOption,
 } from '../types';
 import {
   isLegalSquare,
@@ -118,7 +119,10 @@ export const pawnMoves = (
   if (isPromotionPositionPawn(color, from)) {
     squares = squares.flatMap((move) =>
       [PieceType.Bishop, PieceType.Knight, PieceType.Queen, PieceType.Rook].map(
-        (pieceType) => ({ ...move, promotion: pieceType })
+        (pieceType) => ({
+          ...move,
+          promotion: pieceType as PromotionOption,
+        })
       )
     );
   }
