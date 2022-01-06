@@ -27,31 +27,6 @@ export const VIENNA_OPENING: MoveTest = {
   counts: [27, 966, 27249, 951936, 28181171, 982980787],
 };
 
-const ingestStockfishPerftResult = (str: string): Record<string, number> => {
-  const perMoveCounters: Record<string, number> = {};
-
-  str.split('\n').forEach((part) => {
-    const [move, counter] = part.split(': ');
-    perMoveCounters[move] = Number(counter);
-  });
-
-  return perMoveCounters;
-};
-
-const assertResults = (
-  actual: Record<string, number>,
-  expected: Record<string, number>
-) => {
-  for (const [move, counter] of Object.entries(expected)) {
-    const actualCounter = actual[move];
-    if (typeof actualCounter !== 'number') {
-      console.log(`move ${move} not found in actual`);
-    } else if (actualCounter !== counter) {
-      console.log(`move ${move} was ${actualCounter} != ${counter}`);
-    }
-  }
-};
-
 const isCountCorrectForDepthFromStart = (
   depth: number,
   count: number,
@@ -110,9 +85,7 @@ export const run = (
   test: MoveTest,
   toDepth: number
 ): boolean => {
-  const position = parseFEN(
-    'rnbqkb1r/pppp1ppp/8/4p2Q/2B1P3/2N5/PPPP1PPP/R1B1K1NR/ b KQk - 0 4'
-  );
+  const position = parseFEN(test.fen);
   const results: { depth: number; passed: boolean }[] = [];
   const perMoveCounters: Record<string, number>[] = [];
 
@@ -137,18 +110,7 @@ export const run = (
   }
   logger('--');
 
-  (self as any).MOVE_PERFT = {
-    ingest: ingestStockfishPerftResult,
-    assert(depth: number, expectedString: string) {
-      assertResults(
-        perMoveCounters[depth],
-        ingestStockfishPerftResult(expectedString)
-      );
-    },
-    results: perMoveCounters,
-  };
-
-  console.log('full counts by move', perMoveCounters);
+  // console.log('full counts by move', perMoveCounters);
 
   return results.every((result) => result.passed);
 };

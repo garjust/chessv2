@@ -5,6 +5,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:perft": "webpack-cli -c perft/webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js .",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -33,7 +34,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.27.1",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "ts-loader": "^9.2.6",
+    "webpack-cli": "^4.9.1"
   },
   "browserslist": {
     "production": [
