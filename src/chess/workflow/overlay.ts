@@ -1,5 +1,4 @@
-import { HEATMAPS } from '../lib/heatmaps';
-import { Color, PieceType, Square } from '../types';
+import { Pin, Square } from '../types';
 import {
   State,
   checkedSquare,
@@ -51,5 +50,24 @@ export const setOverlayForAttacks = (
     if (count > 0) {
       map.set(square, SquareOverlayType.Attacked);
     }
+  }
+};
+
+export const setOverlayForPins = (
+  map: Map<Square, SquareOverlayType>,
+  pins: Pin[]
+) => {
+  // Do each type of square involved in the pin one at a time so that we don't
+  // color over squares as much as possible.
+  for (const pin of pins) {
+    for (const square of pin.legalMoveSquares) {
+      map.set(square, SquareOverlayType.Movable);
+    }
+  }
+  for (const pin of pins) {
+    map.set(pin.attacker, SquareOverlayType.SelectedPiece);
+  }
+  for (const pin of pins) {
+    map.set(pin.pinned, SquareOverlayType.Capturable);
   }
 };

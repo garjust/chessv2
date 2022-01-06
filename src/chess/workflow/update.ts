@@ -30,7 +30,11 @@ import {
 import Engine from '../engine';
 import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
-import { setOverlayForAttacks, setOverlayForPlay } from './overlay';
+import {
+  setOverlayForAttacks,
+  setOverlayForPins,
+  setOverlayForPlay,
+} from './overlay';
 
 export type Context = {
   engine: Engine;
@@ -78,6 +82,9 @@ function handleChangeOverlay(state: State): Update<State, Action> {
       nextCategory = SquareOverlayCategory.AttacksForBlack;
       break;
     case SquareOverlayCategory.AttacksForBlack:
+      nextCategory = SquareOverlayCategory.Pins;
+      break;
+    case SquareOverlayCategory.Pins:
       nextCategory = SquareOverlayCategory.Heatmap;
       break;
     case SquareOverlayCategory.Heatmap:
@@ -183,6 +190,9 @@ function handleOverlaySquares(
       break;
     case SquareOverlayCategory.AttacksForBlack:
       setOverlayForAttacks(squareOverlay, context.engine.attacks[Color.Black]);
+      break;
+    case SquareOverlayCategory.Pins:
+      setOverlayForPins(squareOverlay, context.engine.pins);
       break;
   }
 

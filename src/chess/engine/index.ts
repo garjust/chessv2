@@ -3,6 +3,7 @@ import {
   Move,
   MoveWithExtraData,
   Piece,
+  Pin,
   Position as ExternalPosition,
 } from '../types';
 import { allAttackedSquares } from './attacks';
@@ -11,7 +12,7 @@ import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { AttackedSquares, KingChecks, Position } from './types';
+import { AttackedSquares, KingChecks, KingPins, Position } from './types';
 
 export default class Engine {
   _position: Position;
@@ -80,5 +81,12 @@ export default class Engine {
       [Color.White]: allAttackedSquares(this._position.pieces, Color.White),
       [Color.Black]: allAttackedSquares(this._position.pieces, Color.Black),
     };
+  }
+
+  get pins(): Pin[] {
+    return [
+      ...Array.from(this._position.pinsToKing[Color.White].values()),
+      ...Array.from(this._position.pinsToKing[Color.Black].values()),
+    ];
   }
 }

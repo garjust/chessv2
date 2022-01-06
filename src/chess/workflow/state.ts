@@ -29,6 +29,7 @@ export enum SquareOverlayCategory {
   Play = 'PLAY',
   AttacksForWhite = 'ATTACKS_FOR_WHITE',
   AttacksForBlack = 'ATTACKS_FOR_BLACK',
+  Pins = 'PINS',
   Heatmap = 'HEATMAP',
 }
 
