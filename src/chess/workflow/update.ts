@@ -261,7 +261,6 @@ function handleMovePiece(
     {
       ...state,
       lastMove: move,
-      previousPositions: [...state.previousPositions, state.position],
     },
     setPositionAction(engine.position),
   ];

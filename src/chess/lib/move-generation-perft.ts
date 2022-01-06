@@ -79,6 +79,8 @@ const searchRoot = (engine: Engine, depth: number, debug: boolean): number => {
   return counts.reduce((sum, { n }) => sum + n, 0);
 };
 
+const NUMBER_FORMATTR = new Intl.NumberFormat();
+
 export const run = (
   logger: (message: string) => void,
   test: MoveTest,
@@ -98,7 +100,7 @@ export const run = (
     logger(
       `depth=${i}; passed=${
         passed ? 'yes' : 'no'
-      }; count=${count}; timing=${timing}ms (${(
+      }; count=${NUMBER_FORMATTR.format(count)}; timing=${timing}ms (${(
         (timing / count) *
         1000
       ).toPrecision(5)}μs/node)`

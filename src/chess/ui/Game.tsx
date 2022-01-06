@@ -29,7 +29,7 @@ import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
 
-const FEN_FOR_INITIAL_POSITION = VIENNA_GAMBIT_ACCEPTED_FEN;
+const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {

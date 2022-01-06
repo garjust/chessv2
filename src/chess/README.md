@@ -11,11 +11,3 @@
 
 - Decrease weight of moves to squares attacked by pawns
 - King pinned to square being castled through is now a legal move again in kingMoves of piece-movement-control.ts
-
-### Attack Maps
-
-Note: calling `attacksOnSquare` between 1-9 times per move generation (once for checks, 0-8 for king moves)
-
-> Can use the attack map to generate most moves
-  > Need to prune moves leaving self in check and moves capturing own-pieces
-  > Notable handles sliding moves really well which is slow.

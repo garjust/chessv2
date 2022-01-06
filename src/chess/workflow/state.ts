@@ -61,7 +61,6 @@ export interface State {
   overlayCategory: SquareOverlayCategory;
   squareOverlay?: Map<Square, SquareOverlayType>;
   position: Position;
-  previousPositions: Position[];
   moves: MoveWithExtraData[];
   checks: AttackObject[];
   evaluation: number;
@@ -76,12 +75,11 @@ const INITIAL_STATE: State = {
     [Color.White]: HumanPlayer,
     [Color.Black]: HumanPlayer,
   },
-  previousPositions: [],
-  position: parseFEN(BLANK_POSITION_FEN),
   evaluation: 0,
   moves: [],
   checks: [],
   overlayCategory: SquareOverlayCategory.Play,
+  position: parseFEN(BLANK_POSITION_FEN),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
