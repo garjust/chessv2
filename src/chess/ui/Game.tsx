@@ -4,6 +4,7 @@ import './Game.css';
 import init, { createState } from '../workflow';
 import { updateLogger } from '../../lib/workflow';
 import {
+  changeOverlayAction,
   flipBoardAction,
   initializeAction,
   loadChessComputerAction,
@@ -79,8 +80,11 @@ const Game = () => {
           >
             Go back
           </button>
-          <button style={BUTTON_CSS} onClick={emitExampleGame}>
-            Example game
+          <button
+            style={BUTTON_CSS}
+            onClick={() => emit(changeOverlayAction())}
+          >
+            Switch overlay
           </button>
           <button
             style={BUTTON_CSS}
@@ -93,6 +97,9 @@ const Game = () => {
             onClick={() => emit(loadChessComputerAction(Color.White))}
           >
             Load white computer
+          </button>
+          <button style={BUTTON_CSS} onClick={emitExampleGame}>
+            Example game
           </button>
         </div>
 

@@ -5,12 +5,13 @@ import {
   Piece,
   Position as ExternalPosition,
 } from '../types';
+import { allAttackedSquares } from './attacks';
 import { findChecksOnKings } from './checks';
 import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { KingChecks, Position } from './types';
+import { AttackedSquares, KingChecks, Position } from './types';
 
 export default class Engine {
   _position: Position;
@@ -71,5 +72,13 @@ export default class Engine {
       enPassantSquare: this._position.enPassantSquare,
       castlingAvailability: this._position.castlingAvailability,
     });
+  }
+
+  get attacks(): AttackedSquares {
+    // return this._position.attackedSquares;
+    return {
+      [Color.White]: allAttackedSquares(this._position.pieces, Color.White),
+      [Color.Black]: allAttackedSquares(this._position.pieces, Color.Black),
+    };
   }
 }

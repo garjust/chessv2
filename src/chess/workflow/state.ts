@@ -17,11 +17,18 @@ export enum SquareLabel {
 }
 
 export enum SquareOverlayType {
+  Attacked = 'ATTACKED',
   Capturable = 'CAPTURABLE',
   Check = 'CHECK',
   LastMove = 'LAST_MOVE',
   Movable = 'MOVABLE',
   SelectedPiece = 'SELECTED_PIECE',
+}
+
+export enum SquareOverlayCategory {
+  Play = 'PLAY',
+  AttacksForWhite = 'ATTACKS_FOR_WHITE',
+  AttacksForBlack = 'ATTACKS_FOR_BLACK',
 }
 
 export const HumanPlayer = Symbol('HUMAN');
@@ -49,6 +56,7 @@ export interface State {
   };
   winner?: Color | typeof Draw;
   selectedSquare?: Square;
+  overlayCategory: SquareOverlayCategory;
   squareOverlay?: Map<Square, SquareOverlayType>;
   position: Position;
   previousPositions: Position[];
@@ -56,7 +64,6 @@ export interface State {
   checks: AttackObject[];
   evaluation: number;
   lastMove?: Move;
-  attackMap: Map<Square, number>;
 }
 
 const INITIAL_STATE: State = {
@@ -72,7 +79,7 @@ const INITIAL_STATE: State = {
   evaluation: 0,
   moves: [],
   checks: [],
-  attackMap: new Map<Square, number>(),
+  overlayCategory: SquareOverlayCategory.Play,
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -118,15 +125,3 @@ export const checkedSquare = (state: State): Square | undefined =>
 
 export const availableCaptures = (state: State): Move[] =>
   state.moves.filter((move) => move.attack);
-
-export const attackOverlay = (state: State): Map<Square, SquareOverlayType> => {
-  const squareOverlay = new Map<Square, SquareOverlayType>();
-
-  for (const [square, attackerCount] of state.attackMap) {
-    if (attackerCount > 0) {
-      squareOverlay.set(square, SquareOverlayType.LastMove);
-    }
-  }
-
-  return squareOverlay;
-};

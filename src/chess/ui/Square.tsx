@@ -1,13 +1,13 @@
 import React from 'react';
 import './Square.css';
-import { Color, PieceType } from '../types';
+import { Color } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
   isSquareClickable,
   pieceInSquare,
-  SquareOverlayType,
   SquareLabel,
+  SquareOverlayType,
 } from '../workflow/state';
 import {
   BOARD_SQUARE_BLACK,
@@ -35,14 +35,13 @@ const makeRender =
     overlay: state.squareOverlay?.get(square),
     isClickable: isSquareClickable(state, square),
     squareLabels: state.squareLabels,
-    isAttacked: state.attackMap.get(square) ?? 0 > 0,
   });
 
 const Square = (props: SquareProps) => {
   const { rendering, emit } = useWorkflow(makeRender(props));
 
   const { square, color } = props;
-  const { piece, overlay, isClickable, squareLabels, isAttacked } = rendering;
+  const { piece, overlay, isClickable, squareLabels } = rendering;
 
   let css: React.CSSProperties = {
     position: 'relative',
@@ -54,6 +53,9 @@ const Square = (props: SquareProps) => {
 
   if (overlay) {
     switch (overlay) {
+      case SquareOverlayType.Attacked:
+        css = { ...css, ...BOARD_SQUARE_ATTACKED };
+        break;
       case SquareOverlayType.Capturable:
         css = { ...css, ...BOARD_SQUARE_CAPTURABLE };
         break;
@@ -70,13 +72,6 @@ const Square = (props: SquareProps) => {
         css = { ...css, ...BOARD_SQUARE_SELECTED };
         break;
     }
-  }
-
-  if (isAttacked) {
-    css = {
-      ...css,
-      ...BOARD_SQUARE_ATTACKED,
-    };
   }
 
   // const value = HEATMAPS[PieceType.Rook][Color.White][square];

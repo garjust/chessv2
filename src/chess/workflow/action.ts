@@ -3,6 +3,7 @@ import { ChessComputerWrapped } from './state';
 
 export enum Type {
   AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
+  ChangeOverlay = 'CHANGE_OVERLAY',
   ChessComputerLoaded = 'CHESS_COMPUTER_LOADED',
   ClickSquare = 'CLICK_SQUARE',
   FlipBoard = 'FLIP_BOARD',
@@ -21,6 +22,10 @@ export enum Type {
 export declare namespace Action {
   export interface AttemptComputerMove {
     readonly type: Type.AttemptComputerMove;
+  }
+
+  export interface ChangeOverlay {
+    readonly type: Type.ChangeOverlay;
   }
 
   export interface ChessComputerLoaded {
@@ -87,6 +92,7 @@ export declare namespace Action {
 
 export type Action =
   | Action.AttemptComputerMove
+  | Action.ChangeOverlay
   | Action.ChessComputerLoaded
   | Action.ClickSquare
   | Action.FlipBoard
@@ -103,6 +109,10 @@ export type Action =
 
 export const attemptComputerMoveAction = (): Action.AttemptComputerMove => ({
   type: Type.AttemptComputerMove,
+});
+
+export const changeOverlayAction = (): Action.ChangeOverlay => ({
+  type: Type.ChangeOverlay,
 });
 
 export const chessComputerLoadedAction = (

@@ -17,10 +17,9 @@ import {
   createState,
   pieceInSquare,
   HumanPlayer,
-  checkedSquare,
   Draw,
   SquareLabel,
-  attackOverlay,
+  SquareOverlayCategory,
 } from './state';
 import { from } from 'rxjs';
 import {
@@ -31,6 +30,7 @@ import {
 import Engine from '../engine';
 import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
+import { setOverlayForAttacks, setOverlayForPlay } from './overlay';
 
 export type Context = {
   engine: Engine;
@@ -65,6 +65,24 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   } else {
     return [state, null];
   }
+}
+
+function handleChangeOverlay(state: State): Update<State, Action> {
+  let nextCategory: SquareOverlayCategory;
+
+  switch (state.overlayCategory) {
+    case SquareOverlayCategory.Play:
+      nextCategory = SquareOverlayCategory.AttacksForWhite;
+      break;
+    case SquareOverlayCategory.AttacksForWhite:
+      nextCategory = SquareOverlayCategory.AttacksForBlack;
+      break;
+    case SquareOverlayCategory.AttacksForBlack:
+      nextCategory = SquareOverlayCategory.Play;
+      break;
+  }
+
+  return [{ ...state, overlayCategory: nextCategory }, overlaySquaresAction()];
 }
 
 function handleChessComputerLoaded(
@@ -146,38 +164,23 @@ function handleLoadChessComputer(
   ];
 }
 
-function handleOverlaySquares(state: State): Update<State, Action> {
+function handleOverlaySquares(
+  state: State,
+  context: Context
+): Update<State, Action> {
   const squareOverlay = new Map<Square, SquareOverlayType>();
+  const { overlayCategory } = state;
 
-  const { position, selectedSquare, lastMove, moves } = state;
-
-  if (lastMove) {
-    squareOverlay.set(lastMove.from, SquareOverlayType.LastMove);
-    squareOverlay.set(lastMove.to, SquareOverlayType.LastMove);
-  }
-
-  const check = checkedSquare(state);
-  if (check) {
-    squareOverlay.set(check, SquareOverlayType.Check);
-  }
-
-  if (selectedSquare !== undefined) {
-    squareOverlay.set(selectedSquare, SquareOverlayType.SelectedPiece);
-
-    const piece = pieceInSquare(state, selectedSquare);
-    if (piece) {
-      const candidateSquares = moves.filter(
-        (move) => move.from === selectedSquare
-      );
-
-      candidateSquares.forEach(({ to: square }) => {
-        if (position.pieces.has(square)) {
-          squareOverlay.set(square, SquareOverlayType.Capturable);
-        } else {
-          squareOverlay.set(square, SquareOverlayType.Movable);
-        }
-      });
-    }
+  switch (overlayCategory) {
+    case SquareOverlayCategory.Play:
+      setOverlayForPlay(squareOverlay, state);
+      break;
+    case SquareOverlayCategory.AttacksForWhite:
+      setOverlayForAttacks(squareOverlay, context.engine.attacks[Color.White]);
+      break;
+    case SquareOverlayCategory.AttacksForBlack:
+      setOverlayForAttacks(squareOverlay, context.engine.attacks[Color.Black]);
+      break;
   }
 
   return [{ ...state, squareOverlay }, null];
@@ -276,7 +279,6 @@ function handleSetPosition(
     moves,
     evaluation,
     checks,
-    attackMap: engine._position.attackedSquares[Color.White],
   };
 
   if (position.halfMoveCount === 100) {
@@ -359,6 +361,8 @@ export function update(
   switch (action.type) {
     case Type.AttemptComputerMove:
       return handleAttemptComputerMove(state);
+    case Type.ChangeOverlay:
+      return handleChangeOverlay(state);
     case Type.ChessComputerLoaded:
       return handleChessComputerLoaded(state, action);
     case Type.ClickSquare:
@@ -370,7 +374,7 @@ export function update(
     case Type.LoadChessComputer:
       return handleLoadChessComputer(state, action);
     case Type.OverlaySquares:
-      return handleOverlaySquares(state);
+      return handleOverlaySquares(state, context);
     case Type.PreviousPosition:
       return handlePreviousPosition(state, context);
     case Type.ReceiveComputerMove:
