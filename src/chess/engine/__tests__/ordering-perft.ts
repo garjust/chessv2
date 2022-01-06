@@ -7,7 +7,7 @@ const N = 100_000;
 test('perft of move ordering', () => {
   const position = parseFEN(PERFT_5_FEN);
   const engine = new Engine(position);
-  const moves = engine.generateMovementData().moves;
+  const moves = engine.generateMoves();
 
   const start = Date.now();
   for (let i = 0; i < N; i++) {

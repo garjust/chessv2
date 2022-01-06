@@ -1,15 +1,16 @@
 import {
   Color,
-  ComputedMovementData,
   Move,
+  MoveWithExtraData,
   Piece,
   Position as ExternalPosition,
 } from '../types';
+import { findChecksOnKings } from './checks';
 import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
-import { generateMovementData } from './move-generation';
+import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { Position } from './types';
+import { KingChecks, Position } from './types';
 
 export default class Engine {
   _position: Position;
@@ -44,12 +45,8 @@ export default class Engine {
       : -1 * this.evaluate();
   }
 
-  generateMoves(): Move[] {
-    return this.generateMovementData().moves;
-  }
-
-  generateMovementData(): ComputedMovementData {
-    return generateMovementData(this._position.pieces, this._position.turn, {
+  generateMoves(): MoveWithExtraData[] {
+    return generateMoves(this._position.pieces, this._position.turn, {
       attackedSquares: this._position.attackedSquares,
       pieceAttacks: this._position.pieceAttacks,
       pinsToKing: this._position.pinsToKing,
@@ -68,28 +65,11 @@ export default class Engine {
     this._position = copyToInternal(position);
     this._moveStack = [];
   }
+
+  get checks(): KingChecks {
+    return findChecksOnKings(this._position.pieces, this._position.kings, {
+      enPassantSquare: this._position.enPassantSquare,
+      castlingAvailability: this._position.castlingAvailability,
+    });
+  }
 }
-
-export const ImmutableEngine = {
-  applyMove(position: ExternalPosition, move: Move) {
-    const engine = new Engine(position);
-    const captured = engine.applyMove(move);
-
-    return {
-      position: Object.freeze(engine.position),
-      captured,
-    };
-  },
-  evaluate(position: ExternalPosition) {
-    const engine = new Engine(position);
-    return engine.evaluate();
-  },
-  generateMoves(position: ExternalPosition) {
-    const engine = new Engine(position);
-    return engine.generateMovementData().moves;
-  },
-  generateMovementData(position: ExternalPosition) {
-    const engine = new Engine(position);
-    return engine.generateMovementData();
-  },
-};

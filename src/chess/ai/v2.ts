@@ -9,9 +9,9 @@ import Engine from '../engine';
 export default class v2 implements ChessComputer<Position> {
   nextMove(position: Position) {
     const engine = new Engine(position);
-    const movementData = engine.generateMovementData();
+    const moves = engine.generateMoves();
 
-    const captures = movementData.moves.filter((move) => move.attack);
+    const captures = moves.filter((move) => move.attack);
     if (captures.length > 0) {
       return Promise.resolve(pluck(captures));
     }
@@ -35,12 +35,12 @@ export default class v2 implements ChessComputer<Position> {
 
     while (move === undefined) {
       const type = pluck(types);
-      const moves = movementData.moves.filter(({ from }) => {
+      const movesForPiece = moves.filter(({ from }) => {
         return position.pieces.get(from)?.type === type;
       });
 
-      if (moves.length) {
-        move = pluck(moves);
+      if (movesForPiece.length) {
+        move = pluck(movesForPiece);
       }
     }
 

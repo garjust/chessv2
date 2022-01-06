@@ -39,7 +39,7 @@ export default class v4 implements ChessComputer<Position> {
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
-    const moves = orderMoves(engine.generateMovementData().moves);
+    const moves = orderMoves(engine.generateMoves());
     this.moveCounter += moves.length;
 
     return moves.map((move) => {
@@ -58,7 +58,7 @@ export default class v4 implements ChessComputer<Position> {
       return this.scoreCaptures(engine, alpha, beta);
     }
 
-    const moves = orderMoves(engine.generateMovementData().moves);
+    const moves = orderMoves(engine.generateMoves());
     this.moveCounter += moves.length;
 
     for (const move of moves) {
@@ -89,7 +89,7 @@ export default class v4 implements ChessComputer<Position> {
     }
 
     const moves = orderMoves(
-      engine.generateMovementData().moves.filter((move) => move.attack)
+      engine.generateMoves().filter((move) => move.attack)
     );
     this.moveCounter += moves.length;
 

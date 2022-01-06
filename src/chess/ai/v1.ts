@@ -8,14 +8,14 @@ import Engine from '../engine';
 export default class v1 implements ChessComputer<Position> {
   nextMove(position: Position) {
     const engine = new Engine(position);
-    const movementData = engine.generateMovementData();
+    const moves = engine.generateMoves();
 
-    const captures = movementData.moves.filter((move) => move.attack);
+    const captures = moves.filter((move) => move.attack);
     if (captures.length > 0) {
       return Promise.resolve(pluck(captures));
     }
 
-    return Promise.resolve(pluck(movementData.moves));
+    return Promise.resolve(pluck(moves));
   }
 
   toJSON(): string {

@@ -94,20 +94,6 @@ export type Position = {
   fullMoveCount: number;
 };
 
-export type ComputedMovementData = {
-  moves: MoveWithExtraData[];
-  checks: AttackObject[];
-};
-
-// Data that can be computed from a position that we may want to cache because
-// computation is expensive.
-export type ComputedPositionData = {
-  moveData: ComputedMovementData;
-  evaluationData: {
-    evaluation: number;
-  };
-};
-
 export type SquareLabel =
   | 'a1'
   | 'a2'

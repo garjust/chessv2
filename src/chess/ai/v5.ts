@@ -38,7 +38,7 @@ export default class v4 implements ChessComputer<Position> {
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
-    const moves = orderMoves(engine.generateMovementData().moves);
+    const moves = orderMoves(engine.generateMoves());
     this.moveCounter += moves.length;
 
     return moves.map((move) => {
@@ -58,7 +58,7 @@ export default class v4 implements ChessComputer<Position> {
       return engine.evaluateNormalized();
     }
 
-    const moves = orderMoves(engine.generateMovementData().moves);
+    const moves = orderMoves(engine.generateMoves());
     this.moveCounter += moves.length;
 
     for (const move of moves) {

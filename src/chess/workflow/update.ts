@@ -149,7 +149,7 @@ function handleLoadChessComputer(
 function handleOverlaySquares(state: State): Update<State, Action> {
   const squareOverlay = new Map<Square, SquareOverlayType>();
 
-  const { position, selectedSquare, lastMove, computedPositionData } = state;
+  const { position, selectedSquare, lastMove, moves } = state;
 
   if (lastMove) {
     squareOverlay.set(lastMove.from, SquareOverlayType.LastMove);
@@ -166,7 +166,7 @@ function handleOverlaySquares(state: State): Update<State, Action> {
 
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
-      const candidateSquares = computedPositionData.moveData.moves.filter(
+      const candidateSquares = moves.filter(
         (move) => move.from === selectedSquare
       );
 
@@ -213,8 +213,8 @@ function handleMovePiece(
   { engine }: Context
 ): Update<State, Action> {
   const { move } = action;
+  const legalMoves = state.moves;
 
-  const legalMoves = state.computedPositionData.moveData.moves;
   if (!movesIncludes(legalMoves, move)) {
     const piece = pieceInSquare(state, move.from);
     console.log(
@@ -266,13 +266,16 @@ function handleSetPosition(
   { engine }: Context
 ): Update<State, Action> {
   const { position } = action;
-  const moveData = engine.generateMovementData();
+  const moves = engine.generateMoves();
   const evaluation = engine.evaluate();
+  const checks = engine.checks[position.turn];
 
   state = {
     ...state,
     position,
-    computedPositionData: { moveData, evaluationData: { evaluation } },
+    moves,
+    evaluation,
+    checks,
     attackMap: engine._position.attackedSquares[Color.White],
   };
 
@@ -288,8 +291,8 @@ function handleSetPosition(
   }
 
   // Check if current player has no moves to end the game
-  if (position.pieces.size > 0 && moveData.moves.length === 0) {
-    const winner = moveData.checks.length > 0 ? flipColor(position.turn) : Draw;
+  if (position.pieces.size > 0 && moves.length === 0) {
+    const winner = checks.length > 0 ? flipColor(position.turn) : Draw;
     if (winner === Draw) {
       play(Sound.Draw);
     } else if (winner === Color.White) {
@@ -307,7 +310,7 @@ function handleSetPosition(
     ];
   }
 
-  if (moveData.checks.length > 0) {
+  if (checks.length > 0) {
     play(Sound.Check);
   }
 

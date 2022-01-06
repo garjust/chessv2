@@ -37,17 +37,17 @@ export const isCountCorrectForDepthFromStart = (
 };
 
 const search = (engine: Engine, depth: number): number => {
-  const movementData = engine.generateMovementData();
+  const moves = engine.generateMoves();
 
   if (depth === 0) {
     return 1;
   } else if (depth === 1) {
-    return movementData.moves.length;
+    return moves.length;
   }
 
   let n = 0;
 
-  for (const move of movementData.moves) {
+  for (const move of moves) {
     engine.applyMove(move);
     n += search(engine, depth - 1);
     engine.undoLastMove();
@@ -63,8 +63,8 @@ const searchRoot = (engine: Engine, depth: number, debug: boolean): number => {
 
   const counts: { move: Move; n: number }[] = [];
 
-  const movementData = engine.generateMovementData();
-  for (const move of movementData.moves) {
+  const moves = engine.generateMoves();
+  for (const move of moves) {
     engine.applyMove(move);
     counts.push({ move, n: search(engine, depth - 1) });
     engine.undoLastMove();

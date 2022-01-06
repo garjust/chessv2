@@ -5,7 +5,6 @@ import {
   PieceType,
   Square,
   AttackObject,
-  ComputedMovementData,
   CastlingAvailability,
   Pin,
 } from '../types';
@@ -289,7 +288,7 @@ const pruneChecks = (
   );
 };
 
-export const generateMovementData = (
+export const generateMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
   {
@@ -308,7 +307,7 @@ export const generateMovementData = (
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
   }
-): ComputedMovementData => {
+): MoveWithExtraData[] => {
   let checksForPlayer: AttackObject[] = [];
   const king = kings[color];
   if (king) {
@@ -353,8 +352,5 @@ export const generateMovementData = (
     }
   }
 
-  return {
-    moves,
-    checks: checksForPlayer,
-  };
+  return moves;
 };

@@ -1,13 +1,13 @@
 import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
-import { allAttackedSquares } from '../engine/attacks';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
   Position,
   Piece,
   Square,
-  ComputedPositionData,
   Move,
+  MoveWithExtraData,
+  AttackObject,
 } from '../types';
 
 export enum SquareLabel {
@@ -52,7 +52,9 @@ export interface State {
   squareOverlay?: Map<Square, SquareOverlayType>;
   position: Position;
   previousPositions: Position[];
-  computedPositionData: ComputedPositionData;
+  moves: MoveWithExtraData[];
+  checks: AttackObject[];
+  evaluation: number;
   lastMove?: Move;
   attackMap: Map<Square, number>;
 }
@@ -67,15 +69,9 @@ const INITIAL_STATE: State = {
   },
   previousPositions: [],
   position: parseFEN(BLANK_POSITION_FEN),
-  computedPositionData: {
-    moveData: {
-      moves: [],
-      checks: [],
-    },
-    evaluationData: {
-      evaluation: 0,
-    },
-  },
+  evaluation: 0,
+  moves: [],
+  checks: [],
   attackMap: new Map<Square, number>(),
 };
 
@@ -118,12 +114,10 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 };
 
 export const checkedSquare = (state: State): Square | undefined =>
-  state.computedPositionData.moveData.checks.length > 0
-    ? state.computedPositionData.moveData.checks[0].attacked.square
-    : undefined;
+  state.checks.length > 0 ? state.checks[0].attacked.square : undefined;
 
 export const availableCaptures = (state: State): Move[] =>
-  state.computedPositionData.moveData.moves.filter((move) => move.attack);
+  state.moves.filter((move) => move.attack);
 
 export const attackOverlay = (state: State): Map<Square, SquareOverlayType> => {
   const squareOverlay = new Map<Square, SquareOverlayType>();
