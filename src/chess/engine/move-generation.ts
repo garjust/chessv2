@@ -335,6 +335,7 @@ export const generateMoves = (
       if (checksForPlayer.length > 0) {
         if (!moveResolvesCheck(checksForPlayer, move, { ignoreKing: true })) {
           moves.splice(i, 1);
+          continue;
         }
       }
       if (
@@ -348,6 +349,7 @@ export const generateMoves = (
         )
       ) {
         moves.splice(i, 1);
+        continue;
       }
     }
   }
