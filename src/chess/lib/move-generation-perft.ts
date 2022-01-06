@@ -5,7 +5,6 @@ import {
   VIENNA_OPENING_FEN,
 } from './fen';
 import Engine from '../engine';
-import { Move } from '../types';
 import { moveToDirectionString } from '../utils';
 
 export type MoveTest = {
@@ -28,7 +27,32 @@ export const VIENNA_OPENING: MoveTest = {
   counts: [27, 966, 27249, 951936, 28181171, 982980787],
 };
 
-export const isCountCorrectForDepthFromStart = (
+const ingestStockfishPerftResult = (str: string): Record<string, number> => {
+  const perMoveCounters: Record<string, number> = {};
+
+  str.split('\n').forEach((part) => {
+    const [move, counter] = part.split(': ');
+    perMoveCounters[move] = Number(counter);
+  });
+
+  return perMoveCounters;
+};
+
+const assertResults = (
+  actual: Record<string, number>,
+  expected: Record<string, number>
+) => {
+  for (const [move, counter] of Object.entries(expected)) {
+    const actualCounter = actual[move];
+    if (typeof actualCounter !== 'number') {
+      console.log(`move ${move} not found in actual`);
+    } else if (actualCounter !== counter) {
+      console.log(`move ${move} was ${actualCounter} != ${counter}`);
+    }
+  }
+};
+
+const isCountCorrectForDepthFromStart = (
   depth: number,
   count: number,
   test: MoveTest
@@ -56,27 +80,27 @@ const search = (engine: Engine, depth: number): number => {
   return n;
 };
 
-const searchRoot = (engine: Engine, depth: number, debug: boolean): number => {
+const searchRoot = (
+  engine: Engine,
+  depth: number
+): { counter: number; counts: Record<string, number> } => {
   if (depth === 0) {
-    return 1;
+    return { counter: 1, counts: {} };
   }
 
-  const counts: { move: Move; n: number }[] = [];
+  const counts: Record<string, number> = {};
 
   const moves = engine.generateMoves();
   for (const move of moves) {
     engine.applyMove(move);
-    counts.push({ move, n: search(engine, depth - 1) });
+    counts[moveToDirectionString(move, '')] = search(engine, depth - 1);
     engine.undoLastMove();
   }
 
-  if (debug) {
-    counts.forEach(({ move, n }) => {
-      console.log(moveToDirectionString(move), n);
-    });
-  }
-
-  return counts.reduce((sum, { n }) => sum + n, 0);
+  return {
+    counter: Object.values(counts).reduce((sum, n) => sum + n, 0),
+    counts,
+  };
 };
 
 const NUMBER_FORMATTR = new Intl.NumberFormat();
@@ -84,30 +108,47 @@ const NUMBER_FORMATTR = new Intl.NumberFormat();
 export const run = (
   logger: (message: string) => void,
   test: MoveTest,
-  toDepth: number,
-  debug: boolean
+  toDepth: number
 ): boolean => {
-  const position = parseFEN(test.fen);
+  const position = parseFEN(
+    'rnbqkb1r/pppp1ppp/8/4p2Q/2B1P3/2N5/PPPP1PPP/R1B1K1NR/ b KQk - 0 4'
+  );
   const results: { depth: number; passed: boolean }[] = [];
+  const perMoveCounters: Record<string, number>[] = [];
 
   for (let i = 1; i <= toDepth; i++) {
     const start = Date.now();
     const engine = new Engine(position);
-    const count = searchRoot(engine, i, debug);
+    const { counter, counts } = searchRoot(engine, i);
     const timing = Date.now() - start;
-    const passed = isCountCorrectForDepthFromStart(i, count, test);
+
+    const passed = isCountCorrectForDepthFromStart(i, counter, test);
+    perMoveCounters[i] = counts;
 
     logger(
       `depth=${i}; passed=${
         passed ? 'yes' : 'no '
-      }; count=${NUMBER_FORMATTR.format(count)}; timing=${timing}ms (${(
-        (timing / count) *
+      }; count=${NUMBER_FORMATTR.format(counter)}; timing=${timing}ms (${(
+        (timing / counter) *
         1000
       ).toPrecision(5)}μs/node)`
     );
     results.push({ depth: i, passed });
   }
   logger('--');
+
+  (self as any).MOVE_PERFT = {
+    ingest: ingestStockfishPerftResult,
+    assert(depth: number, expectedString: string) {
+      assertResults(
+        perMoveCounters[depth],
+        ingestStockfishPerftResult(expectedString)
+      );
+    },
+    results: perMoveCounters,
+  };
+
+  console.log('full counts by move', perMoveCounters);
 
   return results.every((result) => result.passed);
 };

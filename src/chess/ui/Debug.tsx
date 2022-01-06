@@ -33,7 +33,7 @@ async function runMoveGenerationTest(
   worker.onmessage = (message: MessageEvent<string>) => {
     logger.next(message.data);
   };
-  worker.postMessage({ test, toDepth, debug: false });
+  worker.postMessage({ test, toDepth });
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
