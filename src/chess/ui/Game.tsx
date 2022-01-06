@@ -29,7 +29,8 @@ import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
 
-const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
+const FEN_FOR_INITIAL_POSITION =
+  'rnbq1k1r/pp1Pb1pp/2p1p3/8/8/8/PPP1NnPP/RNBQK2R/ w KQ - 0 9';
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {
