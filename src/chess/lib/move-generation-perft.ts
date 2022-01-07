@@ -6,6 +6,7 @@ import {
 } from './fen';
 import Engine from '../engine';
 import { moveString } from '../utils';
+import { formatNumber } from '../../lib/formatter';
 
 export type MoveTest = {
   fen: string;
@@ -78,8 +79,6 @@ export const searchRoot = (
   };
 };
 
-const NUMBER_FORMATTR = new Intl.NumberFormat();
-
 export const run = (
   logger: (message: string) => void,
   test: MoveTest,
@@ -99,12 +98,11 @@ export const run = (
     perMoveCounters[i] = counts;
 
     logger(
-      `depth=${i}; passed=${
-        passed ? 'yes' : 'no '
-      }; count=${NUMBER_FORMATTR.format(counter)}; timing=${timing}ms (${(
-        (timing / counter) *
-        1000
-      ).toPrecision(5)}μs/node)`
+      `depth=${i}; passed=${passed ? 'yes' : 'no '}; count=${formatNumber(
+        counter
+      )}; timing=${timing}ms (${((timing / counter) * 1000).toPrecision(
+        5
+      )}μs/node)`
     );
     results.push({ depth: i, passed });
   }

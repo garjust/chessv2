@@ -1,51 +1,43 @@
 import { ChessComputer } from './types';
 import { Move, Position } from '../types';
-import { moveString } from '../utils';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
 import { orderMoves } from '../engine/move-ordering';
+import Diagnotics from './diagnostics';
 
 const DEPTH = 4;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search
 // - search through captures
-export default class v4 implements ChessComputer {
+export default class v6 implements ChessComputer {
   engine: Engine;
-  moveCounter = 0;
-  evaluationCounter = 0;
+  diagnostics: Diagnotics;
 
   constructor() {
     this.engine = new Engine();
+    this.diagnostics = new Diagnotics('v6', DEPTH);
   }
 
   async nextMove(position: Position) {
+    this.diagnostics = new Diagnotics('v6', DEPTH);
     this.engine.position = position;
-
-    this.moveCounter = 0;
-    this.evaluationCounter = 0;
 
     const results = this.rootScores(this.engine, DEPTH).sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
-    console.log(
-      `v6 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
-      results.map(({ move, score }) => ({
-        move: moveString(move),
-        score,
-      }))
-    );
-
     const bestScore = results[0].score;
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
+
+    this.diagnostics.recordResult(move, results);
+    console.log(this.diagnostics.toString(), this.diagnostics.result);
 
     return move;
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
     const moves = orderMoves(engine.generateMoves());
-    this.moveCounter += moves.length;
 
     return moves.map((move) => {
       engine.applyMove(move);
@@ -59,12 +51,13 @@ export default class v4 implements ChessComputer {
   }
 
   score(engine: Engine, depth: number, alpha: number, beta: number): number {
+    this.diagnostics.nodeVisit(depth);
+
     if (depth === 0) {
       return this.scoreCaptures(engine, alpha, beta);
     }
 
     const moves = orderMoves(engine.generateMoves());
-    this.moveCounter += moves.length;
 
     for (const move of moves) {
       engine.applyMove(move);
@@ -72,6 +65,8 @@ export default class v4 implements ChessComputer {
       engine.undoLastMove();
 
       if (x >= beta) {
+        this.diagnostics.cut(depth);
+
         return beta;
       }
 
@@ -84,9 +79,11 @@ export default class v4 implements ChessComputer {
   }
 
   scoreCaptures(engine: Engine, alpha: number, beta: number): number {
-    this.evaluationCounter++;
+    this.diagnostics.quiescenceNodeVisit();
+
     const evaluation = engine.evaluateNormalized();
     if (evaluation >= beta) {
+      this.diagnostics.quiescenceCut();
       return beta;
     }
     if (evaluation > alpha) {
@@ -96,7 +93,6 @@ export default class v4 implements ChessComputer {
     const moves = orderMoves(
       engine.generateMoves().filter((move) => move.attack)
     );
-    this.moveCounter += moves.length;
 
     for (const move of moves) {
       engine.applyMove(move);

@@ -9,7 +9,7 @@ const DEPTH = 4;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search
-export default class v4 implements ChessComputer {
+export default class v5 implements ChessComputer {
   engine: Engine;
   moveCounter = 0;
   evaluationCounter = 0;
