@@ -10,25 +10,32 @@ type PlyCounter = {
 
 type MoveScores = { move: string; score: number }[];
 
+export type DiagnosticsResult = {
+  label: string;
+  logString: string;
+  move: string;
+  moveScores: MoveScores;
+  totalNodes: number;
+  totalCuts: number;
+  plyCounters: Record<number, PlyCounter>;
+  depth: number;
+  timing: number;
+};
+
 export default class Diagnotics {
   label: string;
   maxDepth: number;
   enableTreeDiagnostics;
   plyCounters: Record<number, PlyCounter> = {};
-  result?: {
-    move: string;
-    moveScores: MoveScores;
-    totalNodes: number;
-    totalCuts: number;
-    plyCounters: Record<number, PlyCounter>;
-    depth: number;
-  };
+  result?: DiagnosticsResult;
   treeDiagnostics?: TreeDiagnostics;
+  start: number;
 
   constructor(label: string, maxDepth: number, enableTreeDiagnostics = false) {
     this.label = label;
     this.maxDepth = maxDepth;
     this.enableTreeDiagnostics = enableTreeDiagnostics;
+    this.start = Date.now();
 
     this.plyCounters[-1] = { nodes: 0, cuts: 0 };
     for (let i = 1; i <= maxDepth; i++) {
@@ -57,32 +64,34 @@ export default class Diagnotics {
   }
 
   recordResult(move: Move, moveScores: { move: Move; score: number }[]) {
-    this.result = {
+    const timing = Date.now() - this.start;
+    const totalNodes = Object.values(this.plyCounters).reduce(
+      (sum, plyCounter) => sum + plyCounter.nodes,
+      0
+    );
+
+    const result: DiagnosticsResult = {
+      label: this.label,
+      logString: `${this.label} results: depth=${
+        this.maxDepth
+      }; timing=${formatNumber(timing)}ms; nodes=${formatNumber(
+        totalNodes
+      )}; (${((timing / totalNodes) * 1000).toPrecision(5)}μs/node)`,
       move: moveString(move),
       moveScores: moveScores.map(({ move, score }) => ({
         move: moveString(move),
         score,
       })),
-      totalNodes: Object.values(this.plyCounters).reduce(
-        (sum, plyCounter) => sum + plyCounter.nodes,
-        0
-      ),
+      totalNodes,
       totalCuts: Object.values(this.plyCounters).reduce(
         (sum, plyCounter) => sum + plyCounter.cuts,
         0
       ),
       plyCounters: this.plyCounters,
       depth: this.maxDepth,
+      timing,
     };
-  }
 
-  toString() {
-    if (!this.result) {
-      throw Error('no result recorded yet');
-    }
-
-    return `${this.label} results: nodes=${formatNumber(
-      this.result.totalNodes
-    )}; depth=${this.maxDepth}`;
+    this.result = result;
   }
 }

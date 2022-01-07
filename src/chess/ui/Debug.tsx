@@ -41,16 +41,13 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
   const fens = [STARTING_POSITION_FEN, VIENNA_OPENING_FEN, PERFT_5_FEN];
 
   for (const fen of fens) {
-    const start = Date.now();
     await ai.nextMove(parseFEN(fen));
-    const timing = Date.now() - start;
-    const diagnostics = await ai.searchDiagnostics;
-    logger.next(
-      `ai=${diagnostics.label}; timing=${formatNumber(
-        timing
-      )}ms; nodes=${formatNumber(diagnostics.result?.totalNodes)}`
-    );
-    console.log(diagnostics.label, diagnostics.result);
+
+    const diagnosticsResult = await ai.diagnosticsResult;
+    if (diagnosticsResult) {
+      logger.next(diagnosticsResult.logString);
+      console.log(diagnosticsResult.label, diagnosticsResult);
+    }
   }
 
   logger.next('--');
@@ -71,18 +68,13 @@ async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
       continue;
     }
 
-    const start = Date.now();
     await ai.nextMove(parseFEN(fen));
-    const timing = Date.now() - start;
-    const diagnostics = await ai.searchDiagnostics;
-    logger.next(
-      `ai=${diagnostics.label}; timing=${formatNumber(
-        timing
-      )}ms; nodes=${formatNumber(
-        diagnostics.result?.totalNodes
-      )}; cuts=${formatNumber(diagnostics.result?.totalCuts)}`
-    );
-    console.log(diagnostics.label, diagnostics.result);
+
+    const diagnosticsResult = await ai.diagnosticsResult;
+    if (diagnosticsResult) {
+      logger.next(diagnosticsResult.logString);
+      console.log(diagnosticsResult.label, diagnosticsResult);
+    }
   }
 
   logger.next('--');

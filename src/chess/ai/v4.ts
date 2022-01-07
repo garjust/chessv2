@@ -16,8 +16,8 @@ export default class v4 implements ChessComputer {
     this.diagnostics = new Diagnotics('v4', DEPTH);
   }
 
-  get searchDiagnostics() {
-    return this.diagnostics;
+  get diagnosticsResult() {
+    return this.diagnostics.result ?? null;
   }
 
   async nextMove(position: Position) {
