@@ -1,4 +1,5 @@
-import { AvailableComputerVersions, ChessComputerWorker } from '../ai/types';
+import { Remote } from 'comlink';
+import { ChessComputer } from '../ai/types';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
@@ -37,12 +38,12 @@ export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
 export type ChessComputerWrapped = {
-  ai: ChessComputerWorker;
-  version: AvailableComputerVersions;
+  ai: Remote<ChessComputer>;
+  label: string;
   // This property is here to indicate to JSON.stringify replacer function
-  // what type of object this is to avoid serializing the ai. JSON.stringify
-  // does something to the wrapped WebWorker before it hits the replacer
-  // function that explodes.
+  // what type of object this is to avoid serializing the comlink remote
+  // object. JSON.stringify does something to the wrapped WebWorker before
+  // it hits the replacer function that explodes.
   __computer: true;
 };
 

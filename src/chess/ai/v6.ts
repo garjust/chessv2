@@ -10,17 +10,22 @@ const DEPTH = 4;
 // Algorithm:
 // - move-ordered alpha-beta negamax search
 // - search through captures
-export default class v4 implements ChessComputer<Position> {
+export default class v4 implements ChessComputer {
+  engine: Engine;
   moveCounter = 0;
   evaluationCounter = 0;
 
-  nextMove(position: Position) {
-    const engine = new Engine(position);
+  constructor() {
+    this.engine = new Engine();
+  }
+
+  async nextMove(position: Position) {
+    this.engine.position = position;
 
     this.moveCounter = 0;
     this.evaluationCounter = 0;
 
-    const results = this.rootScores(engine, DEPTH).sort(
+    const results = this.rootScores(this.engine, DEPTH).sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
@@ -35,7 +40,7 @@ export default class v4 implements ChessComputer<Position> {
     const bestScore = results[0].score;
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
 
-    return Promise.resolve(move);
+    return move;
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {

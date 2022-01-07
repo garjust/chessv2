@@ -5,17 +5,23 @@ import Engine from '../engine';
 
 // Algorithm:
 // - pick a random move
-export default class v1 implements ChessComputer<Position> {
-  nextMove(position: Position) {
-    const engine = new Engine(position);
-    const moves = engine.generateMoves();
+export default class v1 implements ChessComputer {
+  engine: Engine;
+
+  constructor() {
+    this.engine = new Engine();
+  }
+
+  async nextMove(position: Position) {
+    this.engine.position = position;
+    const moves = this.engine.generateMoves();
 
     const captures = moves.filter((move) => move.attack);
     if (captures.length > 0) {
-      return Promise.resolve(pluck(captures));
+      return pluck(captures);
     }
 
-    return Promise.resolve(pluck(moves));
+    return pluck(moves);
   }
 
   toJSON(): string {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { State } from '../workflow';
 import { ChessComputerWrapped } from '../workflow/state';
-import { Move, Square } from '../types';
-import { moveString, squareLabel } from '../utils';
+import { Square } from '../types';
+import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
 import { formatBitboard } from '../lib/bitboard-def';
 
@@ -15,13 +15,6 @@ const render = (state: State) => ({
 });
 
 function replacer(key: string, value: unknown) {
-  // if (key === 'moves') {
-  //   console.log(
-  //     'moves',
-  //     (value as Move[]).map((move) => moveString(move))
-  //   );
-  // }
-
   if (key === 'evaluation') {
     return (value as number).toPrecision(6);
   }
@@ -46,9 +39,7 @@ function replacer(key: string, value: unknown) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((value as any).__computer) {
-      return `justin's chess computer ${
-        (value as ChessComputerWrapped).version
-      }`;
+      return (value as ChessComputerWrapped).label;
     }
   }
 

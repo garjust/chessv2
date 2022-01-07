@@ -1,3 +1,4 @@
+import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
   Move,
@@ -18,7 +19,7 @@ export default class Engine {
   _position: Position;
   _moveStack: MoveResult[] = [];
 
-  constructor(position: ExternalPosition) {
+  constructor(position: ExternalPosition = parseFEN(BLANK_POSITION_FEN)) {
     this._position = copyToInternal(position);
   }
 

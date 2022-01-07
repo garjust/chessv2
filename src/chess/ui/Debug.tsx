@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
 import { ComputerRegistry } from '../ai';
 import {
+  parseFEN,
   PERFT_5_FEN,
   STARTING_POSITION_FEN,
   VIENNA_OPENING_FEN,
@@ -13,13 +14,10 @@ import {
   VIENNA_OPENING,
 } from '../lib/move-generation-perft';
 import './Debug.css';
-import { wrap } from 'comlink';
-import {
-  AvailableComputerVersions,
-  ChessComputerWorkerConstructor,
-} from '../ai/types';
+import { AvailableComputerVersions } from '../ai/types';
 import { moveString } from '../utils';
 import { BUTTON_CSS } from './theme';
+import { loadComputer } from '../workers';
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -37,17 +35,13 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
-    new Worker(new URL('../workers/ai', import.meta.url))
-  );
-  const instance = await new ChessComputerWorkerRemote();
-  await instance.load('v6');
+  const ai = await loadComputer('v6');
 
   const fens = [STARTING_POSITION_FEN, VIENNA_OPENING_FEN, PERFT_5_FEN];
 
   for (const fen of fens) {
     const start = Date.now();
-    const move = await instance.nextMove(fen);
+    const move = await ai.nextMove(parseFEN(fen));
     const timing = Date.now() - start;
     logger.next(
       `version=${'v6'}; timing=${timing}ms; move=${moveString(move)}`
@@ -60,18 +54,16 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
 async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
   const computers = await Promise.all(
     Object.keys(ComputerRegistry).map(async (version) => {
-      const ChessComputerWorkerRemote = wrap<ChessComputerWorkerConstructor>(
-        new Worker(new URL('../workers/ai', import.meta.url))
-      );
-      const instance = await new ChessComputerWorkerRemote();
-      await instance.load(version as AvailableComputerVersions);
-      return { version, ai: instance };
+      return {
+        version,
+        ai: await loadComputer(version as AvailableComputerVersions),
+      };
     })
   );
 
   for (const { version, ai } of computers) {
     const start = Date.now();
-    const move = await ai.nextMove(fen);
+    const move = await ai.nextMove(parseFEN(fen));
     const timing = Date.now() - start;
     logger.next(
       `version=${version}; timing=${timing}ms; move=${moveString(move)}`

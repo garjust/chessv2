@@ -1,7 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN, formatPosition, STARTING_POSITION_FEN } from '../lib/fen';
+import { parseFEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
   overlaySquaresAction,
@@ -22,22 +22,19 @@ import {
 import { from } from 'rxjs';
 import { AvailableComputerVersions } from '../ai/types';
 import Engine from '../engine';
-import { wrap } from 'comlink';
 import { play, Sound } from '../ui/audio';
 import {
   setOverlayForAttacks,
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
-import { loadComputer, loadEngine } from '../workers';
+import { loadComputer } from '../workers';
 
 export type Context = {
   engine: Engine;
 };
 
 const COMPUTER_VERISON: AvailableComputerVersions = 'v6';
-
-(window as any).LOAD_ENGINE = () => loadEngine(parseFEN(STARTING_POSITION_FEN));
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;
@@ -48,7 +45,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
       state,
       from(
         playerForTurn.ai
-          .nextMove(formatPosition(position))
+          .nextMove(position)
           .then((move) => receiveComputerMoveAction(move))
       ),
     ];
@@ -143,12 +140,16 @@ function handleLoadChessComputer(
   return [
     state,
     from(
-      loadComputer(COMPUTER_VERISON).then((instance) =>
-        chessComputerLoadedAction(
-          { ai: instance, version: COMPUTER_VERISON, __computer: true },
-          playingAs
+      loadComputer(COMPUTER_VERISON)
+        .then((instance) => {
+          return Promise.all([instance, instance.toJSON()]);
+        })
+        .then(([instance, label]) =>
+          chessComputerLoadedAction(
+            { ai: instance, label, __computer: true },
+            playingAs
+          )
         )
-      )
     ),
   ];
 }
