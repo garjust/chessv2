@@ -19,6 +19,10 @@ export default class v6 implements ChessComputer {
     this.diagnostics = new Diagnotics('v6', DEPTH);
   }
 
+  get searchDiagnostics() {
+    return this.diagnostics;
+  }
+
   async nextMove(position: Position) {
     this.diagnostics = new Diagnotics('v6', DEPTH);
     this.engine.position = position;
@@ -31,8 +35,6 @@ export default class v6 implements ChessComputer {
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
 
     this.diagnostics.recordResult(move, results);
-    console.log(this.diagnostics.toString(), this.diagnostics.result);
-
     return move;
   }
 
@@ -66,7 +68,6 @@ export default class v6 implements ChessComputer {
 
       if (x >= beta) {
         this.diagnostics.cut(depth);
-
         return beta;
       }
 

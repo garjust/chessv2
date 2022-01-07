@@ -17,6 +17,7 @@ export default class Diagnotics {
     move: string;
     moveScores: MoveScores;
     totalNodes: number;
+    totalCuts: number;
     plyCounters: Record<number, PlyCounter>;
     depth: number;
   };
@@ -56,6 +57,10 @@ export default class Diagnotics {
       })),
       totalNodes: Object.values(this.plyCounters).reduce(
         (sum, plyCounter) => sum + plyCounter.nodes,
+        0
+      ),
+      totalCuts: Object.values(this.plyCounters).reduce(
+        (sum, plyCounter) => sum + plyCounter.cuts,
         0
       ),
       plyCounters: this.plyCounters,

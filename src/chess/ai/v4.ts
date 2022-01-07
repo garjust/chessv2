@@ -1,8 +1,8 @@
 import { ChessComputer } from './types';
 import { Move, Position } from '../types';
-import { moveString } from '../utils';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
+import Diagnotics from './diagnostics';
 
 const DEPTH = 4;
 
@@ -10,40 +10,34 @@ const DEPTH = 4;
 // - simple alpha-beta negamax search
 export default class v4 implements ChessComputer {
   engine: Engine;
-  moveCounter = 0;
-  evaluationCounter = 0;
+  diagnostics: Diagnotics;
 
   constructor() {
     this.engine = new Engine();
+    this.diagnostics = new Diagnotics('v4', DEPTH);
+  }
+
+  get searchDiagnostics() {
+    return this.diagnostics;
   }
 
   async nextMove(position: Position) {
     this.engine.position = position;
-
-    this.moveCounter = 0;
-    this.evaluationCounter = 0;
+    this.diagnostics = new Diagnotics('v4', DEPTH);
 
     const results = this.rootScores(this.engine, DEPTH).sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
-    console.log(
-      `v4 results for DEPTH=${DEPTH}: moves=${this.moveCounter}; evaluations=${this.evaluationCounter};`,
-      results.map(({ move, score }) => ({
-        move: moveString(move),
-        score,
-      }))
-    );
-
     const bestScore = results[0].score;
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
 
+    this.diagnostics.recordResult(move, results);
     return move;
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
     const moves = engine.generateMoves();
-    this.moveCounter += moves.length;
 
     return moves.map((move) => {
       engine.applyMove(move);
@@ -57,13 +51,13 @@ export default class v4 implements ChessComputer {
   }
 
   score(engine: Engine, depth: number, alpha: number, beta: number): number {
+    this.diagnostics.nodeVisit(depth);
+
     if (depth === 0) {
-      this.evaluationCounter++;
       return engine.evaluateNormalized();
     }
 
     const moves = engine.generateMoves();
-    this.moveCounter += moves.length;
 
     for (const move of moves) {
       engine.applyMove(move);
@@ -71,6 +65,7 @@ export default class v4 implements ChessComputer {
       engine.undoLastMove();
 
       if (x >= beta) {
+        this.diagnostics.cut(depth);
         return beta;
       }
 

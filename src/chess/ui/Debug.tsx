@@ -18,6 +18,7 @@ import { AvailableComputerVersions } from '../ai/types';
 import { moveString } from '../utils';
 import { BUTTON_CSS } from './theme';
 import { loadComputer } from '../workers';
+import { formatNumber } from '../../lib/formatter';
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -41,11 +42,15 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
 
   for (const fen of fens) {
     const start = Date.now();
-    const move = await ai.nextMove(parseFEN(fen));
+    await ai.nextMove(parseFEN(fen));
     const timing = Date.now() - start;
+    const diagnostics = await ai.searchDiagnostics;
     logger.next(
-      `version=${'v6'}; timing=${timing}ms; move=${moveString(move)}`
+      `ai=${diagnostics.label}; timing=${formatNumber(
+        timing
+      )}ms; nodes=${formatNumber(diagnostics.result?.totalNodes)}`
     );
+    console.log(diagnostics.label, diagnostics.result);
   }
 
   logger.next('--');
@@ -62,16 +67,22 @@ async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
   );
 
   for (const { version, ai } of computers) {
-    if (['v1', 'v2', 'v3'].includes(version)) {
+    if (['v1', 'v2'].includes(version)) {
       continue;
     }
 
     const start = Date.now();
-    const move = await ai.nextMove(parseFEN(fen));
+    await ai.nextMove(parseFEN(fen));
     const timing = Date.now() - start;
+    const diagnostics = await ai.searchDiagnostics;
     logger.next(
-      `version=${version}; timing=${timing}ms; move=${moveString(move)}`
+      `ai=${diagnostics.label}; timing=${formatNumber(
+        timing
+      )}ms; nodes=${formatNumber(
+        diagnostics.result?.totalNodes
+      )}; cuts=${formatNumber(diagnostics.result?.totalCuts)}`
     );
+    console.log(diagnostics.label, diagnostics.result);
   }
 
   logger.next('--');
