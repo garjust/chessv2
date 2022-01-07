@@ -106,6 +106,7 @@ export const updatePinsOnKings = (
     // If the moved piece does not enter or leave the king's rays nothing
     // needs to be computed.
     if (
+      piece.type === PieceType.King ||
       QUEEN_RAY_BITARRAYS[opponentKing][move.from] ||
       QUEEN_RAY_BITARRAYS[opponentKing][move.to]
     ) {

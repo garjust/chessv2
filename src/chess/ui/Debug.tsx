@@ -62,6 +62,10 @@ async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
   );
 
   for (const { version, ai } of computers) {
+    if (['v1', 'v2', 'v3'].includes(version)) {
+      continue;
+    }
+
     const start = Date.now();
     const move = await ai.nextMove(parseFEN(fen));
     const timing = Date.now() - start;
