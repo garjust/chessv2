@@ -1,6 +1,7 @@
 import { formatNumber } from '../../lib/formatter';
 import { Move } from '../types';
 import { moveString } from '../utils';
+import { TreeDiagnostics } from './tree-diagnostics';
 
 type PlyCounter = {
   nodes: number;
@@ -11,8 +12,9 @@ type MoveScores = { move: string; score: number }[];
 
 export default class Diagnotics {
   label: string;
-  plyCounters: Record<number, PlyCounter> = {};
   maxDepth: number;
+  enableTreeDiagnostics;
+  plyCounters: Record<number, PlyCounter> = {};
   result?: {
     move: string;
     moveScores: MoveScores;
@@ -21,14 +23,20 @@ export default class Diagnotics {
     plyCounters: Record<number, PlyCounter>;
     depth: number;
   };
+  treeDiagnostics?: TreeDiagnostics;
 
-  constructor(label: string, maxDepth: number) {
+  constructor(label: string, maxDepth: number, enableTreeDiagnostics = false) {
     this.label = label;
     this.maxDepth = maxDepth;
+    this.enableTreeDiagnostics = enableTreeDiagnostics;
 
     this.plyCounters[-1] = { nodes: 0, cuts: 0 };
     for (let i = 1; i <= maxDepth; i++) {
       this.plyCounters[i] = { nodes: 0, cuts: 0 };
+    }
+
+    if (this.treeDiagnostics) {
+      this.treeDiagnostics = new TreeDiagnostics(this.label);
     }
   }
 

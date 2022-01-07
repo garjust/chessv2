@@ -25,27 +25,39 @@ export default class v4 implements ChessComputer {
     this.engine.position = position;
     this.diagnostics = new Diagnotics('v4', DEPTH);
 
-    const results = this.rootScores(this.engine, DEPTH).sort(
+    const rawScores = this.rootScores(this.engine, DEPTH);
+    const results = [...rawScores].sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
     const bestScore = results[0].score;
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
 
-    this.diagnostics.recordResult(move, results);
+    this.diagnostics.recordResult(move, rawScores);
     return move;
   }
 
   rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
     const moves = engine.generateMoves();
 
+    const alpha = -Infinity;
+    const beta = Infinity;
+
     return moves.map((move) => {
       engine.applyMove(move);
       const result = {
         move,
-        score: -1 * this.score(engine, depth - 1, -Infinity, Infinity),
+        score: -1 * this.score(engine, depth - 1, alpha, beta),
       };
       engine.undoLastMove();
+
+      // if (result.score >= beta) {
+      //   beta = result.score;
+      // }
+      // if (result.score > alpha) {
+      //   alpha = result.score;
+      // }
+
       return result;
     });
   }

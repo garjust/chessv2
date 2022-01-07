@@ -27,14 +27,15 @@ export default class v6 implements ChessComputer {
     this.diagnostics = new Diagnotics('v6', DEPTH);
     this.engine.position = position;
 
-    const results = this.rootScores(this.engine, DEPTH).sort(
+    const rawScores = this.rootScores(this.engine, DEPTH);
+    const results = [...rawScores].sort(
       (a: { score: number }, b: { score: number }) => b.score - a.score
     );
 
     const bestScore = results[0].score;
     const move = pluck(results.filter(({ score }) => score === bestScore)).move;
 
-    this.diagnostics.recordResult(move, results);
+    this.diagnostics.recordResult(move, rawScores);
     return move;
   }
 
