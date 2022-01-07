@@ -1,9 +1,10 @@
-import { ChessComputer } from './types';
+import { ChessComputer, SearchResult } from './types';
 import { Move, Position } from '../types';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
 import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './diagnostics';
+import { moveString } from '../utils';
 
 const DEPTH = 4;
 
@@ -26,30 +27,38 @@ export default class v5 implements ChessComputer {
     this.engine.position = position;
     this.diagnostics = new Diagnotics('v5', DEPTH);
 
-    const rawScores = this.rootScores(this.engine, DEPTH);
-    const results = [...rawScores].sort(
-      (a: { score: number }, b: { score: number }) => b.score - a.score
-    );
+    const { scores, move } = this.rootScores(this.engine, DEPTH);
 
-    const bestScore = results[0].score;
-    const move = pluck(results.filter(({ score }) => score === bestScore)).move;
-
-    this.diagnostics.recordResult(move, rawScores);
+    this.diagnostics.recordResult(move, scores);
     return move;
   }
 
-  rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
-    const moves = orderMoves(engine.generateMoves());
+  rootScores(engine: Engine, depth: number): SearchResult {
+    const scores: { move: Move; score: number }[] = [];
+    // Start with an illegal move so it is well defined.
+    let bestMove: Move = { from: -1, to: -1 };
 
-    return moves.map((move) => {
+    let alpha = -Infinity;
+    const beta = Infinity;
+
+    const moves = orderMoves(engine.generateMoves());
+    for (const move of moves) {
       engine.applyMove(move);
       const result = {
         move,
-        score: -1 * this.score(engine, depth - 1, -Infinity, Infinity),
+        score: -1 * this.score(engine, depth - 1, beta * -1, alpha * -1),
       };
       engine.undoLastMove();
-      return result;
-    });
+
+      scores.push(result);
+
+      if (result.score > alpha) {
+        bestMove = result.move;
+        alpha = result.score;
+      }
+    }
+
+    return { scores, move: bestMove };
   }
 
   score(engine: Engine, depth: number, alpha: number, beta: number): number {
@@ -66,13 +75,12 @@ export default class v5 implements ChessComputer {
       const x = -1 * this.score(engine, depth - 1, beta * -1, alpha * -1);
       engine.undoLastMove();
 
-      if (x >= beta) {
-        this.diagnostics.cut(depth);
-        return beta;
-      }
-
       if (x > alpha) {
         alpha = x;
+      }
+      if (alpha >= beta) {
+        this.diagnostics.cut(depth);
+        break;
       }
     }
 

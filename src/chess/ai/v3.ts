@@ -1,4 +1,4 @@
-import { ChessComputer } from './types';
+import { ChessComputer, SearchResult } from './types';
 import { Move, Position } from '../types';
 import Engine from '../engine';
 import { pluck } from '../../lib/array';
@@ -25,30 +25,36 @@ export default class v3 implements ChessComputer {
     this.engine.position = position;
     this.diagnostics = new Diagnotics('v3', DEPTH);
 
-    const rawScores = this.rootScores(this.engine, DEPTH);
-    const results = [...rawScores].sort(
-      (a: { score: number }, b: { score: number }) => b.score - a.score
-    );
+    const { scores, move } = this.rootScores(this.engine, DEPTH);
 
-    const bestScore = results[0].score;
-    const move = pluck(results.filter(({ score }) => score === bestScore)).move;
-
-    this.diagnostics.recordResult(move, rawScores);
+    this.diagnostics.recordResult(move, scores);
     return move;
   }
 
-  rootScores(engine: Engine, depth: number): { move: Move; score: number }[] {
-    const moves = engine.generateMoves();
+  rootScores(engine: Engine, depth: number): SearchResult {
+    const scores: { move: Move; score: number }[] = [];
+    // Start with an illegal move so it is well defined.
+    let bestMove: Move = { from: -1, to: -1 };
+    let bestScore = -Infinity;
 
-    return moves.map((move) => {
+    const moves = engine.generateMoves();
+    for (const move of moves) {
       engine.applyMove(move);
       const result = {
         move,
         score: -1 * this.score(engine, depth - 1),
       };
       engine.undoLastMove();
-      return result;
-    });
+
+      scores.push(result);
+
+      if (result.score > bestScore) {
+        bestMove = result.move;
+        bestScore = result.score;
+      }
+    }
+
+    return { scores, move: bestMove };
   }
 
   score(engine: Engine, depth: number): number {
