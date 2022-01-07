@@ -1,7 +1,6 @@
 import { ChessComputer, SearchResult } from './types';
 import { Move, Position } from '../types';
 import Engine from '../engine';
-import { pluck } from '../../lib/array';
 import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './diagnostics';
 
@@ -65,7 +64,7 @@ export default class v6 implements ChessComputer {
     this.diagnostics.nodeVisit(depth);
 
     if (depth === 0) {
-      return this.scoreCaptures(engine, alpha, beta);
+      return this.quiescenceScores(engine, alpha, beta);
     }
 
     const moves = orderMoves(engine.generateMoves());
@@ -87,12 +86,12 @@ export default class v6 implements ChessComputer {
     return alpha;
   }
 
-  scoreCaptures(engine: Engine, alpha: number, beta: number): number {
+  quiescenceScores(engine: Engine, alpha: number, beta: number): number {
     this.diagnostics.quiescenceNodeVisit();
 
-    const x = engine.evaluateNormalized();
-    if (x > alpha) {
-      alpha = x;
+    const noMove = engine.evaluateNormalized();
+    if (noMove > alpha) {
+      alpha = noMove;
     }
     if (alpha >= beta) {
       this.diagnostics.quiescenceCut();
@@ -105,7 +104,7 @@ export default class v6 implements ChessComputer {
 
     for (const move of moves) {
       engine.applyMove(move);
-      const x = -1 * this.scoreCaptures(engine, beta * -1, alpha * -1);
+      const x = -1 * this.quiescenceScores(engine, beta * -1, alpha * -1);
       engine.undoLastMove();
 
       if (x > alpha) {

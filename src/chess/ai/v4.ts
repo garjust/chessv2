@@ -1,7 +1,6 @@
 import { ChessComputer, SearchResult } from './types';
 import { Move, Position } from '../types';
 import Engine from '../engine';
-import { pluck } from '../../lib/array';
 import Diagnotics from './diagnostics';
 
 const DEPTH = 4;

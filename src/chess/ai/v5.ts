@@ -1,10 +1,8 @@
 import { ChessComputer, SearchResult } from './types';
 import { Move, Position } from '../types';
 import Engine from '../engine';
-import { pluck } from '../../lib/array';
 import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './diagnostics';
-import { moveString } from '../utils';
 
 const DEPTH = 4;
 
