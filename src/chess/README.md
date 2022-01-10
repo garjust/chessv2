@@ -10,10 +10,13 @@
 ## TODO
 
 - Decrease weight of moves to squares attacked by pawns
-- Profile attack-based move generaiton
+- Profile attack-based move generation
 - Add move ordering heuristics (killer move)
 - v7 iterative deepening
 - Transposition table
 - Opening book (Kevin will fried liver me)
 - Computers return the full line of chosen move
 - Evaluation of checkmates (M1..N) and actually able to checkmate
+- Evaluation does not like lone pawns or doubled pawns
+- Evaluation likes pawn cover for king
+  - Maybe this means squares that attack the king are blocked or defended (knight attacks squares are defended against, rays to squares near king are blocked by pawns)

@@ -25,7 +25,7 @@ import { clickSquareAction } from '../workflow/action';
 import Piece from './Piece';
 import { HEATMAPS } from '../lib/heatmaps';
 
-const DEFAULT_HEATMAP = HEATMAPS[PieceType.Knight][Color.White];
+const DEFAULT_HEATMAP = HEATMAPS[PieceType.Rook][Color.White];
 
 export type SquareProps = {
   color: Color;
@@ -58,11 +58,11 @@ const Square = (props: SquareProps) => {
 
   if (showHeatmap) {
     const value = DEFAULT_HEATMAP[square];
-    const adjusted = value / 10;
+    const adjusted = (value + 1) / 10 + 0.65;
     css = {
       ...css,
       ...BOARD_SQUARE_SELECTED,
-      filter: `saturate(${adjusted})`,
+      filter: `brightness(${adjusted})`,
     };
   } else if (overlay) {
     switch (overlay) {

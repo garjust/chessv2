@@ -1,6 +1,10 @@
 import { Position, PieceType, Color, Piece, Square } from '../types';
 import { HEATMAPS } from '../lib/heatmaps';
 
+export const HEATMAP_MULTIPLIER = 100;
+
+export const EVALUATION_DIVIDER = 1000;
+
 export const PieceValue: Record<PieceType, number> = Object.freeze({
   [PieceType.Bishop]: 3000,
   [PieceType.King]: Infinity,
@@ -13,7 +17,7 @@ export const PieceValue: Record<PieceType, number> = Object.freeze({
 const modifier = (color: Color) => (color === Color.White ? 1 : -1);
 
 const squareValue = (square: Square, piece: Piece): number =>
-  HEATMAPS[piece.type][piece.color][square];
+  HEATMAPS[piece.type][piece.color][square] * HEATMAP_MULTIPLIER;
 
 export const evaluate = (position: Position): number => {
   let evaluation = 0;
@@ -23,7 +27,7 @@ export const evaluate = (position: Position): number => {
       continue;
     }
     evaluation +=
-      (PieceValue[piece.type] + squareValue(square, piece) * 10) *
+      (PieceValue[piece.type] + squareValue(square, piece)) *
       modifier(piece.color);
   }
 

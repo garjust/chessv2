@@ -72,7 +72,7 @@ export default class Diagnotics {
 
     const result: DiagnosticsResult = {
       label: this.label,
-      logString: `${this.label} results: depth=${
+      logString: `${this.label} ${moveString(move)}: depth=${
         this.maxDepth
       }; timing=${formatNumber(timing)}ms; nodes=${formatNumber(
         totalNodes

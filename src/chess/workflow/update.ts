@@ -29,6 +29,7 @@ import {
   setOverlayForPlay,
 } from './overlay';
 import { loadComputer } from '../workers';
+import { EVALUATION_DIVIDER } from '../engine/evaluation';
 
 export type Context = {
   engine: Engine;
@@ -262,7 +263,7 @@ function handleSetPosition(
 ): Update<State, Action> {
   const { position } = action;
   const moves = engine.generateMoves();
-  const evaluation = engine.evaluate() / 1000;
+  const evaluation = engine.evaluate() / EVALUATION_DIVIDER;
   const checks = engine.checks[position.turn];
 
   state = {
