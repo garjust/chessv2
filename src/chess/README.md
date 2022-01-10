@@ -10,4 +10,10 @@
 ## TODO
 
 - Decrease weight of moves to squares attacked by pawns
-- King pinned to square being castled through is now a legal move again in kingMoves of piece-movement-control.ts
+- Profile attack-based move generaiton
+- Add move ordering heuristics (killer move)
+- v7 iterative deepening
+- Transposition table
+- Opening book (Kevin will fried liver me)
+- Computers return the full line of chosen move
+- Evaluation of checkmates (M1..N) and actually able to checkmate
