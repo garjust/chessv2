@@ -262,7 +262,7 @@ function handleSetPosition(
 ): Update<State, Action> {
   const { position } = action;
   const moves = engine.generateMoves();
-  const evaluation = engine.evaluate();
+  const evaluation = engine.evaluate() / 1000;
   const checks = engine.checks[position.turn];
 
   state = {

@@ -2,12 +2,12 @@ import { Position, PieceType, Color, Piece, Square } from '../types';
 import { HEATMAPS } from '../lib/heatmaps';
 
 export const PieceValue: Record<PieceType, number> = Object.freeze({
-  [PieceType.Bishop]: 300,
+  [PieceType.Bishop]: 3000,
   [PieceType.King]: Infinity,
-  [PieceType.Knight]: 300,
-  [PieceType.Pawn]: 100,
-  [PieceType.Queen]: 900,
-  [PieceType.Rook]: 500,
+  [PieceType.Knight]: 3000,
+  [PieceType.Pawn]: 1000,
+  [PieceType.Queen]: 9000,
+  [PieceType.Rook]: 5000,
 });
 
 const modifier = (color: Color) => (color === Color.White ? 1 : -1);
@@ -23,11 +23,19 @@ export const evaluate = (position: Position): number => {
       continue;
     }
     evaluation +=
-      (PieceValue[piece.type] + squareValue(square, piece)) *
+      (PieceValue[piece.type] + squareValue(square, piece) * 10) *
       modifier(piece.color);
   }
 
-  evaluation += 20 * modifier(position.turn);
+  evaluation += 200 * modifier(position.turn);
 
-  return evaluation / 100;
+  // Add random jitter to the evaluation. This should be small enough to only
+  // break ties in the evaluation. If two moves tie then one will be randomly
+  // evaluated as better and will be played instead of the first move evaluated.
+  //
+  // Choose 4 as the max value so the jitter is always rounded off to 0 when
+  // rounding the evaluation number to a real evaluation (divide by 1000).
+  evaluation += Math.round(Math.random() * 4);
+
+  return evaluation;
 };

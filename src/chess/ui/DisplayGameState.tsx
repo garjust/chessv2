@@ -16,7 +16,7 @@ const render = (state: State) => ({
 
 function replacer(key: string, value: unknown) {
   if (key === 'evaluation') {
-    return (value as number).toPrecision(6);
+    return (value as number).toFixed(2);
   }
 
   if (value instanceof Map) {
