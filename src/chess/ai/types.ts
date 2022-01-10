@@ -1,5 +1,14 @@
-import { Move, Position } from '../types';
-import { DiagnosticsResult } from './diagnostics';
+import Engine from '../engine';
+import { Move, MoveWithExtraData, Position } from '../types';
+import Diagnotics, { DiagnosticsResult } from './diagnostics';
+
+export type SearchContext = {
+  engine: Engine;
+  diagnostics: Diagnotics;
+  pruneNodes: boolean;
+  quiescenceSearch: boolean;
+  orderMoves: (moves: MoveWithExtraData[]) => Move[];
+};
 
 export type SearchResult = {
   move: Move;

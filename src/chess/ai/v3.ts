@@ -1,7 +1,8 @@
-import { ChessComputer, SearchResult } from './types';
-import { Move, Position } from '../types';
+import { ChessComputer, SearchContext } from './types';
+import { MoveWithExtraData, Position } from '../types';
 import Engine from '../engine';
 import Diagnotics from './diagnostics';
+import { search } from './search';
 
 const DEPTH = 4;
 
@@ -10,74 +11,38 @@ const DEPTH = 4;
 export default class v3 implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
+  context: SearchContext;
 
   constructor() {
     this.engine = new Engine();
     this.diagnostics = new Diagnotics('v3', DEPTH);
+
+    this.context = {
+      engine: this.engine,
+      diagnostics: this.diagnostics,
+      pruneNodes: false,
+      quiescenceSearch: false,
+      orderMoves: (moves: MoveWithExtraData[]) => moves,
+    };
   }
 
   get diagnosticsResult() {
     return this.diagnostics.result ?? null;
   }
 
-  async nextMove(position: Position) {
-    this.engine.position = position;
+  resetDiagnostics() {
     this.diagnostics = new Diagnotics('v3', DEPTH);
+    this.context.diagnostics = this.diagnostics;
+  }
 
-    const { scores, move } = this.rootScores(this.engine, DEPTH);
+  async nextMove(position: Position) {
+    this.resetDiagnostics();
+
+    this.engine.position = position;
+    const { scores, move } = search(DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;
-  }
-
-  rootScores(engine: Engine, depth: number): SearchResult {
-    const scores: { move: Move; score: number }[] = [];
-    // Start with an illegal move so it is well defined.
-    let bestMove: Move = { from: -1, to: -1 };
-    let bestScore = -Infinity;
-
-    const moves = engine.generateMoves();
-    for (const move of moves) {
-      engine.applyMove(move);
-      const result = {
-        move,
-        score: -1 * this.score(engine, depth - 1),
-      };
-      engine.undoLastMove();
-
-      scores.push(result);
-
-      if (result.score > bestScore) {
-        bestMove = result.move;
-        bestScore = result.score;
-      }
-    }
-
-    return { scores, move: bestMove };
-  }
-
-  score(engine: Engine, depth: number): number {
-    this.diagnostics.nodeVisit(depth);
-
-    if (depth === 0) {
-      return engine.evaluateNormalized();
-    }
-
-    let max = -Infinity;
-    const moves = engine.generateMoves();
-
-    // handle no moves (checkmate or draw)
-    moves.forEach((move) => {
-      engine.applyMove(move);
-      const x = -1 * this.score(engine, depth - 1);
-      engine.undoLastMove();
-
-      if (x > max) {
-        max = x;
-      }
-    });
-
-    return max;
   }
 
   toJSON(): string {
