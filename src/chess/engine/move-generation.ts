@@ -126,7 +126,7 @@ const movesForPositionFromAttacks = (
   const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
     options;
 
-  for (const [square, piece] of pieces.entries()) {
+  for (const [square, piece] of pieces) {
     if (color && piece.color !== color) {
       continue;
     }
@@ -220,28 +220,20 @@ const moveResolvesCheck = (
   }
 };
 
-const pruneMovesInCheck = (
-  checks: AttackObject[],
-  moves: MoveWithExtraData[]
-): MoveWithExtraData[] => {
-  return moves.filter((move) =>
-    moveResolvesCheck(checks, move, { ignoreKing: true })
-  );
-};
-
 const noCheckFromMove = (
   pieces: Map<Square, Piece>,
   color: Color,
   king: Square,
   move: MoveWithExtraData,
   pins: Map<Square, Pin>,
+  inCheck: boolean,
   attackMap?: Map<Square, number>
 ): boolean => {
   // We need to prune moves that result in a check on ourselves.
   //
   // To do this we track pieces that are pinned to the king as well as
   // looking at king moves.
-  if (attackMap) {
+  if (!inCheck && attackMap) {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
       return attackMap.get(move.to) === 0;
@@ -275,19 +267,6 @@ const noCheckFromMove = (
   }
 };
 
-const pruneChecks = (
-  pieces: Map<Square, Piece>,
-  color: Color,
-  king: Square,
-  moves: MoveWithExtraData[],
-  pins: Map<Square, Pin>,
-  attackMap?: Map<Square, number>
-) => {
-  return moves.filter((move) =>
-    noCheckFromMove(pieces, color, king, move, pins, attackMap)
-  );
-};
-
 export const generateMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
@@ -317,7 +296,7 @@ export const generateMoves = (
     });
   }
 
-  // let moves = movesForPositionFromAttacks(pieces, {
+  // const moves = movesForPositionFromAttacks(pieces, {
   const moves = movesForPosition(pieces, {
     color,
     enPassantSquare,
@@ -344,7 +323,8 @@ export const generateMoves = (
           color,
           king,
           move,
-          pinsToKing[color]
+          pinsToKing[color],
+          checksForPlayer.length > 0
           // attackedSquares[flipColor(color)]
         )
       ) {

@@ -25,6 +25,17 @@ export type RankFile = {
   file: number;
 };
 
+export enum DirectionUnit {
+  Up = 8,
+  Right = 1,
+  Down = -8,
+  Left = -1,
+  UpLeft = 7,
+  UpRight = 9,
+  DownLeft = -9,
+  DownRight = -7,
+}
+
 export type PromotionOption =
   | PieceType.Bishop
   | PieceType.Knight

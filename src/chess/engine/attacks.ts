@@ -214,31 +214,33 @@ export const updateAttackedSquares = (
 
   // Find sliding pieces affected by the moved piece.
   for (const [square, piece] of pieces) {
-    let isIncident = false;
+    if (square === move.from || square === move.to) {
+      // We have already covered pieces in the move from/to squares.
+      continue;
+    }
+
+    let isFromIncident = false;
+    let isToIncident = false;
 
     switch (piece.type) {
       case PieceType.Bishop:
-        isIncident =
-          BISHOP_RAY_BITARRAYS[square][move.from] ||
-          BISHOP_RAY_BITARRAYS[square][move.to];
+        isFromIncident = BISHOP_RAY_BITARRAYS[square][move.from];
+        isToIncident = BISHOP_RAY_BITARRAYS[square][move.to];
         break;
       case PieceType.Rook:
-        isIncident =
-          ROOK_RAY_BITARRAYS[square][move.from] ||
-          ROOK_RAY_BITARRAYS[square][move.to];
+        isFromIncident = ROOK_RAY_BITARRAYS[square][move.from];
+        isToIncident = ROOK_RAY_BITARRAYS[square][move.to];
         break;
       case PieceType.Queen:
-        isIncident =
-          QUEEN_RAY_BITARRAYS[square][move.from] ||
-          QUEEN_RAY_BITARRAYS[square][move.to];
+        isFromIncident = QUEEN_RAY_BITARRAYS[square][move.from];
+        isToIncident = QUEEN_RAY_BITARRAYS[square][move.to];
         break;
       default:
         break;
     }
 
-    if (isIncident) {
+    if (isFromIncident || isToIncident) {
       removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
-
       const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
 
       addAttacks(

@@ -1,5 +1,6 @@
 import {
   Color,
+  DirectionUnit,
   Move,
   Piece,
   PieceType,
@@ -112,6 +113,31 @@ export const isLegalSquare = (square: Square): boolean =>
 
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
+
+export const directionOfMove = (move: Move): DirectionUnit => {
+  const diff = move.to - move.from;
+  if (diff > 0) {
+    if (diff % DirectionUnit.Up === 0) {
+      return DirectionUnit.Up;
+    } else if (diff % DirectionUnit.UpLeft === 0) {
+      return DirectionUnit.UpLeft;
+    } else if (diff % DirectionUnit.UpRight === 0) {
+      return DirectionUnit.UpRight;
+    } else {
+      return DirectionUnit.Right;
+    }
+  } else {
+    if (diff % DirectionUnit.Down === 0) {
+      return DirectionUnit.Down;
+    } else if (diff % DirectionUnit.DownLeft === 0) {
+      return DirectionUnit.DownLeft;
+    } else if (diff % DirectionUnit.DownRight === 0) {
+      return DirectionUnit.DownRight;
+    } else {
+      return DirectionUnit.Left;
+    }
+  }
+};
 
 const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
   PIECE_TYPE_TO_FEN_PIECE[type];

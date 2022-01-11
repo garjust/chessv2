@@ -185,6 +185,7 @@ function handlePreviousPosition(
   { engine }: Context
 ): Update<State, Action> {
   engine.undoLastMove();
+  play(Sound.Move);
 
   return [
     { ...state, selectedSquare: undefined },
