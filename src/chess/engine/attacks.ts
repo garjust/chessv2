@@ -169,13 +169,24 @@ const addAttacks = (
   pieceAttacks[color].set(square, squares);
 };
 
+export type SquareControlChangeset = {
+  square: Square;
+  squares: SquareControlObject[];
+  color: Color;
+};
+
 const removeAttacks = (
   attackedSquares: AttackedSquares,
   pieceAttacks: PieceAttacks,
   color: Color,
   square: Square
-) => {
+): SquareControlChangeset => {
   const squares = pieceAttacks[color].get(square) ?? [];
+  const changeset = {
+    color,
+    square,
+    squares,
+  };
 
   for (const squareControl of squares) {
     attackedSquares[color].set(
@@ -184,6 +195,8 @@ const removeAttacks = (
     );
   }
   pieceAttacks[color].set(square, []);
+
+  return changeset;
 };
 
 export const updateAttackedSquares = (
@@ -192,11 +205,21 @@ export const updateAttackedSquares = (
   pieces: Map<Square, Piece>,
   move: Move,
   movedPiece: Piece
-) => {
+): SquareControlChangeset[] => {
+  const changes: SquareControlChangeset[] = [];
   const opponentColor = flipColor(movedPiece.color);
 
-  removeAttacks(attackedSquares, pieceAttacks, movedPiece.color, move.from);
-  removeAttacks(attackedSquares, pieceAttacks, opponentColor, move.to);
+  changes.push(
+    removeAttacks(attackedSquares, pieceAttacks, movedPiece.color, move.from)
+  );
+  changes.push({
+    color: movedPiece.color,
+    square: move.to,
+    squares: [],
+  });
+  changes.push(
+    removeAttacks(attackedSquares, pieceAttacks, opponentColor, move.to)
+  );
 
   // Find the squares that are now attacked by the moved piece.
   const newAttacks: SquareControlObject[] = forPiece(
@@ -240,7 +263,9 @@ export const updateAttackedSquares = (
     }
 
     if (isFromIncident || isToIncident) {
-      removeAttacks(attackedSquares, pieceAttacks, piece.color, square);
+      changes.push(
+        removeAttacks(attackedSquares, pieceAttacks, piece.color, square)
+      );
       const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
 
       addAttacks(
@@ -251,5 +276,24 @@ export const updateAttackedSquares = (
         newAttacks
       );
     }
+  }
+
+  return changes;
+};
+
+export const updateAttackedSquaresFromChangeset = (
+  squareControlChanges: SquareControlChangeset[],
+  attackedSquares: AttackedSquares,
+  pieceAttacks: PieceAttacks
+) => {
+  for (const change of squareControlChanges) {
+    removeAttacks(attackedSquares, pieceAttacks, change.color, change.square);
+    addAttacks(
+      attackedSquares,
+      pieceAttacks,
+      change.color,
+      change.square,
+      change.squares
+    );
   }
 };

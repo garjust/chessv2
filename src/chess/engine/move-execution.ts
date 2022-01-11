@@ -5,13 +5,18 @@ import {
   Piece,
   PieceType,
   Square,
+  SquareControlObject,
 } from '../types';
 import {
   ROOK_STARTING_SQUARES,
   flipColor,
   isStartPositionPawn,
 } from '../utils';
-import { updateAttackedSquares } from './attacks';
+import {
+  SquareControlChangeset,
+  updateAttackedSquares,
+  updateAttackedSquaresFromChangeset,
+} from './attacks';
 import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
@@ -27,6 +32,7 @@ export type MoveResult = {
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
     checks: KingChecks;
+    squareControlChanges: SquareControlChangeset[];
   };
 };
 
@@ -54,6 +60,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     throw Error('cannot move piece for other color');
   }
 
+  const squareControlChanges: SquareControlChangeset[] = [];
   const result: MoveResult = {
     move,
     previousState: {
@@ -71,6 +78,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
       checks: { ...position.checks },
+      squareControlChanges: squareControlChanges,
     },
   };
 
@@ -177,12 +185,14 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     move,
     piece
   );
-  // updateAttackedSquares(
-  //   position.attackedSquares,
-  //   position.pieceAttacks,
-  //   position.pieces,
-  //   move,
-  //   piece
+  // squareControlChanges.push(
+  //   ...updateAttackedSquares(
+  //     position.attackedSquares,
+  //     position.pieceAttacks,
+  //     position.pieces,
+  //     move,
+  //     piece
+  //   )
   // );
 
   // NOTE: Re-enable this when up to date check data is needed for move ordering
@@ -260,12 +270,10 @@ export const undoMove = (position: Position, result: MoveResult): void => {
     }
   }
 
-  // updateAttackedSquares(
+  // updateAttackedSquaresFromChangeset(
+  //   result.previousState.squareControlChanges,
   //   position.attackedSquares,
-  //   position.pieceAttacks,
-  //   position.pieces,
-  //   move,
-  //   piece
+  //   position.pieceAttacks
   // );
 
   // Undo rest of the position state.
