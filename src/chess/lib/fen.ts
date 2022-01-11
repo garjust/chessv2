@@ -75,31 +75,32 @@ const pieceMapFromFenPieces = (fenPieces: string): Map<Square, Piece> => {
 };
 
 const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
-  let str = '';
+  const sections: string[] = [];
 
   let emptyCounter;
 
   for (let rank = 7; rank >= 0; rank--) {
+    let rankString = '';
     emptyCounter = 0;
     for (let file = 0; file < 8; file++) {
       const piece = pieces.get(rankFileToSquare({ rank, file }));
       if (piece) {
         if (emptyCounter > 0) {
-          str += String(emptyCounter);
+          rankString += String(emptyCounter);
         }
-        str += pieceToFenPiece(piece);
+        rankString += pieceToFenPiece(piece);
         emptyCounter = 0;
       } else {
         emptyCounter++;
       }
     }
     if (emptyCounter > 0) {
-      str += String(emptyCounter);
+      rankString += String(emptyCounter);
     }
-    str += '/';
+    sections.push(rankString);
   }
 
-  return str;
+  return sections.join('/');
 };
 
 export const parseFEN = (fenString: string): Position => {
@@ -142,7 +143,7 @@ export const formatPosition = (fen: Position): string => {
       fen.castlingAvailability[Color.White].kingside ? 'K' : '',
       fen.castlingAvailability[Color.White].queenside ? 'Q' : '',
       fen.castlingAvailability[Color.Black].kingside ? 'k' : '',
-      fen.castlingAvailability[Color.Black].queenside ? 'Q' : '',
+      fen.castlingAvailability[Color.Black].queenside ? 'q' : '',
     ].join(''),
     fen.enPassantSquare ? squareLabel(fen.enPassantSquare) : '-',
     fen.halfMoveCount,

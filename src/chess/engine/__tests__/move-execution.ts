@@ -23,13 +23,13 @@ test('move execution perft', () => {
       engine.undoLastMove();
     }
   }
+
   const time = Date.now() - now;
-
-  expect(formatPosition(engine.position)).toEqual(STARTING_POSITION_FEN);
-
   console.log(
-    `move execution timing: ${time}ms (${((N / time) * 1000).toPrecision(
+    `move execution timing: ${time}ms (${((time / N) * 1000).toPrecision(
       5
     )}μs/move-unmove)`
   );
+
+  expect(formatPosition(engine.position)).toEqual(STARTING_POSITION_FEN);
 });
