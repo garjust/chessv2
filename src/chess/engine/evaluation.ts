@@ -1,8 +1,9 @@
 import { Position, PieceType, Color, Piece, Square } from '../types';
-import { HEATMAPS } from '../lib/heatmaps';
+import { squareValue } from '../lib/heatmaps';
 
-export const HEATMAP_MULTIPLIER = 100;
-
+// Evaluation is typically based on the value of a pawn = 1. Evaluation is calculated
+// here with a 1000 multiplier to avoid floating points and to allow us to add
+// a small amount of random noise.
 export const EVALUATION_DIVIDER = 1000;
 
 export const PieceValue: Record<PieceType, number> = Object.freeze({
@@ -16,9 +17,6 @@ export const PieceValue: Record<PieceType, number> = Object.freeze({
 
 const modifier = (color: Color) => (color === Color.White ? 1 : -1);
 
-const squareValue = (square: Square, piece: Piece): number =>
-  HEATMAPS[piece.type][piece.color][square] * HEATMAP_MULTIPLIER;
-
 export const evaluate = (position: Position): number => {
   let evaluation = 0;
 
@@ -31,6 +29,7 @@ export const evaluate = (position: Position): number => {
       modifier(piece.color);
   }
 
+  // Points for being player to move.
   evaluation += 200 * modifier(position.turn);
 
   // Add random jitter to the evaluation. This should be small enough to only

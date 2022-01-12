@@ -1,15 +1,12 @@
 import { Move, MoveWithExtraData } from '../types';
-import { HEATMAP_MULTIPLIER, PieceValue } from './evaluation';
-import { HEATMAPS } from '../lib/heatmaps';
+import { PieceValue } from './evaluation';
+import { squareValueDiff } from '../lib/heatmaps';
 import { sort } from 'fast-sort';
 
 const moveWeight = (move: MoveWithExtraData): number => {
   let n = 0;
 
-  n +=
-    (HEATMAPS[move.piece.type][move.piece.color][move.to] -
-      HEATMAPS[move.piece.type][move.piece.color][move.from]) *
-    HEATMAP_MULTIPLIER;
+  n += squareValueDiff(move, move.piece);
 
   if (move.attack) {
     n += Math.max(
