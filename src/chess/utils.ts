@@ -78,6 +78,8 @@ type Nullable<T> = T | undefined | null;
 export const rankFileToSquare = ({ rank, file }: RankFile): Square =>
   rank * 8 + file;
 
+export const rankForSquare = (square: Square) => square % 8;
+
 export const squareLabel = (square: Square): SquareLabel =>
   SQUARE_LABEL_LOOKUP[square];
 
