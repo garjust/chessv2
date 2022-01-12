@@ -53,6 +53,11 @@ export interface State {
   debugVersion?: number;
   boardOrientation: Color;
   squareLabels: SquareLabel;
+  clocks: {
+    lastTick: number;
+    [Color.White]: number;
+    [Color.Black]: number;
+  };
   players: {
     [Color.White]: Player;
     [Color.Black]: Player;
@@ -72,6 +77,11 @@ const INITIAL_STATE: State = {
   debugVersion: 0,
   boardOrientation: Color.White,
   squareLabels: SquareLabel.None,
+  clocks: {
+    lastTick: Date.now(),
+    [Color.White]: 600 * 1000,
+    [Color.Black]: 600 * 1000,
+  },
   players: {
     [Color.White]: HumanPlayer,
     [Color.Black]: HumanPlayer,

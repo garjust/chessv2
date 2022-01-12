@@ -9,6 +9,7 @@ import {
   loadChessComputerAction,
   previousPositionAction,
   setPositionFromFENAction,
+  tickPlayersClockAction,
   toggleSquareLabelsAction,
 } from '../workflow/action';
 import { WorkflowContext } from './workflow';
@@ -28,6 +29,7 @@ import {
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
+import { interval, map } from 'rxjs';
 
 const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
 
@@ -37,6 +39,14 @@ const Game = () => {
   });
 
   updates.subscribe(updateLogger('Chess'));
+
+  useEffect(() => {
+    const ticker = interval(1_000).pipe(map(() => tickPlayersClockAction()));
+    const subscription = ticker.subscribe(emit);
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
 
   useEffect(() => {
     emit(setPositionFromFENAction(FEN_FOR_INITIAL_POSITION));

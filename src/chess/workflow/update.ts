@@ -324,6 +324,27 @@ function handleSetPositionFromFEN(
   return [{ ...state, winner: undefined }, setPositionAction(position)];
 }
 
+function handleTickPlayersClock(state: State): Update<State, Action> {
+  const { position, clocks } = state;
+  const tick = Date.now();
+  const clock = clocks[position.turn] - (tick - clocks.lastTick);
+
+  state = {
+    ...state,
+    clocks: {
+      ...clocks,
+      [position.turn]: clock,
+      lastTick: tick,
+    },
+  };
+
+  if (clock <= 0) {
+    state = { ...state, winner: flipColor(position.turn) };
+  }
+
+  return [state, null];
+}
+
 function handleToggleSquareLabels(state: State): Update<State, Action> {
   const { squareLabels } = state;
 
@@ -379,6 +400,8 @@ export function update(
       return handleSetPosition(state, action, context);
     case Type.SetPositionFromFEN:
       return handleSetPositionFromFEN(state, action, context);
+    case Type.TickPlayersClock:
+      return handleTickPlayersClock(state);
     case Type.ToggleSquareLabels:
       return handleToggleSquareLabels(state);
   }

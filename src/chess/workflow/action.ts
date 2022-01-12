@@ -15,6 +15,7 @@ export enum Type {
   ResetOverlay = 'RESET_OVERLAY',
   SetPosition = 'SET_POSITION',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
+  TickPlayersClock = 'TICK_PLAYERS_CLOCK',
   ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
 }
 
@@ -79,6 +80,10 @@ export declare namespace Action {
     readonly fenString: string;
   }
 
+  export interface TickPlayersClock {
+    readonly type: Type.TickPlayersClock;
+  }
+
   export interface ToggleSquareLabels {
     readonly type: Type.ToggleSquareLabels;
   }
@@ -98,6 +103,7 @@ export type Action =
   | Action.MovePiece
   | Action.SetPosition
   | Action.SetPositionFromFEN
+  | Action.TickPlayersClock
   | Action.ToggleSquareLabels;
 
 export const attemptComputerMoveAction = (): Action.AttemptComputerMove => ({
@@ -167,6 +173,10 @@ export const setPositionFromFENAction = (
 ): Action.SetPositionFromFEN => ({
   type: Type.SetPositionFromFEN,
   fenString,
+});
+
+export const tickPlayersClockAction = (): Action.TickPlayersClock => ({
+  type: Type.TickPlayersClock,
 });
 
 export const toggleSquareLabelsAction = (): Action.ToggleSquareLabels => ({
