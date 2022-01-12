@@ -1,7 +1,7 @@
 import { Remote } from 'comlink';
 import Timer from '../../lib/timer';
-import { Move, Square } from '../types';
-import { IHistoryTable, ISearchState } from './types';
+import { Move } from '../types';
+import { IHistoryTable, IPrincipalVariationTable, ISearchState } from './types';
 
 class HistoryTable implements IHistoryTable {
   readonly _table: number[][];
@@ -25,6 +25,31 @@ class HistoryTable implements IHistoryTable {
   }
 }
 
+class PVTable implements IPrincipalVariationTable {
+  readonly _table: Move[][];
+
+  constructor(maxDepth: number) {
+    this._table = [];
+    for (let i = 0; i < maxDepth; i++) {
+      this._table[i] = [];
+    }
+  }
+
+  set(searchDepth: number, depth: number, move: Move) {
+    this._table[searchDepth - 1][depth - 1] = move;
+  }
+
+  get(searchDepth: number, depth: number) {
+    return this._table[searchDepth - 1][depth - 1];
+  }
+
+  get pv() {
+    const moves = this._table[this._table.length - 1];
+
+    return [...moves].reverse();
+  }
+}
+
 // Communication with web workers is slow, too slow to do at every node.
 //
 // Instead of asking the timer if it has reached 0 at every node we instead
@@ -41,15 +66,19 @@ const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
 export default class SearchState implements ISearchState {
+  currentSearchDepth: number;
   killerMoves: Move[];
   historyTable: HistoryTable;
+  pvTable: PVTable;
   timer: Remote<Timer> | null = null;
 
   _timerSampleCounter = 0;
 
   constructor(depth: number) {
+    this.currentSearchDepth = depth;
     this.killerMoves = new Array(depth);
     this.historyTable = new HistoryTable();
+    this.pvTable = new PVTable(depth);
   }
 
   async timeoutReached() {

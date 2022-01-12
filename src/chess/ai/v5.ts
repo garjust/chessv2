@@ -4,7 +4,6 @@ import Engine from '../engine';
 import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './diagnostics';
 import { search } from './search';
-import SearchState from './search-state';
 import SearchContext from './search-context';
 
 const DEPTH = 4;

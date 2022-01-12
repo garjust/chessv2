@@ -60,7 +60,7 @@ export const evaluate = (position: Position): number => {
   //
   // Choose 4 as the max value so the jitter is always rounded off to 0 when
   // rounding the evaluation number to a real evaluation (divide by 1000).
-  evaluation += Math.random();
+  // evaluation += Math.random();
 
   return evaluation;
 };

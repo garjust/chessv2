@@ -1,9 +1,8 @@
 import { ChessComputer, ISearchContext } from './types';
-import { MoveWithExtraData, Position } from '../types';
+import { Position } from '../types';
 import Engine from '../engine';
 import Diagnotics from './diagnostics';
 import { search } from './search';
-import SearchState from './search-state';
 import SearchContext from './search-context';
 
 const DEPTH = 4;

@@ -8,9 +8,9 @@ import SearchContext from './search-context';
 import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 
-const MAX_DEPTH = 8;
+const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
-const TIMEOUT = 5_000;
+const TIMEOUT = 10_000;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search with iterative deepening
@@ -68,6 +68,7 @@ export default class v7 implements ChessComputer {
       await depthTimer.start(await timer.value);
       this.diagnostics.push(new Diagnotics(this.label, i));
       this.context.diagnostics = this.currentDiagnostics;
+      this.context.state.currentSearchDepth = i;
 
       try {
         currentResult = await search(i, this.context);
@@ -85,6 +86,10 @@ export default class v7 implements ChessComputer {
         currentResult.move,
         currentResult.scores,
         this.context.state
+      );
+      console.log(
+        '[intermediate result]:',
+        this.currentDiagnostics.result?.logString
       );
 
       if (await timer.brrring()) {

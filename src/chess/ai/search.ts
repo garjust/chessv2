@@ -20,6 +20,7 @@ export const search = async (
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
     context.state.killerMoves[depth],
+    undefined,
     context.state.historyTable
   );
 
@@ -37,6 +38,7 @@ export const search = async (
     if (result.score > alpha) {
       bestMove = result.move;
       alpha = result.score;
+      context.state.pvTable.set(context.state.currentSearchDepth, depth, move);
     }
   }
 
@@ -67,6 +69,7 @@ const searchNodes = async (
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
     context.state.killerMoves[depth],
+    undefined,
     context.state.historyTable
   );
 
@@ -82,6 +85,7 @@ const searchNodes = async (
 
     if (x > alpha) {
       alpha = x;
+      context.state.pvTable.set(context.state.currentSearchDepth, depth, move);
     }
     if (context.configuration.pruneNodes && alpha >= beta) {
       if (context.configuration.killerMoveHeuristic && !move.attack) {

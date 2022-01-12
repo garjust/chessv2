@@ -21,7 +21,8 @@ export type DiagnosticsResult = {
   plyCounters: Record<number, PlyCounter>;
   depth: number;
   timing: number;
-  state?: Pick<ISearchState, 'historyTable' | 'killerMoves'>;
+  state?: Pick<ISearchState, 'historyTable' | 'killerMoves' | 'pvTable'>;
+  principleVariation?: string[];
 };
 
 export default class Diagnotics {
@@ -81,12 +82,17 @@ export default class Diagnotics {
     );
 
     const stateData:
-      | Pick<ISearchState, 'historyTable' | 'killerMoves'>
+      | Pick<ISearchState, 'historyTable' | 'killerMoves' | 'pvTable'>
       | undefined = state
       ? {
           historyTable: state.historyTable,
           killerMoves: state.killerMoves,
+          pvTable: state.pvTable,
         }
+      : undefined;
+
+    const principleVariation = state
+      ? state.pvTable.pv.map((move) => moveString(move))
       : undefined;
 
     const result: DiagnosticsResult = {
@@ -109,6 +115,7 @@ export default class Diagnotics {
       depth: this.maxDepth,
       timing,
       state: stateData,
+      principleVariation,
     };
 
     this.result = result;

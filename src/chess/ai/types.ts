@@ -9,9 +9,17 @@ export interface IHistoryTable {
   get(move: Move): number;
 }
 
+export interface IPrincipalVariationTable {
+  set(searchDepth: number, depth: number, move: Move): void;
+  get(searchDepth: number, depth: number): Move;
+  pv: Move[];
+}
+
 export interface ISearchState {
+  currentSearchDepth: number;
   killerMoves: Move[];
   historyTable: IHistoryTable;
+  pvTable: IPrincipalVariationTable;
   timer: Remote<Timer> | null;
   timeoutReached(): Promise<boolean>;
 }
@@ -24,6 +32,7 @@ export type SearchConfiguration = {
   orderMoves: (
     moves: MoveWithExtraData[],
     killerMove?: Move,
+    pvMove?: Move,
     historyTable?: IHistoryTable
   ) => MoveWithExtraData[];
 };
