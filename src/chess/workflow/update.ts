@@ -35,7 +35,7 @@ export type Context = {
   engine: Engine;
 };
 
-const COMPUTER_VERISON: AvailableComputerVersions = 'v6';
+const COMPUTER_VERISON: AvailableComputerVersions = 'v7';
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;

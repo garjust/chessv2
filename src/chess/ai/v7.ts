@@ -9,12 +9,14 @@ import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 
 const MAX_DEPTH = 4;
+const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search with iterative deepening
 // - search through captures
 export default class v7 implements ChessComputer {
+  label = 'v7';
   engine: Engine;
   diagnostics: Diagnotics[] = [];
   context: ISearchContext;
@@ -44,9 +46,12 @@ export default class v7 implements ChessComputer {
   async nextMove(position: Position, timeout = TIMEOUT) {
     this.diagnostics = [];
 
-    const [timer, timerCleanup] = await loadTimer('v7-search', timeout);
+    const [timer, timerCleanup] = await loadTimer(
+      `${this.label}-search`,
+      timeout
+    );
     const [depthTimer, depthTimerCleanup] = await loadTimer(
-      'v7-search-for-depth',
+      `${this.label}-search-for-depth`,
       0,
       false
     );
@@ -58,9 +63,9 @@ export default class v7 implements ChessComputer {
       scores: [],
     };
 
-    for (let i = 1; i <= MAX_DEPTH; i++) {
+    for (let i = INITIAL_DEPTH; i <= MAX_DEPTH; i++) {
       await depthTimer.start(await timer.value);
-      this.diagnostics.push(new Diagnotics('v7', i));
+      this.diagnostics.push(new Diagnotics(this.label, i));
       this.context.diagnostics = this.currentDiagnostics;
 
       try {
@@ -81,7 +86,6 @@ export default class v7 implements ChessComputer {
       );
 
       if (await timer.brrring()) {
-        console.log('BRRRNNNGGG');
         break;
       }
     }
@@ -92,6 +96,6 @@ export default class v7 implements ChessComputer {
   }
 
   toJSON(): string {
-    return 'justins chess computer v6';
+    return `justins chess computer ${this.label}`;
   }
 }
