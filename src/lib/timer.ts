@@ -23,7 +23,12 @@ export default class Timer {
 
   constructor(
     timeout: number,
-    { tickRate = 100, label = 'anonymous', debug = true, autoStart = true } = {}
+    {
+      tickRate = 100,
+      label = 'anonymous',
+      debug = false,
+      autoStart = true,
+    } = {}
   ) {
     this.label = label;
     this.tickRate = tickRate;

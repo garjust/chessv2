@@ -1,14 +1,15 @@
 import { Move } from '../types';
+import TimeoutError from './timeout-error';
 import { ISearchContext, SearchResult } from './types';
 
 // Alpha-beta negamax search.
 //
 // This is a alpha-beta negamax search. If move pruning is disabled in the
 // context it will function as a normal negamax search.
-export const search = (
+export const search = async (
   depth: number,
   context: ISearchContext
-): SearchResult => {
+): Promise<SearchResult> => {
   const scores: { move: Move; score: number }[] = [];
   // Start with an illegal move so it is well defined.
   let bestMove: Move = { from: -1, to: -1 };
@@ -25,7 +26,8 @@ export const search = (
     context.engine.applyMove(move);
     const result = {
       move,
-      score: -1 * searchNodes(depth - 1, beta * -1, alpha * -1, context),
+      score:
+        -1 * (await searchNodes(depth - 1, beta * -1, alpha * -1, context)),
     };
     context.engine.undoLastMove();
 
@@ -41,13 +43,17 @@ export const search = (
 };
 
 // Recursive search function for the alpha-beta negamax search.
-const searchNodes = (
+const searchNodes = async (
   depth: number,
   alpha: number,
   beta: number,
   context: ISearchContext
-): number => {
+): Promise<number> => {
   context.diagnostics.nodeVisit(depth);
+
+  if (await context.state.timeoutReached()) {
+    throw new TimeoutError();
+  }
 
   if (depth === 0) {
     if (context.configuration.quiescenceSearch) {
@@ -68,7 +74,8 @@ const searchNodes = (
 
   for (const move of moves) {
     context.engine.applyMove(move);
-    const x = -1 * searchNodes(depth - 1, beta * -1, alpha * -1, context);
+    const x =
+      -1 * (await searchNodes(depth - 1, beta * -1, alpha * -1, context));
     context.engine.undoLastMove();
 
     if (x > alpha) {

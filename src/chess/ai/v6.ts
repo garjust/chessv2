@@ -40,7 +40,7 @@ export default class v6 implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = search(DEPTH, this.context);
+    const { scores, move } = await search(DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;

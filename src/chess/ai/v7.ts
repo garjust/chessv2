@@ -6,9 +6,10 @@ import Diagnotics from './diagnostics';
 import { search } from './search';
 import SearchContext from './search-context';
 import { loadTimer } from '../workers';
+import TimeoutError from './timeout-error';
 
-const MAX_DEPTH = 10;
-const TIMEOUT = 1000;
+const MAX_DEPTH = 4;
+const TIMEOUT = 10_000;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search with iterative deepening
@@ -62,7 +63,16 @@ export default class v7 implements ChessComputer {
       this.diagnostics.push(new Diagnotics('v7', i));
       this.context.diagnostics = this.currentDiagnostics;
 
-      currentResult = search(i, this.context);
+      try {
+        currentResult = await search(i, this.context);
+      } catch (error) {
+        if (error instanceof TimeoutError) {
+          this.diagnostics.pop();
+          break;
+        } else {
+          throw error;
+        }
+      }
 
       await depthTimer.stop();
       this.currentDiagnostics.recordResult(
