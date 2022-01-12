@@ -32,7 +32,7 @@ export const findChecksOnKings = (
     });
   }
   if (blackKing) {
-    whiteChecks = attacksOnSquare(pieces, Color.White, blackKing, {
+    blackChecks = attacksOnSquare(pieces, Color.White, blackKing, {
       ...options,
       skip: [blackKing],
     });
