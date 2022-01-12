@@ -178,7 +178,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     move,
     piece
   );
-  updateAttackedSquares(position.attackedSquares, position.pieces, move, piece);
+  // updateAttackedSquares(position.attackedSquares, position.pieces, move, piece);
 
   // NOTE: Re-enable this when up to date check data is needed for move ordering
   // or evaluation. This adds check calculation to the leaf nodes of a move
@@ -255,8 +255,8 @@ export const undoMove = (position: Position, result: MoveResult): void => {
     }
   }
 
-  position.attackedSquares[Color.White].undoChangeset();
-  position.attackedSquares[Color.Black].undoChangeset();
+  // position.attackedSquares[Color.White].undoChangeset();
+  // position.attackedSquares[Color.Black].undoChangeset();
 
   // Undo rest of the position state.
   if (position.turn === Color.White) {

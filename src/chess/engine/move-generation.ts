@@ -286,8 +286,8 @@ export const generateMoves = (
     });
   }
 
-  const moves = movesForPositionFromAttacks(pieces, {
-    // const moves = movesForPosition(pieces, {
+  // const moves = movesForPositionFromAttacks(pieces, {
+  const moves = movesForPosition(pieces, {
     color,
     enPassantSquare,
     castlingAvailability:
