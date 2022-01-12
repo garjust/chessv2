@@ -32,6 +32,7 @@ export default class v7 implements ChessComputer {
     this.context.configuration.pruneNodes = true;
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;
+    this.context.configuration.historyMoveHeuristic = true;
     this.context.configuration.orderMoves = orderMoves;
   }
 
@@ -82,7 +83,8 @@ export default class v7 implements ChessComputer {
       await depthTimer.stop();
       this.currentDiagnostics.recordResult(
         currentResult.move,
-        currentResult.scores
+        currentResult.scores,
+        this.context.state
       );
 
       if (await timer.brrring()) {

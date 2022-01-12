@@ -8,6 +8,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   pruneNodes: false,
   quiescenceSearch: false,
   killerMoveHeuristic: false,
+  historyMoveHeuristic: false,
   orderMoves: (moves: MoveWithExtraData[]) => moves,
 };
 

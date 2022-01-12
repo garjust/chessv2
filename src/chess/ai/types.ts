@@ -4,8 +4,14 @@ import Engine from '../engine';
 import { Move, MoveWithExtraData, Position } from '../types';
 import Diagnotics, { DiagnosticsResult } from './diagnostics';
 
+export interface IHistoryTable {
+  increment(move: Move, depth: number): void;
+  get(move: Move): number;
+}
+
 export interface ISearchState {
   killerMoves: Move[];
+  historyTable: IHistoryTable;
   timer: Remote<Timer> | null;
   timeoutReached(): Promise<boolean>;
 }
@@ -14,9 +20,11 @@ export type SearchConfiguration = {
   pruneNodes: boolean;
   quiescenceSearch: boolean;
   killerMoveHeuristic: boolean;
+  historyMoveHeuristic: boolean;
   orderMoves: (
     moves: MoveWithExtraData[],
-    killerMove?: Move
+    killerMove?: Move,
+    historyTable?: IHistoryTable
   ) => MoveWithExtraData[];
 };
 

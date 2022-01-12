@@ -2,6 +2,7 @@ import { formatNumber } from '../../lib/formatter';
 import { Move } from '../types';
 import { moveString } from '../utils';
 import { TreeDiagnostics } from './tree-diagnostics';
+import { ISearchState } from './types';
 
 type PlyCounter = {
   nodes: number;
@@ -20,6 +21,7 @@ export type DiagnosticsResult = {
   plyCounters: Record<number, PlyCounter>;
   depth: number;
   timing: number;
+  state?: Pick<ISearchState, 'historyTable' | 'killerMoves'>;
 };
 
 export default class Diagnotics {
@@ -63,7 +65,11 @@ export default class Diagnotics {
     this.plyCounters[-1].cuts++;
   }
 
-  recordResult(move: Move, moveScores: { move: Move; score: number }[]) {
+  recordResult(
+    move: Move,
+    moveScores: { move: Move; score: number }[],
+    state?: ISearchState
+  ) {
     const timing = Date.now() - this.start;
     const totalNodes = Object.values(this.plyCounters).reduce(
       (sum, plyCounter) => sum + plyCounter.nodes,
@@ -73,6 +79,15 @@ export default class Diagnotics {
       (sum, plyCounter) => sum + plyCounter.cuts,
       0
     );
+
+    const stateData:
+      | Pick<ISearchState, 'historyTable' | 'killerMoves'>
+      | undefined = state
+      ? {
+          historyTable: state.historyTable,
+          killerMoves: state.killerMoves,
+        }
+      : undefined;
 
     const result: DiagnosticsResult = {
       label: this.label,
@@ -93,6 +108,7 @@ export default class Diagnotics {
       plyCounters: this.plyCounters,
       depth: this.maxDepth,
       timing,
+      state: stateData,
     };
 
     this.result = result;

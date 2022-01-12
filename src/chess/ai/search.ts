@@ -19,7 +19,8 @@ export const search = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
-    context.state.killerMoves[depth]
+    context.state.killerMoves[depth],
+    context.state.historyTable
   );
 
   for (const move of moves) {
@@ -65,7 +66,8 @@ const searchNodes = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
-    context.state.killerMoves[depth]
+    context.state.killerMoves[depth],
+    context.state.historyTable
   );
 
   if (moves.length === 0) {
@@ -85,6 +87,9 @@ const searchNodes = async (
       if (context.configuration.killerMoveHeuristic && !move.attack) {
         // New killer move for this depth.
         context.state.killerMoves[depth] = move;
+      }
+      if (context.configuration.historyMoveHeuristic) {
+        context.state.historyTable.increment(move, depth);
       }
       context.diagnostics.cut(depth);
       break;

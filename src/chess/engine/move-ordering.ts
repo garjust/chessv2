@@ -3,8 +3,13 @@ import { PieceValue } from './evaluation';
 import { squareValueDiff } from '../lib/heatmaps';
 import { sort } from 'fast-sort';
 import { moveEquals } from '../utils';
+import { IHistoryTable } from '../ai/types';
 
-const moveWeight = (move: MoveWithExtraData, killerMove?: Move): number => {
+const moveWeight = (
+  move: MoveWithExtraData,
+  killerMove?: Move,
+  historyTable?: IHistoryTable
+): number => {
   let n = 0;
 
   if (moveEquals(move, killerMove)) {
@@ -22,7 +27,11 @@ const moveWeight = (move: MoveWithExtraData, killerMove?: Move): number => {
         1000
       )
     );
+  } else if (historyTable) {
+    // assign value using history heuristic
+    n += historyTable.get(move);
   }
+
   if (move.promotion) {
     n += PieceValue[move.promotion];
   }
@@ -32,11 +41,12 @@ const moveWeight = (move: MoveWithExtraData, killerMove?: Move): number => {
 
 export const orderMoves = (
   moves: MoveWithExtraData[],
-  killerMove?: Move
+  killerMove?: Move,
+  historyTable?: IHistoryTable
 ): MoveWithExtraData[] => {
   const sortBy = (move: MoveWithExtraData) => {
     if (!move.weight) {
-      move.weight = moveWeight(move, killerMove);
+      move.weight = moveWeight(move, killerMove, historyTable);
     }
 
     return move.weight;
