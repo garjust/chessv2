@@ -22,13 +22,7 @@ import {
   queenMoves,
   rookMoves,
 } from './piece-movement';
-import {
-  KingSquares,
-  KingPins,
-  KingChecks,
-  AttackedSquares,
-  PieceAttacks,
-} from './types';
+import { KingSquares, KingPins, KingChecks, AttackedSquares } from './types';
 
 const movesForPiece = (
   pieces: Map<Square, Piece>,
@@ -37,11 +31,11 @@ const movesForPiece = (
   {
     enPassantSquare,
     castlingAvailability,
-    pieceAttacks,
+    attackedSquares,
   }: {
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
-    pieceAttacks: PieceAttacks;
+    attackedSquares: AttackedSquares;
   }
 ) => {
   const moves: MoveWithExtraData[] = [];
@@ -55,7 +49,6 @@ const movesForPiece = (
         ...kingMoves(pieces, piece.color, square, {
           castlingOnly: false,
           castlingAvailability,
-          pieceAttacks,
         })
       );
       break;
@@ -88,12 +81,12 @@ const movesForPosition = (
     color?: Color;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
-    pieceAttacks: PieceAttacks;
+    attackedSquares: AttackedSquares;
   }
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 
-  const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
+  const { color, enPassantSquare, castlingAvailability, attackedSquares } =
     options;
 
   for (const [square, piece] of pieces.entries()) {
@@ -104,7 +97,7 @@ const movesForPosition = (
       ...movesForPiece(pieces, piece, square, {
         enPassantSquare,
         castlingAvailability,
-        pieceAttacks,
+        attackedSquares,
       })
     );
   }
@@ -118,12 +111,12 @@ const movesForPositionFromAttacks = (
     color?: Color;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
-    pieceAttacks: PieceAttacks;
+    attackedSquares: AttackedSquares;
   }
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 
-  const { color, enPassantSquare, castlingAvailability, pieceAttacks } =
+  const { color, enPassantSquare, castlingAvailability, attackedSquares } =
     options;
 
   for (const [square, piece] of pieces) {
@@ -131,7 +124,7 @@ const movesForPositionFromAttacks = (
       continue;
     }
 
-    const attacks = pieceAttacks[piece.color].get(square) ?? [];
+    const attacks = attackedSquares[piece.color].controlForPiece(square);
 
     for (const squareControl of attacks) {
       const attackedPiece = pieces.get(squareControl.square);
@@ -172,7 +165,6 @@ const movesForPositionFromAttacks = (
         ...kingMoves(pieces, piece.color, square, {
           castlingOnly: true,
           castlingAvailability,
-          pieceAttacks,
         })
       );
     } else if (piece.type === PieceType.Pawn) {
@@ -272,14 +264,12 @@ export const generateMoves = (
   color: Color,
   {
     attackedSquares,
-    pieceAttacks,
     pinsToKing,
     kings,
     enPassantSquare,
     castlingAvailability,
   }: {
     attackedSquares: AttackedSquares;
-    pieceAttacks: PieceAttacks;
     pinsToKing: KingPins;
     checks: KingChecks;
     kings: KingSquares;
@@ -296,15 +286,15 @@ export const generateMoves = (
     });
   }
 
-  // const moves = movesForPositionFromAttacks(pieces, {
-  const moves = movesForPosition(pieces, {
+  const moves = movesForPositionFromAttacks(pieces, {
+    // const moves = movesForPosition(pieces, {
     color,
     enPassantSquare,
     castlingAvailability:
       checksForPlayer.length > 0
         ? CASTLING_AVAILABILITY_BLOCKED
         : castlingAvailability,
-    pieceAttacks,
+    attackedSquares,
   });
 
   if (king) {

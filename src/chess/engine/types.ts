@@ -22,22 +22,23 @@ export type KingChecks = {
   [Color.Black]: AttackObject[];
 };
 
-// Maps that store the number of pieces attacking a particular square.
-export type AttackedSquares = {
-  [Color.White]: Map<Square, number>;
-  [Color.Black]: Map<Square, number>;
-};
+export interface IAttackMap {
+  isAttacked(square: Square): boolean;
+  attackEntries(): IterableIterator<[Square, number]>;
+  controlForPiece(square: Square): SquareControlObject[];
+  addAttacks(square: Square, squares: SquareControlObject[]): void;
+  removeAttacks(square: Square): void;
+  startChangeset(): void;
+  undoChangeset(): void;
+}
 
-// Maps that store all squares controlled by the piece residing in
-// the key square.
-export type PieceAttacks = {
-  [Color.White]: Map<Square, SquareControlObject[]>;
-  [Color.Black]: Map<Square, SquareControlObject[]>;
+export type AttackedSquares = {
+  [Color.White]: IAttackMap;
+  [Color.Black]: IAttackMap;
 };
 
 export type Position = ExternalPosition & {
   kings: KingSquares;
-  pieceAttacks: PieceAttacks;
   attackedSquares: AttackedSquares;
   pinsToKing: KingPins;
   checks: KingChecks;

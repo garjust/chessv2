@@ -6,6 +6,7 @@ import {
   AttackObject,
   Move,
   SquareControlObject,
+  Position as ExternalPosition,
 } from '../types';
 import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
 import {
@@ -21,7 +22,7 @@ import {
   rookMoves,
 } from './piece-movement';
 import { forPiece } from './piece-movement-control';
-import { AttackedSquares, PieceAttacks } from './types';
+import { AttackedSquares, IAttackMap } from './types';
 
 export const attacksOnSquare = (
   pieces: Map<Square, Piece>,
@@ -44,10 +45,6 @@ export const attacksOnSquare = (
     kingMoves(pieces, color, square, {
       castlingOnly: false,
       castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
-      pieceAttacks: {
-        [Color.White]: new Map<Square, SquareControlObject[]>(),
-        [Color.Black]: new Map<Square, SquareControlObject[]>(),
-      },
     }),
     bishopMoves(pieces, color, square, { skip }),
     rookMoves(pieces, color, square, { skip }),
@@ -100,126 +97,97 @@ export const attacksOnSquare = (
   return attacks;
 };
 
-export const allPieceAttacks = (
-  pieces: Map<Square, Piece>,
-  attackingColor: Color
-): Map<Square, SquareControlObject[]> => {
-  const pieceAttacks = new Map<Square, SquareControlObject[]>();
+type SquareControlChangeset = {
+  square: Square;
+  squares: SquareControlObject[];
+};
 
-  for (let square = 0; square < 64; square++) {
-    pieceAttacks.set(square, []);
-  }
+export class AttackMap implements IAttackMap {
+  // Store the number of pieces attacking a particular square.
+  _countMap = new Map<Square, number>();
+  // Store all squares controlled by the piece residing in
+  // the key square.
+  _squareControlByPiece = new Map<Square, SquareControlObject[]>();
+  _removals: SquareControlChangeset[][] = [];
 
-  for (let square = 0; square < 64; square++) {
-    const attacks = attacksOnSquare(pieces, attackingColor, square, {
-      enPassantSquare: null,
-      skip: [],
-    });
-
-    for (const attack of attacks) {
-      const attackersObjects = pieceAttacks.get(attack.attacker.square);
-      if (!attackersObjects) {
-        throw Error('cant be possible');
+  constructor(position: ExternalPosition, color: Color) {
+    for (const [square, piece] of position.pieces) {
+      if (piece.color !== color) {
+        continue;
       }
 
-      attackersObjects.push({
-        square,
-        attacker: attack.attacker,
-        slideSquares: attack.slideSquares,
-      });
+      const squareControl = forPiece(piece, position.pieces, square);
+      this.addAttacks(square, squareControl);
     }
   }
 
-  return pieceAttacks;
-};
-
-export const allAttackedSquares = (
-  pieces: Map<Square, Piece>,
-  attackingColor: Color
-): Map<Square, number> => {
-  const attackedSquares = new Map<Square, number>();
-
-  for (let square = 0; square < 64; square++) {
-    attackedSquares.set(square, 0);
-
-    const attacks = attacksOnSquare(pieces, attackingColor, square, {
-      enPassantSquare: null,
-      skip: [],
-    });
-
-    attackedSquares.set(square, attacks.length);
+  isAttacked(square: Square): boolean {
+    return (this._countMap.get(square) ?? 0) > 0;
   }
 
-  return attackedSquares;
-};
-
-const addAttacks = (
-  attackedSquares: AttackedSquares,
-  pieceAttacks: PieceAttacks,
-  color: Color,
-  square: Square,
-  squares: SquareControlObject[]
-) => {
-  for (const squareControl of squares) {
-    attackedSquares[color].set(
-      squareControl.square,
-      (attackedSquares[color].get(squareControl.square) ?? 0) + 1
-    );
+  controlForPiece(square: number): SquareControlObject[] {
+    return this._squareControlByPiece.get(square) ?? [];
   }
-  pieceAttacks[color].set(square, squares);
-};
 
-export type SquareControlChangeset = {
-  square: Square;
-  squares: SquareControlObject[];
-  color: Color;
-};
-
-const removeAttacks = (
-  attackedSquares: AttackedSquares,
-  pieceAttacks: PieceAttacks,
-  color: Color,
-  square: Square
-): SquareControlChangeset => {
-  const squares = pieceAttacks[color].get(square) ?? [];
-  const changeset = {
-    color,
-    square,
-    squares,
-  };
-
-  for (const squareControl of squares) {
-    attackedSquares[color].set(
-      squareControl.square,
-      (attackedSquares[color].get(squareControl.square) ?? 0) - 1
-    );
+  attackEntries(): IterableIterator<[number, number]> {
+    return this._countMap.entries();
   }
-  pieceAttacks[color].set(square, []);
 
-  return changeset;
-};
+  startChangeset() {
+    this._removals.push([]);
+  }
+
+  undoChangeset() {
+    const removals = this._removals.pop() ?? [];
+    for (const change of removals) {
+      this.removeAttacks(change.square, false);
+      this.addAttacks(change.square, change.squares);
+    }
+  }
+
+  addAttacks(square: Square, squares: SquareControlObject[]) {
+    for (const squareControl of squares) {
+      this._countMap.set(
+        squareControl.square,
+        (this._countMap.get(squareControl.square) ?? 0) + 1
+      );
+    }
+    this._squareControlByPiece.set(square, squares);
+  }
+
+  removeAttacks(square: Square, cache = true) {
+    const squares = this._squareControlByPiece.get(square) ?? [];
+    if (cache) {
+      this._removals[this._removals.length - 1].push({
+        square,
+        squares,
+      });
+    }
+
+    for (const squareControl of squares) {
+      this._countMap.set(
+        squareControl.square,
+        (this._countMap.get(squareControl.square) ?? 0) - 1
+      );
+    }
+    this._squareControlByPiece.set(square, []);
+  }
+}
 
 export const updateAttackedSquares = (
   attackedSquares: AttackedSquares,
-  pieceAttacks: PieceAttacks,
   pieces: Map<Square, Piece>,
   move: Move,
   movedPiece: Piece
-): SquareControlChangeset[] => {
-  const changes: SquareControlChangeset[] = [];
+) => {
+  attackedSquares[Color.White].startChangeset();
+  attackedSquares[Color.Black].startChangeset();
+
   const opponentColor = flipColor(movedPiece.color);
 
-  changes.push(
-    removeAttacks(attackedSquares, pieceAttacks, movedPiece.color, move.from)
-  );
-  changes.push({
-    color: movedPiece.color,
-    square: move.to,
-    squares: [],
-  });
-  changes.push(
-    removeAttacks(attackedSquares, pieceAttacks, opponentColor, move.to)
-  );
+  attackedSquares[movedPiece.color].removeAttacks(move.from);
+  attackedSquares[movedPiece.color].removeAttacks(move.to);
+  attackedSquares[opponentColor].removeAttacks(move.to);
 
   // Find the squares that are now attacked by the moved piece.
   const newAttacks: SquareControlObject[] = forPiece(
@@ -227,13 +195,7 @@ export const updateAttackedSquares = (
     pieces,
     move.to
   );
-  addAttacks(
-    attackedSquares,
-    pieceAttacks,
-    movedPiece.color,
-    move.to,
-    newAttacks
-  );
+  attackedSquares[movedPiece.color].addAttacks(move.to, newAttacks);
 
   // Find sliding pieces affected by the moved piece.
   for (const [square, piece] of pieces) {
@@ -263,37 +225,9 @@ export const updateAttackedSquares = (
     }
 
     if (isFromIncident || isToIncident) {
-      changes.push(
-        removeAttacks(attackedSquares, pieceAttacks, piece.color, square)
-      );
+      attackedSquares[piece.color].removeAttacks(square);
       const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
-
-      addAttacks(
-        attackedSquares,
-        pieceAttacks,
-        piece.color,
-        square,
-        newAttacks
-      );
+      attackedSquares[piece.color].addAttacks(square, newAttacks);
     }
-  }
-
-  return changes;
-};
-
-export const updateAttackedSquaresFromChangeset = (
-  squareControlChanges: SquareControlChangeset[],
-  attackedSquares: AttackedSquares,
-  pieceAttacks: PieceAttacks
-) => {
-  for (const change of squareControlChanges) {
-    removeAttacks(attackedSquares, pieceAttacks, change.color, change.square);
-    addAttacks(
-      attackedSquares,
-      pieceAttacks,
-      change.color,
-      change.square,
-      change.squares
-    );
   }
 };

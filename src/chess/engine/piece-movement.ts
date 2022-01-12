@@ -22,7 +22,7 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
-import { PieceAttacks } from './types';
+import { AttackedSquares } from './types';
 
 export const pawnMoves = (
   pieces: Map<Square, Piece>,
@@ -163,11 +163,9 @@ export const kingMoves = (
   {
     castlingOnly,
     castlingAvailability,
-    pieceAttacks,
   }: {
     castlingOnly: boolean;
     castlingAvailability: CastlingAvailability;
-    pieceAttacks: PieceAttacks;
   }
 ): MoveWithExtraData[] => {
   const squares = castlingOnly

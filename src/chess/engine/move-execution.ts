@@ -12,11 +12,7 @@ import {
   flipColor,
   isStartPositionPawn,
 } from '../utils';
-import {
-  SquareControlChangeset,
-  updateAttackedSquares,
-  updateAttackedSquaresFromChangeset,
-} from './attacks';
+import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
@@ -32,7 +28,6 @@ export type MoveResult = {
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
     checks: KingChecks;
-    squareControlChanges: SquareControlChangeset[];
   };
 };
 
@@ -60,7 +55,6 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     throw Error('cannot move piece for other color');
   }
 
-  const squareControlChanges: SquareControlChangeset[] = [];
   const result: MoveResult = {
     move,
     previousState: {
@@ -78,7 +72,6 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
       checks: { ...position.checks },
-      squareControlChanges: squareControlChanges,
     },
   };
 
@@ -185,15 +178,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     move,
     piece
   );
-  // squareControlChanges.push(
-  //   ...updateAttackedSquares(
-  //     position.attackedSquares,
-  //     position.pieceAttacks,
-  //     position.pieces,
-  //     move,
-  //     piece
-  //   )
-  // );
+  updateAttackedSquares(position.attackedSquares, position.pieces, move, piece);
 
   // NOTE: Re-enable this when up to date check data is needed for move ordering
   // or evaluation. This adds check calculation to the leaf nodes of a move
@@ -270,11 +255,8 @@ export const undoMove = (position: Position, result: MoveResult): void => {
     }
   }
 
-  // updateAttackedSquaresFromChangeset(
-  //   result.previousState.squareControlChanges,
-  //   position.attackedSquares,
-  //   position.pieceAttacks
-  // );
+  position.attackedSquares[Color.White].undoChangeset();
+  position.attackedSquares[Color.Black].undoChangeset();
 
   // Undo rest of the position state.
   if (position.turn === Color.White) {
