@@ -47,6 +47,12 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
       from(
         playerForTurn.ai
           .nextMove(position)
+          .then(async (move) => {
+            const diagnostics = await playerForTurn.ai.diagnosticsResult;
+            console.log(diagnostics?.logString);
+
+            return move;
+          })
           .then((move) => receiveComputerMoveAction(move))
       ),
     ];
