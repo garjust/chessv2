@@ -2,9 +2,14 @@ import { Move, MoveWithExtraData } from '../types';
 import { PieceValue } from './evaluation';
 import { squareValueDiff } from '../lib/heatmaps';
 import { sort } from 'fast-sort';
+import { moveEquals } from '../utils';
 
-const moveWeight = (move: MoveWithExtraData): number => {
+const moveWeight = (move: MoveWithExtraData, killerMove?: Move): number => {
   let n = 0;
+
+  if (moveEquals(move, killerMove)) {
+    return Infinity;
+  }
 
   n += squareValueDiff(move, move.piece);
 
@@ -25,14 +30,17 @@ const moveWeight = (move: MoveWithExtraData): number => {
   return n;
 };
 
-const sortBy = (move: MoveWithExtraData) => {
-  if (!move.weight) {
-    move.weight = moveWeight(move);
-  }
+export const orderMoves = (
+  moves: MoveWithExtraData[],
+  killerMove?: Move
+): MoveWithExtraData[] => {
+  const sortBy = (move: MoveWithExtraData) => {
+    if (!move.weight) {
+      move.weight = moveWeight(move, killerMove);
+    }
 
-  return move.weight;
-};
+    return move.weight;
+  };
 
-export const orderMoves = (moves: MoveWithExtraData[]): Move[] => {
   return sort(moves).desc(sortBy);
 };

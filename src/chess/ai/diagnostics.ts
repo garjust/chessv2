@@ -69,6 +69,10 @@ export default class Diagnotics {
       (sum, plyCounter) => sum + plyCounter.nodes,
       0
     );
+    const totalCuts = Object.values(this.plyCounters).reduce(
+      (sum, plyCounter) => sum + plyCounter.cuts,
+      0
+    );
 
     const result: DiagnosticsResult = {
       label: this.label,
@@ -76,17 +80,16 @@ export default class Diagnotics {
         this.maxDepth
       }; timing=${formatNumber(timing)}ms; nodes=${formatNumber(
         totalNodes
-      )}; (${((timing / totalNodes) * 1000).toPrecision(5)}μs/node)`,
+      )}; (${((timing / totalNodes) * 1000).toPrecision(
+        5
+      )}μs/node); cuts=${formatNumber(totalCuts)}`,
       move: moveString(move),
       moveScores: moveScores.map(({ move, score }) => ({
         move: moveString(move),
         score,
       })),
       totalNodes,
-      totalCuts: Object.values(this.plyCounters).reduce(
-        (sum, plyCounter) => sum + plyCounter.cuts,
-        0
-      ),
+      totalCuts,
       plyCounters: this.plyCounters,
       depth: this.maxDepth,
       timing,

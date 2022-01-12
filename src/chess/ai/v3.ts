@@ -1,9 +1,9 @@
-import { ChessComputer, SearchContext } from './types';
-import { MoveWithExtraData, Position } from '../types';
+import { ChessComputer, ISearchContext } from './types';
+import { Position } from '../types';
 import Engine from '../engine';
 import Diagnotics from './diagnostics';
 import { search } from './search';
-import SearchState from './search-state';
+import SearchContext from './search-context';
 
 const DEPTH = 4;
 
@@ -12,22 +12,13 @@ const DEPTH = 4;
 export default class v3 implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
-  context: SearchContext;
+  context: ISearchContext;
 
   constructor() {
     this.engine = new Engine();
     this.diagnostics = new Diagnotics('v3', DEPTH);
 
-    this.context = {
-      engine: this.engine,
-      diagnostics: this.diagnostics,
-      state: new SearchState(DEPTH),
-      configuration: {
-        pruneNodes: false,
-        quiescenceSearch: false,
-        orderMoves: (moves: MoveWithExtraData[]) => moves,
-      },
-    };
+    this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
   }
 
   get diagnosticsResult() {

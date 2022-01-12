@@ -1,11 +1,14 @@
 import { Move } from '../types';
-import { SearchContext, SearchResult } from './types';
+import { ISearchContext, SearchResult } from './types';
 
 // Alpha-beta negamax search.
 //
 // This is a alpha-beta negamax search. If move pruning is disabled in the
 // context it will function as a normal negamax search.
-export const search = (depth: number, context: SearchContext): SearchResult => {
+export const search = (
+  depth: number,
+  context: ISearchContext
+): SearchResult => {
   const scores: { move: Move; score: number }[] = [];
   // Start with an illegal move so it is well defined.
   let bestMove: Move = { from: -1, to: -1 };
@@ -14,7 +17,8 @@ export const search = (depth: number, context: SearchContext): SearchResult => {
   const beta = Infinity;
 
   const moves = context.configuration.orderMoves(
-    context.engine.generateMoves()
+    context.engine.generateMoves(),
+    context.state.killerMoves[depth]
   );
   for (const move of moves) {
     context.engine.applyMove(move);
@@ -40,7 +44,7 @@ const searchNodes = (
   depth: number,
   alpha: number,
   beta: number,
-  context: SearchContext
+  context: ISearchContext
 ): number => {
   context.diagnostics.nodeVisit(depth);
 
@@ -53,7 +57,8 @@ const searchNodes = (
   }
 
   const moves = context.configuration.orderMoves(
-    context.engine.generateMoves()
+    context.engine.generateMoves(),
+    context.state.killerMoves[depth]
   );
 
   for (const move of moves) {
@@ -65,6 +70,10 @@ const searchNodes = (
       alpha = x;
     }
     if (context.configuration.pruneNodes && alpha >= beta) {
+      if (context.configuration.killerMoveHeuristic && !move.attack) {
+        // New killer move for this depth.
+        context.state.killerMoves[depth] = move;
+      }
       context.diagnostics.cut(depth);
       break;
     }
@@ -81,7 +90,7 @@ const searchNodes = (
 export const quiescenceSearch = (
   alpha: number,
   beta: number,
-  context: SearchContext
+  context: ISearchContext
 ): number => {
   context.diagnostics.quiescenceNodeVisit();
 

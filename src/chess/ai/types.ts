@@ -9,15 +9,19 @@ export interface ISearchState {
 export type SearchConfiguration = {
   pruneNodes: boolean;
   quiescenceSearch: boolean;
-  orderMoves: (moves: MoveWithExtraData[]) => Move[];
+  killerMoveHeuristic: boolean;
+  orderMoves: (
+    moves: MoveWithExtraData[],
+    killerMove?: Move
+  ) => MoveWithExtraData[];
 };
 
-export type SearchContext = {
+export interface ISearchContext {
   engine: Engine;
   diagnostics: Diagnotics;
   state: ISearchState;
   configuration: SearchConfiguration;
-};
+}
 
 export type SearchResult = {
   move: Move;
