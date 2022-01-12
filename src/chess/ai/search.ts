@@ -20,6 +20,7 @@ export const search = (
     context.engine.generateMoves(),
     context.state.killerMoves[depth]
   );
+
   for (const move of moves) {
     context.engine.applyMove(move);
     const result = {
@@ -60,6 +61,10 @@ const searchNodes = (
     context.engine.generateMoves(),
     context.state.killerMoves[depth]
   );
+
+  if (moves.length === 0) {
+    return context.engine.evaluateNormalized();
+  }
 
   for (const move of moves) {
     context.engine.applyMove(move);

@@ -4,8 +4,15 @@ interface ActionWithType {
 
 /* eslint-disable no-console */
 export const updateLogger =
-  <S, A extends ActionWithType, C>(workflowName: string) =>
+  <S, A extends ActionWithType, C>(
+    workflowName: string,
+    ignoreList: string[] = []
+  ) =>
   ([[before, after], action, _]: [[S, S], A, C]) => {
+    if (ignoreList.includes(action.type)) {
+      return;
+    }
+
     console.groupCollapsed(
       `%c${workflowName} Workflow Update:`,
       'font-weight: bold; color: orange;',

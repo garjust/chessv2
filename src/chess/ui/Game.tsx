@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState } from '../workflow';
+import init, { createState, Type } from '../workflow';
 import { updateLogger } from '../../lib/workflow';
 import {
   changeOverlayAction,
@@ -38,7 +38,7 @@ const Game = () => {
     engine: new Engine(parseFEN(STARTING_POSITION_FEN)),
   });
 
-  updates.subscribe(updateLogger('Chess'));
+  updates.subscribe(updateLogger('Chess', [Type.TickPlayersClock]));
 
   useEffect(() => {
     const ticker = interval(1_000).pipe(map(() => tickPlayersClockAction()));
