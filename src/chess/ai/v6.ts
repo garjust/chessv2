@@ -4,6 +4,7 @@ import Engine from '../engine';
 import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './diagnostics';
 import { search } from './search';
+import SearchState from './search-state';
 
 const DEPTH = 4;
 
@@ -22,9 +23,12 @@ export default class v6 implements ChessComputer {
     this.context = {
       engine: this.engine,
       diagnostics: this.diagnostics,
-      pruneNodes: true,
-      quiescenceSearch: true,
-      orderMoves,
+      state: new SearchState(DEPTH),
+      configuration: {
+        pruneNodes: true,
+        quiescenceSearch: true,
+        orderMoves,
+      },
     };
   }
 

@@ -13,7 +13,9 @@ export const search = (depth: number, context: SearchContext): SearchResult => {
   let alpha = -Infinity;
   const beta = Infinity;
 
-  const moves = context.orderMoves(context.engine.generateMoves());
+  const moves = context.configuration.orderMoves(
+    context.engine.generateMoves()
+  );
   for (const move of moves) {
     context.engine.applyMove(move);
     const result = {
@@ -43,14 +45,16 @@ const searchNodes = (
   context.diagnostics.nodeVisit(depth);
 
   if (depth === 0) {
-    if (context.quiescenceSearch) {
+    if (context.configuration.quiescenceSearch) {
       return quiescenceSearch(alpha, beta, context);
     } else {
       return context.engine.evaluateNormalized();
     }
   }
 
-  const moves = context.orderMoves(context.engine.generateMoves());
+  const moves = context.configuration.orderMoves(
+    context.engine.generateMoves()
+  );
 
   for (const move of moves) {
     context.engine.applyMove(move);
@@ -60,7 +64,7 @@ const searchNodes = (
     if (x > alpha) {
       alpha = x;
     }
-    if (context.pruneNodes && alpha >= beta) {
+    if (context.configuration.pruneNodes && alpha >= beta) {
       context.diagnostics.cut(depth);
       break;
     }
@@ -90,7 +94,7 @@ export const quiescenceSearch = (
     return alpha;
   }
 
-  const moves = context.orderMoves(
+  const moves = context.configuration.orderMoves(
     context.engine.generateMoves().filter((move) => move.attack)
   );
 
@@ -102,7 +106,7 @@ export const quiescenceSearch = (
     if (x > alpha) {
       alpha = x;
     }
-    if (context.pruneNodes && alpha >= beta) {
+    if (context.configuration.pruneNodes && alpha >= beta) {
       context.diagnostics.quiescenceCut();
       break;
     }

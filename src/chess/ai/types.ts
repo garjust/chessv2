@@ -2,12 +2,21 @@ import Engine from '../engine';
 import { Move, MoveWithExtraData, Position } from '../types';
 import Diagnotics, { DiagnosticsResult } from './diagnostics';
 
-export type SearchContext = {
-  engine: Engine;
-  diagnostics: Diagnotics;
+export interface ISearchState {
+  killerMoves: Move[];
+}
+
+export type SearchConfiguration = {
   pruneNodes: boolean;
   quiescenceSearch: boolean;
   orderMoves: (moves: MoveWithExtraData[]) => Move[];
+};
+
+export type SearchContext = {
+  engine: Engine;
+  diagnostics: Diagnotics;
+  state: ISearchState;
+  configuration: SearchConfiguration;
 };
 
 export type SearchResult = {

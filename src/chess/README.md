@@ -22,6 +22,7 @@
 - Evaluation does not like lone pawns or doubled pawns
 - Evaluation likes pawn cover for king
   - Maybe this means squares that attack the king are blocked or defended (knight attacks squares are defended against, rays to squares near king are blocked by pawns)
+- Disable move ordering in quiescenceSearch
 
 
 Diff for move-unmove with attack map
