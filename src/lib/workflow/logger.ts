@@ -4,11 +4,11 @@ interface ActionWithType {
 
 /* eslint-disable no-console */
 export const updateLogger =
-  <S, A extends ActionWithType, C>(
+  <S, A extends ActionWithType>(
     workflowName: string,
     ignoreList: string[] = []
   ) =>
-  ([[before, after], action, _]: [[S, S], A, C]) => {
+  ([[before, after], action]: [[S, S], A]) => {
     if (ignoreList.includes(action.type)) {
       return;
     }

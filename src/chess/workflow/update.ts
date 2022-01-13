@@ -44,17 +44,18 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   if (playerForTurn !== HumanPlayer) {
     return [
       state,
-      from(
-        playerForTurn.ai
-          .nextMove(position)
-          .then(async (move) => {
-            const diagnostics = await playerForTurn.ai.diagnosticsResult;
-            console.log(diagnostics?.logString);
+      () =>
+        from(
+          playerForTurn.ai
+            .nextMove(position)
+            .then(async (move) => {
+              const diagnostics = await playerForTurn.ai.diagnosticsResult;
+              console.log(diagnostics?.logString);
 
-            return move;
-          })
-          .then((move) => receiveComputerMoveAction(move))
-      ),
+              return move;
+            })
+            .then((move) => receiveComputerMoveAction(move))
+        ),
     ];
   } else {
     return [state, null];
@@ -82,7 +83,7 @@ function handleChangeOverlay(state: State): Update<State, Action> {
       break;
   }
 
-  return [{ ...state, overlayCategory: nextCategory }, overlaySquaresAction()];
+  return [{ ...state, overlayCategory: nextCategory }, overlaySquaresAction];
 }
 
 function handleChessComputerLoaded(
@@ -99,7 +100,7 @@ function handleChessComputerLoaded(
         [color]: instance,
       },
     },
-    attemptComputerMoveAction(),
+    attemptComputerMoveAction,
   ];
 }
 
@@ -111,25 +112,28 @@ function handleClickSquare(
   const { position } = state;
 
   if (state.selectedSquare !== undefined) {
-    if (state.selectedSquare === square) {
-      return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
+    const selectedSquare = state.selectedSquare;
+
+    if (selectedSquare === square) {
+      return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
     }
 
     return [
       { ...state, selectedSquare: undefined },
-      movePieceAction({
-        from: state.selectedSquare,
-        to: square,
-      }),
+      () =>
+        movePieceAction({
+          from: selectedSquare,
+          to: square,
+        }),
     ];
   } else {
     // Nothing is already selected so attempt to "select" the square.
     if (pieceInSquare(state, square)?.color === position.turn) {
-      return [{ ...state, selectedSquare: square }, overlaySquaresAction()];
+      return [{ ...state, selectedSquare: square }, overlaySquaresAction];
     }
   }
 
-  return [state, overlaySquaresAction()];
+  return [state, overlaySquaresAction];
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {
@@ -146,18 +150,19 @@ function handleLoadChessComputer(
 
   return [
     state,
-    from(
-      loadComputer(COMPUTER_VERISON)
-        .then((instance) => {
-          return Promise.all([instance, instance.toJSON()]);
-        })
-        .then(([instance, label]) =>
-          chessComputerLoadedAction(
-            { ai: instance, label, __computer: true },
-            playingAs
+    () =>
+      from(
+        loadComputer(COMPUTER_VERISON)
+          .then((instance) => {
+            return Promise.all([instance, instance.toJSON()]);
+          })
+          .then(([instance, label]) =>
+            chessComputerLoadedAction(
+              { ai: instance, label, __computer: true },
+              playingAs
+            )
           )
-        )
-    ),
+      ),
   ];
 }
 
@@ -195,7 +200,7 @@ function handlePreviousPosition(
 
   return [
     { ...state, selectedSquare: undefined },
-    setPositionAction(engine.position),
+    () => setPositionAction(engine.position),
   ];
 }
 
@@ -204,7 +209,7 @@ function handleReceiveComputerMove(
   action: Action.ReceiveComputerMove
 ): Update<State, Action> {
   const { move } = action;
-  return [state, movePieceAction(move)];
+  return [state, () => movePieceAction(move)];
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
@@ -229,7 +234,7 @@ function handleMovePiece(
       move.to,
       state.position
     );
-    return [{ ...state, selectedSquare: undefined }, overlaySquaresAction()];
+    return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
   }
 
   const pieceToMove = pieceInSquare(state, move.from);
@@ -259,7 +264,7 @@ function handleMovePiece(
       ...state,
       lastMove: move,
     },
-    setPositionAction(engine.position),
+    () => setPositionAction(engine.position),
   ];
 }
 
@@ -308,7 +313,7 @@ function handleSetPosition(
         ...state,
         winner,
       },
-      overlaySquaresAction(),
+      overlaySquaresAction,
     ];
   }
 
@@ -316,7 +321,10 @@ function handleSetPosition(
     play(Sound.Check);
   }
 
-  return [state, from([overlaySquaresAction(), attemptComputerMoveAction()])];
+  return [
+    state,
+    () => from([overlaySquaresAction(), attemptComputerMoveAction()]),
+  ];
 }
 
 function handleSetPositionFromFEN(
@@ -327,7 +335,7 @@ function handleSetPositionFromFEN(
   const position = parseFEN(action.fenString);
   engine.position = position;
 
-  return [{ ...state, winner: undefined }, setPositionAction(position)];
+  return [{ ...state, winner: undefined }, () => setPositionAction(position)];
 }
 
 function handleTickPlayersClock(state: State): Update<State, Action> {
@@ -370,45 +378,43 @@ function handleToggleSquareLabels(state: State): Update<State, Action> {
   return [{ ...state, squareLabels: nextLabel }, null];
 }
 
-export function update(
-  state: State,
-  action: Action,
-  context: Context
-): Update<State, Action> {
-  if (state.debugVersion != undefined) {
-    state = { ...state, debugVersion: state.debugVersion + 1 };
-  }
+export const update =
+  (context: Context) =>
+  (state: State, action: Action): Update<State, Action> => {
+    if (state.debugVersion != undefined) {
+      state = { ...state, debugVersion: state.debugVersion + 1 };
+    }
 
-  switch (action.type) {
-    case Type.AttemptComputerMove:
-      return handleAttemptComputerMove(state);
-    case Type.ChangeOverlay:
-      return handleChangeOverlay(state);
-    case Type.ChessComputerLoaded:
-      return handleChessComputerLoaded(state, action);
-    case Type.ClickSquare:
-      return handleClickSquare(state, action);
-    case Type.FlipBoard:
-      return handleFlipBoard(state);
-    case Type.LoadChessComputer:
-      return handleLoadChessComputer(state, action);
-    case Type.OverlaySquares:
-      return handleOverlaySquares(state, context);
-    case Type.PreviousPosition:
-      return handlePreviousPosition(state, context);
-    case Type.ReceiveComputerMove:
-      return handleReceiveComputerMove(state, action);
-    case Type.ResetOverlay:
-      return handleResetOverlay(state);
-    case Type.MovePiece:
-      return handleMovePiece(state, action, context);
-    case Type.SetPosition:
-      return handleSetPosition(state, action, context);
-    case Type.SetPositionFromFEN:
-      return handleSetPositionFromFEN(state, action, context);
-    case Type.TickPlayersClock:
-      return handleTickPlayersClock(state);
-    case Type.ToggleSquareLabels:
-      return handleToggleSquareLabels(state);
-  }
-}
+    switch (action.type) {
+      case Type.AttemptComputerMove:
+        return handleAttemptComputerMove(state);
+      case Type.ChangeOverlay:
+        return handleChangeOverlay(state);
+      case Type.ChessComputerLoaded:
+        return handleChessComputerLoaded(state, action);
+      case Type.ClickSquare:
+        return handleClickSquare(state, action);
+      case Type.FlipBoard:
+        return handleFlipBoard(state);
+      case Type.LoadChessComputer:
+        return handleLoadChessComputer(state, action);
+      case Type.OverlaySquares:
+        return handleOverlaySquares(state, context);
+      case Type.PreviousPosition:
+        return handlePreviousPosition(state, context);
+      case Type.ReceiveComputerMove:
+        return handleReceiveComputerMove(state, action);
+      case Type.ResetOverlay:
+        return handleResetOverlay(state);
+      case Type.MovePiece:
+        return handleMovePiece(state, action, context);
+      case Type.SetPosition:
+        return handleSetPosition(state, action, context);
+      case Type.SetPositionFromFEN:
+        return handleSetPositionFromFEN(state, action, context);
+      case Type.TickPlayersClock:
+        return handleTickPlayersClock(state);
+      case Type.ToggleSquareLabels:
+        return handleToggleSquareLabels(state);
+    }
+  };

@@ -11,5 +11,5 @@ export type { Context } from './update';
 export { update } from './update';
 
 const init = (seed: State, context: Context) =>
-  workflow<State, Action, Context>(update, seed, context);
+  workflow<State, Action>(update(context), seed);
 export default init;

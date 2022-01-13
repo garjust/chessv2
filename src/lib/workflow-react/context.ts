@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Workflow } from '../workflow';
 
-export const contextFactory = <S, A, C>(
+export const contextFactory = <S, A>(
   initialState: S
 ): {
-  WorkflowContext: React.Context<Workflow<S, A, C>>;
+  WorkflowContext: React.Context<Workflow<S, A>>;
   useWorkflow: <R>(render: (state: S) => R) => {
     rendering: R;
     emit: (action: A) => void;
@@ -16,7 +16,7 @@ export const contextFactory = <S, A, C>(
     emit: (_: A) => {
       /* do nothing, this is just an empty default */
     },
-    updates: new Observable<[[S, S], A, C]>(),
+    updates: new Observable<[[S, S], A]>(),
   });
 
   return {

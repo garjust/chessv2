@@ -1,4 +1,4 @@
-import { Observable, Subject, empty, of, partition } from 'rxjs';
+import { Observable, Subject, empty, from, of, partition } from 'rxjs';
 import {
   catchError,
   filter,
@@ -17,22 +17,26 @@ export enum Command {
 
 type NextActionObservable<A> = Observable<A | Command | null | never>;
 
-export type NextAction<A> = NextActionObservable<A> | A | Command | null;
+type NextActionPromise<A> = Promise<A | Command | null | never>;
 
-export type Update<S, A> = [S, NextAction<A>];
+export type NextAction<A> =
+  | NextActionObservable<A>
+  | NextActionPromise<A>
+  | A
+  | Command
+  | null;
+
+export type NextActionFactory<A> = () => NextAction<A>;
+
+export type Update<S, A> = [S, NextActionFactory<A> | null];
 
 // FIXME(steckel): How do we have the type system enforce Readonly<T>?
-export type Updater<S, A, C> = (
+export type Updater<S, A> = (
   state: Readonly<S>,
-  action: Readonly<A>,
-  context: Readonly<C>
+  action: Readonly<A>
 ) => Update<S, A>;
 
-export type UpdateSubscriber<S, A, C> = (
-  state: S,
-  action: A,
-  context: C
-) => void;
+export type UpdateSubscriber<S, A> = (state: S, action: A) => void;
 
 type InternalAction<A> = A | Command;
 
@@ -40,10 +44,10 @@ type InternalUpdateAction<A> = Observable<InternalAction<A>>;
 
 type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 
-export interface Workflow<S, A, C> {
+export interface Workflow<S, A> {
   emit: (action: A) => void;
   states: Observable<S>;
-  updates: Observable<[[S, S], A, C]>;
+  updates: Observable<[[S, S], A]>;
 }
 
 // TODO(steckel): Don't export.
@@ -53,31 +57,39 @@ export const nonNullable = <T>(value: T): value is NonNullable<T> =>
 const isCommand = <A>(value: InternalAction<A>): value is Command =>
   value === Command.Done;
 
+// NOTE(steckel): We previously utilized `instance of Promise` for this
+// use-case but that does not work well where Promise-polyfill libraries must
+// seamlessly integrate.
+const isPromiseLike = (value: any): value is Promise<any> =>
+  typeof value?.then === 'function';
+
 // TODO(steckel): Maybe don't export.
 export const normalizeUpdateAction = <A>(
   nextAction: NextAction<A>
-): InternalUpdateAction<A> =>
-  (nextAction instanceof Observable
-    ? nextAction
-    : nextAction !== null
-    ? of(nextAction)
-    : empty()
-  ).pipe(filter(nonNullable));
+): InternalUpdateAction<A> => {
+  const observableAction = (() => {
+    if (nextAction instanceof Observable) {
+      return nextAction;
+    } else if (isPromiseLike(nextAction)) {
+      return from(nextAction);
+    } else if (nextAction !== null) {
+      return of(nextAction);
+    } else {
+      return empty();
+    }
+  })();
 
-// NOTE(steckel): I'd love to go to war with prettier over this formatting.
-const normalizeUpdate = <S, A>([state, nextAction]: Update<
-  S,
-  A
->): InternalUpdate<S, A> => [state, normalizeUpdateAction(nextAction)];
+  return observableAction.pipe(filter(nonNullable));
+};
 
 const update =
-  <S, A, C>(updater: Updater<S, A, C>, seed: S, context: C) =>
+  <S, A>(updater: Updater<S, A>, seed: S) =>
   (source: Observable<A>) =>
     new Observable<Update<S, A>>((subscriber) => {
       let state: S = seed;
       const next = (action: A) => {
         try {
-          const update = updater(state, action, context);
+          const update = updater(state, action);
           state = update[0];
           subscriber.next(update);
         } catch (err) {
@@ -91,17 +103,13 @@ const update =
       return () => subscription.unsubscribe();
     });
 
-const core = <S, A, C>(
-  updater: Updater<S, A, C>,
-  seed: S,
-  context: C
-): Workflow<S, A, C> => {
+const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   // Public states subject. This will be exposed publically as a hot
   // observable for workflow state.
   const publicStates = new Subject<S>();
   // Public side-effect subject. This will be exposed publically as a hot
   // observable for workflow side-effects.
-  const publicUpdates = new Subject<[[S, S], A, C]>();
+  const publicUpdates = new Subject<[[S, S], A]>();
 
   const internalActions = new Subject<InternalAction<A>>();
 
@@ -120,8 +128,13 @@ const core = <S, A, C>(
 
   // This observable receives actions and invokes the updater function
   const actionHandler: Observable<InternalUpdate<S, A>> = actions.pipe(
-    update(updater, seed, context),
-    map(normalizeUpdate),
+    update(updater, seed),
+    map(
+      ([state, nextActionFactory]): InternalUpdate<S, A> => [
+        state,
+        normalizeUpdateAction(nextActionFactory?.() ?? null),
+      ]
+    ),
     // We need this observable to be hot so that the update function does not
     // receive duplicate invocations for a particular action
     share()
@@ -140,7 +153,7 @@ const core = <S, A, C>(
     // select previous and next state
     pairwise(),
     withLatestFrom(actions),
-    map(([states, action]): [[S, S], A, C] => [states, action, context]),
+    map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
     catchError(() => empty())
   );
