@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { ComputerRegistry } from '../ai';
+import { ComputerRegistry, LATEST } from '../ai';
 import {
   parseFEN,
   PERFT_5_FEN,
@@ -15,10 +15,8 @@ import {
 } from '../lib/move-generation-perft';
 import './Debug.css';
 import { AvailableComputerVersions } from '../ai/types';
-import { moveString } from '../utils';
 import { BUTTON_CSS } from './theme';
 import { loadComputer } from '../workers';
-import { formatNumber } from '../../lib/formatter';
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -36,12 +34,12 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const ai = await loadComputer('v6');
+  const ai = await loadComputer(LATEST);
 
-  const fens = [STARTING_POSITION_FEN, VIENNA_OPENING_FEN, PERFT_5_FEN];
+  const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
 
-  for (const fen of fens) {
-    await ai.nextMove(parseFEN(fen));
+  for (const test of tests) {
+    await ai.nextMove(parseFEN(test.fen));
 
     const diagnosticsResult = await ai.diagnosticsResult;
     if (diagnosticsResult) {
@@ -53,7 +51,10 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
   logger.next('--');
 }
 
-async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
+async function runComputerNextMoveTest(
+  logger: Observer<string>,
+  test: MoveTest
+) {
   const computers = await Promise.all(
     Object.keys(ComputerRegistry).map(async (version) => {
       return {
@@ -68,12 +69,21 @@ async function runComputerNextMoveTest(logger: Observer<string>, fen: string) {
       continue;
     }
 
-    await ai.nextMove(parseFEN(fen));
+    await ai.nextMove(parseFEN(test.fen));
 
     const diagnosticsResult = await ai.diagnosticsResult;
     if (diagnosticsResult) {
       logger.next(diagnosticsResult.logString);
       console.log(diagnosticsResult.label, diagnosticsResult);
+
+      const cutPercentage =
+        1 -
+        diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
+
+      console.log(
+        diagnosticsResult.label,
+        `cut=${(cutPercentage * 100).toPrecision(5)}%`
+      );
     }
   }
 
@@ -127,21 +137,21 @@ const Debug = () => {
 
         <button
           style={BUTTON_CSS}
-          onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION_FEN)}
+          onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION)}
         >
           Move AI perft
         </button>
 
         <button
           style={BUTTON_CSS}
-          onClick={() => runComputerNextMoveTest(logger, PERFT_5_FEN)}
+          onClick={() => runComputerNextMoveTest(logger, PERFT_POSITION_5)}
         >
           Move AI perft PERFT_5
         </button>
 
         <button
           style={BUTTON_CSS}
-          onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING_FEN)}
+          onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING)}
         >
           Move AI perft VIENNA
         </button>

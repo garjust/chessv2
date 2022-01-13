@@ -8,7 +8,7 @@ import SearchContext from './search-context';
 import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 
-const MAX_DEPTH = 6;
+const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 

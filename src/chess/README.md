@@ -22,3 +22,5 @@
 
 - PVTable final PV is incorrect
 - Enable PVTable lookup for move ordering
+
+- Copy workflow refactor

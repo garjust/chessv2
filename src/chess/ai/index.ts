@@ -7,6 +7,8 @@ import v5 from './v5';
 import v6 from './v6';
 import v7 from './v7';
 
+export const LATEST = 'v7';
+
 export const ComputerRegistry: Record<
   AvailableComputerVersions,
   ChessComputerConstructor
