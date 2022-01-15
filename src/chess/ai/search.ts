@@ -24,6 +24,10 @@ export const search = async (
     context.state.historyTable
   );
 
+  if (moves.length === 1) {
+    return { scores, move: moves[0] };
+  }
+
   for (const move of moves) {
     context.engine.applyMove(move);
     const result = {

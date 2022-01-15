@@ -11,6 +11,7 @@
 
 - King pinned to square behind it, now allowing king to move to square being x-ray attacked by checking piece with attack moves scheme
 `rnbqk1nr/pppp1ppp/8/4p3/1b1P4/8/PPPKPPPP/RNBQ1BNR/ w kQ - 2 3`
+
 - Decrease weight of moves to squares attacked by pawns
 - Profile attack-based move generation
 - Transposition table
