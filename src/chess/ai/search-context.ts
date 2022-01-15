@@ -4,6 +4,8 @@ import Diagnostics from './diagnostics';
 import SearchState from './search-state';
 import { ISearchContext, ISearchState, SearchConfiguration } from './types';
 
+// All search features disabled. A search with the default configuration
+// will be a plain negamax search.
 export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   pruneNodes: false,
   quiescenceSearch: false,
@@ -18,9 +20,9 @@ export default class SearchContext implements ISearchContext {
   state: ISearchState;
   configuration = DEFAULT_CONFIGURATION;
 
-  constructor(depth: number, engine: Engine, diagnostics: Diagnostics) {
+  constructor(maxDepth: number, engine: Engine, diagnostics: Diagnostics) {
     this.engine = engine;
     this.diagnostics = diagnostics;
-    this.state = new SearchState(depth);
+    this.state = new SearchState(maxDepth);
   }
 }

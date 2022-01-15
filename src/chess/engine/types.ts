@@ -13,9 +13,8 @@ export interface IHistoryTable {
   get(move: Move): number;
 }
 
-export interface IPrincipalVariationTable {
-  set(searchDepth: number, depth: number, move: Move): void;
-  get(searchDepth: number, depth: number): Move;
+export interface IPVTable {
+  set(depth: number, move: Move): void;
   pv: Move[];
 }
 

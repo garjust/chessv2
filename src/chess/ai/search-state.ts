@@ -21,16 +21,15 @@ const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
 export default class SearchState implements ISearchState {
-  currentSearchDepth: number;
   killerMoves: Move[];
   historyTable: HistoryTable;
   pvTable: PVTable;
+  lastPV: Move[] = [];
   timer: Remote<Timer> | null = null;
 
   _timerSampleCounter = 0;
 
   constructor(depth: number) {
-    this.currentSearchDepth = depth;
     this.killerMoves = new Array(depth);
     this.historyTable = new HistoryTable();
     this.pvTable = new PVTable(depth);

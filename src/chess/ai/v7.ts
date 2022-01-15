@@ -7,10 +7,11 @@ import { search } from './search';
 import SearchContext from './search-context';
 import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
+import PVTable from '../engine/pv-table';
 
 const MAX_DEPTH = 8;
 const INITIAL_DEPTH = 1;
-const TIMEOUT = 5_000;
+const TIMEOUT = 10_000;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search with iterative deepening
@@ -68,7 +69,11 @@ export default class v7 implements ChessComputer {
       await depthTimer.start(await timer.value);
       this.diagnostics.push(new Diagnotics(this.label, i));
       this.context.diagnostics = this.currentDiagnostics;
-      this.context.state.currentSearchDepth = i;
+
+      // PVTable needs to be reset each iteration, extract the prior PV before
+      // the reset.
+      this.context.state.lastPV = this.context.state.pvTable.pv;
+      this.context.state.pvTable = new PVTable(i);
 
       try {
         currentResult = await search(i, this.context);
@@ -82,6 +87,7 @@ export default class v7 implements ChessComputer {
       }
 
       await depthTimer.stop();
+
       this.currentDiagnostics.recordResult(
         currentResult.move,
         currentResult.scores,

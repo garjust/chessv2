@@ -92,7 +92,7 @@ export default class Diagnotics {
       : undefined;
 
     const principleVariation = state
-      ? state.pvTable.pv.map((move) => moveString(move))
+      ? state.pvTable.pv.map((move) => moveString(move)).reverse()
       : undefined;
 
     const result: DiagnosticsResult = {

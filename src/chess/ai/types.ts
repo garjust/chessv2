@@ -1,15 +1,15 @@
 import { Remote } from 'comlink';
 import Timer from '../../lib/timer';
 import Engine from '../engine';
-import { IHistoryTable, IPrincipalVariationTable } from '../engine/types';
+import { IHistoryTable, IPVTable } from '../engine/types';
 import { Move, MoveWithExtraData, Position } from '../types';
 import Diagnotics, { DiagnosticsResult } from './diagnostics';
 
 export interface ISearchState {
-  currentSearchDepth: number;
   killerMoves: Move[];
   historyTable: IHistoryTable;
-  pvTable: IPrincipalVariationTable;
+  pvTable: IPVTable;
+  lastPV: Move[];
   timer: Remote<Timer> | null;
   timeoutReached(): Promise<boolean>;
 }
