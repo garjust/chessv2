@@ -78,7 +78,7 @@ const searchNodes = async (
   );
 
   if (moves.length === 0) {
-    return context.engine.evaluateNormalized();
+    return -Infinity;
   }
 
   for (const move of moves) {
