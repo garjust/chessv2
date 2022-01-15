@@ -1,23 +1,27 @@
 import { Remote, wrap } from 'comlink';
+import { workerData } from 'worker_threads';
 import Timer, { TimerConstructor } from '../../lib/timer';
 import { ComputerRegistry } from '../ai';
-import { AvailableComputerVersions } from '../ai/types';
+import { AvailableComputerVersions, ChessComputer } from '../ai/types';
 import Engine from '../engine';
 import { Position } from '../types';
 
-export const loadEngine = async (position?: Position) => {
-  const RemoteEngine = wrap<{ new (position?: Position): Engine }>(
-    new Worker(new URL('./engine', import.meta.url))
-  );
-  return new RemoteEngine(position);
+export const loadEngine = async (
+  position?: Position
+): Promise<[engine: Remote<Engine>, cleanup: () => void]> => {
+  const worker = new Worker(new URL('../workers/engine', import.meta.url));
+  const RemoteEngine = wrap<{ new (position?: Position): Engine }>(worker);
+  const engine = await new RemoteEngine(position);
+  return [engine, () => worker.terminate()];
 };
 
-export const loadComputer = async (version: AvailableComputerVersions) => {
-  const computerRegistry = wrap<typeof ComputerRegistry>(
-    new Worker(new URL('../workers/ai', import.meta.url))
-  );
+export const loadComputer = async (
+  version: AvailableComputerVersions
+): Promise<[computer: Remote<ChessComputer>, cleanup: () => void]> => {
+  const worker = new Worker(new URL('../workers/ai', import.meta.url));
+  const computerRegistry = wrap<typeof ComputerRegistry>(worker);
   const instance = await new computerRegistry[version]();
-  return instance;
+  return [instance, () => worker.terminate()];
 };
 
 export const loadTimer = async (
@@ -29,10 +33,5 @@ export const loadTimer = async (
   const RemoteTimer = wrap<TimerConstructor>(worker);
   const timer = await new RemoteTimer(timeout, { label, autoStart });
 
-  return [
-    timer,
-    () => {
-      worker.terminate();
-    },
-  ];
+  return [timer, () => worker.terminate()];
 };

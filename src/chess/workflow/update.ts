@@ -153,7 +153,7 @@ function handleLoadChessComputer(
     () =>
       from(
         loadComputer(COMPUTER_VERISON)
-          .then((instance) => {
+          .then(([instance]) => {
             return Promise.all([instance, instance.toJSON()]);
           })
           .then(([instance, label]) =>

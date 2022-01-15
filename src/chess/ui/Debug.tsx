@@ -34,7 +34,7 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const ai = await loadComputer(LATEST);
+  const [ai, cleanup] = await loadComputer(LATEST);
 
   const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
 
@@ -48,6 +48,8 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
     }
   }
 
+  cleanup();
+
   logger.next('--');
 }
 
@@ -57,14 +59,18 @@ async function runComputerNextMoveTest(
 ) {
   const computers = await Promise.all(
     Object.keys(ComputerRegistry).map(async (version) => {
+      const [ai, cleanup] = await loadComputer(
+        version as AvailableComputerVersions
+      );
       return {
         version,
-        ai: await loadComputer(version as AvailableComputerVersions),
+        ai,
+        cleanup,
       };
     })
   );
 
-  for (const { version, ai } of computers) {
+  for (const { version, ai, cleanup } of computers) {
     if (['v1', 'v2'].includes(version)) {
       continue;
     }
@@ -85,6 +91,8 @@ async function runComputerNextMoveTest(
         `cut=${(cutPercentage * 100).toPrecision(5)}%`
       );
     }
+
+    cleanup();
   }
 
   logger.next('--');
