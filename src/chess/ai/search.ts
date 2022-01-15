@@ -20,7 +20,7 @@ export const search = async (
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
     context.state.killerMoves[depth],
-    undefined,
+    context.state.lastPV[depth],
     context.state.historyTable
   );
 
@@ -69,7 +69,7 @@ const searchNodes = async (
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
     context.state.killerMoves[depth],
-    undefined,
+    context.state.lastPV[depth],
     context.state.historyTable
   );
 

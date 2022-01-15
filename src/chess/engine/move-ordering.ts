@@ -5,6 +5,8 @@ import { sort } from 'fast-sort';
 import { moveEquals } from '../utils';
 import { IHistoryTable } from './types';
 
+const MAX = Number.MAX_SAFE_INTEGER;
+
 const moveWeight = (
   move: MoveWithExtraData,
   killerMove?: Move,
@@ -14,9 +16,9 @@ const moveWeight = (
   let n = 0;
 
   if (moveEquals(move, pvMove)) {
-    return 1_000_000;
+    return MAX;
   } else if (moveEquals(move, killerMove)) {
-    return 999_999;
+    return MAX - 1;
   }
 
   n += squareValueDiff(move, move.piece);
