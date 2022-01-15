@@ -1,19 +1,9 @@
 import { Remote } from 'comlink';
 import Timer from '../../lib/timer';
 import Engine from '../engine';
+import { IHistoryTable, IPrincipalVariationTable } from '../engine/types';
 import { Move, MoveWithExtraData, Position } from '../types';
 import Diagnotics, { DiagnosticsResult } from './diagnostics';
-
-export interface IHistoryTable {
-  increment(move: Move, depth: number): void;
-  get(move: Move): number;
-}
-
-export interface IPrincipalVariationTable {
-  set(searchDepth: number, depth: number, move: Move): void;
-  get(searchDepth: number, depth: number): Move;
-  pv: Move[];
-}
 
 export interface ISearchState {
   currentSearchDepth: number;

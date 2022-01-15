@@ -22,3 +22,19 @@
 
 - PVTable final PV is incorrect
 - Enable PVTable lookup for move ordering
+
+
+On PV Tables
+- I am storing them incorrectly
+- When a new alpha is set I need to copy the entire PV of the new alpha move into the current depth's PV
+- In this sense the PV at max depth is a single move.
+  When a new alpha occurs at max depth minus one the new PV is two moves long, and therefore the two moves must be copied over
+
+After a search to depth N I should have the following PV table/matrix:
+[a, b, c, ...N]
+[a, b, c, ...N-1]
+...
+[y, z]
+[z]
+
+Array at the top of the matrix is the full PV which should be reused for the next iteration

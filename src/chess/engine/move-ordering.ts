@@ -3,7 +3,7 @@ import { PieceValue } from './evaluation';
 import { squareValueDiff } from '../lib/heatmaps';
 import { sort } from 'fast-sort';
 import { moveEquals } from '../utils';
-import { IHistoryTable } from '../ai/types';
+import { IHistoryTable } from './types';
 
 const moveWeight = (
   move: MoveWithExtraData,

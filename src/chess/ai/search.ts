@@ -38,7 +38,11 @@ export const search = async (
     if (result.score > alpha) {
       bestMove = result.move;
       alpha = result.score;
-      context.state.pvTable.set(context.state.currentSearchDepth, depth, move);
+      context.state.pvTable.set(
+        context.state.currentSearchDepth,
+        depth,
+        result.move
+      );
     }
   }
 

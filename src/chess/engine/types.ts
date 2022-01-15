@@ -1,11 +1,23 @@
 import {
   AttackObject,
   Color,
+  Move,
   Pin,
   Position as ExternalPosition,
   Square,
   SquareControlObject,
 } from '../types';
+
+export interface IHistoryTable {
+  increment(move: Move, depth: number): void;
+  get(move: Move): number;
+}
+
+export interface IPrincipalVariationTable {
+  set(searchDepth: number, depth: number, move: Move): void;
+  get(searchDepth: number, depth: number): Move;
+  pv: Move[];
+}
 
 export type KingSquares = {
   [Color.White]?: Square;

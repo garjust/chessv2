@@ -8,9 +8,9 @@ import SearchContext from './search-context';
 import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 
-const MAX_DEPTH = 4;
+const MAX_DEPTH = 8;
 const INITIAL_DEPTH = 1;
-const TIMEOUT = 10_000;
+const TIMEOUT = 5_000;
 
 // Algorithm:
 // - move-ordered alpha-beta negamax search with iterative deepening

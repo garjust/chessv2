@@ -1,54 +1,9 @@
 import { Remote } from 'comlink';
 import Timer from '../../lib/timer';
+import HistoryTable from '../engine/history-table';
+import PVTable from '../engine/pv-table';
 import { Move } from '../types';
-import { IHistoryTable, IPrincipalVariationTable, ISearchState } from './types';
-
-class HistoryTable implements IHistoryTable {
-  readonly _table: number[][];
-
-  constructor() {
-    this._table = [];
-    for (let i = 0; i < 64; i++) {
-      this._table[i] = [];
-      for (let j = 0; j < 64; j++) {
-        this._table[i][j] = 0;
-      }
-    }
-  }
-
-  get(move: Move) {
-    return this._table[move.from][move.to];
-  }
-
-  increment(move: Move, depth: number) {
-    this._table[move.from][move.to] += depth * depth;
-  }
-}
-
-class PVTable implements IPrincipalVariationTable {
-  readonly _table: Move[][];
-
-  constructor(maxDepth: number) {
-    this._table = [];
-    for (let i = 0; i < maxDepth; i++) {
-      this._table[i] = [];
-    }
-  }
-
-  set(searchDepth: number, depth: number, move: Move) {
-    this._table[searchDepth - 1][depth - 1] = move;
-  }
-
-  get(searchDepth: number, depth: number) {
-    return this._table[searchDepth - 1][depth - 1];
-  }
-
-  get pv() {
-    const moves = this._table[this._table.length - 1];
-
-    return [...moves].reverse();
-  }
-}
+import { ISearchState } from './types';
 
 // Communication with web workers is slow, too slow to do at every node.
 //
