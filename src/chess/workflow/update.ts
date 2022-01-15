@@ -147,23 +147,33 @@ function handleLoadChessComputer(
   action: Action.LoadChessComputer
 ): Update<State, Action> {
   const { playingAs } = action;
+  const { players } = state;
+  const player = players[playingAs];
 
-  return [
-    state,
-    () =>
-      from(
-        loadComputer(COMPUTER_VERISON)
-          .then(([instance]) => {
-            return Promise.all([instance, instance.toJSON()]);
-          })
-          .then(([instance, label]) =>
-            chessComputerLoadedAction(
-              { ai: instance, label, __computer: true },
-              playingAs
+  if (player === HumanPlayer) {
+    return [
+      state,
+      () =>
+        from(
+          loadComputer(COMPUTER_VERISON)
+            .then(([instance, cleanup]) => {
+              return Promise.all([instance, cleanup, instance.toJSON()]);
+            })
+            .then(([instance, cleanup, label]) =>
+              chessComputerLoadedAction(
+                { ai: instance, label, cleanup, __computer: true },
+                playingAs
+              )
             )
-          )
-      ),
-  ];
+        ),
+    ];
+  } else {
+    player.cleanup();
+    return [
+      { ...state, players: { ...players, [playingAs]: HumanPlayer } },
+      null,
+    ];
+  }
 }
 
 function handleOverlaySquares(

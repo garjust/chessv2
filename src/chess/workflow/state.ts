@@ -40,6 +40,7 @@ export const Draw = Symbol('DRAW');
 export type ChessComputerWrapped = {
   ai: Remote<ChessComputer>;
   label: string;
+  cleanup: () => void;
   // This property is here to indicate to JSON.stringify replacer function
   // what type of object this is to avoid serializing the comlink remote
   // object. JSON.stringify does something to the wrapped WebWorker before
