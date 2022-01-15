@@ -18,6 +18,9 @@ export const VIENNA_GAMBIT_ACCEPTED_FEN =
 export const VIENNA_OPENING_FEN =
   'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
 
+export const BLACK_CHECKMATE_FEN =
+  '4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24';
+
 const pieceToFenPiece = (piece: Piece): string =>
   piece.color === Color.White
     ? PIECE_TYPE_TO_FEN_PIECE[piece.type].toUpperCase()

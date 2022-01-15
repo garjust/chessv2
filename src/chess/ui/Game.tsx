@@ -20,6 +20,7 @@ import {
   VIENNA_OPENING_FEN,
   VIENNA_GAMBIT_ACCEPTED_FEN,
   PERFT_5_FEN,
+  BLACK_CHECKMATE_FEN,
   parseFEN,
 } from '../lib/fen';
 import {
@@ -31,7 +32,7 @@ import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
 import { interval, map } from 'rxjs';
 
-const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
+const FEN_FOR_INITIAL_POSITION = BLACK_CHECKMATE_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {

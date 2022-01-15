@@ -9,7 +9,7 @@ import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 import PVTable from '../engine/pv-table';
 
-const MAX_DEPTH = 8;
+const MAX_DEPTH = 5;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 

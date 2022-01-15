@@ -8,6 +8,7 @@ import {
   VIENNA_OPENING_FEN,
 } from '../lib/fen';
 import {
+  BLACK_CHECKMATE,
   MoveTest,
   PERFT_POSITION_5,
   STARTING_POSITION,
@@ -145,6 +146,13 @@ const Debug = () => {
 
         <button
           style={BUTTON_CSS}
+          onClick={() => runMoveGenerationTest(logger, BLACK_CHECKMATE)}
+        >
+          Move generation perft BLACK MATE
+        </button>
+
+        <button
+          style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION)}
         >
           Move AI perft
@@ -162,6 +170,13 @@ const Debug = () => {
           onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING)}
         >
           Move AI perft VIENNA
+        </button>
+
+        <button
+          style={BUTTON_CSS}
+          onClick={() => runComputerNextMoveTest(logger, BLACK_CHECKMATE)}
+        >
+          Move AI perft BLACK MATE
         </button>
 
         <button

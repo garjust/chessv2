@@ -1,4 +1,5 @@
 import {
+  BLACK_CHECKMATE_FEN,
   parseFEN,
   PERFT_5_FEN,
   STARTING_POSITION_FEN,
@@ -26,6 +27,11 @@ export const STARTING_POSITION: MoveTest = {
 export const VIENNA_OPENING: MoveTest = {
   fen: VIENNA_OPENING_FEN,
   counts: [27, 966, 27249, 951936, 28181171, 982980787],
+};
+
+export const BLACK_CHECKMATE: MoveTest = {
+  fen: BLACK_CHECKMATE_FEN,
+  counts: [30, 847, 24516, 666062, 18526901, 493165553],
 };
 
 const isCountCorrectForDepthFromStart = (
