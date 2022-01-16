@@ -21,3 +21,4 @@
   - Maybe this means squares that attack the king are blocked or defended (knight attacks squares are defended against, rays to squares near king are blocked by pawns)
 - Disable move ordering in quiescenceSearch
 - Cut% is incorrect because v3 visits more nodes than there are moves
+- Debug black mate position, engine should find it at depth 5

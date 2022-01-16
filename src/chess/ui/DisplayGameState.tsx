@@ -4,7 +4,7 @@ import { ChessComputerWrapped } from '../workflow/state';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
-import { formatBitboard } from '../lib/bitboard-def';
+import { formatAsBytes, formatBits } from '../../lib/bits';
 
 export type DisplayGameStateProps = {
   style?: React.CSSProperties;
@@ -48,7 +48,7 @@ function replacer(key: string, value: unknown) {
   }
 
   if (typeof value === 'bigint') {
-    return formatBitboard(value);
+    return formatAsBytes(formatBits(value));
   }
 
   return value;

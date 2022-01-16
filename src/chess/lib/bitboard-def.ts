@@ -1,18 +1,6 @@
 import { SquareLabel } from '../types';
-import { Bitboard } from './bitboard';
 
 export const ZERO = BigInt(0b0);
-
-export const formatBitboard = (bitboard: Bitboard): string => {
-  const str = bitboard.toString(2).padStart(64, '0');
-
-  const parts: string[] = [];
-  for (let i = 0; i < 64; i += 8) {
-    parts.push(str.slice(i, i + 8));
-  }
-
-  return parts.join(':');
-};
 
 const a1 = BigInt(0b1);
 const b1 = BigInt(0b10);

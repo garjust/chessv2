@@ -1,7 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN, formatPosition } from '../lib/fen';
+import { parseFEN, STARTING_POSITION_FEN } from '../lib/fen';
 import {
   movePieceAction,
   overlaySquaresAction,

@@ -83,6 +83,8 @@ export type MoveWithExtraData = Move & {
   weight?: number;
 };
 
+export type CastlingSide = 'kingside' | 'queenside';
+
 export type CastlingAvailability = {
   [Color.White]: {
     kingside: boolean;
