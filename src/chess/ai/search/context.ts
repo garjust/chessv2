@@ -36,14 +36,18 @@ export default class Context {
     moves: MoveWithExtraData[],
     currentDepth: number
   ): MoveWithExtraData[] {
-    return orderMoves(
-      moves,
-      this.configuration.transpositionTableMoveHeuristic
-        ? this.state.tTable.get()?.move
-        : undefined,
-      this.state.pvTable.pvMove(currentDepth),
-      this.state.killerMoves[currentDepth],
-      this.state.historyTable
-    );
+    if (this.configuration.moveOrdering) {
+      return orderMoves(
+        moves,
+        this.configuration.transpositionTableMoveHeuristic
+          ? this.state.tTable.get()?.move
+          : undefined,
+        this.state.pvTable.pvMove(currentDepth),
+        this.state.killerMoves[currentDepth],
+        this.state.historyTable
+      );
+    } else {
+      return moves;
+    }
   }
 }
