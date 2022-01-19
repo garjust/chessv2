@@ -2,7 +2,7 @@ import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
-import { search } from '../search';
+import Search from '../search';
 import Context from '../search/context';
 import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
@@ -88,7 +88,7 @@ export default class Iterative implements ChessComputer {
       this.context.state.pvTable.nextIteration(i);
 
       try {
-        currentResult = await search(i, this.context);
+        currentResult = await new Search(i, this.context).run();
       } catch (error) {
         if (error instanceof TimeoutError) {
           this.diagnostics.pop();

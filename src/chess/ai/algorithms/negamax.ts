@@ -2,7 +2,7 @@ import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
-import { search } from '../search';
+import Search from '../search';
 import Context from '../search/context';
 
 const MAX_DEPTH = 4;
@@ -38,7 +38,7 @@ export default class Negamax implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = await search(MAX_DEPTH, this.context);
+    const { scores, move } = await new Search(MAX_DEPTH, this.context).run();
 
     this.diagnostics.recordResult(move, scores);
     return move;
