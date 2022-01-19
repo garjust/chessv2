@@ -36,12 +36,14 @@ export default class Iterative implements ChessComputer {
 
     this.context = new Context(this.label, MAX_DEPTH, this.engine);
     this.context.configuration.pruneNodes = true;
-    this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
-    this.context.configuration.moveOrderingHeuristics.killerMove = true;
-    this.context.configuration.moveOrderingHeuristics.historyMove = true;
-    this.context.configuration.moveOrderingHeuristics.pvMove = true;
-    this.context.configuration.moveOrderingHeuristics.hashMove = true;
+    this.context.configuration.moveOrdering = true;
+    this.context.configuration.moveOrderingHeuristics = {
+      killerMove: true,
+      historyMove: true,
+      pvMove: true,
+      hashMove: true,
+    };
   }
 
   get diagnosticsResult() {
