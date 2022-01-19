@@ -2,7 +2,6 @@ import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
-import Search from '../search';
 import Context from '../search/context';
 
 const MAX_DEPTH = 4;
@@ -36,10 +35,9 @@ export default class AlphaBeta implements ChessComputer {
     this.diagnostics = undefined;
     this.engine.position = position;
 
-    const [{ move }, diagnostics] = await new Search(
-      MAX_DEPTH,
-      this.context
-    ).run();
+    const [{ move }, diagnostics] = await this.context.withDiagnostics(
+      MAX_DEPTH
+    );
 
     this.diagnostics = diagnostics;
     return move;

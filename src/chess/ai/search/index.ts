@@ -1,20 +1,14 @@
 import { Move } from '../../types';
-import Context from './context';
+import type Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
 // Alpha-beta negamax search with various optional features.
 export default class Search {
-  maxDepth: number;
   context: Context;
 
-  constructor(maxDepth: number, context: Context) {
-    this.maxDepth = maxDepth;
+  constructor(context: Context) {
     this.context = context;
-  }
-
-  async run() {
-    return this.context.withDiagnostics(this.maxDepth, this.search.bind(this));
   }
 
   async search(depth: number): Promise<SearchResult> {

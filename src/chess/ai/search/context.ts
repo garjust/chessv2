@@ -1,3 +1,4 @@
+import Search from '.';
 import Engine from '../../engine';
 import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
@@ -33,14 +34,17 @@ export default class Context {
   }
 
   async withDiagnostics(
-    maxDepth: number,
-    searchFn: (maxDepth: number) => Promise<SearchResult>
+    maxDepth: number
   ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
-    const result = await searchFn(maxDepth);
+    const result = await this.run(maxDepth);
     this.diagnostics.recordResult(result.move, result.scores);
 
     return [result, this.diagnostics];
+  }
+
+  async run(maxDepth: number) {
+    return new Search(this).search(maxDepth);
   }
 
   quiescenceOrderMoves(moves: MoveWithExtraData[]) {

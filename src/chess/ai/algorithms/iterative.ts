@@ -2,7 +2,6 @@ import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
-import Search from '../search';
 import Context from '../search/context';
 import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
@@ -55,6 +54,12 @@ export default class Iterative implements ChessComputer {
 
   async nextMove(position: Position, timeout = TIMEOUT) {
     this.diagnostics = undefined;
+    this.engine.position = position;
+    let currentResult: SearchResult = {
+      move: { from: -1, to: -1 },
+      scores: [],
+    };
+    let diagnostics: Diagnotics | undefined;
 
     const [timer, timerCleanup] = await loadTimer(
       `${this.label}-search`,
@@ -67,13 +72,7 @@ export default class Iterative implements ChessComputer {
     );
     this.context.state.timer = depthTimer;
 
-    this.engine.position = position;
     this.context.state.tTable.newHash(position);
-    let currentResult: SearchResult = {
-      move: { from: -1, to: -1 },
-      scores: [],
-    };
-    let diagnostics: Diagnotics | undefined;
 
     for (let i = INITIAL_DEPTH; i <= MAX_DEPTH; i++) {
       await depthTimer.start(await timer.value);
@@ -83,7 +82,7 @@ export default class Iterative implements ChessComputer {
       this.context.state.pvTable.nextIteration(i);
 
       try {
-        [currentResult, diagnostics] = await new Search(i, this.context).run();
+        [currentResult, diagnostics] = await this.context.withDiagnostics(i);
       } catch (error) {
         if (error instanceof TimeoutError) {
           break;
