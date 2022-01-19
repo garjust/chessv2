@@ -1,7 +1,6 @@
 import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
-import { orderMoves } from '../../engine/move-ordering';
 import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
@@ -25,9 +24,9 @@ export default class Quiescence implements ChessComputer {
 
     this.context = new Context(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
+    this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;
-    this.context.configuration.orderMoves = orderMoves;
   }
 
   get diagnosticsResult() {

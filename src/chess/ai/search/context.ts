@@ -1,6 +1,7 @@
 import Engine from '../../engine';
 import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
+import { orderMoves } from './move-ordering';
 import State from './state';
 import { SearchConfiguration } from './types';
 
@@ -8,11 +9,11 @@ import { SearchConfiguration } from './types';
 // will be a plain negamax search.
 export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   pruneNodes: false,
+  moveOrdering: false,
   quiescenceSearch: false,
   killerMoveHeuristic: false,
   historyMoveHeuristic: false,
   transpositionTableMoveHeuristic: false,
-  orderMoves: (moves: MoveWithExtraData[]) => moves,
 };
 
 export default class Context {
@@ -25,5 +26,24 @@ export default class Context {
     this.engine = engine;
     this.diagnostics = diagnostics;
     this.state = new State(engine.position, maxDepth);
+  }
+
+  quiescenceOrderMoves(moves: MoveWithExtraData[]) {
+    return orderMoves(moves);
+  }
+
+  orderMoves(
+    moves: MoveWithExtraData[],
+    currentDepth: number
+  ): MoveWithExtraData[] {
+    return orderMoves(
+      moves,
+      this.configuration.transpositionTableMoveHeuristic
+        ? this.state.tTable.get()?.move
+        : undefined,
+      this.state.pvTable.pvMove(currentDepth),
+      this.state.killerMoves[currentDepth],
+      this.state.historyTable
+    );
   }
 }

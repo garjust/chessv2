@@ -63,6 +63,10 @@ export default class Engine {
     });
   }
 
+  generateAttackingMoves(): MoveWithExtraData[] {
+    return this.generateMoves().filter((move) => move.attack);
+  }
+
   get position(): ExternalPosition {
     return copyToExternal(this._position);
   }

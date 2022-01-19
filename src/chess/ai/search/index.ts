@@ -3,10 +3,7 @@ import Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
-// Alpha-beta negamax search.
-//
-// This is a alpha-beta negamax search. If move pruning is disabled in the
-// context it will function as a normal negamax search.
+// Alpha-beta negamax search with various optional features.
 export const search = async (
   depth: number,
   context: Context
@@ -18,15 +15,7 @@ export const search = async (
   let alpha = -Infinity;
   const beta = Infinity;
 
-  const moves = context.configuration.orderMoves(
-    context.engine.generateMoves(),
-    context.configuration.transpositionTableMoveHeuristic
-      ? context.state.tTable.get()?.move
-      : undefined,
-    context.state.pvTable.pvMove(depth),
-    context.state.killerMoves[depth],
-    context.state.historyTable
-  );
+  const moves = context.orderMoves(context.engine.generateMoves(), depth);
 
   if (moves.length === 1) {
     return { scores, move: moves[0] };
@@ -84,15 +73,7 @@ const searchNodes = async (
     }
   }
 
-  const moves = context.configuration.orderMoves(
-    context.engine.generateMoves(),
-    context.configuration.transpositionTableMoveHeuristic
-      ? context.state.tTable.get()?.move
-      : undefined,
-    context.state.pvTable.pvMove(depth),
-    context.state.killerMoves[depth],
-    context.state.historyTable
-  );
+  const moves = context.orderMoves(context.engine.generateMoves(), depth);
 
   // If there are no moves at this node then it is checkmate.
   if (moves.length === 0) {
@@ -161,8 +142,8 @@ export const quiescenceSearch = (
     return alpha;
   }
 
-  const moves = context.configuration.orderMoves(
-    context.engine.generateMoves().filter((move) => move.attack)
+  const moves = context.quiescenceOrderMoves(
+    context.engine.generateAttackingMoves()
   );
 
   for (const move of moves) {

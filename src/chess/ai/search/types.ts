@@ -33,11 +33,5 @@ export type SearchConfiguration = {
   killerMoveHeuristic: boolean;
   historyMoveHeuristic: boolean;
   transpositionTableMoveHeuristic: boolean;
-  orderMoves: (
-    moves: MoveWithExtraData[],
-    tableMove?: Move,
-    killerMove?: Move,
-    pvMove?: Move,
-    historyTable?: IHistoryTable
-  ) => MoveWithExtraData[];
+  moveOrdering: boolean;
 };

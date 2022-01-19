@@ -1,7 +1,6 @@
 import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
-import { orderMoves } from '../../engine/move-ordering';
 import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
@@ -38,11 +37,11 @@ export default class Iterative implements ChessComputer {
 
     this.context = new Context(MAX_DEPTH, this.engine, this.currentDiagnostics);
     this.context.configuration.pruneNodes = true;
+    this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;
     this.context.configuration.historyMoveHeuristic = true;
     this.context.configuration.transpositionTableMoveHeuristic = true;
-    this.context.configuration.orderMoves = orderMoves;
   }
 
   get currentDiagnostics() {

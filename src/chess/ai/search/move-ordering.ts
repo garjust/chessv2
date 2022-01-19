@@ -1,9 +1,9 @@
-import { Move, MoveWithExtraData } from '../types';
-import { PieceValue } from './evaluation';
-import { squareValueDiff } from '../lib/heatmaps';
 import { sort } from 'fast-sort';
-import { moveEquals } from '../utils';
-import { IHistoryTable } from './types';
+import { PieceValue } from '../../engine/evaluation';
+import { IHistoryTable } from '../../engine/types';
+import { squareValueDiff } from '../../lib/heatmaps';
+import { Move, MoveWithExtraData } from '../../types';
+import { moveEquals } from '../../utils';
 
 const MAX = Number.MAX_SAFE_INTEGER;
 
