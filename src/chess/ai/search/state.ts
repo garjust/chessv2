@@ -25,6 +25,7 @@ export default class State {
   killerMoves: Move[];
   historyTable: HistoryTable;
   pvTable: PVTable;
+  currentPV: Move[];
   tTable: TranspositionTable<TranspositionTableEntry>;
   timer: Remote<Timer> | null = null;
 
@@ -38,6 +39,7 @@ export default class State {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
     this.pvTable = new PVTable(maxDepth);
+    this.currentPV = [];
     this.tTable = new TranspositionTable(position);
     this.moveExecutionOptions = {
       table: this.tTable,
@@ -52,5 +54,9 @@ export default class State {
     } else {
       return false;
     }
+  }
+
+  pvMove(depth: number): Move | undefined {
+    return this.currentPV[depth - 2];
   }
 }

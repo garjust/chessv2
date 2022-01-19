@@ -38,13 +38,16 @@ export default class Context {
   ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
     const result = await this.run(maxDepth);
-    this.diagnostics.recordResult(result.move, result.scores);
+    this.diagnostics.recordResult(result, this.state);
 
     return [result, this.diagnostics];
   }
 
   async run(maxDepth: number) {
-    return new Search(this).search(maxDepth);
+    const result = await new Search(this).search(maxDepth);
+    this.state.currentPV = [...result.pv].reverse();
+
+    return result;
   }
 
   quiescenceOrderMoves(moves: MoveWithExtraData[]) {
@@ -62,7 +65,7 @@ export default class Context {
           ? this.state.tTable.get()?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
-          ? this.state.pvTable.pvMove(currentDepth)
+          ? this.state.pvMove(currentDepth)
           : undefined,
         this.configuration.moveOrderingHeuristics.killerMove
           ? this.state.killerMoves[currentDepth]

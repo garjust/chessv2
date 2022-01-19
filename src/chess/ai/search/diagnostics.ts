@@ -3,6 +3,7 @@ import { Move } from '../../types';
 import { moveString } from '../../utils';
 import State from './state';
 import { TreeDiagnostics } from './tree-diagnostics';
+import { SearchResult } from './types';
 
 type PlyCounter = {
   nodes: number;
@@ -71,11 +72,9 @@ export default class Diagnotics {
     this.plyCounters[-1].cuts++;
   }
 
-  recordResult(
-    move: Move,
-    moveScores: { move: Move; score: number }[],
-    state?: State
-  ) {
+  recordResult(result: SearchResult, state?: State) {
+    const { move, scores, pv } = result;
+
     const timing = Date.now() - this.start;
     const totalNodes = Object.values(this.plyCounters).reduce(
       (sum, plyCounter) => sum + plyCounter.nodes,
@@ -95,11 +94,7 @@ export default class Diagnotics {
         }
       : undefined;
 
-    const principleVariation = state
-      ? state.pvTable.currentPV.map((move) => moveString(move))
-      : undefined;
-
-    const result: DiagnosticsResult = {
+    const diagnosticsResults: DiagnosticsResult = {
       label: this.label,
       logString: `${this.label} ${moveString(move)}: depth=${
         this.maxDepth
@@ -109,7 +104,7 @@ export default class Diagnotics {
         5
       )}μs/node); cuts=${formatNumber(totalCuts)}`,
       move: moveString(move),
-      moveScores: moveScores.map(({ move, score }) => ({
+      moveScores: scores.map(({ move, score }) => ({
         move: moveString(move),
         score,
       })),
@@ -119,9 +114,9 @@ export default class Diagnotics {
       depth: this.maxDepth,
       timing,
       state: stateData,
-      principleVariation,
+      principleVariation: pv.map((move) => moveString(move)),
     };
 
-    this.result = result;
+    this.result = diagnosticsResults;
   }
 }

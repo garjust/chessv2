@@ -57,6 +57,7 @@ export default class Iterative implements ChessComputer {
     this.engine.position = position;
     let currentResult: SearchResult = {
       move: { from: -1, to: -1 },
+      pv: [],
       scores: [],
     };
     let diagnostics: Diagnotics | undefined;

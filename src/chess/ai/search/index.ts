@@ -25,7 +25,7 @@ export default class Search {
     );
 
     if (moves.length === 1) {
-      return { scores, move: moves[0] };
+      return { scores, move: moves[0], pv: moves };
     }
 
     for (const move of moves) {
@@ -55,7 +55,7 @@ export default class Search {
       move: bestMove,
     });
 
-    return { scores, move: bestMove };
+    return { scores, move: bestMove, pv: this.context.state.pvTable.pv };
   }
 
   // Recursive search function for the alpha-beta negamax search.

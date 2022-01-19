@@ -3,6 +3,7 @@ import { Move } from '../../types';
 // Object returned from the search function
 export type SearchResult = {
   move: Move;
+  pv: Move[];
   scores: { move: Move; score: number }[];
 };
 
