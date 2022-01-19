@@ -1,6 +1,12 @@
 import { IHistoryTable } from '../../engine/types';
 import { Move, MoveWithExtraData } from '../../types';
 
+// Object returned from the search function
+export type SearchResult = {
+  move: Move;
+  scores: { move: Move; score: number }[];
+};
+
 // See documentation here https://www.chessprogramming.org/Node_Types.
 export enum NodeType {
   // A PV node is a node where the best score alpha < X < beta. Therefore the
@@ -26,7 +32,7 @@ export type SearchConfiguration = {
   quiescenceSearch: boolean;
   killerMoveHeuristic: boolean;
   historyMoveHeuristic: boolean;
-  transpositionTable: boolean;
+  transpositionTableMoveHeuristic: boolean;
   orderMoves: (
     moves: MoveWithExtraData[],
     tableMove?: Move,
@@ -34,9 +40,4 @@ export type SearchConfiguration = {
     pvMove?: Move,
     historyTable?: IHistoryTable
   ) => MoveWithExtraData[];
-};
-
-export type SearchResult = {
-  move: Move;
-  scores: { move: Move; score: number }[];
 };

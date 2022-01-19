@@ -20,7 +20,9 @@ export const search = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
-    context.state.tTable.get()?.move,
+    context.configuration.transpositionTableMoveHeuristic
+      ? context.state.tTable.get()?.move
+      : undefined,
     context.state.pvTable.pvMove(depth),
     context.state.killerMoves[depth],
     context.state.historyTable
@@ -48,14 +50,12 @@ export const search = async (
     }
   }
 
-  if (context.configuration.transpositionTable) {
-    context.state.tTable.set({
-      nodeType: NodeType.PV,
-      depth,
-      score: alpha,
-      move: bestMove,
-    });
-  }
+  context.state.tTable.set({
+    nodeType: NodeType.PV,
+    depth,
+    score: alpha,
+    move: bestMove,
+  });
 
   return { scores, move: bestMove };
 };
@@ -86,7 +86,9 @@ const searchNodes = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
-    context.state.tTable.get()?.move,
+    context.configuration.transpositionTableMoveHeuristic
+      ? context.state.tTable.get()?.move
+      : undefined,
     context.state.pvTable.pvMove(depth),
     context.state.killerMoves[depth],
     context.state.historyTable
@@ -127,14 +129,12 @@ const searchNodes = async (
     }
   }
 
-  if (context.configuration.transpositionTable) {
-    context.state.tTable.set({
-      nodeType,
-      depth,
-      score: alpha,
-      move: nodeMove,
-    });
-  }
+  context.state.tTable.set({
+    nodeType,
+    depth,
+    score: alpha,
+    move: nodeMove,
+  });
 
   return alpha;
 };

@@ -41,7 +41,7 @@ export default class Iterative implements ChessComputer {
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;
     this.context.configuration.historyMoveHeuristic = true;
-    this.context.configuration.transpositionTable = true;
+    this.context.configuration.transpositionTableMoveHeuristic = true;
     this.context.configuration.orderMoves = orderMoves;
   }
 

@@ -11,7 +11,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   quiescenceSearch: false,
   killerMoveHeuristic: false,
   historyMoveHeuristic: false,
-  transpositionTable: false,
+  transpositionTableMoveHeuristic: false,
   orderMoves: (moves: MoveWithExtraData[]) => moves,
 };
 
