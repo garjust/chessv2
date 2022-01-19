@@ -20,7 +20,6 @@ import {
   SquareOverlayCategory,
 } from './state';
 import { from } from 'rxjs';
-import { AvailableComputerVersions } from '../ai/types';
 import Engine from '../engine';
 import { play, Sound } from '../ui/audio';
 import {
@@ -30,12 +29,13 @@ import {
 } from './overlay';
 import { loadComputer } from '../workers';
 import { EVALUATION_DIVIDER } from '../engine/evaluation';
+import { Versions, LATEST } from '../ai';
 
 export type Context = {
   engine: Engine;
 };
 
-const COMPUTER_VERISON: AvailableComputerVersions = 'v7';
+const COMPUTER_VERISON: Versions = LATEST;
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;

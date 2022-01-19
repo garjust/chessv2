@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { ComputerRegistry, LATEST } from '../ai';
+import { Registry, LATEST, Versions } from '../ai';
 import {
   parseFEN,
   PERFT_5_FEN,
@@ -15,7 +15,6 @@ import {
   VIENNA_OPENING,
 } from '../lib/move-generation-perft';
 import './Debug.css';
-import { AvailableComputerVersions } from '../ai/types';
 import { BUTTON_CSS } from './theme';
 import { loadComputer } from '../workers';
 
@@ -59,10 +58,8 @@ async function runComputerNextMoveTest(
   test: MoveTest
 ) {
   const computers = await Promise.all(
-    Object.keys(ComputerRegistry).map(async (version) => {
-      const [ai, cleanup] = await loadComputer(
-        version as AvailableComputerVersions
-      );
+    Object.keys(Registry).map(async (version) => {
+      const [ai, cleanup] = await loadComputer(version as Versions);
       return {
         version,
         ai,

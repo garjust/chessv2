@@ -1,8 +1,8 @@
-import { ChessComputer } from './types';
-import { Move, Piece, PieceType, Position, Square } from '../types';
-import { pluck } from '../../lib/array';
-import Engine from '../engine';
-import Diagnotics from './search/diagnostics';
+import { ChessComputer } from '../types';
+import { Move, Piece, PieceType, Position, Square } from '../../types';
+import { pluck } from '../../../lib/array';
+import Engine from '../../engine';
+import Diagnotics from '../search/diagnostics';
 
 // Just randomly pick a move, with a tiny bit of intelligence to make
 //  non-sliding piece moves more often.

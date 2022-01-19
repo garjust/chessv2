@@ -1,21 +1,19 @@
-import { AvailableComputerVersions, ChessComputerConstructor } from './types';
-import Random from './random';
-import Negamax from './negamax';
-import AlphaBeta from './alpha-beta';
-import MoveOrdering from './move-ordering';
-import Quiescence from './quiescence';
-import Iterative from './iterative';
+import Random from './algorithms/random';
+import Negamax from './algorithms/negamax';
+import AlphaBeta from './algorithms/alpha-beta';
+import MoveOrdering from './algorithms/move-ordering';
+import Quiescence from './algorithms/quiescence';
+import Iterative from './algorithms/iterative';
 
-export const LATEST = 'v7';
-
-export const ComputerRegistry: Record<
-  AvailableComputerVersions,
-  ChessComputerConstructor
-> = Object.freeze({
-  v7: Iterative,
-  v6: Quiescence,
-  v5: MoveOrdering,
-  v4: AlphaBeta,
-  v3: Negamax,
-  v2: Random,
+export const Registry = Object.freeze({
+  AlphaBeta,
+  Iterative,
+  MoveOrdering,
+  Negamax,
+  Quiescence,
+  Random,
 });
+
+export type Versions = keyof typeof Registry;
+
+export const LATEST: Versions = 'Iterative';

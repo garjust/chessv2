@@ -1,12 +1,12 @@
-import { ChessComputer, ISearchContext, SearchResult } from './types';
-import { Position } from '../types';
-import Engine from '../engine';
-import { orderMoves } from '../engine/move-ordering';
-import Diagnotics from './search/diagnostics';
-import { search } from './search/search';
-import SearchContext from './search/search-context';
-import { loadTimer } from '../workers';
-import TimeoutError from './search/timeout-error';
+import { ChessComputer, ISearchContext, SearchResult } from '../types';
+import { Position } from '../../types';
+import Engine from '../../engine';
+import { orderMoves } from '../../engine/move-ordering';
+import Diagnotics from '../search/diagnostics';
+import { search } from '../search/search';
+import SearchContext from '../search/search-context';
+import { loadTimer } from '../../workers';
+import TimeoutError from '../search/timeout-error';
 
 const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;

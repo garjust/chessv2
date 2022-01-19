@@ -1,4 +1,4 @@
 import { expose } from 'comlink';
-import { ComputerRegistry } from '../ai';
+import { Registry } from '../ai';
 
-expose(ComputerRegistry);
+expose(Registry);

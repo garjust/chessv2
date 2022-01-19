@@ -1,8 +1,7 @@
 import { Remote, wrap } from 'comlink';
-import { workerData } from 'worker_threads';
 import Timer, { TimerConstructor } from '../../lib/timer';
-import { ComputerRegistry } from '../ai';
-import { AvailableComputerVersions, ChessComputer } from '../ai/types';
+import { Registry, Versions } from '../ai';
+import { ChessComputer } from '../ai/types';
 import Engine from '../engine';
 import { Position } from '../types';
 
@@ -16,11 +15,11 @@ export const loadEngine = async (
 };
 
 export const loadComputer = async (
-  version: AvailableComputerVersions
+  version: Versions
 ): Promise<[computer: Remote<ChessComputer>, cleanup: () => void]> => {
   const worker = new Worker(new URL('../workers/ai', import.meta.url));
-  const computerRegistry = wrap<typeof ComputerRegistry>(worker);
-  const instance = await new computerRegistry[version]();
+  const registry = wrap<typeof Registry>(worker);
+  const instance = await new registry[version]();
   return [instance, () => worker.terminate()];
 };
 

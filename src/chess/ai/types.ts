@@ -65,8 +65,6 @@ export type SearchResult = {
   scores: { move: Move; score: number }[];
 };
 
-export type AvailableComputerVersions = 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7';
-
 export interface ChessComputer {
   nextMove(position: Position, timeout?: number): Promise<Move>;
   get diagnosticsResult(): DiagnosticsResult | null;

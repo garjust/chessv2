@@ -1,10 +1,10 @@
-import { ChessComputer, ISearchContext } from './types';
-import { Position } from '../types';
-import Engine from '../engine';
-import { orderMoves } from '../engine/move-ordering';
-import Diagnotics from './search/diagnostics';
-import { search } from './search/search';
-import SearchContext from './search/search-context';
+import { ChessComputer, ISearchContext } from '../types';
+import { Position } from '../../types';
+import Engine from '../../engine';
+import { orderMoves } from '../../engine/move-ordering';
+import Diagnotics from '../search/diagnostics';
+import { search } from '../search/search';
+import SearchContext from '../search/search-context';
 
 const DEPTH = 4;
 
