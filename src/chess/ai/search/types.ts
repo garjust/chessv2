@@ -42,13 +42,6 @@ export interface ISearchState {
   timeoutReached(): Promise<boolean>;
 }
 
-export interface ISearchContext {
-  engine: Engine;
-  diagnostics: Diagnotics;
-  state: ISearchState;
-  configuration: SearchConfiguration;
-}
-
 export type SearchConfiguration = {
   pruneNodes: boolean;
   quiescenceSearch: boolean;

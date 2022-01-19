@@ -29,13 +29,13 @@ import {
 } from './overlay';
 import { loadComputer } from '../workers';
 import { EVALUATION_DIVIDER } from '../engine/evaluation';
-import { Versions, LATEST } from '../ai';
+import { Version, LATEST } from '../ai';
 
 export type Context = {
   engine: Engine;
 };
 
-const COMPUTER_VERISON: Versions = LATEST;
+const COMPUTER_VERISON: Version = LATEST;
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;

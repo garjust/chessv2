@@ -1,6 +1,6 @@
 import { Remote, wrap } from 'comlink';
 import Timer, { TimerConstructor } from '../../lib/timer';
-import { Registry, Versions } from '../ai';
+import { Registry, Version } from '../ai';
 import { ChessComputer } from '../ai/chess-computer';
 import Engine from '../engine';
 import { Position } from '../types';
@@ -15,7 +15,7 @@ export const loadEngine = async (
 };
 
 export const loadComputer = async (
-  version: Versions
+  version: Version
 ): Promise<[computer: Remote<ChessComputer>, cleanup: () => void]> => {
   const worker = new Worker(new URL('../workers/ai', import.meta.url));
   const registry = wrap<typeof Registry>(worker);

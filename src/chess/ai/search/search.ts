@@ -1,7 +1,8 @@
 import { formatPosition } from '../../lib/fen';
 import { Move } from '../../types';
+import SearchContext from './search-context';
 import TimeoutError from './timeout-error';
-import { ISearchContext, NodeType, SearchResult } from './types';
+import { NodeType, SearchResult } from './types';
 
 // Alpha-beta negamax search.
 //
@@ -9,7 +10,7 @@ import { ISearchContext, NodeType, SearchResult } from './types';
 // context it will function as a normal negamax search.
 export const search = async (
   depth: number,
-  context: ISearchContext
+  context: SearchContext
 ): Promise<SearchResult> => {
   const scores: { move: Move; score: number }[] = [];
   // Start with an illegal move so it is well defined.
@@ -66,7 +67,7 @@ const searchNodes = async (
   depth: number,
   alpha: number,
   beta: number,
-  context: ISearchContext
+  context: SearchContext
 ): Promise<number> => {
   context.diagnostics.nodeVisit(depth);
 
@@ -149,7 +150,7 @@ const searchNodes = async (
 export const quiescenceSearch = (
   alpha: number,
   beta: number,
-  context: ISearchContext
+  context: SearchContext
 ): number => {
   context.diagnostics.quiescenceNodeVisit();
 

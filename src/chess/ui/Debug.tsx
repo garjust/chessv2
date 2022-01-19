@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { Registry, LATEST, Versions } from '../ai';
+import { Registry, LATEST, Version } from '../ai';
 import {
   parseFEN,
   PERFT_5_FEN,
@@ -17,6 +17,8 @@ import {
 import './Debug.css';
 import { BUTTON_CSS } from './theme';
 import { loadComputer } from '../workers';
+
+const EXCLUDED_COMPUTERS: Version[] = ['Random'];
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -59,9 +61,9 @@ async function runComputerNextMoveTest(
 ) {
   const computers = await Promise.all(
     Object.keys(Registry).map(async (version) => {
-      const [ai, cleanup] = await loadComputer(version as Versions);
+      const [ai, cleanup] = await loadComputer(version as Version);
       return {
-        version,
+        version: version as Version,
         ai,
         cleanup,
       };
@@ -69,7 +71,7 @@ async function runComputerNextMoveTest(
   );
 
   for (const { version, ai, cleanup } of computers) {
-    if (['v2'].includes(version)) {
+    if (EXCLUDED_COMPUTERS.includes(version)) {
       continue;
     }
 

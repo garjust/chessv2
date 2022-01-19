@@ -45,7 +45,7 @@ export default class SearchState implements ISearchState {
     };
   }
 
-  async timeoutReached() {
+  async timeoutReached(): Promise<boolean> {
     this._timerSampleCounter++;
     if (this.timer && this._timerSampleCounter >= TIMER_SAMPLE_THRESHOLD) {
       this._timerSampleCounter = 0;

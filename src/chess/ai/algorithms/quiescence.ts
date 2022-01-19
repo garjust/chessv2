@@ -5,7 +5,6 @@ import { orderMoves } from '../../engine/move-ordering';
 import Diagnotics from '../search/diagnostics';
 import { search } from '../search/search';
 import SearchContext from '../search/search-context';
-import { ISearchContext } from '../search/types';
 
 const DEPTH = 4;
 
@@ -18,7 +17,7 @@ const DEPTH = 4;
 export default class Quiescence implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
-  context: ISearchContext;
+  context: SearchContext;
 
   constructor() {
     this.engine = new Engine();

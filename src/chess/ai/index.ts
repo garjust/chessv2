@@ -14,6 +14,6 @@ export const Registry = Object.freeze({
   Random,
 });
 
-export type Versions = keyof typeof Registry;
+export type Version = keyof typeof Registry;
 
-export const LATEST: Versions = 'Iterative';
+export const LATEST: Version = 'Iterative';
