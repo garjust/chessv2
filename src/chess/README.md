@@ -24,5 +24,4 @@
 - Debug black mate position, engine should find it at depth 5
 - Zobrish hash en passant square
 
-- Rename computers
 - Clean up computer features

@@ -1,14 +1,18 @@
 import { ChessComputer, ISearchContext } from './types';
 import { Position } from '../types';
 import Engine from '../engine';
-import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './search/diagnostics';
 import { search } from './search/search';
 import SearchContext from './search/search-context';
 
 const DEPTH = 4;
 
-export default class v5 implements ChessComputer {
+// A step up from the negamax algorithm, this is the classic tree search
+// algorithm used for games like chess.
+//
+// Alpha-beta adds tree-pruning to the tree search in a way that is completely
+// safe. Alpha-beta will always return the same move as negamax.
+export default class AlphaBeta implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
   context: ISearchContext;
@@ -19,7 +23,6 @@ export default class v5 implements ChessComputer {
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
-    this.context.configuration.orderMoves = orderMoves;
   }
 
   get diagnosticsResult() {
@@ -27,7 +30,7 @@ export default class v5 implements ChessComputer {
   }
 
   get label() {
-    return 'alphabeta-v2-move-ordered';
+    return 'alphabeta';
   }
 
   resetDiagnostics() {

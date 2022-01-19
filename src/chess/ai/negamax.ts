@@ -1,17 +1,15 @@
 import { ChessComputer, ISearchContext } from './types';
 import { Position } from '../types';
 import Engine from '../engine';
-import { orderMoves } from '../engine/move-ordering';
 import Diagnotics from './search/diagnostics';
 import { search } from './search/search';
 import SearchContext from './search/search-context';
 
 const DEPTH = 4;
 
-// Algorithm:
-// - move-ordered alpha-beta negamax search
-// - search through captures
-export default class v6 implements ChessComputer {
+// The most basic tree search algorithm (minimax) but optimized to a single
+// recursive function.
+export default class Negamax implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
   context: ISearchContext;
@@ -21,10 +19,6 @@ export default class v6 implements ChessComputer {
     this.diagnostics = new Diagnotics(this.label, DEPTH);
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
-    this.context.configuration.pruneNodes = true;
-    this.context.configuration.quiescenceSearch = true;
-    this.context.configuration.killerMoveHeuristic = true;
-    this.context.configuration.orderMoves = orderMoves;
   }
 
   get diagnosticsResult() {
@@ -32,7 +26,7 @@ export default class v6 implements ChessComputer {
   }
 
   get label() {
-    return 'alphabeta-v3-quiescence';
+    return 'negamax';
   }
 
   resetDiagnostics() {
