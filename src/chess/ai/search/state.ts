@@ -1,7 +1,7 @@
 import { Remote } from 'comlink';
 import Timer from '../../../lib/timer';
 import HistoryTable from './history-table';
-import PVTable from '../../engine/pv-table';
+import PVTable from './pv-table';
 import TranspositionTable from '../../engine/transposition-table';
 import { Move, Position } from '../../types';
 import { TranspositionTableEntry } from './types';

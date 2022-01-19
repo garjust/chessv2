@@ -1,4 +1,4 @@
-import { Move } from '../types';
+import { Move } from '../../types';
 
 export default class PVTable {
   _table: Move[][] = [[]];
