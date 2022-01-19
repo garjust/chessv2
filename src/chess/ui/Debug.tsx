@@ -72,7 +72,7 @@ async function runComputerNextMoveTest(
   );
 
   for (const { version, ai, cleanup } of computers) {
-    if (['v1', 'v2'].includes(version)) {
+    if (['v2'].includes(version)) {
       continue;
     }
 

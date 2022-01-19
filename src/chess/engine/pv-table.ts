@@ -23,7 +23,7 @@ export default class PVTable implements IPVTable {
   }
 
   get currentPV() {
-    return this._currentPV;
+    return [...this._currentPV].reverse();
   }
 
   pvMove(depth: number) {

@@ -2,13 +2,11 @@ import { ChessComputer, ISearchContext, SearchResult } from './types';
 import { Position } from '../types';
 import Engine from '../engine';
 import { orderMoves } from '../engine/move-ordering';
-import Diagnotics from './diagnostics';
-import { search } from './search';
-import SearchContext from './search-context';
+import Diagnotics from './search/diagnostics';
+import { search } from './search/search';
+import SearchContext from './search/search-context';
 import { loadTimer } from '../workers';
-import TimeoutError from './timeout-error';
-import PVTable from '../engine/pv-table';
-import { moveString } from '../utils';
+import TimeoutError from './search/timeout-error';
 
 const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;
@@ -98,7 +96,7 @@ export default class v7 implements ChessComputer {
       console.log(
         '[intermediate result]:',
         this.currentDiagnostics.result?.logString,
-        this.context.state.pvTable.currentPV.map((move) => moveString(move))
+        this.currentDiagnostics.result?.principleVariation
       );
 
       if (await timer.brrring()) {

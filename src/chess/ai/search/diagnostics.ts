@@ -1,8 +1,8 @@
-import { formatNumber } from '../../lib/formatter';
-import { Move } from '../types';
-import { moveString } from '../utils';
+import { formatNumber } from '../../../lib/formatter';
+import { Move } from '../../types';
+import { moveString } from '../../utils';
 import { TreeDiagnostics } from './tree-diagnostics';
-import { ISearchState } from './types';
+import { ISearchState } from '../types';
 
 type PlyCounter = {
   nodes: number;
@@ -99,7 +99,7 @@ export default class Diagnotics {
       : undefined;
 
     const principleVariation = state
-      ? state.pvTable.currentPV.map((move) => moveString(move)).reverse()
+      ? state.pvTable.currentPV.map((move) => moveString(move))
       : undefined;
 
     const result: DiagnosticsResult = {

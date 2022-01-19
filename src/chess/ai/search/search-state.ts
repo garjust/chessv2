@@ -1,11 +1,11 @@
 import { Remote } from 'comlink';
-import Timer from '../../lib/timer';
-import HistoryTable from '../engine/history-table';
-import PVTable from '../engine/pv-table';
-import TranspositionTable from '../engine/transposition-table';
-import { ITranspositionTable } from '../engine/types';
-import { Move, Position } from '../types';
-import { ISearchState, TranspositionTableEntry } from './types';
+import Timer from '../../../lib/timer';
+import HistoryTable from '../../engine/history-table';
+import PVTable from '../../engine/pv-table';
+import TranspositionTable from '../../engine/transposition-table';
+import { ITranspositionTable } from '../../engine/types';
+import { Move, Position } from '../../types';
+import { ISearchState, TranspositionTableEntry } from '../types';
 
 // Communication with web workers is slow, too slow to do at every node.
 //

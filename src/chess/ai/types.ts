@@ -3,7 +3,7 @@ import Timer from '../../lib/timer';
 import Engine from '../engine';
 import { IHistoryTable, IPVTable, ITranspositionTable } from '../engine/types';
 import { Move, MoveWithExtraData, Position } from '../types';
-import Diagnotics, { DiagnosticsResult } from './diagnostics';
+import Diagnotics, { DiagnosticsResult } from './search/diagnostics';
 
 // See documentation here https://www.chessprogramming.org/Node_Types.
 export enum NodeType {
@@ -65,14 +65,7 @@ export type SearchResult = {
   scores: { move: Move; score: number }[];
 };
 
-export type AvailableComputerVersions =
-  | 'v1'
-  | 'v2'
-  | 'v3'
-  | 'v4'
-  | 'v5'
-  | 'v6'
-  | 'v7';
+export type AvailableComputerVersions = 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7';
 
 export interface ChessComputer {
   nextMove(position: Position, timeout?: number): Promise<Move>;

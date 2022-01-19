@@ -2,7 +2,7 @@ import { ChessComputer } from './types';
 import { Move, Piece, PieceType, Position, Square } from '../types';
 import { pluck } from '../../lib/array';
 import Engine from '../engine';
-import Diagnotics from './diagnostics';
+import Diagnotics from './search/diagnostics';
 
 // Algorithm:
 // - pick a random move of a random piece type, because some pieces have move
