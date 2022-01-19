@@ -20,6 +20,7 @@ type StateData = Pick<
 export type DiagnosticsResult = {
   label: string;
   logString: string;
+  logStringLight: string;
   move: string;
   moveScores: MoveScores;
   totalNodes: number;
@@ -103,6 +104,9 @@ export default class Diagnotics {
       )}; (${((timing / totalNodes) * 1000).toPrecision(
         5
       )}μs/node); cuts=${formatNumber(totalCuts)}`,
+      logStringLight: `depth=${this.maxDepth}; timing=${formatNumber(
+        timing
+      )}ms; nodes=${formatNumber(totalNodes)}`,
       move: moveString(move),
       moveScores: scores.map(({ move, score }) => ({
         move: moveString(move),

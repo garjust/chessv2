@@ -3,7 +3,6 @@ import type Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
-// Alpha-beta negamax search with various optional features.
 export default class Search {
   context: Context;
 
@@ -11,6 +10,7 @@ export default class Search {
     this.context = context;
   }
 
+  // Alpha-beta negamax search with various optional features.
   async search(depth: number): Promise<SearchResult> {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
