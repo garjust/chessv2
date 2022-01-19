@@ -1,7 +1,6 @@
 import { Move } from '../types';
-import { IPVTable } from './types';
 
-export default class PVTable implements IPVTable {
+export default class PVTable {
   _table: Move[][] = [[]];
   _currentPV: Move[];
 
@@ -10,7 +9,7 @@ export default class PVTable implements IPVTable {
     this.nextIteration(maxDepth);
   }
 
-  nextIteration(maxDepth: number) {
+  nextIteration(maxDepth: number): void {
     this._currentPV = [...this._table[this._table.length - 1]].reverse();
     this._table = Array(maxDepth);
     for (let i = 0; i <= maxDepth; i++) {
@@ -18,15 +17,15 @@ export default class PVTable implements IPVTable {
     }
   }
 
-  set(depth: number, move: Move) {
+  set(depth: number, move: Move): void {
     this._table[depth] = [move, ...this._table[depth - 1]];
   }
 
-  get currentPV() {
+  get currentPV(): Move[] {
     return [...this._currentPV].reverse();
   }
 
-  pvMove(depth: number) {
+  pvMove(depth: number): Move | undefined {
     return this._currentPV[depth - 2];
   }
 }

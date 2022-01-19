@@ -2,7 +2,7 @@ import Engine from '../../engine';
 import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
 import SearchState from './search-state';
-import { ISearchState, SearchConfiguration } from './types';
+import { SearchConfiguration } from './types';
 
 // All search features disabled. A search with the default configuration
 // will be a plain negamax search.
@@ -18,7 +18,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
 export default class SearchContext {
   engine: Engine;
   diagnostics: Diagnostics;
-  state: ISearchState;
+  state: SearchState;
   configuration: SearchConfiguration = DEFAULT_CONFIGURATION;
 
   constructor(maxDepth: number, engine: Engine, diagnostics: Diagnostics) {

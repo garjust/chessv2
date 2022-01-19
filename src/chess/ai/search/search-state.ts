@@ -3,9 +3,8 @@ import Timer from '../../../lib/timer';
 import HistoryTable from '../../engine/history-table';
 import PVTable from '../../engine/pv-table';
 import TranspositionTable from '../../engine/transposition-table';
-import { ITranspositionTable } from '../../engine/types';
 import { Move, Position } from '../../types';
-import { ISearchState, TranspositionTableEntry } from './types';
+import { TranspositionTableEntry } from './types';
 
 // Communication with web workers is slow, too slow to do at every node.
 //
@@ -22,7 +21,7 @@ const MICROSECONDS_PER_NODE = 30;
 const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
-export default class SearchState implements ISearchState {
+export default class SearchState {
   killerMoves: Move[];
   historyTable: HistoryTable;
   pvTable: PVTable;
@@ -30,7 +29,7 @@ export default class SearchState implements ISearchState {
   timer: Remote<Timer> | null = null;
 
   moveExecutionOptions: {
-    table?: ITranspositionTable<TranspositionTableEntry>;
+    table?: TranspositionTable<TranspositionTableEntry>;
   };
 
   _timerSampleCounter = 0;

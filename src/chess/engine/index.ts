@@ -13,12 +13,8 @@ import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import {
-  AttackedSquares,
-  KingChecks,
-  Position,
-  ITranspositionTable,
-} from './types';
+import TranspositionTable from './transposition-table';
+import { AttackedSquares, KingChecks, Position } from './types';
 
 export default class Engine {
   _position: Position;
@@ -30,14 +26,14 @@ export default class Engine {
 
   applyMove(
     move: Move,
-    options: { table?: ITranspositionTable<unknown> } = {}
+    options: { table?: TranspositionTable<unknown> } = {}
   ): Piece | undefined {
     const result = applyMove(this._position, move, options);
     this._moveStack.push(result);
     return result.captured?.piece;
   }
 
-  undoLastMove(options: { table?: ITranspositionTable<unknown> } = {}) {
+  undoLastMove(options: { table?: TranspositionTable<unknown> } = {}) {
     const moveResult = this._moveStack.pop();
     if (moveResult) {
       undoMove(this._position, moveResult, options);

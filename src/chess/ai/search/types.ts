@@ -1,13 +1,5 @@
-import { Remote } from 'comlink';
-import Timer from '../../../lib/timer';
-import Engine from '../../engine';
-import {
-  IHistoryTable,
-  IPVTable,
-  ITranspositionTable,
-} from '../../engine/types';
+import { IHistoryTable } from '../../engine/types';
 import { Move, MoveWithExtraData } from '../../types';
-import Diagnotics from './diagnostics';
 
 // See documentation here https://www.chessprogramming.org/Node_Types.
 export enum NodeType {
@@ -29,18 +21,6 @@ export type TranspositionTableEntry = {
   fen: string; // TODO: remove eventually, just here for checking the hash function
   move?: Move;
 };
-
-export interface ISearchState {
-  killerMoves: Move[];
-  historyTable: IHistoryTable;
-  pvTable: IPVTable;
-  tTable: ITranspositionTable<TranspositionTableEntry>;
-  moveExecutionOptions: {
-    table?: ITranspositionTable<TranspositionTableEntry>;
-  };
-  timer: Remote<Timer> | null;
-  timeoutReached(): Promise<boolean>;
-}
 
 export type SearchConfiguration = {
   pruneNodes: boolean;

@@ -16,7 +16,8 @@ import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import { ITranspositionTable, KingChecks, KingPins, Position } from './types';
+import TranspositionTable from './transposition-table';
+import { KingChecks, KingPins, Position } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -48,7 +49,7 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
 export const applyMove = (
   position: Position,
   move: Move,
-  { table }: { table?: ITranspositionTable<unknown> }
+  { table }: { table?: TranspositionTable<unknown> }
 ): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
@@ -247,7 +248,7 @@ export const applyMove = (
 export const undoMove = (
   position: Position,
   result: MoveResult,
-  { table }: { table?: ITranspositionTable<unknown> }
+  { table }: { table?: TranspositionTable<unknown> }
 ): void => {
   const { move } = result;
   let piece = position.pieces.get(move.to);

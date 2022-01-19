@@ -1,8 +1,8 @@
 import { formatNumber } from '../../../lib/formatter';
 import { Move } from '../../types';
 import { moveString } from '../../utils';
+import SearchState from './search-state';
 import { TreeDiagnostics } from './tree-diagnostics';
-import { ISearchState } from './types';
 
 type PlyCounter = {
   nodes: number;
@@ -22,7 +22,7 @@ export type DiagnosticsResult = {
   depth: number;
   timing: number;
   state?: Pick<
-    ISearchState,
+    SearchState,
     'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'
   >;
   principleVariation?: string[];
@@ -72,7 +72,7 @@ export default class Diagnotics {
   recordResult(
     move: Move,
     moveScores: { move: Move; score: number }[],
-    state?: ISearchState
+    state?: SearchState
   ) {
     const timing = Date.now() - this.start;
     const totalNodes = Object.values(this.plyCounters).reduce(
@@ -85,10 +85,7 @@ export default class Diagnotics {
     );
 
     const stateData:
-      | Pick<
-          ISearchState,
-          'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'
-        >
+      | Pick<SearchState, 'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'>
       | undefined = state
       ? {
           historyTable: state.historyTable,

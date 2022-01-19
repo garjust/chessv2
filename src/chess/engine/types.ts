@@ -1,9 +1,7 @@
 import {
   AttackObject,
-  CastlingSide,
   Color,
   Move,
-  Piece,
   Pin,
   Position as ExternalPosition,
   Square,
@@ -13,25 +11,6 @@ import {
 export interface IHistoryTable {
   increment(move: Move, depth: number): void;
   get(move: Move): number;
-}
-
-export interface IPVTable {
-  set(depth: number, move: Move): void;
-  nextIteration(maxDepth: number): void;
-  currentPV: Move[];
-  pvMove(depth: number): Move | undefined;
-}
-
-export interface ITranspositionTable<T> {
-  set(value: T): void;
-  get(): T | undefined;
-  newHash(position: ExternalPosition): void;
-  currentHash: [number, number];
-  setCurrentHash(x: number, y: number): void;
-
-  updateSquareOccupancy(square: Square, piece: Piece): void;
-  updateTurn(): void;
-  updateCastling(color: Color, side: CastlingSide): void;
 }
 
 export type KingSquares = {
