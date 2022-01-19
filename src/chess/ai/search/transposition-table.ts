@@ -1,4 +1,4 @@
-import { ZobristKey } from './types';
+import { ZobristKey } from '../../engine/types';
 
 export default class TranspositionTable<T> {
   _map;
