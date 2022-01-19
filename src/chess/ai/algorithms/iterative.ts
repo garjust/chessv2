@@ -90,10 +90,6 @@ export default class Iterative implements ChessComputer {
         this.diagnostics?.result?.logStringLight,
         this.diagnostics?.result?.principleVariation
       );
-
-      if (await timer.brrring()) {
-        break;
-      }
     }
 
     timerCleanup();
