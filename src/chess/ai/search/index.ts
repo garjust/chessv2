@@ -65,6 +65,21 @@ const searchNodes = async (
     throw new TimeoutError();
   }
 
+  const cacheHit = context.state.tTable.get();
+
+  // If we found this position in the TTable and it was a CUT node then we can
+  // test against beta before move generation.
+  if (
+    cacheHit &&
+    cacheHit.nodeType === NodeType.Cut &&
+    cacheHit.score >= beta &&
+    context.configuration.pruneNodes
+  ) {
+    context.diagnostics.cut(depth);
+    console.log('TTable cut');
+    return cacheHit.score;
+  }
+
   if (depth === 0) {
     if (context.configuration.quiescenceSearch) {
       return quiescenceSearch(alpha, beta, context);
