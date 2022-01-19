@@ -8,11 +8,6 @@ import {
   SquareControlObject,
 } from '../types';
 
-export interface IHistoryTable {
-  increment(move: Move, depth: number): void;
-  get(move: Move): number;
-}
-
 export type KingSquares = {
   [Color.White]?: Square;
   [Color.Black]?: Square;

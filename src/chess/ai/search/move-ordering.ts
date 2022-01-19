@@ -1,9 +1,9 @@
 import { sort } from 'fast-sort';
 import { PieceValue } from '../../engine/evaluation';
-import { IHistoryTable } from '../../engine/types';
 import { squareValueDiff } from '../../lib/heatmaps';
 import { Move, MoveWithExtraData } from '../../types';
 import { moveEquals } from '../../utils';
+import HistoryTable from './history-table';
 
 const MAX = Number.MAX_SAFE_INTEGER;
 
@@ -12,7 +12,7 @@ const moveWeight = (
   tableMove?: Move,
   pvMove?: Move,
   killerMove?: Move,
-  historyTable?: IHistoryTable
+  historyTable?: HistoryTable
 ): number => {
   let n = 0;
 
@@ -52,7 +52,7 @@ export const orderMoves = (
   tableMove?: Move,
   pvMove?: Move,
   killerMove?: Move,
-  historyTable?: IHistoryTable
+  historyTable?: HistoryTable
 ): MoveWithExtraData[] => {
   const sortBy = (move: MoveWithExtraData) => {
     if (!move.weight) {

@@ -1,7 +1,6 @@
-import { Move } from '../types';
-import { IHistoryTable } from './types';
+import { Move } from '../../types';
 
-export default class HistoryTable implements IHistoryTable {
+export default class HistoryTable {
   readonly _table: number[][];
 
   constructor() {
@@ -14,11 +13,11 @@ export default class HistoryTable implements IHistoryTable {
     }
   }
 
-  get(move: Move) {
+  get(move: Move): number {
     return this._table[move.from][move.to];
   }
 
-  increment(move: Move, depth: number) {
+  increment(move: Move, depth: number): void {
     this._table[move.from][move.to] += depth * depth;
   }
 }

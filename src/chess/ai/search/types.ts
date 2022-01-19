@@ -1,5 +1,4 @@
-import { IHistoryTable } from '../../engine/types';
-import { Move, MoveWithExtraData } from '../../types';
+import { Move } from '../../types';
 
 // Object returned from the search function
 export type SearchResult = {
