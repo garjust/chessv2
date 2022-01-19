@@ -14,26 +14,41 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   moveOrdering: false,
   moveOrderingHeuristics: {
     killerMove: false,
-    historyMove: false,
+    historyTable: false,
     pvMove: false,
     hashMove: false,
   },
   quiescenceSearch: false,
 };
 
+// The context object contains any information, state, or other objects
+// used by the search algorithm. This includes configuration for how the
+// search should operate, a pointer to the underlying chess engine, various
+// state tables, etc.
+//
+// The context object also provides an entry point to running the search
+// algorithm which will perform some extra work updating state, extracting the
+// PV from the state, etc.
 export default class Context {
-  label: string;
-  engine: Engine;
-  state: State;
-  configuration: SearchConfiguration = DEFAULT_CONFIGURATION;
+  readonly label: string;
+  readonly engine: Engine;
+  readonly configuration: SearchConfiguration;
+  readonly state: State;
   diagnostics?: Diagnostics;
 
-  constructor(label: string, maxDepth: number, engine: Engine) {
+  constructor(
+    label: string,
+    maxDepth: number,
+    engine: Engine,
+    config: Partial<SearchConfiguration> = {}
+  ) {
     this.label = label;
     this.engine = engine;
     this.state = new State(engine.position, maxDepth);
+    this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
   }
 
+  // Run a search with diagnostics.
   async withDiagnostics(
     maxDepth: number
   ): Promise<[SearchResult, Diagnostics]> {
@@ -77,7 +92,7 @@ export default class Context {
         this.configuration.moveOrderingHeuristics.killerMove
           ? this.state.killerMoves[currentDepth]
           : undefined,
-        this.configuration.moveOrderingHeuristics.historyMove
+        this.configuration.moveOrderingHeuristics.historyTable
           ? this.state.historyTable
           : undefined
       );

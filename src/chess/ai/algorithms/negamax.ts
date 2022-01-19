@@ -15,7 +15,6 @@ export default class Negamax implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-
     this.context = new Context(this.label, MAX_DEPTH, this.engine);
   }
 

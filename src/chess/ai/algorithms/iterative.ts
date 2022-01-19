@@ -33,17 +33,17 @@ export default class Iterative implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-
-    this.context = new Context(this.label, MAX_DEPTH, this.engine);
-    this.context.configuration.pruneNodes = true;
-    this.context.configuration.quiescenceSearch = true;
-    this.context.configuration.moveOrdering = true;
-    this.context.configuration.moveOrderingHeuristics = {
-      killerMove: true,
-      historyMove: true,
-      pvMove: true,
-      hashMove: true,
-    };
+    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+      pruneNodes: true,
+      quiescenceSearch: true,
+      moveOrdering: true,
+      moveOrderingHeuristics: {
+        killerMove: true,
+        historyTable: true,
+        pvMove: true,
+        hashMove: true,
+      },
+    });
   }
 
   get diagnosticsResult() {

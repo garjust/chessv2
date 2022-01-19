@@ -19,10 +19,10 @@ export default class MoveOrdering implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-
-    this.context = new Context(this.label, MAX_DEPTH, this.engine);
-    this.context.configuration.pruneNodes = true;
-    this.context.configuration.moveOrdering = true;
+    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+      pruneNodes: true,
+      moveOrdering: true,
+    });
   }
 
   get diagnosticsResult() {

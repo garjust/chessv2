@@ -18,9 +18,9 @@ export default class AlphaBeta implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-
-    this.context = new Context(this.label, MAX_DEPTH, this.engine);
-    this.context.configuration.pruneNodes = true;
+    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+      pruneNodes: true,
+    });
   }
 
   get diagnosticsResult() {
