@@ -44,7 +44,7 @@ export default class Context {
   ) {
     this.label = label;
     this.engine = engine;
-    this.state = new State(engine.position, maxDepth);
+    this.state = new State(maxDepth);
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
   }
 
@@ -62,7 +62,6 @@ export default class Context {
   async run(maxDepth: number) {
     // Before executing a search update state.
     this.state.pvTable = new PVTable(maxDepth);
-    this.state.tTable.newHash(this.engine.position);
 
     const result = await new Search(this).search(maxDepth);
 
@@ -84,7 +83,7 @@ export default class Context {
       return orderMoves(
         moves,
         this.configuration.moveOrderingHeuristics.hashMove
-          ? this.state.tTable.get()?.move
+          ? this.state.tTable.get(this.engine.zobrist)?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
           ? this.state.pvMove(currentDepth)

@@ -25,10 +25,6 @@ export default class State {
   readonly killerMoves: Move[];
   readonly historyTable: HistoryTable;
   readonly tTable: TranspositionTable<TranspositionTableEntry>;
-  // Pre-construct a single options object for move execution.
-  readonly moveExecutionOptions: {
-    table?: TranspositionTable<TranspositionTableEntry>;
-  };
 
   pvTable: PVTable;
   currentPV: Move[] = [];
@@ -36,14 +32,10 @@ export default class State {
 
   _timerSampleCounter = 0;
 
-  constructor(position: Position, maxDepth: number) {
+  constructor(maxDepth: number) {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
-    this.tTable = new TranspositionTable(position);
-    this.moveExecutionOptions = {
-      table: this.tTable,
-    };
-
+    this.tTable = new TranspositionTable();
     this.pvTable = new PVTable(maxDepth);
   }
 

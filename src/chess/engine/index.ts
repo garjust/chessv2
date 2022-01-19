@@ -9,34 +9,33 @@ import {
 } from '../types';
 import { AttackMap } from './attacks';
 import { findChecksOnKings } from './checks';
+import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import TranspositionTable from './transposition-table';
-import { AttackedSquares, KingChecks, Position } from './types';
+import { AttackedSquares, KingChecks, Position, ZobristKey } from './types';
 
 export default class Engine {
   _position: Position;
   _moveStack: MoveResult[] = [];
+  _currentZobrist: CurrentZobrist;
 
   constructor(position: ExternalPosition = parseFEN(BLANK_POSITION_FEN)) {
     this._position = copyToInternal(position);
+    this._currentZobrist = new CurrentZobrist(position);
   }
 
-  applyMove(
-    move: Move,
-    options: { table?: TranspositionTable<unknown> } = {}
-  ): Piece | undefined {
-    const result = applyMove(this._position, move, options);
+  applyMove(move: Move): Piece | undefined {
+    const result = applyMove(this._position, move, this._currentZobrist);
     this._moveStack.push(result);
     return result.captured?.piece;
   }
 
-  undoLastMove(options: { table?: TranspositionTable<unknown> } = {}) {
+  undoLastMove() {
     const moveResult = this._moveStack.pop();
     if (moveResult) {
-      undoMove(this._position, moveResult, options);
+      undoMove(this._position, moveResult, this._currentZobrist);
     } else {
       throw Error('no last move to undo');
     }
@@ -73,7 +72,12 @@ export default class Engine {
 
   set position(position: ExternalPosition) {
     this._position = copyToInternal(position);
+    this._currentZobrist = new CurrentZobrist(position);
     this._moveStack = [];
+  }
+
+  get zobrist(): ZobristKey {
+    return this._currentZobrist.key;
   }
 
   get checks(): KingChecks {

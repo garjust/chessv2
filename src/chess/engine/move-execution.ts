@@ -14,10 +14,10 @@ import {
 } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
+import CurrentZobrist from './current-zobrist';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import TranspositionTable from './transposition-table';
-import { KingChecks, KingPins, Position } from './types';
+import { KingChecks, KingPins, Position, ZobristKey } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -29,7 +29,7 @@ export type MoveResult = {
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
     checks: KingChecks;
-    zobrist?: [number, number];
+    zobrist?: ZobristKey;
   };
 };
 
@@ -49,7 +49,7 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
 export const applyMove = (
   position: Position,
   move: Move,
-  { table }: { table?: TranspositionTable<unknown> }
+  currentZobrist: CurrentZobrist
 ): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
@@ -78,7 +78,7 @@ export const applyMove = (
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
       checks: { ...position.checks },
-      zobrist: table?.currentHash,
+      zobrist: currentZobrist.key,
     },
   };
 
@@ -100,8 +100,8 @@ export const applyMove = (
   pieces.delete(move.from);
   pieces.set(move.to, piece);
 
-  table?.updateSquareOccupancy(move.from, piece);
-  table?.updateSquareOccupancy(move.to, piece);
+  currentZobrist.updateSquareOccupancy(move.from, piece);
+  currentZobrist.updateSquareOccupancy(move.to, piece);
 
   if (captured) {
     // If the captured piece is a rook we need to update castling state.
@@ -147,11 +147,11 @@ export const applyMove = (
 
     // The king moved, no more castling.
     if (position.castlingAvailability[piece.color].queenside) {
-      table?.updateCastling(piece.color, 'queenside');
+      currentZobrist.updateCastling(piece.color, 'queenside');
       position.castlingAvailability[piece.color].queenside = false;
     }
     if (position.castlingAvailability[piece.color].kingside) {
-      table?.updateCastling(piece.color, 'kingside');
+      currentZobrist.updateCastling(piece.color, 'kingside');
       position.castlingAvailability[piece.color].kingside = false;
     }
 
@@ -167,8 +167,8 @@ export const applyMove = (
       const rookToSquare = piece.color === Color.White ? 3 : 59;
       position.pieces.delete(rookFromSquare);
       position.pieces.set(rookToSquare, rook);
-      table?.updateSquareOccupancy(rookFromSquare, rook);
-      table?.updateSquareOccupancy(rookToSquare, rook);
+      currentZobrist.updateSquareOccupancy(rookFromSquare, rook);
+      currentZobrist.updateSquareOccupancy(rookToSquare, rook);
     } else if (move.from - move.to === -2) {
       const rook = {
         color: piece.color,
@@ -180,8 +180,8 @@ export const applyMove = (
       const rookToSquare = piece.color === Color.White ? 5 : 61;
       position.pieces.delete(rookFromSquare);
       position.pieces.set(rookToSquare, rook);
-      table?.updateSquareOccupancy(rookFromSquare, rook);
-      table?.updateSquareOccupancy(rookToSquare, rook);
+      currentZobrist.updateSquareOccupancy(rookFromSquare, rook);
+      currentZobrist.updateSquareOccupancy(rookToSquare, rook);
     }
   }
 
@@ -189,12 +189,12 @@ export const applyMove = (
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
       if (position.castlingAvailability[piece.color].queenside) {
-        table?.updateCastling(piece.color, 'queenside');
+        currentZobrist.updateCastling(piece.color, 'queenside');
         position.castlingAvailability[piece.color].queenside = false;
       }
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
       if (position.castlingAvailability[piece.color].kingside) {
-        table?.updateCastling(piece.color, 'kingside');
+        currentZobrist.updateCastling(piece.color, 'kingside');
         position.castlingAvailability[piece.color].kingside = false;
       }
     }
@@ -228,9 +228,12 @@ export const applyMove = (
   // );
 
   if (result.captured) {
-    table?.updateSquareOccupancy(result.captured.square, result.captured.piece);
+    currentZobrist.updateSquareOccupancy(
+      result.captured.square,
+      result.captured.piece
+    );
   }
-  table?.updateTurn();
+  currentZobrist.updateTurn();
 
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
@@ -248,7 +251,7 @@ export const applyMove = (
 export const undoMove = (
   position: Position,
   result: MoveResult,
-  { table }: { table?: TranspositionTable<unknown> }
+  currentZobrist: CurrentZobrist
 ): void => {
   const { move } = result;
   let piece = position.pieces.get(move.to);
@@ -298,7 +301,7 @@ export const undoMove = (
   // position.attackedSquares[Color.Black].undoChangeset();
 
   if (result.previousState.zobrist) {
-    table?.setCurrentHash(...result.previousState.zobrist);
+    currentZobrist.key = result.previousState.zobrist;
   }
 
   // Undo rest of the position state.

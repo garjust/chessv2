@@ -29,15 +29,12 @@ export default class Search {
     }
 
     for (const move of moves) {
-      this.context.engine.applyMove(
-        move,
-        this.context.state.moveExecutionOptions
-      );
+      this.context.engine.applyMove(move);
       const result = {
         move,
         score: -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1)),
       };
-      this.context.engine.undoLastMove(this.context.state.moveExecutionOptions);
+      this.context.engine.undoLastMove();
 
       scores.push(result);
 
@@ -48,7 +45,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set({
+    this.context.state.tTable.set(this.context.engine.zobrist, {
       nodeType: NodeType.PV,
       depth,
       score: alpha,
@@ -73,7 +70,7 @@ export default class Search {
       throw new TimeoutError();
     }
 
-    const cacheHit = this.context.state.tTable.get();
+    const cacheHit = this.context.state.tTable.get(this.context.engine.zobrist);
 
     // If we found this position in the TTable and it was a CUT node then we can
     // test against beta before move generation.
@@ -106,12 +103,9 @@ export default class Search {
     }
 
     for (const move of moves) {
-      this.context.engine.applyMove(
-        move,
-        this.context.state.moveExecutionOptions
-      );
+      this.context.engine.applyMove(move);
       const x = -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1));
-      this.context.engine.undoLastMove(this.context.state.moveExecutionOptions);
+      this.context.engine.undoLastMove();
 
       if (x > alpha) {
         nodeType = NodeType.PV;
@@ -135,7 +129,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set({
+    this.context.state.tTable.set(this.context.engine.zobrist, {
       nodeType,
       depth,
       score: alpha,
@@ -168,12 +162,9 @@ export default class Search {
     );
 
     for (const move of moves) {
-      this.context.engine.applyMove(
-        move,
-        this.context.state.moveExecutionOptions
-      );
+      this.context.engine.applyMove(move);
       const x = -1 * this.quiescenceSearch(beta * -1, alpha * -1);
-      this.context.engine.undoLastMove(this.context.state.moveExecutionOptions);
+      this.context.engine.undoLastMove();
 
       if (x > alpha) {
         alpha = x;

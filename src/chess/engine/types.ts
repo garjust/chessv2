@@ -8,6 +8,9 @@ import {
   SquareControlObject,
 } from '../types';
 
+// Use two 32bit numbers for the zobrist key maintained by the engine.
+export type ZobristKey = [number, number];
+
 export type KingSquares = {
   [Color.White]?: Square;
   [Color.Black]?: Square;

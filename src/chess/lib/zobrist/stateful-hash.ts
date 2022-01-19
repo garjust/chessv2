@@ -49,9 +49,6 @@ export class StatefulHash64 {
   get hash() {
     return this._hash;
   }
-  newHash(position: Position) {
-    this._hash = hash64(position, this._zobristNumbers);
-  }
 
   updateSquareOccupancy(square: Square, piece: Piece) {
     this._hash ^=
