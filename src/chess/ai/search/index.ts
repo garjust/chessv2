@@ -1,4 +1,3 @@
-import { formatPosition } from '../../lib/fen';
 import { Move } from '../../types';
 import SearchContext from './search-context';
 import TimeoutError from './timeout-error';
@@ -54,7 +53,6 @@ export const search = async (
       nodeType: NodeType.PV,
       depth,
       score: alpha,
-      fen: formatPosition(context.engine.position),
       move: bestMove,
     });
   }
@@ -134,7 +132,6 @@ const searchNodes = async (
       nodeType,
       depth,
       score: alpha,
-      fen: formatPosition(context.engine.position),
       move: nodeMove,
     });
   }

@@ -2,7 +2,7 @@ import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
-import { search } from '../search/search';
+import { search } from '../search';
 import SearchContext from '../search/search-context';
 
 const DEPTH = 4;

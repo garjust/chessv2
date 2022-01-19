@@ -18,7 +18,6 @@ export type TranspositionTableEntry = {
   nodeType: NodeType;
   depth: number;
   score: number;
-  fen: string; // TODO: remove eventually, just here for checking the hash function
   move?: Move;
 };
 
