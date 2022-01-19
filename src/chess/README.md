@@ -1,20 +1,22 @@
 # chess
 
-- `ai/` Computer implementations, each will rely on a chess engines
-- `engines/` Various chess engines. `default` is used by the game workflow
-- `lib/` Reusable chess libraries across the whole application and multiple engines
-- `ui/` React UI for the chess game
-- `workers/` WebWorker scripts for multi-threading
-- `workflow/` The workflow which controls the game
+- `chess/` The chess game
+  - `ai/` Search algorithm implementations
+    - `algorithms/` Each individual algorithm and configuration
+    - `search/` The actual search function and supporting code
+  - `engine/` The core chess engine. Supports functionality needed for humans to play a game of chess (move gen, move execution)
+  - `lib/` Reusable chess libraries across the whole application
+  - `ui/` React UI for the chess game
+  - `workers/` WebWorker scripts for multi-threading
+  - `workflow/` The state workflow which controls the game ui
+- `lib/`
+  - `workflow/` Workflow core library
+  - `workflow-react/` Integration of the core workflow library with react
 
 ## TODO
 
-- King pinned to square behind it, now allowing king to move to square being x-ray attacked by checking piece with attack moves scheme
-`rnbqk1nr/pppp1ppp/8/4p3/1b1P4/8/PPPKPPPP/RNBQ1BNR/ w kQ - 2 3`
-
 - Decrease weight of moves to squares attacked by pawns
-- Profile attack-based move generation
-- Transposition table
+- Implement attack-based move generation as an option (instead of commenting code repeatedly)
 - Opening book (Kevin will fried liver me)
 - Evaluation of checkmates (M1..N) and actually able to checkmate
 - Evaluation likes pawn cover for king
@@ -23,6 +25,8 @@
 - Cut% is incorrect because v3 visits more nodes than there are moves
 - Debug black mate position, engine should find it at depth 5
 - Zobrish hash en passant square
-- Separate StatefulHash from TranspositionTable so I _could_ lookup in it if I wanted arbit
-- Clean up computer features
 
+## Bug Positions
+
+### `rnbqk1nr/pppp1ppp/8/4p3/1b1P4/8/PPPKPPPP/RNBQ1BNR/ w kQ - 2 3`
+King pinned to square behind it, now allowing king to move to square being x-ray attacked by checking piece with *attack moves* scheme
