@@ -5,7 +5,7 @@ import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
 
-const DEPTH = 4;
+const MAX_DEPTH = 4;
 
 // The most basic tree search algorithm (minimax) but optimized to a single
 // recursive function.
@@ -16,9 +16,9 @@ export default class Negamax implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
 
-    this.context = new Context(DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(MAX_DEPTH, this.engine, this.diagnostics);
   }
 
   get diagnosticsResult() {
@@ -30,7 +30,7 @@ export default class Negamax implements ChessComputer {
   }
 
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -38,7 +38,7 @@ export default class Negamax implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = await search(DEPTH, this.context);
+    const { scores, move } = await search(MAX_DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;

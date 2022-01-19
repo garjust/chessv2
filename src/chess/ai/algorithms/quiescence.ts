@@ -5,7 +5,7 @@ import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
 
-const DEPTH = 4;
+const MAX_DEPTH = 4;
 
 // Add a quiescence search to the leaf nodes of the tree search instead of
 // immediately evaluating the leaf node.
@@ -20,9 +20,9 @@ export default class Quiescence implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
 
-    this.context = new Context(DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(MAX_DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
     this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
@@ -38,7 +38,7 @@ export default class Quiescence implements ChessComputer {
   }
 
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -46,7 +46,7 @@ export default class Quiescence implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = await search(DEPTH, this.context);
+    const { scores, move } = await search(MAX_DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;

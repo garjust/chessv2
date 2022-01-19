@@ -5,7 +5,7 @@ import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
 
-const DEPTH = 4;
+const MAX_DEPTH = 4;
 
 // A step up from the negamax algorithm, this is the classic tree search
 // algorithm used for games like chess.
@@ -19,9 +19,9 @@ export default class AlphaBeta implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
 
-    this.context = new Context(DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(MAX_DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
   }
 
@@ -34,7 +34,7 @@ export default class AlphaBeta implements ChessComputer {
   }
 
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -42,7 +42,7 @@ export default class AlphaBeta implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = await search(DEPTH, this.context);
+    const { scores, move } = await search(MAX_DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;

@@ -5,7 +5,7 @@ import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
 import Context from '../search/context';
 
-const DEPTH = 4;
+const MAX_DEPTH = 4;
 
 // Add move ordering to the alpha-beta tree search. Searching better moves
 // earlier at a particular node allows alpha-beta to prune more branches of
@@ -20,9 +20,9 @@ export default class MoveOrdering implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
 
-    this.context = new Context(DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(MAX_DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
     this.context.configuration.moveOrdering = true;
   }
@@ -36,7 +36,7 @@ export default class MoveOrdering implements ChessComputer {
   }
 
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics(this.label, DEPTH);
+    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -44,7 +44,7 @@ export default class MoveOrdering implements ChessComputer {
     this.resetDiagnostics();
 
     this.engine.position = position;
-    const { scores, move } = await search(DEPTH, this.context);
+    const { scores, move } = await search(MAX_DEPTH, this.context);
 
     this.diagnostics.recordResult(move, scores);
     return move;
