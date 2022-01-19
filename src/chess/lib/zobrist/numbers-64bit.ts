@@ -29,10 +29,7 @@ const numbersForSquares = () => {
 };
 
 export const makeNumbers = (): ZobristNumbers<bigint> => ({
-  [Type.Turn]: {
-    [Color.White]: zobristNumber(),
-    [Color.Black]: zobristNumber(),
-  },
+  [Type.Turn]: zobristNumber(),
   [Type.PieceSquare]: {
     [Color.White]: numbersForSquares(),
     [Color.Black]: numbersForSquares(),

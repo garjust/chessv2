@@ -1,3 +1,4 @@
+import { formatBits } from '../../lib/bits';
 import { makeNumbers } from '../lib/zobrist/numbers-32bit';
 import { StatefulHash } from '../lib/zobrist/stateful-hash';
 import { CastlingSide, Color, Piece, Position, Square } from '../types';
@@ -24,14 +25,28 @@ export default class TranspositionTable<T> {
     return this._map.get(this._hashX.hash)?.get(this._hashY.hash);
   }
 
+  newHash(position: Position) {
+    this._hashX.hash = position;
+    this._hashY.hash = position;
+  }
+
+  get currentHash(): [number, number] {
+    return [this._hashX.hash, this._hashY.hash];
+  }
+
+  setCurrentHash(x: number, y: number) {
+    this._hashX.hash = x;
+    this._hashY.hash = y;
+  }
+
   updateSquareOccupancy(square: Square, piece: Piece) {
     this._hashX.updateSquareOccupancy(square, piece);
     this._hashY.updateSquareOccupancy(square, piece);
   }
 
-  updateTurn(color: Color) {
-    this._hashX.updateTurn(color);
-    this._hashY.updateTurn(color);
+  updateTurn() {
+    this._hashX.updateTurn();
+    this._hashY.updateTurn();
   }
 
   updateCastling(color: Color, side: CastlingSide) {

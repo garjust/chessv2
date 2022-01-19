@@ -1,6 +1,8 @@
+import { formatPosition } from '../lib/fen';
 import { Move } from '../types';
+import { moveString } from '../utils';
 import TimeoutError from './timeout-error';
-import { ISearchContext, SearchResult } from './types';
+import { ISearchContext, NodeType, SearchResult } from './types';
 
 // Alpha-beta negamax search.
 //
@@ -19,8 +21,9 @@ export const search = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
+    context.state.tTable.get()?.move,
+    context.state.pvTable.pvMove(depth),
     context.state.killerMoves[depth],
-    context.state.lastPV[depth],
     context.state.historyTable
   );
 
@@ -29,13 +32,13 @@ export const search = async (
   }
 
   for (const move of moves) {
-    context.engine.applyMove(move);
+    context.engine.applyMove(move, context.state.moveExecutionOptions);
     const result = {
       move,
       score:
         -1 * (await searchNodes(depth - 1, beta * -1, alpha * -1, context)),
     };
-    context.engine.undoLastMove();
+    context.engine.undoLastMove(context.state.moveExecutionOptions);
 
     scores.push(result);
 
@@ -44,6 +47,16 @@ export const search = async (
       alpha = result.score;
       context.state.pvTable.set(depth, result.move);
     }
+  }
+
+  if (context.configuration.transpositionTable) {
+    context.state.tTable.set({
+      nodeType: NodeType.PV,
+      depth,
+      score: alpha,
+      fen: formatPosition(context.engine.position),
+      move: bestMove,
+    });
   }
 
   return { scores, move: bestMove };
@@ -57,6 +70,9 @@ const searchNodes = async (
   context: ISearchContext
 ): Promise<number> => {
   context.diagnostics.nodeVisit(depth);
+
+  let nodeType = NodeType.All;
+  let nodeMove: Move | undefined;
 
   if (await context.state.timeoutReached()) {
     throw new TimeoutError();
@@ -72,26 +88,35 @@ const searchNodes = async (
 
   const moves = context.configuration.orderMoves(
     context.engine.generateMoves(),
+    context.state.tTable.get()?.move,
+    context.state.pvTable.pvMove(depth),
     context.state.killerMoves[depth],
-    context.state.lastPV[depth],
     context.state.historyTable
   );
 
+  // If there are no moves at this node then it is checkmate.
   if (moves.length === 0) {
     return -Infinity;
   }
 
   for (const move of moves) {
-    context.engine.applyMove(move);
+    context.engine.applyMove(move, context.state.moveExecutionOptions);
     const x =
       -1 * (await searchNodes(depth - 1, beta * -1, alpha * -1, context));
-    context.engine.undoLastMove();
+    context.engine.undoLastMove(context.state.moveExecutionOptions);
 
     if (x > alpha) {
-      alpha = x;
+      nodeType = NodeType.PV;
+      nodeMove = move;
       context.state.pvTable.set(depth, move);
+
+      alpha = x;
     }
     if (context.configuration.pruneNodes && alpha >= beta) {
+      context.diagnostics.cut(depth);
+      nodeType = NodeType.Cut;
+      nodeMove = move;
+
       if (context.configuration.killerMoveHeuristic && !move.attack) {
         // New killer move for this depth.
         context.state.killerMoves[depth] = move;
@@ -99,9 +124,19 @@ const searchNodes = async (
       if (context.configuration.historyMoveHeuristic) {
         context.state.historyTable.increment(move, depth);
       }
-      context.diagnostics.cut(depth);
+
       break;
     }
+  }
+
+  if (context.configuration.transpositionTable) {
+    context.state.tTable.set({
+      nodeType,
+      depth,
+      score: alpha,
+      fen: formatPosition(context.engine.position),
+      move: nodeMove,
+    });
   }
 
   return alpha;
@@ -120,6 +155,7 @@ export const quiescenceSearch = (
   context.diagnostics.quiescenceNodeVisit();
 
   const noMove = context.engine.evaluateNormalized();
+
   if (noMove > alpha) {
     alpha = noMove;
   }
@@ -133,9 +169,9 @@ export const quiescenceSearch = (
   );
 
   for (const move of moves) {
-    context.engine.applyMove(move);
+    context.engine.applyMove(move, context.state.moveExecutionOptions);
     const x = -1 * quiescenceSearch(beta * -1, alpha * -1, context);
-    context.engine.undoLastMove();
+    context.engine.undoLastMove(context.state.moveExecutionOptions);
 
     if (x > alpha) {
       alpha = x;

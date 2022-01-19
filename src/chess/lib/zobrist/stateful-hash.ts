@@ -11,8 +11,16 @@ export class StatefulHash {
     this._hash = hash(position, this._zobristNumbers);
   }
 
-  get hash() {
+  get hash(): number {
     return this._hash;
+  }
+
+  set hash(value: Position | number) {
+    if (typeof value === 'number') {
+      this._hash = value;
+    } else {
+      this._hash = hash(value, this._zobristNumbers);
+    }
   }
 
   updateSquareOccupancy(square: Square, piece: Piece) {
@@ -20,8 +28,8 @@ export class StatefulHash {
       this._zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  updateTurn(color: Color) {
-    this._hash ^= this._zobristNumbers[Type.Turn][color];
+  updateTurn() {
+    this._hash ^= this._zobristNumbers[Type.Turn];
   }
 
   updateCastling(color: Color, side: CastlingSide) {
@@ -41,14 +49,17 @@ export class StatefulHash64 {
   get hash() {
     return this._hash;
   }
+  newHash(position: Position) {
+    this._hash = hash64(position, this._zobristNumbers);
+  }
 
   updateSquareOccupancy(square: Square, piece: Piece) {
     this._hash ^=
       this._zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  updateTurn(color: Color) {
-    this._hash ^= this._zobristNumbers[Type.Turn][color];
+  updateTurn() {
+    this._hash ^= this._zobristNumbers[Type.Turn];
   }
 
   updateCastling(color: Color, side: CastlingSide) {

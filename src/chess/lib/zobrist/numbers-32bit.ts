@@ -21,10 +21,7 @@ const numbersForSquares = () => {
 };
 
 export const makeNumbers = (): ZobristNumbers<number> => ({
-  [Type.Turn]: {
-    [Color.White]: zobristNumber(),
-    [Color.Black]: zobristNumber(),
-  },
+  [Type.Turn]: zobristNumber(),
   [Type.PieceSquare]: {
     [Color.White]: numbersForSquares(),
     [Color.Black]: numbersForSquares(),

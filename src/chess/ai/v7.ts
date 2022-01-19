@@ -8,8 +8,9 @@ import SearchContext from './search-context';
 import { loadTimer } from '../workers';
 import TimeoutError from './timeout-error';
 import PVTable from '../engine/pv-table';
+import { moveString } from '../utils';
 
-const MAX_DEPTH = 5;
+const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 
@@ -34,6 +35,7 @@ export default class v7 implements ChessComputer {
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;
     this.context.configuration.historyMoveHeuristic = true;
+    this.context.configuration.transpositionTable = true;
     this.context.configuration.orderMoves = orderMoves;
   }
 
@@ -60,6 +62,7 @@ export default class v7 implements ChessComputer {
     this.context.state.timer = depthTimer;
 
     this.engine.position = position;
+    this.context.state.tTable.newHash(position);
     let currentResult: SearchResult = {
       move: { from: -1, to: -1 },
       scores: [],
@@ -72,8 +75,7 @@ export default class v7 implements ChessComputer {
 
       // PVTable needs to be reset each iteration, extract the prior PV before
       // the reset.
-      this.context.state.lastPV = this.context.state.pvTable.pv;
-      this.context.state.pvTable = new PVTable(i);
+      this.context.state.pvTable.nextIteration(i);
 
       try {
         currentResult = await search(i, this.context);
@@ -95,7 +97,8 @@ export default class v7 implements ChessComputer {
       );
       console.log(
         '[intermediate result]:',
-        this.currentDiagnostics.result?.logString
+        this.currentDiagnostics.result?.logString,
+        this.context.state.pvTable.currentPV.map((move) => moveString(move))
       );
 
       if (await timer.brrring()) {

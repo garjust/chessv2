@@ -2,8 +2,10 @@ import { Remote } from 'comlink';
 import Timer from '../../lib/timer';
 import HistoryTable from '../engine/history-table';
 import PVTable from '../engine/pv-table';
-import { Move } from '../types';
-import { ISearchState } from './types';
+import TranspositionTable from '../engine/transposition-table';
+import { ITranspositionTable } from '../engine/types';
+import { Move, Position } from '../types';
+import { ISearchState, TranspositionTableEntry } from './types';
 
 // Communication with web workers is slow, too slow to do at every node.
 //
@@ -24,15 +26,23 @@ export default class SearchState implements ISearchState {
   killerMoves: Move[];
   historyTable: HistoryTable;
   pvTable: PVTable;
-  lastPV: Move[] = [];
+  tTable: TranspositionTable<TranspositionTableEntry>;
   timer: Remote<Timer> | null = null;
+
+  moveExecutionOptions: {
+    table?: ITranspositionTable<TranspositionTableEntry>;
+  };
 
   _timerSampleCounter = 0;
 
-  constructor(depth: number) {
+  constructor(position: Position, depth: number) {
     this.killerMoves = new Array(depth);
     this.historyTable = new HistoryTable();
     this.pvTable = new PVTable(depth);
+    this.tTable = new TranspositionTable(position);
+    this.moveExecutionOptions = {
+      table: this.tTable,
+    };
   }
 
   async timeoutReached() {

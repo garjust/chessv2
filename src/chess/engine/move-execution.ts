@@ -16,7 +16,7 @@ import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import { KingChecks, KingPins, Position } from './types';
+import { ITranspositionTable, KingChecks, KingPins, Position } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -28,6 +28,7 @@ export type MoveResult = {
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
     checks: KingChecks;
+    zobrist?: [number, number];
   };
 };
 
@@ -44,7 +45,11 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
     : move.to >= 32 && move.to < 40;
 };
 
-export const applyMove = (position: Position, move: Move): MoveResult => {
+export const applyMove = (
+  position: Position,
+  move: Move,
+  { table }: { table?: ITranspositionTable<unknown> }
+): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
 
@@ -72,6 +77,7 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
       checks: { ...position.checks },
+      zobrist: table?.currentHash,
     },
   };
 
@@ -92,6 +98,9 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   }
   pieces.delete(move.from);
   pieces.set(move.to, piece);
+
+  table?.updateSquareOccupancy(move.from, piece);
+  table?.updateSquareOccupancy(move.to, piece);
 
   if (captured) {
     // If the captured piece is a rook we need to update castling state.
@@ -136,37 +145,57 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
     position.kings[piece.color] = move.to;
 
     // The king moved, no more castling.
-    position.castlingAvailability[piece.color].queenside = false;
-    position.castlingAvailability[piece.color].kingside = false;
+    if (position.castlingAvailability[piece.color].queenside) {
+      table?.updateCastling(piece.color, 'queenside');
+      position.castlingAvailability[piece.color].queenside = false;
+    }
+    if (position.castlingAvailability[piece.color].kingside) {
+      table?.updateCastling(piece.color, 'kingside');
+      position.castlingAvailability[piece.color].kingside = false;
+    }
 
     // If the king move is a castle we need to move the corresponding rook.
     if (move.from - move.to === 2) {
+      const rook = {
+        color: piece.color,
+        type: PieceType.Rook,
+      };
+
       // queenside
       const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].queenside;
       const rookToSquare = piece.color === Color.White ? 3 : 59;
       position.pieces.delete(rookFromSquare);
-      position.pieces.set(rookToSquare, {
+      position.pieces.set(rookToSquare, rook);
+      table?.updateSquareOccupancy(rookFromSquare, rook);
+      table?.updateSquareOccupancy(rookToSquare, rook);
+    } else if (move.from - move.to === -2) {
+      const rook = {
         color: piece.color,
         type: PieceType.Rook,
-      });
-    } else if (move.from - move.to === -2) {
+      };
+
       // kingside
       const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].kingside;
       const rookToSquare = piece.color === Color.White ? 5 : 61;
       position.pieces.delete(rookFromSquare);
-      position.pieces.set(rookToSquare, {
-        color: piece.color,
-        type: PieceType.Rook,
-      });
+      position.pieces.set(rookToSquare, rook);
+      table?.updateSquareOccupancy(rookFromSquare, rook);
+      table?.updateSquareOccupancy(rookToSquare, rook);
     }
   }
 
   // If the moved piece is a rook update castling state.
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
-      position.castlingAvailability[piece.color].queenside = false;
+      if (position.castlingAvailability[piece.color].queenside) {
+        table?.updateCastling(piece.color, 'queenside');
+        position.castlingAvailability[piece.color].queenside = false;
+      }
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
-      position.castlingAvailability[piece.color].kingside = false;
+      if (position.castlingAvailability[piece.color].kingside) {
+        table?.updateCastling(piece.color, 'kingside');
+        position.castlingAvailability[piece.color].kingside = false;
+      }
     }
   }
 
@@ -197,6 +226,11 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   //   }
   // );
 
+  if (result.captured) {
+    table?.updateSquareOccupancy(result.captured.square, result.captured.piece);
+  }
+  table?.updateTurn();
+
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
   }
@@ -210,7 +244,11 @@ export const applyMove = (position: Position, move: Move): MoveResult => {
   return result;
 };
 
-export const undoMove = (position: Position, result: MoveResult): void => {
+export const undoMove = (
+  position: Position,
+  result: MoveResult,
+  { table }: { table?: ITranspositionTable<unknown> }
+): void => {
   const { move } = result;
   let piece = position.pieces.get(move.to);
   if (!piece) {
@@ -257,6 +295,10 @@ export const undoMove = (position: Position, result: MoveResult): void => {
 
   // position.attackedSquares[Color.White].undoChangeset();
   // position.attackedSquares[Color.Black].undoChangeset();
+
+  if (result.previousState.zobrist) {
+    table?.setCurrentHash(...result.previousState.zobrist);
+  }
 
   // Undo rest of the position state.
   if (position.turn === Color.White) {

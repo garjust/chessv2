@@ -13,7 +13,12 @@ import { evaluate } from './evaluation';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { AttackedSquares, KingChecks, Position } from './types';
+import {
+  AttackedSquares,
+  KingChecks,
+  Position,
+  ITranspositionTable,
+} from './types';
 
 export default class Engine {
   _position: Position;
@@ -23,16 +28,19 @@ export default class Engine {
     this._position = copyToInternal(position);
   }
 
-  applyMove(move: Move): Piece | undefined {
-    const result = applyMove(this._position, move);
+  applyMove(
+    move: Move,
+    options: { table?: ITranspositionTable<unknown> } = {}
+  ): Piece | undefined {
+    const result = applyMove(this._position, move, options);
     this._moveStack.push(result);
     return result.captured?.piece;
   }
 
-  undoLastMove() {
+  undoLastMove(options: { table?: ITranspositionTable<unknown> } = {}) {
     const moveResult = this._moveStack.pop();
     if (moveResult) {
-      undoMove(this._position, moveResult);
+      undoMove(this._position, moveResult, options);
     } else {
       throw Error('no last move to undo');
     }

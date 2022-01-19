@@ -22,3 +22,7 @@
 - Disable move ordering in quiescenceSearch
 - Cut% is incorrect because v3 visits more nodes than there are moves
 - Debug black mate position, engine should find it at depth 5
+- Zobrish hash en passant square
+
+- Rename computers
+- Clean up computer features

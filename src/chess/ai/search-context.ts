@@ -11,6 +11,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   quiescenceSearch: false,
   killerMoveHeuristic: false,
   historyMoveHeuristic: false,
+  transpositionTable: false,
   orderMoves: (moves: MoveWithExtraData[]) => moves,
 };
 
@@ -23,6 +24,6 @@ export default class SearchContext implements ISearchContext {
   constructor(maxDepth: number, engine: Engine, diagnostics: Diagnostics) {
     this.engine = engine;
     this.diagnostics = diagnostics;
-    this.state = new SearchState(maxDepth);
+    this.state = new SearchState(engine.position, maxDepth);
   }
 }

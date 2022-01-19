@@ -5,7 +5,11 @@ export const hash = (
   position: Position,
   zobristNumbers: ZobristNumbers<number>
 ) => {
-  let h = zobristNumbers[Type.Turn][position.turn];
+  let h = 0;
+
+  if (position.turn === Color.Black) {
+    h ^= zobristNumbers[Type.Turn];
+  }
 
   for (const [square, piece] of position.pieces) {
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
@@ -31,7 +35,11 @@ export const hash64 = (
   position: Position,
   zobristNumbers: ZobristNumbers<bigint>
 ) => {
-  let h = zobristNumbers[Type.Turn][position.turn];
+  let h = 0n;
+
+  if (position.turn === Color.Black) {
+    h ^= zobristNumbers[Type.Turn];
+  }
 
   for (const [square, piece] of position.pieces) {
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];

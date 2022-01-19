@@ -9,16 +9,19 @@ const MAX = Number.MAX_SAFE_INTEGER;
 
 const moveWeight = (
   move: MoveWithExtraData,
-  killerMove?: Move,
+  tableMove?: Move,
   pvMove?: Move,
+  killerMove?: Move,
   historyTable?: IHistoryTable
 ): number => {
   let n = 0;
 
-  if (moveEquals(move, pvMove)) {
+  if (moveEquals(move, tableMove)) {
     return MAX;
-  } else if (moveEquals(move, killerMove)) {
+  } else if (moveEquals(move, pvMove)) {
     return MAX - 1;
+  } else if (moveEquals(move, killerMove)) {
+    return MAX - 2;
   }
 
   n += squareValueDiff(move, move.piece);
@@ -46,13 +49,20 @@ const moveWeight = (
 
 export const orderMoves = (
   moves: MoveWithExtraData[],
-  killerMove?: Move,
+  tableMove?: Move,
   pvMove?: Move,
+  killerMove?: Move,
   historyTable?: IHistoryTable
 ): MoveWithExtraData[] => {
   const sortBy = (move: MoveWithExtraData) => {
     if (!move.weight) {
-      move.weight = moveWeight(move, killerMove, pvMove, historyTable);
+      move.weight = moveWeight(
+        move,
+        tableMove,
+        pvMove,
+        killerMove,
+        historyTable
+      );
     }
 
     return move.weight;

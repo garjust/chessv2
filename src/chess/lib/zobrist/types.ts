@@ -14,10 +14,7 @@ type XOR<T, U> = T | U extends object
 export type NumberOrBigInt = XOR<number, bigint>;
 
 export type ZobristNumbers<T> = {
-  [Type.Turn]: {
-    [Color.White]: T;
-    [Color.Black]: T;
-  };
+  [Type.Turn]: T;
   [Type.PieceSquare]: {
     [Color.White]: Record<
       Square,
