@@ -34,10 +34,10 @@ export default class State {
 
   _timerSampleCounter = 0;
 
-  constructor(position: Position, depth: number) {
-    this.killerMoves = new Array(depth);
+  constructor(position: Position, maxDepth: number) {
+    this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
-    this.pvTable = new PVTable(depth);
+    this.pvTable = new PVTable(maxDepth);
     this.tTable = new TranspositionTable(position);
     this.moveExecutionOptions = {
       table: this.tTable,

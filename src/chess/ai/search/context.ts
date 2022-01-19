@@ -3,7 +3,7 @@ import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import State from './state';
-import { SearchConfiguration } from './types';
+import { SearchConfiguration, SearchResult } from './types';
 
 // All search features disabled. A search with the default configuration
 // will be a plain negamax search.
@@ -32,8 +32,15 @@ export default class Context {
     this.state = new State(engine.position, maxDepth);
   }
 
-  newDiagnostics(maxDepth: number) {
+  async withDiagnostics(
+    maxDepth: number,
+    searchFn: (maxDepth: number) => Promise<SearchResult>
+  ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
+    const result = await searchFn(maxDepth);
+    this.diagnostics.recordResult(result.move, result.scores);
+
+    return [result, this.diagnostics];
   }
 
   quiescenceOrderMoves(moves: MoveWithExtraData[]) {

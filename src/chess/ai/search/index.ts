@@ -1,6 +1,5 @@
 import { Move } from '../../types';
 import Context from './context';
-import Diagnotics from './diagnostics';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
@@ -14,12 +13,8 @@ export default class Search {
     this.context = context;
   }
 
-  async run(): Promise<[SearchResult, Diagnotics?]> {
-    this.context.newDiagnostics(this.maxDepth);
-    const result = await this.search(this.maxDepth);
-    this.context.diagnostics?.recordResult(result.move, result.scores);
-
-    return [result, this.context.diagnostics];
+  async run() {
+    return this.context.withDiagnostics(this.maxDepth, this.search.bind(this));
   }
 
   async search(depth: number): Promise<SearchResult> {
