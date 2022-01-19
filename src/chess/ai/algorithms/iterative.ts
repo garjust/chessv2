@@ -73,14 +73,8 @@ export default class Iterative implements ChessComputer {
     );
     this.context.state.timer = depthTimer;
 
-    this.context.state.tTable.newHash(position);
-
     for (let i = INITIAL_DEPTH; i <= MAX_DEPTH; i++) {
       await depthTimer.start(await timer.value);
-
-      // PVTable needs to be reset each iteration, extract the prior PV before
-      // the reset.
-      this.context.state.pvTable.nextIteration(i);
 
       try {
         [currentResult, diagnostics] = await this.context.withDiagnostics(i);

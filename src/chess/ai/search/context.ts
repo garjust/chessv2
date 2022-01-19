@@ -3,6 +3,7 @@ import Engine from '../../engine';
 import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
+import PVTable from './pv-table';
 import State from './state';
 import { SearchConfiguration, SearchResult } from './types';
 
@@ -44,7 +45,13 @@ export default class Context {
   }
 
   async run(maxDepth: number) {
+    // Before executing a search update state.
+    this.state.pvTable = new PVTable(maxDepth);
+    this.state.tTable.newHash(this.engine.position);
+
     const result = await new Search(this).search(maxDepth);
+
+    // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();
 
     return result;

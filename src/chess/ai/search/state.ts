@@ -22,28 +22,29 @@ const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
 export default class State {
-  killerMoves: Move[];
-  historyTable: HistoryTable;
-  pvTable: PVTable;
-  currentPV: Move[];
-  tTable: TranspositionTable<TranspositionTableEntry>;
-  timer: Remote<Timer> | null = null;
-
-  moveExecutionOptions: {
+  readonly killerMoves: Move[];
+  readonly historyTable: HistoryTable;
+  readonly tTable: TranspositionTable<TranspositionTableEntry>;
+  // Pre-construct a single options object for move execution.
+  readonly moveExecutionOptions: {
     table?: TranspositionTable<TranspositionTableEntry>;
   };
+
+  pvTable: PVTable;
+  currentPV: Move[] = [];
+  timer: Remote<Timer> | null = null;
 
   _timerSampleCounter = 0;
 
   constructor(position: Position, maxDepth: number) {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
-    this.pvTable = new PVTable(maxDepth);
-    this.currentPV = [];
     this.tTable = new TranspositionTable(position);
     this.moveExecutionOptions = {
       table: this.tTable,
     };
+
+    this.pvTable = new PVTable(maxDepth);
   }
 
   async timeoutReached(): Promise<boolean> {

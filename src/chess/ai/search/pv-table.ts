@@ -4,10 +4,6 @@ export default class PVTable {
   _table: Move[][] = [[]];
 
   constructor(maxDepth: number) {
-    this.nextIteration(maxDepth);
-  }
-
-  nextIteration(maxDepth: number): void {
     this._table = Array(maxDepth);
     for (let i = 0; i <= maxDepth; i++) {
       this._table[i] = [];
