@@ -2,7 +2,7 @@ import Engine from '../../engine';
 import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
 import SearchState from './search-state';
-import { ISearchContext, ISearchState, SearchConfiguration } from '../types';
+import { ISearchContext, ISearchState, SearchConfiguration } from './types';
 
 // All search features disabled. A search with the default configuration
 // will be a plain negamax search.

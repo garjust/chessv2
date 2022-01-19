@@ -1,9 +1,13 @@
 import { Remote } from 'comlink';
-import Timer from '../../lib/timer';
-import Engine from '../engine';
-import { IHistoryTable, IPVTable, ITranspositionTable } from '../engine/types';
-import { Move, MoveWithExtraData, Position } from '../types';
-import Diagnotics, { DiagnosticsResult } from './search/diagnostics';
+import Timer from '../../../lib/timer';
+import Engine from '../../engine';
+import {
+  IHistoryTable,
+  IPVTable,
+  ITranspositionTable,
+} from '../../engine/types';
+import { Move, MoveWithExtraData } from '../../types';
+import Diagnotics from './diagnostics';
 
 // See documentation here https://www.chessprogramming.org/Node_Types.
 export enum NodeType {
@@ -38,6 +42,13 @@ export interface ISearchState {
   timeoutReached(): Promise<boolean>;
 }
 
+export interface ISearchContext {
+  engine: Engine;
+  diagnostics: Diagnotics;
+  state: ISearchState;
+  configuration: SearchConfiguration;
+}
+
 export type SearchConfiguration = {
   pruneNodes: boolean;
   quiescenceSearch: boolean;
@@ -53,24 +64,7 @@ export type SearchConfiguration = {
   ) => MoveWithExtraData[];
 };
 
-export interface ISearchContext {
-  engine: Engine;
-  diagnostics: Diagnotics;
-  state: ISearchState;
-  configuration: SearchConfiguration;
-}
-
 export type SearchResult = {
   move: Move;
   scores: { move: Move; score: number }[];
 };
-
-export interface ChessComputer {
-  nextMove(position: Position, timeout?: number): Promise<Move>;
-  get diagnosticsResult(): DiagnosticsResult | null;
-  get label(): string;
-}
-
-export interface ChessComputerConstructor {
-  new (): ChessComputer;
-}

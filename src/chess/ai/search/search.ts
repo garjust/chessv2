@@ -1,8 +1,7 @@
 import { formatPosition } from '../../lib/fen';
 import { Move } from '../../types';
-import { moveString } from '../../utils';
 import TimeoutError from './timeout-error';
-import { ISearchContext, NodeType, SearchResult } from '../types';
+import { ISearchContext, NodeType, SearchResult } from './types';
 
 // Alpha-beta negamax search.
 //

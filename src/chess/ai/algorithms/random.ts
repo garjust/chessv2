@@ -1,4 +1,4 @@
-import { ChessComputer } from '../types';
+import { ChessComputer } from '../chess-computer';
 import { Move, Piece, PieceType, Position, Square } from '../../types';
 import { pluck } from '../../../lib/array';
 import Engine from '../../engine';

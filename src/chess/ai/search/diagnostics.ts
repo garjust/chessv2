@@ -2,7 +2,7 @@ import { formatNumber } from '../../../lib/formatter';
 import { Move } from '../../types';
 import { moveString } from '../../utils';
 import { TreeDiagnostics } from './tree-diagnostics';
-import { ISearchState } from '../types';
+import { ISearchState } from './types';
 
 type PlyCounter = {
   nodes: number;

@@ -1,4 +1,4 @@
-import { ChessComputer, ISearchContext, SearchResult } from '../types';
+import { ChessComputer } from '../chess-computer';
 import { Position } from '../../types';
 import Engine from '../../engine';
 import { orderMoves } from '../../engine/move-ordering';
@@ -7,6 +7,7 @@ import { search } from '../search/search';
 import SearchContext from '../search/search-context';
 import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
+import { ISearchContext, SearchResult } from '../search/types';
 
 const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;

@@ -1,5 +1,5 @@
 import { Remote } from 'comlink';
-import { ChessComputer } from '../ai/types';
+import { ChessComputer } from '../ai/chess-computer';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
