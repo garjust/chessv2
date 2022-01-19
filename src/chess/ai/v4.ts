@@ -16,7 +16,7 @@ export default class v4 implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics('v4', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
@@ -26,8 +26,12 @@ export default class v4 implements ChessComputer {
     return this.diagnostics.result ?? null;
   }
 
+  get label() {
+    return 'alphabeta';
+  }
+
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics('v4', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -39,9 +43,5 @@ export default class v4 implements ChessComputer {
 
     this.diagnostics.recordResult(move, scores);
     return move;
-  }
-
-  toJSON(): string {
-    return 'justins chess computer v4';
   }
 }

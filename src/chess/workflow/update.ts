@@ -157,7 +157,7 @@ function handleLoadChessComputer(
         from(
           loadComputer(COMPUTER_VERISON)
             .then(([instance, cleanup]) => {
-              return Promise.all([instance, cleanup, instance.toJSON()]);
+              return Promise.all([instance, cleanup, instance.label]);
             })
             .then(([instance, cleanup, label]) =>
               chessComputerLoadedAction(

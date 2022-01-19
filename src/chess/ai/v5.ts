@@ -8,8 +8,6 @@ import SearchContext from './search/search-context';
 
 const DEPTH = 4;
 
-// Algorithm:
-// - move-ordered alpha-beta negamax search
 export default class v5 implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
@@ -17,7 +15,7 @@ export default class v5 implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics('v5', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
@@ -28,8 +26,12 @@ export default class v5 implements ChessComputer {
     return this.diagnostics.result ?? null;
   }
 
+  get label() {
+    return 'alphabeta-v2-move-ordered';
+  }
+
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics('v5', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -41,9 +43,5 @@ export default class v5 implements ChessComputer {
 
     this.diagnostics.recordResult(move, scores);
     return move;
-  }
-
-  toJSON(): string {
-    return 'justins chess computer v5';
   }
 }

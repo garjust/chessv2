@@ -106,9 +106,10 @@ export const run = (
     logger(
       `depth=${i}; passed=${passed ? 'yes' : 'no '}; count=${formatNumber(
         counter
-      )}; timing=${timing}ms (${((timing / counter) * 1000).toPrecision(
-        5
-      )}μs/node)`
+      )}; timing=${formatNumber(timing)}ms (${(
+        (timing / counter) *
+        1000
+      ).toPrecision(5)}μs/node)`
     );
     results.push({ depth: i, passed });
   }

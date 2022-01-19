@@ -18,7 +18,7 @@ export default class v6 implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics('v6', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
@@ -31,8 +31,12 @@ export default class v6 implements ChessComputer {
     return this.diagnostics.result ?? null;
   }
 
+  get label() {
+    return 'alphabeta-v3-quiescence';
+  }
+
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics('v6', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -44,9 +48,5 @@ export default class v6 implements ChessComputer {
 
     this.diagnostics.recordResult(move, scores);
     return move;
-  }
-
-  toJSON(): string {
-    return 'justins chess computer v6';
   }
 }

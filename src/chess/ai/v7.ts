@@ -16,7 +16,6 @@ const TIMEOUT = 10_000;
 // - move-ordered alpha-beta negamax search with iterative deepening
 // - search through captures
 export default class v7 implements ChessComputer {
-  label = 'v7';
   engine: Engine;
   diagnostics: Diagnotics[] = [];
   context: ISearchContext;
@@ -43,6 +42,10 @@ export default class v7 implements ChessComputer {
 
   get diagnosticsResult() {
     return this.currentDiagnostics.result ?? null;
+  }
+
+  get label() {
+    return 'alphabeta-iterativedeep';
   }
 
   async nextMove(position: Position, timeout = TIMEOUT) {
@@ -107,9 +110,5 @@ export default class v7 implements ChessComputer {
     timerCleanup();
     depthTimerCleanup();
     return currentResult.move;
-  }
-
-  toJSON(): string {
-    return `justins chess computer ${this.label}`;
   }
 }

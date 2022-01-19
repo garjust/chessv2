@@ -7,8 +7,6 @@ import SearchContext from './search/search-context';
 
 const DEPTH = 4;
 
-// Algorithm:
-// - simple negamax search
 export default class v3 implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
@@ -16,7 +14,7 @@ export default class v3 implements ChessComputer {
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics('v3', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
 
     this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
   }
@@ -25,8 +23,12 @@ export default class v3 implements ChessComputer {
     return this.diagnostics.result ?? null;
   }
 
+  get label() {
+    return 'negamax';
+  }
+
   resetDiagnostics() {
-    this.diagnostics = new Diagnotics('v3', DEPTH);
+    this.diagnostics = new Diagnotics(this.label, DEPTH);
     this.context.diagnostics = this.diagnostics;
   }
 
@@ -38,9 +40,5 @@ export default class v3 implements ChessComputer {
 
     this.diagnostics.recordResult(move, scores);
     return move;
-  }
-
-  toJSON(): string {
-    return 'justins chess computer v3';
   }
 }

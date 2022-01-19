@@ -4,25 +4,26 @@ import { pluck } from '../../lib/array';
 import Engine from '../engine';
 import Diagnotics from './search/diagnostics';
 
-// Algorithm:
-// - pick a random move of a random piece type, because some pieces have move
-// moves than others
 export default class v2 implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics('v2', 0);
+    this.diagnostics = new Diagnotics(this.label, 0);
   }
 
   get diagnosticsResult() {
     return this.diagnostics.result ?? null;
   }
 
+  get label() {
+    return 'just-random';
+  }
+
   async nextMove(position: Position) {
     this.engine.position = position;
-    this.diagnostics = new Diagnotics('v2', 0);
+    this.diagnostics = new Diagnotics(this.label, 0);
 
     let move: Move | undefined;
     const moves = this.engine.generateMoves();
@@ -64,9 +65,5 @@ export default class v2 implements ChessComputer {
       moves.map((move) => ({ move, score: 0 }))
     );
     return move;
-  }
-
-  toJSON(): string {
-    return 'justins chess computer v2';
   }
 }
