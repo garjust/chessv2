@@ -20,15 +20,20 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
 };
 
 export default class Context {
+  label: string;
   engine: Engine;
-  diagnostics: Diagnostics;
   state: State;
   configuration: SearchConfiguration = DEFAULT_CONFIGURATION;
+  diagnostics?: Diagnostics;
 
-  constructor(maxDepth: number, engine: Engine, diagnostics: Diagnostics) {
+  constructor(label: string, maxDepth: number, engine: Engine) {
+    this.label = label;
     this.engine = engine;
-    this.diagnostics = diagnostics;
     this.state = new State(engine.position, maxDepth);
+  }
+
+  newDiagnostics(maxDepth: number) {
+    this.diagnostics = new Diagnostics(this.label, maxDepth);
   }
 
   quiescenceOrderMoves(moves: MoveWithExtraData[]) {

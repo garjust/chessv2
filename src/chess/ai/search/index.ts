@@ -1,5 +1,6 @@
 import { Move } from '../../types';
 import Context from './context';
+import Diagnotics from './diagnostics';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
@@ -13,8 +14,12 @@ export default class Search {
     this.context = context;
   }
 
-  async run(): Promise<SearchResult> {
-    return this.search(this.maxDepth);
+  async run(): Promise<[SearchResult, Diagnotics?]> {
+    this.context.newDiagnostics(this.maxDepth);
+    const result = await this.search(this.maxDepth);
+    this.context.diagnostics?.recordResult(result.move, result.scores);
+
+    return [result, this.context.diagnostics];
   }
 
   async search(depth: number): Promise<SearchResult> {
@@ -70,7 +75,7 @@ export default class Search {
     alpha: number,
     beta: number
   ): Promise<number> {
-    this.context.diagnostics.nodeVisit(depth);
+    this.context.diagnostics?.nodeVisit(depth);
 
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
@@ -89,7 +94,7 @@ export default class Search {
       cacheHit.score >= beta &&
       this.context.configuration.pruneNodes
     ) {
-      this.context.diagnostics.cut(depth);
+      this.context.diagnostics?.cut(depth);
       return cacheHit.score;
     }
 
@@ -127,7 +132,7 @@ export default class Search {
         alpha = x;
       }
       if (this.context.configuration.pruneNodes && alpha >= beta) {
-        this.context.diagnostics.cut(depth);
+        this.context.diagnostics?.cut(depth);
         nodeType = NodeType.Cut;
         nodeMove = move;
 
@@ -157,7 +162,7 @@ export default class Search {
   // capturing moves. Therefore this search function only scores "quiet"
   // positions, that is positions with no possible capturing moves.
   quiescenceSearch(alpha: number, beta: number): number {
-    this.context.diagnostics.quiescenceNodeVisit();
+    this.context.diagnostics?.quiescenceNodeVisit();
 
     const noMove = this.context.engine.evaluateNormalized();
 
@@ -165,7 +170,7 @@ export default class Search {
       alpha = noMove;
     }
     if (alpha >= beta) {
-      this.context.diagnostics.quiescenceCut();
+      this.context.diagnostics?.quiescenceCut();
       return alpha;
     }
 
@@ -185,7 +190,7 @@ export default class Search {
         alpha = x;
       }
       if (this.context.configuration.pruneNodes && alpha >= beta) {
-        this.context.diagnostics.quiescenceCut();
+        this.context.diagnostics?.quiescenceCut();
         break;
       }
     }

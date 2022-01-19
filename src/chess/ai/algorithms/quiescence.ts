@@ -15,39 +15,36 @@ const MAX_DEPTH = 4;
 // search fixes this by only searching capturing moves (to unlimited depth).
 export default class Quiescence implements ChessComputer {
   engine: Engine;
-  diagnostics: Diagnotics;
   context: Context;
+  diagnostics?: Diagnotics;
 
   constructor() {
     this.engine = new Engine();
-    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
 
-    this.context = new Context(MAX_DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(this.label, MAX_DEPTH, this.engine);
     this.context.configuration.pruneNodes = true;
     this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
   }
 
   get diagnosticsResult() {
-    return this.diagnostics.result ?? null;
+    return this.diagnostics?.result ?? null;
   }
 
   get label() {
     return 'alphabeta-v3-quiescence';
   }
 
-  resetDiagnostics() {
-    this.diagnostics = new Diagnotics(this.label, MAX_DEPTH);
-    this.context.diagnostics = this.diagnostics;
-  }
-
   async nextMove(position: Position) {
-    this.resetDiagnostics();
-
+    this.diagnostics = undefined;
     this.engine.position = position;
-    const { scores, move } = await new Search(MAX_DEPTH, this.context).run();
 
-    this.diagnostics.recordResult(move, scores);
+    const [{ move }, diagnostics] = await new Search(
+      MAX_DEPTH,
+      this.context
+    ).run();
+
+    this.diagnostics = diagnostics;
     return move;
   }
 }

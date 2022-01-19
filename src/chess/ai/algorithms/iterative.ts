@@ -29,13 +29,13 @@ const TIMEOUT = 10_000;
 //   would otherwise be (better move ordering, more TTable hits, etc).
 export default class Iterative implements ChessComputer {
   engine: Engine;
-  diagnostics: Diagnotics[] = [];
+  diagnostics?: Diagnotics;
   context: Context;
 
   constructor() {
     this.engine = new Engine();
 
-    this.context = new Context(MAX_DEPTH, this.engine, this.currentDiagnostics);
+    this.context = new Context(this.label, MAX_DEPTH, this.engine);
     this.context.configuration.pruneNodes = true;
     this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
@@ -45,12 +45,8 @@ export default class Iterative implements ChessComputer {
     this.context.configuration.moveOrderingHeuristics.hashMove = true;
   }
 
-  get currentDiagnostics() {
-    return this.diagnostics[this.diagnostics.length - 1];
-  }
-
   get diagnosticsResult() {
-    return this.currentDiagnostics.result ?? null;
+    return this.diagnostics?.result ?? null;
   }
 
   get label() {
@@ -58,7 +54,7 @@ export default class Iterative implements ChessComputer {
   }
 
   async nextMove(position: Position, timeout = TIMEOUT) {
-    this.diagnostics = [];
+    this.diagnostics = undefined;
 
     const [timer, timerCleanup] = await loadTimer(
       `${this.label}-search`,
@@ -77,21 +73,19 @@ export default class Iterative implements ChessComputer {
       move: { from: -1, to: -1 },
       scores: [],
     };
+    let diagnostics: Diagnotics | undefined;
 
     for (let i = INITIAL_DEPTH; i <= MAX_DEPTH; i++) {
       await depthTimer.start(await timer.value);
-      this.diagnostics.push(new Diagnotics(this.label, i));
-      this.context.diagnostics = this.currentDiagnostics;
 
       // PVTable needs to be reset each iteration, extract the prior PV before
       // the reset.
       this.context.state.pvTable.nextIteration(i);
 
       try {
-        currentResult = await new Search(i, this.context).run();
+        [currentResult, diagnostics] = await new Search(i, this.context).run();
       } catch (error) {
         if (error instanceof TimeoutError) {
-          this.diagnostics.pop();
           break;
         } else {
           throw error;
@@ -100,15 +94,11 @@ export default class Iterative implements ChessComputer {
 
       await depthTimer.stop();
 
-      this.currentDiagnostics.recordResult(
-        currentResult.move,
-        currentResult.scores,
-        this.context.state
-      );
+      this.diagnostics = diagnostics;
       console.log(
         '[intermediate result]:',
-        this.currentDiagnostics.result?.logString,
-        this.currentDiagnostics.result?.principleVariation
+        this.diagnostics?.result?.logString,
+        this.diagnostics?.result?.principleVariation
       );
 
       if (await timer.brrring()) {
