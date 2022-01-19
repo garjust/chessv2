@@ -21,16 +21,29 @@ export enum NodeType {
 
 export type TranspositionTableEntry = {
   nodeType: NodeType;
+  // The depth of search which resulted in this entry. For example when entries
+  // are created at the second ply of an N-depth search this value will be
+  // equal to N-1. Higher values mean more plys were searched to determine the
+  // score.
   depth: number;
+  // This is the score returned by the search function when this entry was
+  // made.
+  // - When the node type is CUT this represents a lower-bound for the score
+  // of the position and can be re-tested against beta values.
+  // - When the node type is PV this represents an exact value for the score.
+  // - When the node type is ALL this represents an upper-bound for the score.
   score: number;
   move?: Move;
 };
 
 export type SearchConfiguration = {
   pruneNodes: boolean;
-  quiescenceSearch: boolean;
-  killerMoveHeuristic: boolean;
-  historyMoveHeuristic: boolean;
-  transpositionTableMoveHeuristic: boolean;
   moveOrdering: boolean;
+  moveOrderingHeuristics: {
+    killerMove: boolean;
+    historyMove: boolean;
+    pvMove: boolean;
+    hashMove: boolean;
+  };
+  quiescenceSearch: boolean;
 };

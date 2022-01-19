@@ -98,13 +98,11 @@ const searchNodes = async (
       nodeType = NodeType.Cut;
       nodeMove = move;
 
-      if (context.configuration.killerMoveHeuristic && !move.attack) {
+      if (!move.attack) {
         // New killer move for this depth.
         context.state.killerMoves[depth] = move;
       }
-      if (context.configuration.historyMoveHeuristic) {
-        context.state.historyTable.increment(move, depth);
-      }
+      context.state.historyTable.increment(move, depth);
 
       break;
     }

@@ -10,10 +10,13 @@ import { SearchConfiguration } from './types';
 export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   pruneNodes: false,
   moveOrdering: false,
+  moveOrderingHeuristics: {
+    killerMove: false,
+    historyMove: false,
+    pvMove: false,
+    hashMove: false,
+  },
   quiescenceSearch: false,
-  killerMoveHeuristic: false,
-  historyMoveHeuristic: false,
-  transpositionTableMoveHeuristic: false,
 };
 
 export default class Context {
@@ -39,12 +42,18 @@ export default class Context {
     if (this.configuration.moveOrdering) {
       return orderMoves(
         moves,
-        this.configuration.transpositionTableMoveHeuristic
+        this.configuration.moveOrderingHeuristics.hashMove
           ? this.state.tTable.get()?.move
           : undefined,
-        this.state.pvTable.pvMove(currentDepth),
-        this.state.killerMoves[currentDepth],
-        this.state.historyTable
+        this.configuration.moveOrderingHeuristics.pvMove
+          ? this.state.pvTable.pvMove(currentDepth)
+          : undefined,
+        this.configuration.moveOrderingHeuristics.killerMove
+          ? this.state.killerMoves[currentDepth]
+          : undefined,
+        this.configuration.moveOrderingHeuristics.historyMove
+          ? this.state.historyTable
+          : undefined
       );
     } else {
       return moves;

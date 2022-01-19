@@ -26,7 +26,6 @@ export default class Quiescence implements ChessComputer {
     this.context.configuration.pruneNodes = true;
     this.context.configuration.moveOrdering = true;
     this.context.configuration.quiescenceSearch = true;
-    this.context.configuration.killerMoveHeuristic = true;
   }
 
   get diagnosticsResult() {
