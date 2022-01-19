@@ -4,7 +4,7 @@ import Engine from '../../engine';
 import { orderMoves } from '../../engine/move-ordering';
 import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
-import SearchContext from '../search/search-context';
+import Context from '../search/context';
 import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
 import { SearchResult } from '../search/types';
@@ -31,16 +31,12 @@ const TIMEOUT = 10_000;
 export default class Iterative implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics[] = [];
-  context: SearchContext;
+  context: Context;
 
   constructor() {
     this.engine = new Engine();
 
-    this.context = new SearchContext(
-      MAX_DEPTH,
-      this.engine,
-      this.currentDiagnostics
-    );
+    this.context = new Context(MAX_DEPTH, this.engine, this.currentDiagnostics);
     this.context.configuration.pruneNodes = true;
     this.context.configuration.quiescenceSearch = true;
     this.context.configuration.killerMoveHeuristic = true;

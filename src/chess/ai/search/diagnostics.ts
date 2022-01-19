@@ -1,7 +1,7 @@
 import { formatNumber } from '../../../lib/formatter';
 import { Move } from '../../types';
 import { moveString } from '../../utils';
-import SearchState from './search-state';
+import State from './state';
 import { TreeDiagnostics } from './tree-diagnostics';
 
 type PlyCounter = {
@@ -10,6 +10,11 @@ type PlyCounter = {
 };
 
 type MoveScores = { move: string; score: number }[];
+
+type StateData = Pick<
+  State,
+  'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'
+>;
 
 export type DiagnosticsResult = {
   label: string;
@@ -21,10 +26,7 @@ export type DiagnosticsResult = {
   plyCounters: Record<number, PlyCounter>;
   depth: number;
   timing: number;
-  state?: Pick<
-    SearchState,
-    'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'
-  >;
+  state?: StateData;
   principleVariation?: string[];
 };
 
@@ -72,7 +74,7 @@ export default class Diagnotics {
   recordResult(
     move: Move,
     moveScores: { move: Move; score: number }[],
-    state?: SearchState
+    state?: State
   ) {
     const timing = Date.now() - this.start;
     const totalNodes = Object.values(this.plyCounters).reduce(
@@ -84,9 +86,7 @@ export default class Diagnotics {
       0
     );
 
-    const stateData:
-      | Pick<SearchState, 'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'>
-      | undefined = state
+    const stateData: StateData | undefined = state
       ? {
           historyTable: state.historyTable,
           killerMoves: state.killerMoves,

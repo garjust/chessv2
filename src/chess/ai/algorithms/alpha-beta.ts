@@ -3,7 +3,7 @@ import { Position } from '../../types';
 import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
 import { search } from '../search';
-import SearchContext from '../search/search-context';
+import Context from '../search/context';
 
 const DEPTH = 4;
 
@@ -15,13 +15,13 @@ const DEPTH = 4;
 export default class AlphaBeta implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;
-  context: SearchContext;
+  context: Context;
 
   constructor() {
     this.engine = new Engine();
     this.diagnostics = new Diagnotics(this.label, DEPTH);
 
-    this.context = new SearchContext(DEPTH, this.engine, this.diagnostics);
+    this.context = new Context(DEPTH, this.engine, this.diagnostics);
     this.context.configuration.pruneNodes = true;
   }
 

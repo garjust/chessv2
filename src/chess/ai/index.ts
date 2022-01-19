@@ -6,11 +6,11 @@ import Quiescence from './algorithms/quiescence';
 import Iterative from './algorithms/iterative';
 
 export const Registry = Object.freeze({
-  AlphaBeta,
   Iterative,
-  MoveOrdering,
-  Negamax,
   Quiescence,
+  MoveOrdering,
+  AlphaBeta,
+  Negamax,
   Random,
 });
 

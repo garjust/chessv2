@@ -1,5 +1,5 @@
 import { Move } from '../../types';
-import SearchContext from './search-context';
+import Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from './types';
 
@@ -9,7 +9,7 @@ import { NodeType, SearchResult } from './types';
 // context it will function as a normal negamax search.
 export const search = async (
   depth: number,
-  context: SearchContext
+  context: Context
 ): Promise<SearchResult> => {
   const scores: { move: Move; score: number }[] = [];
   // Start with an illegal move so it is well defined.
@@ -65,7 +65,7 @@ const searchNodes = async (
   depth: number,
   alpha: number,
   beta: number,
-  context: SearchContext
+  context: Context
 ): Promise<number> => {
   context.diagnostics.nodeVisit(depth);
 
@@ -147,7 +147,7 @@ const searchNodes = async (
 export const quiescenceSearch = (
   alpha: number,
   beta: number,
-  context: SearchContext
+  context: Context
 ): number => {
   context.diagnostics.quiescenceNodeVisit();
 

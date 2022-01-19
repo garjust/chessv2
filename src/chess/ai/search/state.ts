@@ -21,7 +21,7 @@ const MICROSECONDS_PER_NODE = 30;
 const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
-export default class SearchState {
+export default class State {
   killerMoves: Move[];
   historyTable: HistoryTable;
   pvTable: PVTable;
