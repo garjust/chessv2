@@ -55,11 +55,7 @@ export default class Iterative implements ChessComputer {
   async nextMove(position: Position, timeout = TIMEOUT) {
     this.diagnostics = undefined;
     this.engine.position = position;
-    let currentResult: SearchResult = {
-      move: { from: -1, to: -1 },
-      pv: [],
-      scores: [],
-    };
+    let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
     const [timer, timerCleanup] = await loadTimer(
@@ -102,6 +98,10 @@ export default class Iterative implements ChessComputer {
 
     timerCleanup();
     depthTimerCleanup();
+
+    if (currentResult === null) {
+      throw Error('no search result');
+    }
     return currentResult.move;
   }
 }
