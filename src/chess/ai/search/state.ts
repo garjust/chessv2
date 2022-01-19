@@ -15,9 +15,10 @@ const TIMER_SAMPLE_RATE = 200;
 
 // Make an assumption about how long it takes to process a node in the search
 // tree.
-const MICROSECONDS_PER_NODE = 30;
+const MICROSECONDS_PER_NODE = 50;
 
 // Caculate a threshold using the assumption for μs/node and the sample rate.
+// We also assume the timer is read exactly once per node.
 const TIMER_SAMPLE_THRESHOLD =
   (TIMER_SAMPLE_RATE * 1000) / MICROSECONDS_PER_NODE;
 
