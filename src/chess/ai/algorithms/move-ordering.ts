@@ -4,7 +4,7 @@ import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
 import Context from '../search/context';
 
-const MAX_DEPTH = 4;
+const MAX_DEPTH = 6;
 
 // Add move ordering to the alpha-beta tree search. Searching better moves
 // earlier at a particular node allows alpha-beta to prune more branches of

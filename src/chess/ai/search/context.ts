@@ -1,6 +1,7 @@
 import Search from '.';
 import Engine from '../../engine';
-import { MoveWithExtraData } from '../../types';
+import { Move, MoveWithExtraData } from '../../types';
+import { moveString } from '../../utils';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
@@ -68,6 +69,26 @@ export default class Context {
 
     // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();
+
+    const extractedPV: string[] = [];
+    let i;
+
+    for (i = 0; i < maxDepth; i++) {
+      const entry = this.state.tTable.get(this.engine.zobrist);
+      if (entry?.move) {
+        extractedPV.push(moveString(entry.move));
+      } else {
+        extractedPV.push(`#`);
+        break;
+      }
+
+      this.engine.applyMove(entry.move);
+    }
+    for (; i > 0; i--) {
+      this.engine.undoLastMove();
+    }
+
+    console.log('EXTRACTED PV', extractedPV);
 
     return result;
   }
