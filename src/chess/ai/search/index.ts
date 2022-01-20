@@ -14,7 +14,7 @@ export default class Search {
   async search(depth: number): Promise<SearchResult> {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
-    let bestMove: Move = { from: -1, to: -1 };
+    let bestMove: Move;
 
     let alpha = -Infinity;
     const beta = Infinity;
@@ -24,8 +24,10 @@ export default class Search {
       depth
     );
 
+    bestMove = moves[0];
+
     if (moves.length === 1) {
-      return { scores, move: moves[0], pv: moves };
+      return { scores, move: bestMove, pv: moves };
     }
 
     for (const move of moves) {

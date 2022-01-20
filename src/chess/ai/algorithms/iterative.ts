@@ -7,7 +7,7 @@ import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
 import { SearchResult } from '../search/types';
 
-const MAX_DEPTH = 4;
+const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 
@@ -37,7 +37,7 @@ export default class Iterative implements ChessComputer {
     this.engine = new Engine();
     this.context = new Context(this.label, maxDepth, this.engine, {
       pruneNodes: true,
-      quiescenceSearch: false,
+      quiescenceSearch: true,
       moveOrdering: true,
       moveOrderingHeuristics: {
         killerMove: true,
