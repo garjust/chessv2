@@ -1,5 +1,6 @@
 import Search from '.';
 import Engine from '../../engine';
+import { EVALUATION_DIVIDER, MATE_SCORE } from '../../engine/evaluation';
 import { Move, MoveWithExtraData } from '../../types';
 import { moveString } from '../../utils';
 import Diagnostics from './diagnostics';
@@ -88,7 +89,17 @@ export default class Context {
       this.engine.undoLastMove();
     }
 
-    console.log('EXTRACTED PV', extractedPV);
+    console.log('TTable PV', extractedPV);
+    let evaluation: number | string = result.bestScore.score;
+    if (evaluation >= MATE_SCORE) {
+      evaluation = `+M${(maxDepth - (evaluation - MATE_SCORE) + 1) / 2}`;
+    } else if (evaluation <= -1 * MATE_SCORE) {
+      evaluation = `-M${(maxDepth - (evaluation + MATE_SCORE)) / 2}`;
+    } else {
+      evaluation /= EVALUATION_DIVIDER;
+    }
+
+    console.log('Search Evaluation:', evaluation);
 
     return result;
   }

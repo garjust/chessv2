@@ -65,6 +65,7 @@ export default class Random implements ChessComputer {
     this.diagnostics.recordResult({
       move,
       pv: [move],
+      bestScore: { move, score: 0 },
       scores: moves.map((move) => ({ move, score: 0 })),
     });
     return move;

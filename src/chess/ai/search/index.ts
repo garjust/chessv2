@@ -16,6 +16,7 @@ export default class Search {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
+    let bestScore: number;
 
     let alpha = -Infinity;
     const beta = Infinity;
@@ -26,9 +27,15 @@ export default class Search {
     );
 
     bestMove = moves[0];
+    bestScore = 0;
 
     if (moves.length === 1) {
-      return { scores, move: bestMove, pv: moves };
+      return {
+        scores,
+        move: bestMove,
+        pv: moves,
+        bestScore: { score: bestScore, move: bestMove },
+      };
     }
 
     for (const move of moves) {
@@ -43,6 +50,7 @@ export default class Search {
 
       if (result.score > alpha) {
         bestMove = result.move;
+        bestScore = result.score;
         alpha = result.score;
         this.context.state.pvTable.set(depth, result.move);
       }
@@ -55,7 +63,12 @@ export default class Search {
       move: bestMove,
     });
 
-    return { scores, move: bestMove, pv: this.context.state.pvTable.pv };
+    return {
+      scores,
+      bestScore: { score: bestScore, move: bestMove },
+      move: bestMove,
+      pv: this.context.state.pvTable.pv,
+    };
   }
 
   // Recursive search function for the alpha-beta negamax search.

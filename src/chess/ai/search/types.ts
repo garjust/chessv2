@@ -4,6 +4,7 @@ import { Move } from '../../types';
 export type SearchResult = {
   move: Move;
   pv: Move[];
+  bestScore: { move: Move; score: number };
   scores: { move: Move; score: number }[];
 };
 
