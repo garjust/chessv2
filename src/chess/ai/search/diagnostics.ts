@@ -1,8 +1,7 @@
 import { formatNumber } from '../../../lib/formatter';
-import { Move } from '../../types';
 import { moveString } from '../../utils';
 import State from './state';
-import { TreeDiagnostics } from './tree-diagnostics';
+import SearchTree from './tree-diagnostics';
 import { SearchResult } from './types';
 
 type PlyCounter = {
@@ -30,6 +29,7 @@ export type DiagnosticsResult = {
   timing: number;
   state?: StateData;
   principleVariation?: string[];
+  searchTree?: SearchTree;
 };
 
 export default class Diagnotics {
@@ -38,7 +38,7 @@ export default class Diagnotics {
   enableTreeDiagnostics;
   plyCounters: Record<number, PlyCounter> = {};
   result?: DiagnosticsResult;
-  treeDiagnostics?: TreeDiagnostics;
+  searchTree?: SearchTree;
   start: number;
 
   constructor(label: string, maxDepth: number, enableTreeDiagnostics = false) {
@@ -52,8 +52,8 @@ export default class Diagnotics {
       this.plyCounters[i] = { nodes: 0, cuts: 0 };
     }
 
-    if (this.treeDiagnostics) {
-      this.treeDiagnostics = new TreeDiagnostics(this.label);
+    if (this.enableTreeDiagnostics) {
+      this.searchTree = new SearchTree();
     }
   }
 
