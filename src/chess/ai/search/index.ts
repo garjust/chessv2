@@ -78,10 +78,11 @@ export default class Search {
     // If we found this position in the TTable and it was a CUT node then we can
     // test against beta before move generation.
     if (
+      this.context.configuration.pruneFromTTable &&
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      this.context.configuration.pruneFromTTable
+      cacheHit.depth >= depth
     ) {
       this.context.diagnostics?.cut(depth);
       return cacheHit.score;
