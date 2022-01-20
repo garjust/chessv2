@@ -12,13 +12,15 @@ const MAX_DEPTH = 4;
 // Alpha-beta adds tree-pruning to the tree search in a way that is completely
 // safe. Alpha-beta will always return the same move as negamax.
 export default class AlphaBeta implements ChessComputer {
+  maxDepth: number;
   engine: Engine;
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor() {
+  constructor(maxDepth = MAX_DEPTH) {
+    this.maxDepth = maxDepth;
     this.engine = new Engine();
-    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+    this.context = new Context(this.label, maxDepth, this.engine, {
       pruneNodes: true,
     });
   }
@@ -36,7 +38,7 @@ export default class AlphaBeta implements ChessComputer {
     this.engine.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
-      MAX_DEPTH
+      this.maxDepth
     );
 
     this.diagnostics = diagnostics;

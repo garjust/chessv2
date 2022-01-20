@@ -8,5 +8,5 @@ export interface ChessComputer {
 }
 
 export interface ChessComputerConstructor {
-  new (): ChessComputer;
+  new (maxDepth?: number): ChessComputer;
 }

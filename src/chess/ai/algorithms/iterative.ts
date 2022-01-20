@@ -27,13 +27,15 @@ const TIMEOUT = 10_000;
 //   during each iteration which can make future iterations faster than they
 //   would otherwise be (better move ordering, more TTable hits, etc).
 export default class Iterative implements ChessComputer {
+  maxDepth: number;
   engine: Engine;
   diagnostics?: Diagnotics;
   context: Context;
 
-  constructor() {
+  constructor(maxDepth = MAX_DEPTH) {
+    this.maxDepth = maxDepth;
     this.engine = new Engine();
-    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+    this.context = new Context(this.label, maxDepth, this.engine, {
       pruneNodes: true,
       quiescenceSearch: true,
       moveOrdering: true,
@@ -61,19 +63,19 @@ export default class Iterative implements ChessComputer {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    const [timer, timerCleanup] = await loadTimer(
-      `${this.label}-search`,
-      timeout
-    );
-    const [depthTimer, depthTimerCleanup] = await loadTimer(
-      `${this.label}-search-for-depth`,
-      0,
-      false
-    );
-    this.context.state.timer = depthTimer;
+    // const [timer, timerCleanup] = await loadTimer(
+    //   `${this.label}-search`,
+    //   timeout
+    // );
+    // const [depthTimer, depthTimerCleanup] = await loadTimer(
+    //   `${this.label}-search-for-depth`,
+    //   0,
+    //   false
+    // );
+    // this.context.state.timer = depthTimer;
 
-    for (let i = INITIAL_DEPTH; i <= MAX_DEPTH; i++) {
-      await depthTimer.start(await timer.value);
+    for (let i = INITIAL_DEPTH; i <= this.maxDepth; i++) {
+      // await depthTimer.start(await timer.value);
 
       try {
         [currentResult, diagnostics] = await this.context.withDiagnostics(i);
@@ -85,7 +87,7 @@ export default class Iterative implements ChessComputer {
         }
       }
 
-      await depthTimer.stop();
+      // await depthTimer.stop();
 
       this.diagnostics = diagnostics;
       console.log(
@@ -95,8 +97,8 @@ export default class Iterative implements ChessComputer {
       );
     }
 
-    timerCleanup();
-    depthTimerCleanup();
+    // timerCleanup();
+    // depthTimerCleanup();
 
     if (currentResult === null) {
       throw Error('no search result');
