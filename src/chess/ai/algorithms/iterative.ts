@@ -43,6 +43,7 @@ export default class Iterative implements ChessComputer {
         pvMove: true,
         hashMove: true,
       },
+      pruneFromTTable: false, // TODO: enable
     });
   }
 

@@ -19,6 +19,7 @@ import { BUTTON_CSS } from './theme';
 import { loadComputer } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
+const COMPUTER_DEPTH = 4;
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -36,7 +37,7 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const [ai, cleanup] = await loadComputer(LATEST);
+  const [ai, cleanup] = await loadComputer(LATEST, COMPUTER_DEPTH);
 
   const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
 
@@ -61,7 +62,10 @@ async function runComputerNextMoveTest(
 ) {
   const computers = await Promise.all(
     Object.keys(Registry).map(async (version) => {
-      const [ai, cleanup] = await loadComputer(version as Version);
+      const [ai, cleanup] = await loadComputer(
+        version as Version,
+        COMPUTER_DEPTH
+      );
       return {
         version: version as Version,
         ai,

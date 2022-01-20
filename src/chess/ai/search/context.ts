@@ -19,6 +19,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
     hashMove: false,
   },
   quiescenceSearch: false,
+  pruneFromTTable: false,
 };
 
 // The context object contains any information, state, or other objects

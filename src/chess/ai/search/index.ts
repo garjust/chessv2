@@ -78,7 +78,7 @@ export default class Search {
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      this.context.configuration.pruneNodes
+      this.context.configuration.pruneFromTTable
     ) {
       this.context.diagnostics?.cut(depth);
       return cacheHit.score;

@@ -59,4 +59,5 @@ export type SearchConfiguration = {
     readonly hashMove: boolean;
   };
   readonly quiescenceSearch: boolean;
+  readonly pruneFromTTable: boolean;
 };
