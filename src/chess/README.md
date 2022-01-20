@@ -17,14 +17,15 @@
 
 - Decrease weight of moves to squares attacked by pawns
 - Implement attack-based move generation as an option (instead of commenting code repeatedly)
+- Don't recalculate all rays for tracking attacked squares, this should make it fast enough and then check state is instant for evaluation
 - Opening book (Kevin will fried liver me)
 - Evaluation of checkmates (M1..N) and actually able to checkmate
 - Evaluation likes pawn cover for king
   - Maybe this means squares that attack the king are blocked or defended (knight attacks squares are defended against, rays to squares near king are blocked by pawns)
 - Disable move ordering in quiescenceSearch
 - Cut% is incorrect because v3 visits more nodes than there are moves
-- Debug black mate position, engine should find it at depth 5
 - Zobrish hash en passant square
+- Evaluation function should be able to detect checkmate + draw, allowing mates to be found one-ply less in the search
 
 ## Bug Positions
 

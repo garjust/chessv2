@@ -6,6 +6,7 @@ import { moveString } from '../../utils';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
+import { extractPV, humanEvaluation } from './score-utils';
 import State from './state';
 import { SearchConfiguration, SearchResult } from './types';
 
@@ -62,44 +63,21 @@ export default class Context {
     return [result, this.diagnostics];
   }
 
+  useTTForPV = true;
+
   async run(maxDepth: number) {
     // Before executing a search update state.
     this.state.pvTable = new PVTable(maxDepth);
 
     const result = await new Search(this).search(maxDepth);
 
+    // If we want to use the TT to extract the PV we overwrite the result's
+    // PV.
+    if (this.useTTForPV) {
+      result.pv = extractPV(this.state.tTable, this.engine);
+    }
     // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();
-
-    const extractedPV: string[] = [];
-    let i;
-
-    for (i = 0; i < maxDepth; i++) {
-      const entry = this.state.tTable.get(this.engine.zobrist);
-      if (entry?.move) {
-        extractedPV.push(moveString(entry.move));
-      } else {
-        extractedPV.push(`#`);
-        break;
-      }
-
-      this.engine.applyMove(entry.move);
-    }
-    for (; i > 0; i--) {
-      this.engine.undoLastMove();
-    }
-
-    console.log('TTable PV', extractedPV);
-    let evaluation: number | string = result.bestScore.score;
-    if (evaluation >= MATE_SCORE) {
-      evaluation = `+M${(maxDepth - (evaluation - MATE_SCORE) + 1) / 2}`;
-    } else if (evaluation <= -1 * MATE_SCORE) {
-      evaluation = `-M${(maxDepth - (evaluation + MATE_SCORE)) / 2}`;
-    } else {
-      evaluation /= EVALUATION_DIVIDER;
-    }
-
-    console.log('Search Evaluation:', evaluation);
 
     return result;
   }

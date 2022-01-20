@@ -1,5 +1,6 @@
 import { formatNumber } from '../../../lib/formatter';
 import { moveString } from '../../utils';
+import { humanEvaluation } from './score-utils';
 import State from './state';
 import SearchTree from './tree-diagnostics';
 import { SearchResult } from './types';
@@ -21,6 +22,7 @@ export type DiagnosticsResult = {
   logString: string;
   logStringLight: string;
   move: string;
+  evaluation: string;
   moveScores: MoveScores;
   totalNodes: number;
   totalCuts: number;
@@ -108,6 +110,7 @@ export default class Diagnotics {
         timing
       )}ms; nodes=${formatNumber(totalNodes)}`,
       move: moveString(move),
+      evaluation: humanEvaluation(result.bestScore.score, this.maxDepth),
       moveScores: scores.map(({ move, score }) => ({
         move: moveString(move),
         score,

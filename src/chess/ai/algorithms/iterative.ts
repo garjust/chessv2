@@ -93,6 +93,7 @@ export default class Iterative implements ChessComputer {
       console.log(
         '[intermediate result]:',
         this.diagnostics?.result?.logStringLight,
+        this.diagnostics.result?.evaluation,
         this.diagnostics?.result?.principleVariation
       );
     }

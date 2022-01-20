@@ -86,14 +86,14 @@ async function runComputerNextMoveTest(
       logger.next(diagnosticsResult.logString);
       console.log(diagnosticsResult.label, diagnosticsResult);
 
-      const cutPercentage =
-        1 -
-        diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
+      // const cutPercentage =
+      //   1 -
+      //   diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
 
-      console.log(
-        diagnosticsResult.label,
-        `cut=${(cutPercentage * 100).toPrecision(5)}%`
-      );
+      // console.log(
+      //   diagnosticsResult.label,
+      //   `cut=${(cutPercentage * 100).toPrecision(5)}%`
+      // );
     }
 
     cleanup();
