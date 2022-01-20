@@ -9,7 +9,7 @@ enum Screen {
 }
 
 const App = () => {
-  const [screen, setScreen] = useState(Screen.Game);
+  const [screen, setScreen] = useState(Screen.Debug);
 
   const toggleScreen = () => {
     setScreen(screen === Screen.Game ? Screen.Debug : Screen.Game);

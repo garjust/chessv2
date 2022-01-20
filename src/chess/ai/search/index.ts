@@ -125,8 +125,6 @@ export default class Search {
       }
     }
 
-    nodeMove = moves[0];
-
     for (const move of moves) {
       this.context.engine.applyMove(move);
       const x = -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1));
