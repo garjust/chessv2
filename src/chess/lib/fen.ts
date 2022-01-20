@@ -21,6 +21,8 @@ export const VIENNA_OPENING_FEN =
 export const BLACK_CHECKMATE_FEN =
   '4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24';
 
+export const LADDER_MATE_FEN = '8/8/k7/6QR/8/8/8/7K w  - 20 59';
+
 const pieceToFenPiece = (piece: Piece): string =>
   piece.color === Color.White
     ? PIECE_TYPE_TO_FEN_PIECE[piece.type].toUpperCase()

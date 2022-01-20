@@ -22,6 +22,7 @@ import {
   PERFT_5_FEN,
   BLACK_CHECKMATE_FEN,
   parseFEN,
+  LADDER_MATE_FEN,
 } from '../lib/fen';
 import { moveActions } from '../workflow/moves-to-actions';
 import DisplayGameFEN from './DisplayGameFen';
@@ -30,7 +31,7 @@ import Engine from '../engine';
 import { interval, map } from 'rxjs';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 
-const FEN_FOR_INITIAL_POSITION = BLACK_CHECKMATE_FEN;
+const FEN_FOR_INITIAL_POSITION = LADDER_MATE_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {

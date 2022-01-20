@@ -7,7 +7,7 @@ import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
 import { SearchResult } from '../search/types';
 
-const MAX_DEPTH = 4;
+const MAX_DEPTH = 5;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 
@@ -45,7 +45,7 @@ export default class Iterative implements ChessComputer {
         pvMove: true,
         hashMove: true,
       },
-      pruneFromTTable: false, // TODO: enable
+      pruneFromTTable: false,
     });
   }
 
@@ -63,19 +63,19 @@ export default class Iterative implements ChessComputer {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    // const [timer, timerCleanup] = await loadTimer(
-    //   `${this.label}-search`,
-    //   timeout
-    // );
-    // const [depthTimer, depthTimerCleanup] = await loadTimer(
-    //   `${this.label}-search-for-depth`,
-    //   0,
-    //   false
-    // );
-    // this.context.state.timer = depthTimer;
+    const [timer, timerCleanup] = await loadTimer(
+      `${this.label}-search`,
+      timeout
+    );
+    const [depthTimer, depthTimerCleanup] = await loadTimer(
+      `${this.label}-search-for-depth`,
+      0,
+      false
+    );
+    this.context.state.timer = depthTimer;
 
     for (let i = INITIAL_DEPTH; i <= this.maxDepth; i++) {
-      // await depthTimer.start(await timer.value);
+      await depthTimer.start(await timer.value);
 
       try {
         [currentResult, diagnostics] = await this.context.withDiagnostics(i);
@@ -87,7 +87,7 @@ export default class Iterative implements ChessComputer {
         }
       }
 
-      // await depthTimer.stop();
+      await depthTimer.stop();
 
       this.diagnostics = diagnostics;
       console.log(
@@ -97,8 +97,8 @@ export default class Iterative implements ChessComputer {
       );
     }
 
-    // timerCleanup();
-    // depthTimerCleanup();
+    timerCleanup();
+    depthTimerCleanup();
 
     if (currentResult === null) {
       throw Error('no search result');
