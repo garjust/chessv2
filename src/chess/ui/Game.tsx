@@ -23,14 +23,12 @@ import {
   BLACK_CHECKMATE_FEN,
   parseFEN,
 } from '../lib/fen';
-import {
-  runTestGame,
-  VIENNA_GAMBIT_ACCEPTED_GAME,
-} from '../workflow/test-games';
+import { moveActions } from '../workflow/moves-to-actions';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
 import { interval, map } from 'rxjs';
+import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 
 const FEN_FOR_INITIAL_POSITION = BLACK_CHECKMATE_FEN;
 
@@ -55,7 +53,7 @@ const Game = () => {
 
   function emitExampleGame(): void {
     emit(setPositionFromFENAction(STARTING_POSITION_FEN));
-    runTestGame(400, VIENNA_GAMBIT_ACCEPTED_GAME).subscribe({
+    moveActions(VIENNA_GAMBIT_ACCEPTED_GAME, 400).subscribe({
       next: (action) => emit(action),
     });
   }

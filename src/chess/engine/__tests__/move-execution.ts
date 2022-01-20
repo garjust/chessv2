@@ -1,14 +1,11 @@
 import Engine from '..';
+import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../../lib/example-games';
 import { formatPosition, parseFEN, STARTING_POSITION_FEN } from '../../lib/fen';
 import { Move } from '../../types';
-import { labelToSquare } from '../../utils';
-import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../../workflow/test-games';
+import { moveFromString } from '../../utils';
 
 const N = 1000;
-const MOVES: Move[] = VIENNA_GAMBIT_ACCEPTED_GAME.map(([from, to]) => ({
-  from: labelToSquare(from),
-  to: labelToSquare(to),
-}));
+const MOVES: Move[] = VIENNA_GAMBIT_ACCEPTED_GAME.map(moveFromString);
 
 test('move execution perft', () => {
   const engine = new Engine(parseFEN(STARTING_POSITION_FEN));

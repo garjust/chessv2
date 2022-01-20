@@ -1,17 +1,8 @@
 import { parseFEN, STARTING_POSITION_FEN } from '../../fen';
-import {
-  PERFT_POSITION_5,
-  run,
-  STARTING_POSITION,
-  VIENNA_OPENING,
-} from '../../move-generation-perft';
+
 import { makeNumbers as makeNumbers32 } from '../numbers-32bit';
 import { makeNumbers as makeNumbers64 } from '../numbers-64bit';
 import { StatefulHash, StatefulHash64 } from '../stateful-hash';
-
-const EMPTY_FN = () => {
-  /* empty */
-};
 
 const N = 1_000_000;
 
