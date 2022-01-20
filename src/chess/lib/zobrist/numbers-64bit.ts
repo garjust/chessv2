@@ -1,4 +1,3 @@
-import { formatBits } from '../../../lib/bits';
 import { Color, PieceType, Square } from '../../types';
 import { Type, ZobristNumbers } from './types';
 
@@ -47,19 +46,3 @@ export const makeNumbers = (): ZobristNumbers<bigint> => ({
 });
 
 const numbers = makeNumbers();
-
-// console.log('zobrist', numbers);
-// console.log(
-//   'zobrist-bits',
-//   JSON.stringify(
-//     numbers,
-//     (_, value: unknown) => {
-//       if (value instanceof Object) {
-//         return value;
-//       } else {
-//         return formatBits(value as number);
-//       }
-//     },
-//     2
-//   )
-// );

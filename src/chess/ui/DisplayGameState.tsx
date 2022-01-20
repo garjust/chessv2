@@ -19,6 +19,11 @@ function replacer(key: string, value: unknown) {
     return (value as number).toFixed(2);
   }
 
+  if (key === 'zobrist') {
+    const zobrist = value as [number, number];
+    return `${zobrist[0]}:${zobrist[1]}`;
+  }
+
   if (value instanceof Map) {
     return `{ size ${value.size} }`;
   }

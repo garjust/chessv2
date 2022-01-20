@@ -1,4 +1,4 @@
-import { makeNumbers } from '../lib/zobrist/numbers-32bit';
+import { A, B } from '../lib/zobrist/constant-numbers-32bit';
 import { StatefulHash } from '../lib/zobrist/stateful-hash';
 import { CastlingSide, Color, Piece, Position, Square } from '../types';
 import { ZobristKey } from './types';
@@ -8,8 +8,8 @@ export default class CurrentZobrist {
   readonly _hashY: StatefulHash;
 
   constructor(position: Position) {
-    this._hashX = new StatefulHash(position, makeNumbers());
-    this._hashY = new StatefulHash(position, makeNumbers());
+    this._hashX = new StatefulHash(position, A);
+    this._hashY = new StatefulHash(position, B);
   }
 
   set key(value: ZobristKey) {

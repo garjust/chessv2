@@ -286,6 +286,7 @@ function handleSetPosition(
   const { position } = action;
   const moves = engine.generateMoves();
   const evaluation = engine.evaluate() / EVALUATION_DIVIDER;
+  const zobrist = engine.zobrist;
   const checks = engine.checks[position.turn];
 
   state = {
@@ -294,6 +295,7 @@ function handleSetPosition(
     moves,
     evaluation,
     checks,
+    zobrist,
   };
 
   if (position.halfMoveCount === 100) {

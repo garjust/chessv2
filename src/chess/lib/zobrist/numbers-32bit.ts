@@ -37,28 +37,3 @@ export const makeNumbers = (): ZobristNumbers<number> => ({
     },
   },
 });
-
-// console.log(
-//   'zobrist',
-//   ZOBRIST_NUMBERS_FOR_TURN,
-//   ZOBRIST_NUMBERS_FOR_CASTLING,
-//   ZOBRIST_NUMBERS_FOR_SQUARES
-// );
-// console.log(
-//   'zobrist-bits',
-//   JSON.stringify(
-//     {
-//       turn: ZOBRIST_NUMBERS_FOR_TURN,
-//       castling: ZOBRIST_NUMBERS_FOR_CASTLING,
-//       pieceSquare: ZOBRIST_NUMBERS_FOR_SQUARES,
-//     },
-//     (key: string, value: unknown) => {
-//       if (value instanceof Object) {
-//         return value;
-//       } else {
-//         return formatBits(value as number);
-//       }
-//     },
-//     2
-//   )
-// );

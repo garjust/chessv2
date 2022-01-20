@@ -71,6 +71,7 @@ export interface State {
   moves: MoveWithExtraData[];
   checks: AttackObject[];
   evaluation: number;
+  zobrist?: [number, number];
   lastMove?: Move;
 }
 
