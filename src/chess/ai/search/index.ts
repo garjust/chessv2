@@ -1,3 +1,4 @@
+import { DRAW_SCORE, MATE_SCORE } from '../../engine/evaluation';
 import { Move } from '../../types';
 import type Context from './context';
 import TimeoutError from './timeout-error';
@@ -104,11 +105,13 @@ export default class Search {
       if (
         this.context.engine.checks[this.context.engine.position.turn].length > 0
       ) {
-        return -Infinity;
+        return -1 * (MATE_SCORE + depth);
       } else {
-        return 0;
+        return DRAW_SCORE;
       }
     }
+
+    nodeMove = moves[0];
 
     for (const move of moves) {
       this.context.engine.applyMove(move);

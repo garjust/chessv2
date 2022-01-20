@@ -27,6 +27,17 @@ test('alphaBeta finds checkmate in ladder mate position', async () => {
   expect(['f6', 'g6', 'h6'].includes(squareLabel(result.to))).toEqual(true);
 });
 
+test('alphaBeta finds castle mate', async () => {
+  const position = parseFEN('8/8/8/8/8/8/R7/R3K2k w Q - 0 1');
+  const ai = new MoveOrdering(2);
+
+  const result = await ai.nextMove(position);
+  const pv = ai.diagnosticsResult?.principleVariation;
+
+  expect(moveString(result)).toEqual('e1c1');
+  expect(pv).toEqual(['e1c1']);
+});
+
 // test('iterative finds checkmate in black mate position', async () => {
 //   const position = parseFEN(BLACK_CHECKMATE_FEN);
 //   const ai = new Iterative();
