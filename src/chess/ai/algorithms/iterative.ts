@@ -7,7 +7,7 @@ import { loadTimer } from '../../workers';
 import TimeoutError from '../search/timeout-error';
 import { SearchResult } from '../search/types';
 
-const MAX_DEPTH = 6;
+const MAX_DEPTH = 4;
 const INITIAL_DEPTH = 1;
 const TIMEOUT = 10_000;
 

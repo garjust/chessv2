@@ -99,9 +99,15 @@ export default class Search {
       depth
     );
 
-    // If there are no moves at this node then it is checkmate.
+    // If there are no moves at this node then the game has ended.
     if (moves.length === 0) {
-      return -Infinity;
+      if (
+        this.context.engine.checks[this.context.engine.position.turn].length > 0
+      ) {
+        return -Infinity;
+      } else {
+        return 0;
+      }
     }
 
     for (const move of moves) {
