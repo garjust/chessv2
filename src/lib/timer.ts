@@ -17,7 +17,7 @@ export default class Timer {
   readonly tickRate;
   readonly _debug;
 
-  value = 0;
+  value;
   _lastTick = 0;
   _tickerId?: NodeJS.Timer;
 
@@ -25,6 +25,7 @@ export default class Timer {
     timeout: number,
     { tickRate = 50, label = 'anonymous', debug = false, autoStart = true } = {}
   ) {
+    this.value = timeout;
     this.label = label;
     this.tickRate = tickRate;
     this._debug = debug;
@@ -39,7 +40,7 @@ export default class Timer {
     }
 
     if (autoStart) {
-      this.start(timeout);
+      this.start();
     }
   }
 
@@ -47,15 +48,18 @@ export default class Timer {
     return this.value === 0;
   }
 
-  start(timeout: number) {
+  start(timeout?: number) {
+    if (timeout) {
+      this.value = timeout;
+    }
+
     if (this._debug) {
       console.log(
         '[TIMER]',
-        `started ${this.label}: ${formatNumber(timeout)}ms`
+        `started ${this.label}: ${formatNumber(this.value)}ms`
       );
     }
 
-    this.value = timeout;
     this._lastTick = Date.now();
     this._tickerId = setInterval(() => {
       const tick = Date.now();

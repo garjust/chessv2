@@ -1,5 +1,3 @@
-import { start } from 'repl';
-import { Color } from '../../../types';
 import { parseFEN, STARTING_POSITION_FEN } from '../../fen';
 import {
   PERFT_POSITION_5,
@@ -23,12 +21,11 @@ test('32bit zobrist updating', () => {
 
   const start = Date.now();
   for (let n = 0; n < N; n++) {
-    zobrist.updateTurn(Color.Black);
-    zobrist.updateTurn(Color.White);
+    zobrist.updateTurn();
   }
   const timing = Date.now() - start;
 
-  console.log(`zobrist 32: ${(timing * 1000) / (N * 2)}μs/op`);
+  console.log(`zobrist 32: ${(timing * 1000) / N}μs/op`);
 });
 
 test('64bit zobrist updating', () => {
@@ -37,10 +34,9 @@ test('64bit zobrist updating', () => {
 
   const start = Date.now();
   for (let n = 0; n < N; n++) {
-    zobrist.updateTurn(Color.Black);
-    zobrist.updateTurn(Color.White);
+    zobrist.updateTurn();
   }
   const timing = Date.now() - start;
 
-  console.log(`zobrist 64: ${(timing * 1000) / (N * 2)}μs/op`);
+  console.log(`zobrist 64: ${(timing * 1000) / N}μs/op`);
 });
