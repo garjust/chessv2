@@ -3,12 +3,17 @@ import { moveString } from '../../utils';
 import { humanEvaluation } from './score-utils';
 import State from './state';
 import SearchTree from './tree-diagnostics';
-import { SearchResult } from './types';
+import { NodeType, SearchResult } from './types';
 
 type PlyCounter = {
   nodes: number;
   cuts: number;
   tableCuts: number;
+  nodeType: {
+    [NodeType.PV]: number;
+    [NodeType.Cut]: number;
+    [NodeType.All]: number;
+  };
 };
 
 type MoveScores = { move: string; score: number }[];
@@ -17,6 +22,17 @@ type StateData = Pick<
   State,
   'historyTable' | 'killerMoves' | 'pvTable' | 'tTable'
 >;
+
+const emptyPlyCounter = (): PlyCounter => ({
+  nodes: 0,
+  cuts: 0,
+  tableCuts: 0,
+  nodeType: {
+    [NodeType.PV]: 0,
+    [NodeType.Cut]: 0,
+    [NodeType.All]: 0,
+  },
+});
 
 export type DiagnosticsResult = {
   label: string;
@@ -50,9 +66,9 @@ export default class Diagnotics {
     this.enableTreeDiagnostics = enableTreeDiagnostics;
     this.start = Date.now();
 
-    this.plyCounters[-1] = { nodes: 0, cuts: 0, tableCuts: 0 };
+    this.plyCounters[-1] = emptyPlyCounter();
     for (let i = 1; i <= maxDepth; i++) {
-      this.plyCounters[i] = { nodes: 0, cuts: 0, tableCuts: 0 };
+      this.plyCounters[i] = emptyPlyCounter();
     }
 
     if (this.enableTreeDiagnostics) {
@@ -62,6 +78,10 @@ export default class Diagnotics {
 
   nodeVisit(depth: number) {
     this.plyCounters[this.maxDepth - depth].nodes++;
+  }
+
+  nodeType(depth: number, type: NodeType) {
+    this.plyCounters[this.maxDepth - depth].nodeType[type]++;
   }
 
   cut(depth: number) {

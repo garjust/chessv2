@@ -159,6 +159,8 @@ export default class Search {
       move: nodeMove,
     });
 
+    this.context.diagnostics?.nodeType(depth, nodeType);
+
     return alpha;
   }
 
