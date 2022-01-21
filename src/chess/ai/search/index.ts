@@ -97,7 +97,7 @@ export default class Search {
       cacheHit.score >= beta &&
       cacheHit.depth >= depth
     ) {
-      this.context.diagnostics?.cut(depth);
+      this.context.diagnostics?.cutFromTable(depth);
       return cacheHit.score;
     }
 

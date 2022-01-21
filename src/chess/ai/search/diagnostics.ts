@@ -8,6 +8,7 @@ import { SearchResult } from './types';
 type PlyCounter = {
   nodes: number;
   cuts: number;
+  tableCuts: number;
 };
 
 type MoveScores = { move: string; score: number }[];
@@ -49,9 +50,9 @@ export default class Diagnotics {
     this.enableTreeDiagnostics = enableTreeDiagnostics;
     this.start = Date.now();
 
-    this.plyCounters[-1] = { nodes: 0, cuts: 0 };
+    this.plyCounters[-1] = { nodes: 0, cuts: 0, tableCuts: 0 };
     for (let i = 1; i <= maxDepth; i++) {
-      this.plyCounters[i] = { nodes: 0, cuts: 0 };
+      this.plyCounters[i] = { nodes: 0, cuts: 0, tableCuts: 0 };
     }
 
     if (this.enableTreeDiagnostics) {
@@ -65,6 +66,11 @@ export default class Diagnotics {
 
   cut(depth: number) {
     this.plyCounters[this.maxDepth - depth].cuts++;
+  }
+
+  cutFromTable(depth: number) {
+    this.plyCounters[this.maxDepth - depth].tableCuts++;
+    this.cut(depth);
   }
 
   quiescenceNodeVisit() {
