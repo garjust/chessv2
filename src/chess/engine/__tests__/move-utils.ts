@@ -98,3 +98,38 @@ test('rayControlScanner queen skipPast through own piece', () => {
   // square.
   expect(squareControl).toEqual([]);
 });
+
+test('rayControlScanner rook skipPast through opponent piece', () => {
+  const position = parseFEN(
+    'rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3'
+  );
+  const scanningPiece = {
+    square: labelToSquare('a1'),
+    piece: { type: PieceType.Rook, color: Color.White },
+  };
+  const ray =
+    RAY_BY_DIRECTION[PieceType.Rook][scanningPiece.square][DirectionUnit.Up];
+  const move = { from: 48, to: 40 };
+
+  expect(ray).toEqual([8, 16, 24, 32, 40, 48, 56]);
+
+  // A pawn has just moved close to the scanning piece.
+  const squareControl = rayControlScanner(
+    position.pieces,
+    scanningPiece,
+    ray,
+    move.to,
+    move.from
+  );
+
+  expect(squareControl).toEqual([
+    {
+      attacker: {
+        square: scanningPiece.square,
+        type: PieceType.Rook,
+      },
+      square: 48,
+      slideSquares: [8, 16, 24, 32, 40],
+    },
+  ]);
+});

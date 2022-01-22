@@ -180,7 +180,8 @@ export const updateAttackedSquares = (
           pieces,
           { square, piece },
           ray,
-          move.to
+          move.to,
+          move.from
         );
         attackedSquares[piece.color].removeAttacks(
           square,

@@ -75,7 +75,8 @@ export const rayControlScanner = (
   pieces: Map<Square, Piece>,
   scanningPiece: { square: Square; piece: Piece },
   ray: Square[],
-  skipPast?: Square
+  skipPast?: Square,
+  stopAt?: Square
 ): SquareControlObject[] => {
   const moves: SquareControlObject[] = [];
   const slideSquares: Square[] = [];
@@ -105,6 +106,10 @@ export const rayControlScanner = (
       slideSquares: [...slideSquares],
     });
     slideSquares.push(to);
+
+    if (to === stopAt) {
+      break;
+    }
 
     const piece = pieces.get(to);
     if (piece) {
