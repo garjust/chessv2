@@ -12,7 +12,7 @@ const MAX_DEPTH = 6;
 //
 // This is the first expansion in "work" done by the search algorithm
 // separate from core engine work (move generation and execution).
-export default class MoveOrdering implements ChessComputer {
+export default class OrderMoves implements ChessComputer {
   maxDepth: number;
   engine: Engine;
   context: Context;
