@@ -77,14 +77,14 @@ export default class Search {
     alpha: number,
     beta: number
   ): Promise<number> {
+    if (await this.context.state.timeoutReached()) {
+      throw new TimeoutError();
+    }
+
     this.context.diagnostics?.nodeVisit(depth);
 
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
-
-    if (await this.context.state.timeoutReached()) {
-      throw new TimeoutError();
-    }
 
     const cacheHit = this.context.state.tTable.get(this.context.engine.zobrist);
 

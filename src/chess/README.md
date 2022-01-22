@@ -26,6 +26,7 @@
 - Cut% is incorrect because v3 visits more nodes than there are moves
 - Zobrish hash en passant square
 - Evaluation function should be able to detect checkmate + draw, allowing mates to be found one-ply less in the search
+- TTable memory is crashing chrome.
 
 ## Bug Positions
 
