@@ -1,10 +1,6 @@
 import { SquareBitmask, ZERO } from '../../lib/bitboard-def';
 import { Move } from '../../types';
-import {
-  QUEEN_RAYS_FLAT,
-  QUEEN_RAY_BITARRAYS,
-  KING_RAY_BITBOARDS_FLAT,
-} from '../move-lookup';
+import { QUEEN_RAYS_FLAT, QUEEN_RAY_BITARRAYS } from '../move-lookup';
 
 const N = 10_000_000;
 const KING = 4;
@@ -13,7 +9,6 @@ const MOVE_MISS: Move = { from: 21, to: 30 };
 
 test('perft of king ray lookup hit', () => {
   const move = MOVE_HIT;
-  expect(testFn(bitboard, 'bitboard', move)).toEqual(N);
   expect(testFn(arrayIncludes, 'array_in', move)).toEqual(N);
   expect(testFn(arraySome, 'arr_some', move)).toEqual(N);
   expect(testFn(arrayLookup, 'arr_look', move)).toEqual(N);
@@ -21,7 +16,6 @@ test('perft of king ray lookup hit', () => {
 
 test('perft of king ray lookup miss', () => {
   const move = MOVE_MISS;
-  expect(testFn(bitboard, 'bitboard', move)).toEqual(0);
   expect(testFn(arrayIncludes, 'array_in', move)).toEqual(0);
   expect(testFn(arraySome, 'arr_some', move)).toEqual(0);
   expect(testFn(arrayLookup, 'arr_look', move)).toEqual(0);
@@ -36,18 +30,6 @@ function testFn(fn: (move: Move) => number, name: string, move: Move): number {
       5
     )}ns/op     //check=${counter}`
   );
-  return counter;
-}
-
-function bitboard(move: Move) {
-  let counter = 0;
-  for (let i = 0; i < N; i++) {
-    (KING_RAY_BITBOARDS_FLAT[KING] &
-      (SquareBitmask[move.from] | SquareBitmask[move.to])) !==
-    ZERO
-      ? counter++
-      : counter;
-  }
   return counter;
 }
 
