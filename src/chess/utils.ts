@@ -118,11 +118,21 @@ export const flipColor = (color: Color): Color =>
 
 export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
   const diff = to - from;
+  const fromRank = rankForSquare(from);
+
+  if (from === 0 && to === 63) {
+    return DirectionUnit.UpRight;
+  }
+
   if (diff > 0) {
     if (diff % DirectionUnit.Up === 0) {
       return DirectionUnit.Up;
     } else if (diff % DirectionUnit.UpLeft === 0) {
-      return DirectionUnit.UpLeft;
+      if (fromRank === 0) {
+        return DirectionUnit.Right;
+      } else {
+        return DirectionUnit.UpLeft;
+      }
     } else if (diff % DirectionUnit.UpRight === 0) {
       return DirectionUnit.UpRight;
     } else {
@@ -134,7 +144,11 @@ export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
     } else if (diff % DirectionUnit.DownLeft === 0) {
       return DirectionUnit.DownLeft;
     } else if (diff % DirectionUnit.DownRight === 0) {
-      return DirectionUnit.DownRight;
+      if (fromRank === 7) {
+        return DirectionUnit.Left;
+      } else {
+        return DirectionUnit.DownRight;
+      }
     } else {
       return DirectionUnit.Left;
     }
@@ -185,7 +199,6 @@ export const findKing = (
   color: Color
 ): Square | undefined => {
   for (const [square, piece] of position.pieces) {
-    // Find the king we want to compute attacks for.
     if (piece.type === PieceType.King && piece.color === color) {
       return square;
     }
