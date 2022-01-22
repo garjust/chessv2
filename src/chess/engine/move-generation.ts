@@ -230,7 +230,7 @@ const noCheckFromMove = (
   if (!inCheck && attackMap) {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
-      return attackMap?.isAttacked(move.to);
+      return !attackMap?.isAttacked(move.to);
     } else {
       const pin = pins.get(move.from);
       if (!pin) {
