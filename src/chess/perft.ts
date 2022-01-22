@@ -2,26 +2,30 @@ import { searchRoot } from './lib/move-generation-perft';
 import { argv } from 'process';
 import { parseFEN } from './lib/fen';
 import Engine from './engine';
-import { moveFromString } from './utils';
+import { moveFromString, moveString } from './utils';
+import { open } from 'fs/promises';
 
-const DEBUG = false;
+const DEBUG_FILE = '/tmp/perft-debug';
+const DEBUG = true;
+
+const debugFile = await open(DEBUG_FILE, 'a');
 
 const [, , depth, fen, movesString] = argv;
 if (DEBUG) {
-  console.log('args', depth, fen, movesString);
+  debugFile.write(`PERFT CALL ===================\n`);
+  debugFile.write(`args ${depth} ${fen} ${movesString}\n`);
 }
 
 const position = parseFEN(fen);
-if (DEBUG) {
-  console.log('parsed position', position);
-}
 
 const moveList =
   movesString.length === 0
     ? []
     : movesString.split(' ').map((moveString) => moveFromString(moveString));
 if (DEBUG) {
-  console.log('parsed moves', moveList);
+  debugFile.write(
+    `parsed moves: ${moveList.map((move) => moveString(move)).join('-')}\n`
+  );
 }
 
 const engine = new Engine(position);
@@ -37,3 +41,5 @@ for (const [move, count] of Object.entries(results.counts)) {
 }
 
 console.log(`\n${results.counter}`);
+
+debugFile.close();

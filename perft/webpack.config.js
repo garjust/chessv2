@@ -30,6 +30,9 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
+  experiments: {
+    topLevelAwait: true,
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
   },
