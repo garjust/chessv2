@@ -175,6 +175,13 @@ export const updateAttackedSquares = (
         );
         attackedSquares[piece.color].addAttacks(square, newSquaresControlled);
       } else {
+        // If the move captured a piece then there is no change to the squares
+        // the slider controls since the capturing piece moved from further
+        // away and the to square was occupied before the move.
+        if (isCapture) {
+          continue;
+        }
+
         // The to square is closer so we remove attacks.
         const squaresNoLongerControlled = rayControlScanner(
           pieces,
