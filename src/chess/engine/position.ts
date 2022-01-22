@@ -1,6 +1,6 @@
 import { Color, Position as ExternalPosition } from '../types';
 import { copyPosition, findKing } from '../utils';
-import { AttackMap } from './attacks';
+import AttackMap from './attack-map';
 import { findChecksOnKings } from './checks';
 import { findPinsOnKings } from './pins';
 import { KingSquares, Position } from './types';

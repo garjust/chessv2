@@ -1,12 +1,11 @@
 import {
   AttackObject,
   Color,
-  Move,
   Pin,
   Position as ExternalPosition,
   Square,
-  SquareControlObject,
 } from '../types';
+import AttackMap from './attack-map';
 
 // Use two 32bit numbers for the zobrist key maintained by the engine.
 export type ZobristKey = [number, number];
@@ -26,19 +25,9 @@ export type KingChecks = {
   [Color.Black]: AttackObject[];
 };
 
-export interface IAttackMap {
-  isAttacked(square: Square): boolean;
-  attackEntries(): IterableIterator<[Square, number]>;
-  controlForPiece(square: Square): SquareControlObject[];
-  addAttacks(square: Square, squares: SquareControlObject[]): void;
-  removeAttacks(square: Square): void;
-  startChangeset(): void;
-  undoChangeset(): void;
-}
-
 export type AttackedSquares = {
-  [Color.White]: IAttackMap;
-  [Color.Black]: IAttackMap;
+  [Color.White]: AttackMap;
+  [Color.Black]: AttackMap;
 };
 
 export type Position = ExternalPosition & {

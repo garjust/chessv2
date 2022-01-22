@@ -7,10 +7,11 @@ import {
   Pin,
   Position as ExternalPosition,
 } from '../types';
-import { AttackMap } from './attacks';
+import AttackMap from './attack-map';
 import { findChecksOnKings } from './checks';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
+import { ENABLE_ATTACK_MAP, ENABLE_CHECK_TRACKING } from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
@@ -81,18 +82,25 @@ export default class Engine {
   }
 
   get checks(): KingChecks {
-    return findChecksOnKings(this._position.pieces, this._position.kings, {
-      enPassantSquare: this._position.enPassantSquare,
-      castlingAvailability: this._position.castlingAvailability,
-    });
+    if (ENABLE_CHECK_TRACKING) {
+      return this._position.checks;
+    } else {
+      return findChecksOnKings(this._position.pieces, this._position.kings, {
+        enPassantSquare: this._position.enPassantSquare,
+        castlingAvailability: this._position.castlingAvailability,
+      });
+    }
   }
 
   get attacks(): AttackedSquares {
-    // return this._position.attackedSquares;
-    return {
-      [Color.White]: new AttackMap(this._position, Color.White),
-      [Color.Black]: new AttackMap(this._position, Color.Black),
-    };
+    if (ENABLE_ATTACK_MAP) {
+      return this._position.attackedSquares;
+    } else {
+      return {
+        [Color.White]: new AttackMap(this._position, Color.White),
+        [Color.Black]: new AttackMap(this._position, Color.Black),
+      };
+    }
   }
 
   get pins(): Pin[] {

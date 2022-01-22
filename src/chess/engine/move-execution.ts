@@ -15,6 +15,7 @@ import {
 import { updateAttackedSquares } from './attacks';
 import { updateChecksOnKings } from './checks';
 import CurrentZobrist from './current-zobrist';
+import { ENABLE_ATTACK_MAP, ENABLE_CHECK_TRACKING } from './global-config';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
 import { KingChecks, KingPins, Position, ZobristKey } from './types';
@@ -208,24 +209,29 @@ export const applyMove = (
     move,
     piece
   );
-  // updateAttackedSquares(position.attackedSquares, position.pieces, move, piece);
 
-  // NOTE: Re-enable this when up to date check data is needed for move ordering
-  // or evaluation. This adds check calculation to the leaf nodes of a move
-  // search, while currently check calculation only happens in nodes of depth
-  // N-1 in the search.
-  // updateChecksOnKings(
-  //   position.checks,
-  //   position.pieces,
-  //   position.kings,
-  //   position.turn,
-  //   move,
-  //   piece,
-  //   {
-  //     enPassantSquare: position.enPassantSquare,
-  //     castlingAvailability: position.castlingAvailability,
-  //   }
-  // );
+  if (ENABLE_ATTACK_MAP) {
+    updateAttackedSquares(
+      position.attackedSquares,
+      position.pieces,
+      move,
+      piece
+    );
+  }
+  if (ENABLE_CHECK_TRACKING) {
+    updateChecksOnKings(
+      position.checks,
+      position.pieces,
+      position.kings,
+      position.turn,
+      move,
+      piece,
+      {
+        enPassantSquare: position.enPassantSquare,
+        castlingAvailability: position.castlingAvailability,
+      }
+    );
+  }
 
   if (result.captured) {
     currentZobrist.updateSquareOccupancy(
@@ -297,8 +303,10 @@ export const undoMove = (
     }
   }
 
-  // position.attackedSquares[Color.White].undoChangeset();
-  // position.attackedSquares[Color.Black].undoChangeset();
+  if (ENABLE_ATTACK_MAP) {
+    position.attackedSquares[Color.White].undoChangeset();
+    position.attackedSquares[Color.Black].undoChangeset();
+  }
 
   if (result.previousState.zobrist) {
     currentZobrist.key = result.previousState.zobrist;

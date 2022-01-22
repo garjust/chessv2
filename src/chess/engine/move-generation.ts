@@ -13,7 +13,9 @@ import {
   squaresInclude,
   CASTLING_AVAILABILITY_BLOCKED,
 } from '../utils';
+import AttackMap from './attack-map';
 import { attacksOnSquare } from './attacks';
+import { ENABLE_ATTACK_MAP } from './global-config';
 import {
   bishopMoves,
   kingMoves,
@@ -219,7 +221,7 @@ const noCheckFromMove = (
   move: MoveWithExtraData,
   pins: Map<Square, Pin>,
   inCheck: boolean,
-  attackMap?: Map<Square, number>
+  attackMap?: AttackMap
 ): boolean => {
   // We need to prune moves that result in a check on ourselves.
   //
@@ -228,7 +230,7 @@ const noCheckFromMove = (
   if (!inCheck && attackMap) {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
-      return attackMap.get(move.to) === 0;
+      return attackMap?.isAttacked(move.to);
     } else {
       const pin = pins.get(move.from);
       if (!pin) {
@@ -286,16 +288,28 @@ export const generateMoves = (
     });
   }
 
-  // const moves = movesForPositionFromAttacks(pieces, {
-  const moves = movesForPosition(pieces, {
-    color,
-    enPassantSquare,
-    castlingAvailability:
-      checksForPlayer.length > 0
-        ? CASTLING_AVAILABILITY_BLOCKED
-        : castlingAvailability,
-    attackedSquares,
-  });
+  let moves: MoveWithExtraData[];
+  if (ENABLE_ATTACK_MAP) {
+    moves = movesForPositionFromAttacks(pieces, {
+      color,
+      enPassantSquare,
+      castlingAvailability:
+        checksForPlayer.length > 0
+          ? CASTLING_AVAILABILITY_BLOCKED
+          : castlingAvailability,
+      attackedSquares,
+    });
+  } else {
+    moves = movesForPosition(pieces, {
+      color,
+      enPassantSquare,
+      castlingAvailability:
+        checksForPlayer.length > 0
+          ? CASTLING_AVAILABILITY_BLOCKED
+          : castlingAvailability,
+      attackedSquares,
+    });
+  }
 
   if (king) {
     for (let i = moves.length - 1; i >= 0; i--) {
@@ -314,8 +328,8 @@ export const generateMoves = (
           king,
           move,
           pinsToKing[color],
-          checksForPlayer.length > 0
-          // attackedSquares[flipColor(color)]
+          checksForPlayer.length > 0,
+          ENABLE_ATTACK_MAP ? attackedSquares[flipColor(color)] : undefined
         )
       ) {
         moves.splice(i, 1);

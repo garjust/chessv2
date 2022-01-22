@@ -1,4 +1,4 @@
-import { IAttackMap } from '../engine/types';
+import AttackMap from '../engine/attack-map';
 import { Pin, Square } from '../types';
 import {
   State,
@@ -45,7 +45,7 @@ export const setOverlayForPlay = (
 
 export const setOverlayForAttacks = (
   map: Map<Square, SquareOverlayType>,
-  attacks: IAttackMap
+  attacks: AttackMap
 ) => {
   for (const [square, count] of attacks.attackEntries()) {
     if (count > 0) {
