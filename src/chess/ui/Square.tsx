@@ -23,7 +23,7 @@ import {
 import { useWorkflow } from './workflow';
 import { clickSquareAction } from '../workflow/action';
 import Piece from './Piece';
-import { HEATMAPS } from '../lib/heatmaps';
+import { HEATMAPS, HEATMAP_MULTIPLIER } from '../lib/heatmaps';
 
 const DEFAULT_HEATMAP = HEATMAPS[PieceType.Rook][Color.White];
 
@@ -57,7 +57,7 @@ const Square = (props: SquareProps) => {
   };
 
   if (showHeatmap) {
-    const value = DEFAULT_HEATMAP[square];
+    const value = DEFAULT_HEATMAP[square] / HEATMAP_MULTIPLIER;
     const adjusted = (value + 1) / 10 + 0.65;
     css = {
       ...css,

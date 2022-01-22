@@ -1,6 +1,6 @@
 import { Color, Move, Piece, PieceType, Square } from '../types';
 
-const HEATMAP_MULTIPLIER = 100;
+export const HEATMAP_MULTIPLIER = 100;
 const heatmapMultiplier = (arr: number[]) =>
   arr.map((x) => x * HEATMAP_MULTIPLIER);
 
@@ -67,7 +67,7 @@ const ROOK_MATRIX = [
   [1, 3, 2, 1, 1, 2, 3, 1],
   [4, 3, 2, 4, 2, 4, 3, 4],
   [0, 0, 3, 1, 1, 3, 0, 0],
-  [0, 0, 2, 4, 4, 2, 0, 0],
+  [1, 0, 2, 3, 3, 2, 0, 1],
 ].map(heatmapMultiplier);
 
 export const HEATMAPS = {
