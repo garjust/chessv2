@@ -116,8 +116,8 @@ export const isLegalSquare = (square: Square): boolean =>
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
-export const directionOfMove = (move: Move): DirectionUnit => {
-  const diff = move.to - move.from;
+export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
+  const diff = to - from;
   if (diff > 0) {
     if (diff % DirectionUnit.Up === 0) {
       return DirectionUnit.Up;

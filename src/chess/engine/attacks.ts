@@ -7,7 +7,11 @@ import {
   Move,
   SquareControlObject,
 } from '../types';
-import { flipColor, CASTLING_AVAILABILITY_BLOCKED } from '../utils';
+import {
+  flipColor,
+  CASTLING_AVAILABILITY_BLOCKED,
+  directionOfMove,
+} from '../utils';
 import {
   BISHOP_RAY_BITARRAYS,
   QUEEN_RAY_BITARRAYS,
@@ -96,6 +100,19 @@ export const attacksOnSquare = (
   return attacks;
 };
 
+const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
+  switch (piece.type) {
+    case PieceType.Bishop:
+      return BISHOP_RAY_BITARRAYS[pieceSquare][square];
+    case PieceType.Rook:
+      return ROOK_RAY_BITARRAYS[pieceSquare][square];
+    case PieceType.Queen:
+      return QUEEN_RAY_BITARRAYS[pieceSquare][square];
+    default:
+      return false;
+  }
+};
+
 export const updateAttackedSquares = (
   attackedSquares: AttackedSquares,
   pieces: Map<Square, Piece>,
@@ -126,27 +143,18 @@ export const updateAttackedSquares = (
       continue;
     }
 
-    let isFromIncident = false;
-    let isToIncident = false;
+    if (sliderHasVision(piece, square, move.from)) {
+      const unit = directionOfMove(square, move.from);
+      const ray = 1; //some lookup using the unit vector
 
-    switch (piece.type) {
-      case PieceType.Bishop:
-        isFromIncident = BISHOP_RAY_BITARRAYS[square][move.from];
-        isToIncident = BISHOP_RAY_BITARRAYS[square][move.to];
-        break;
-      case PieceType.Rook:
-        isFromIncident = ROOK_RAY_BITARRAYS[square][move.from];
-        isToIncident = ROOK_RAY_BITARRAYS[square][move.to];
-        break;
-      case PieceType.Queen:
-        isFromIncident = QUEEN_RAY_BITARRAYS[square][move.from];
-        isToIncident = QUEEN_RAY_BITARRAYS[square][move.to];
-        break;
-      default:
-        break;
+      // For now do the old thing
+      attackedSquares[piece.color].removeAttacks(square);
+      const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
+      attackedSquares[piece.color].addAttacks(square, newAttacks);
     }
 
-    if (isFromIncident || isToIncident) {
+    if (sliderHasVision(piece, square, move.to)) {
+      // For now do the old thing
       attackedSquares[piece.color].removeAttacks(square);
       const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
       attackedSquares[piece.color].addAttacks(square, newAttacks);
