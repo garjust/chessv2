@@ -6,7 +6,14 @@ import {
 } from '../types';
 import { forPiece } from './piece-movement-control';
 
-type SquareControlChangeset = {
+enum ChangeType {
+  FullRemove,
+  PartialRemove,
+  PartialAdd,
+}
+
+type SquareControlChange = {
+  type: ChangeType;
   square: Square;
   squares: SquareControlObject[];
 };
@@ -18,7 +25,7 @@ export default class AttackMap {
   // the key square.
   _squareControlByPiece = new Map<Square, SquareControlObject[]>();
 
-  _updatesStack: SquareControlChangeset[][] = [];
+  _updatesStack: SquareControlChange[][] = [];
 
   constructor(position: ExternalPosition, color: Color) {
     for (const [square, piece] of position.pieces) {
@@ -27,7 +34,7 @@ export default class AttackMap {
       }
 
       const squareControl = forPiece(piece, position.pieces, square);
-      this.addAttacks(square, squareControl);
+      this.addAttacksForPiece(square, squareControl);
     }
   }
 
@@ -50,12 +57,22 @@ export default class AttackMap {
   undoChangeset(): void {
     const removals = this._updatesStack.pop() ?? [];
     for (const change of removals) {
-      this.removeAttacks(change.square, false);
-      this.addAttacks(change.square, change.squares);
+      switch (change.type) {
+        case ChangeType.FullRemove:
+          this.removeAttacksForPiece(change.square, false);
+          this.addAttacksForPiece(change.square, change.squares);
+          break;
+        case ChangeType.PartialRemove:
+          this.addAttacks(change.square, change.squares, false);
+          break;
+        case ChangeType.PartialAdd:
+          this.removeAttacks(change.square, change.squares, false);
+          break;
+      }
     }
   }
 
-  addAttacks(square: Square, squares: SquareControlObject[]): void {
+  addAttacksForPiece(square: Square, squares: SquareControlObject[]): void {
     for (const squareControl of squares) {
       this._countMap.set(
         squareControl.square,
@@ -65,10 +82,14 @@ export default class AttackMap {
     this._squareControlByPiece.set(square, squares);
   }
 
-  removeAttacks(square: Square, cache = true): void {
-    const squares = this._squareControlByPiece.get(square) ?? [];
+  addAttacks(
+    square: Square,
+    squares: SquareControlObject[],
+    cache = true
+  ): void {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
+        type: ChangeType.PartialAdd,
         square,
         squares,
       });
@@ -77,9 +98,72 @@ export default class AttackMap {
     for (const squareControl of squares) {
       this._countMap.set(
         squareControl.square,
-        (this._countMap.get(squareControl.square) ?? 0) - 1
+        (this._countMap.get(squareControl.square) ?? 0) + 1
       );
     }
+    const existing = this._squareControlByPiece.get(square);
+    if (!existing) {
+      throw Error('there should be square control from this square');
+    }
+    existing.push(...squares);
+  }
+
+  removeAttacksForPiece(square: Square, cache = true): void {
+    const squares = this._squareControlByPiece.get(square) ?? [];
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: ChangeType.FullRemove,
+        square,
+        squares,
+      });
+    }
+
+    for (const squareControl of squares) {
+      const count = this._countMap.get(squareControl.square);
+      if (!count || count === 0) {
+        throw Error('cannot remove attack that does not exist');
+      }
+      this._countMap.set(squareControl.square, count - 1);
+    }
     this._squareControlByPiece.set(square, []);
+  }
+
+  removeAttacks(
+    square: Square,
+    squares: SquareControlObject[],
+    cache = true
+  ): void {
+    const existing = this._squareControlByPiece.get(square);
+    if (!existing) {
+      throw Error('there should be square control from this square');
+    }
+
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: ChangeType.PartialRemove,
+        square,
+        squares,
+      });
+    }
+
+    const squaresToRemove = squares.map(
+      (squareControl) => squareControl.square
+    );
+
+    for (const squareControl of squares) {
+      const count = this._countMap.get(squareControl.square);
+      if (!count || count === 0) {
+        throw Error('cannot remove attack that does not exist');
+      }
+
+      this._countMap.set(squareControl.square, count - 1);
+    }
+
+    for (let i = existing.length - 1; i >= 0; i--) {
+      const control = existing[i];
+      if (squaresToRemove.includes(control.square)) {
+        existing.splice(i, 1);
+      }
+    }
   }
 }

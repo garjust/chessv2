@@ -31,7 +31,7 @@ import Engine from '../engine';
 import { interval, map } from 'rxjs';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 
-const FEN_FOR_INITIAL_POSITION = LADDER_MATE_FEN;
+const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {

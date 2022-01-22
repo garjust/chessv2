@@ -215,7 +215,8 @@ export const applyMove = (
       position.attackedSquares,
       position.pieces,
       move,
-      piece
+      piece,
+      result.captured !== undefined
     );
   }
   if (ENABLE_CHECK_TRACKING) {

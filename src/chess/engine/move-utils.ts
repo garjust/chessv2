@@ -74,17 +74,37 @@ export const rayScanner = (
 export const rayControlScanner = (
   pieces: Map<Square, Piece>,
   scanningPiece: { square: Square; piece: Piece },
-  ray: Square[]
+  ray: Square[],
+  skipPast?: Square
 ): SquareControlObject[] => {
   const moves: SquareControlObject[] = [];
+  const slideSquares: Square[] = [];
   const from = scanningPiece.square;
+  let skip = skipPast ? true : false;
 
   for (const to of ray) {
+    if (skip) {
+      slideSquares.push(to);
+
+      if (to === skipPast) {
+        skip = false;
+      } else {
+        const piece = pieces.get(to);
+        if (piece) {
+          // Stop scanning if we hit a piece of either colour
+          break;
+        }
+      }
+
+      continue;
+    }
+
     moves.push({
       attacker: { square: from, type: scanningPiece.piece.type },
       square: to,
-      slideSquares: moves.map(({ square }) => square),
+      slideSquares: [...slideSquares],
     });
+    slideSquares.push(to);
 
     const piece = pieces.get(to);
     if (piece) {
