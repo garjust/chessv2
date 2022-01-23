@@ -12,12 +12,14 @@ import {
   flipColor,
   squaresInclude,
   CASTLING_AVAILABILITY_BLOCKED,
+  isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
 import { attacksOnSquare } from './attacks';
 import { ENABLE_ATTACK_MAP } from './global-config';
 import {
   bishopMoves,
+  expandPromotions,
   kingMoves,
   knightMoves,
   pawnMoves,
@@ -144,7 +146,7 @@ const movesForPositionFromAttacks = (
         }
       }
 
-      moves.push({
+      const move = {
         from: squareControl.attacker.square,
         to: squareControl.square,
         piece,
@@ -158,7 +160,16 @@ const movesForPositionFromAttacks = (
               slideSquares: squareControl.slideSquares,
             }
           : undefined,
-      });
+      };
+
+      if (
+        piece.type === PieceType.Pawn &&
+        isPromotionPositionPawn(piece.color, square)
+      ) {
+        moves.push(...expandPromotions(move));
+      } else {
+        moves.push(move);
+      }
     }
 
     if (piece.type === PieceType.King) {

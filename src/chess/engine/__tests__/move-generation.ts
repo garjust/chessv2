@@ -1,5 +1,12 @@
 import Engine from '..';
-import { parseFEN } from '../../lib/fen';
+import { parseFEN, PERFT_5_FEN } from '../../lib/fen';
+
+test('move generation perft_5', () => {
+  const engine = new Engine(parseFEN(PERFT_5_FEN));
+
+  const moves = engine.generateMoves();
+  expect(moves.length).toEqual(44);
+});
 
 test('move generation bongcloud 1', () => {
   const engine = new Engine(

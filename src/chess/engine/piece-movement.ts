@@ -22,7 +22,17 @@ import {
   ROOK_LOOKUP,
 } from './move-lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
-import { AttackedSquares } from './types';
+
+export const expandPromotions = (move: MoveWithExtraData) =>
+  [PieceType.Bishop, PieceType.Knight, PieceType.Queen, PieceType.Rook].map(
+    (pieceType) => ({
+      ...move,
+      promotion: pieceType as PromotionOption,
+    })
+  );
+
+export const expandAllPromotions = (moves: MoveWithExtraData[]) =>
+  moves.flatMap((move) => expandPromotions(move));
 
 export const pawnMoves = (
   pieces: Map<Square, Piece>,
@@ -117,14 +127,7 @@ export const pawnMoves = (
   // If the pawn will promote on next advancement take the possible pawn moves
   // and add possible promotions.
   if (isPromotionPositionPawn(color, from)) {
-    squares = squares.flatMap((move) =>
-      [PieceType.Bishop, PieceType.Knight, PieceType.Queen, PieceType.Rook].map(
-        (pieceType) => ({
-          ...move,
-          promotion: pieceType as PromotionOption,
-        })
-      )
-    );
+    squares = expandAllPromotions(squares);
   }
 
   return squares;
