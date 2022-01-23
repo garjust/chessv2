@@ -99,7 +99,7 @@ test('rayControlScanner queen skipPast through own piece', () => {
   expect(squareControl).toEqual([]);
 });
 
-test('rayControlScanner queen skipPast through own piece on first rank', () => {
+test('rayControlScanner queen skipPast is a1', () => {
   const position = parseFEN(
     'r1bqkbnr/pppppppp/n7/8/8/P7/RPPPPPPP/1NBQKBNR b Kkq - 2 2'
   );
@@ -116,6 +116,7 @@ test('rayControlScanner queen skipPast through own piece on first rank', () => {
     position.pieces,
     scanningPiece,
     ray,
+    // The bug here was the 0-square being treated as false
     0
   );
   // No square control because a piece is blocking the ray before the skipPast

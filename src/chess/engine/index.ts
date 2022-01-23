@@ -1,3 +1,4 @@
+import equal from 'fast-deep-equal/es6';
 import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
 import {
   Color,
@@ -7,11 +8,15 @@ import {
   Pin,
   Position as ExternalPosition,
 } from '../types';
-import AttackMap, { verify } from './attack-map';
+import AttackMap from './attack-map';
 import { findChecksOnKings } from './checks';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
-import { ENABLE_ATTACK_MAP, ENABLE_CHECK_TRACKING } from './global-config';
+import {
+  DEBUG_FLAG,
+  ENABLE_ATTACK_MAP,
+  ENABLE_CHECK_TRACKING,
+} from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
@@ -31,8 +36,18 @@ export default class Engine {
     const result = applyMove(this._position, move, this._currentZobrist);
     this._moveStack.push(result);
 
-    verify(this._position.attackedSquares[Color.White], this, Color.White);
-    verify(this._position.attackedSquares[Color.Black], this, Color.Black);
+    if (DEBUG_FLAG) {
+      verifyAttackMap(
+        this._position.attackedSquares[Color.White],
+        this,
+        Color.White
+      );
+      verifyAttackMap(
+        this._position.attackedSquares[Color.Black],
+        this,
+        Color.Black
+      );
+    }
 
     return result.captured?.piece;
   }
@@ -45,8 +60,18 @@ export default class Engine {
       throw Error('no last move to undo');
     }
 
-    verify(this._position.attackedSquares[Color.White], this, Color.White);
-    verify(this._position.attackedSquares[Color.Black], this, Color.Black);
+    if (DEBUG_FLAG) {
+      verifyAttackMap(
+        this._position.attackedSquares[Color.White],
+        this,
+        Color.White
+      );
+      verifyAttackMap(
+        this._position.attackedSquares[Color.Black],
+        this,
+        Color.Black
+      );
+    }
   }
 
   evaluate(): number {
@@ -117,3 +142,14 @@ export default class Engine {
     ];
   }
 }
+
+const verifyAttackMap = (map: AttackMap, engine: Engine, color: Color) => {
+  const computed = new AttackMap(engine._position, color);
+
+  // if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
+  //   console.log('control map is out of sync');
+  // }
+  if (!equal(map._countMap, computed._countMap)) {
+    console.log('attack count map is out of sync');
+  }
+};

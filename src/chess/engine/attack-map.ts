@@ -1,5 +1,3 @@
-import equal from 'fast-deep-equal/es6';
-import Engine from '.';
 import {
   Color,
   Square,
@@ -173,14 +171,3 @@ export default class AttackMap {
     }
   }
 }
-
-export const verify = (map: AttackMap, engine: Engine, color: Color) => {
-  const computed = new AttackMap(engine._position, color);
-
-  // if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
-  //   console.log('control map is out of sync');
-  // }
-  if (!equal(map._countMap, computed._countMap)) {
-    console.log('attack count map is out of sync');
-  }
-};
