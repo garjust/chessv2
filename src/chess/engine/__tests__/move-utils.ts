@@ -99,6 +99,30 @@ test('rayControlScanner queen skipPast through own piece', () => {
   expect(squareControl).toEqual([]);
 });
 
+test('rayControlScanner queen skipPast through own piece on first rank', () => {
+  const position = parseFEN(
+    'r1bqkbnr/pppppppp/n7/8/8/P7/RPPPPPPP/1NBQKBNR b Kkq - 2 2'
+  );
+  const scanningPiece = {
+    square: labelToSquare('d1'),
+    piece: { type: PieceType.Queen, color: Color.White },
+  };
+  const ray =
+    RAY_BY_DIRECTION[PieceType.Queen][scanningPiece.square][DirectionUnit.Left];
+
+  expect(ray).toEqual([2, 1, 0]);
+
+  const squareControl = rayControlScanner(
+    position.pieces,
+    scanningPiece,
+    ray,
+    0
+  );
+  // No square control because a piece is blocking the ray before the skipPast
+  // square.
+  expect(squareControl).toEqual([]);
+});
+
 test('rayControlScanner rook skipPast through opponent piece', () => {
   const position = parseFEN(
     'rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3'

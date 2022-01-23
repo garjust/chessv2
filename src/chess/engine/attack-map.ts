@@ -1,4 +1,4 @@
-import equal from 'fast-deep-equal';
+import equal from 'fast-deep-equal/es6';
 import Engine from '.';
 import {
   Color,
@@ -20,9 +20,13 @@ type SquareControlChange = {
   squares: SquareControlObject[];
 };
 
+const EMPTY_ATTACKS: [number, number][] = Array(64)
+  .fill(0)
+  .map((v, i) => [i, v]);
+
 export default class AttackMap {
   // Store the number of pieces attacking a particular square.
-  _countMap = new Map<Square, number>();
+  _countMap = new Map<Square, number>(EMPTY_ATTACKS);
   // Store all squares controlled by the piece residing in
   // the key square.
   _squareControlByPiece = new Map<Square, SquareControlObject[]>();
@@ -172,8 +176,11 @@ export default class AttackMap {
 
 export const verify = (map: AttackMap, engine: Engine, color: Color) => {
   const computed = new AttackMap(engine._position, color);
-  return (
-    equal(map._squareControlByPiece, computed._squareControlByPiece) &&
-    equal(map._countMap, computed._countMap)
-  );
+
+  // if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
+  //   console.log('control map is out of sync');
+  // }
+  if (!equal(map._countMap, computed._countMap)) {
+    console.log('attack count map is out of sync');
+  }
 };

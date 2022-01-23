@@ -81,7 +81,7 @@ export const rayControlScanner = (
   const moves: SquareControlObject[] = [];
   const slideSquares: Square[] = [];
   const from = scanningPiece.square;
-  let skip = skipPast ? true : false;
+  let skip = skipPast !== undefined ? true : false;
 
   for (const to of ray) {
     if (skip) {
