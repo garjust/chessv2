@@ -7,7 +7,8 @@ import {
   Pin,
   Position as ExternalPosition,
 } from '../types';
-import AttackMap from './attack-map';
+import { flipColor } from '../utils';
+import AttackMap, { verify } from './attack-map';
 import { findChecksOnKings } from './checks';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
@@ -30,6 +31,14 @@ export default class Engine {
   applyMove(move: Move): Piece | undefined {
     const result = applyMove(this._position, move, this._currentZobrist);
     this._moveStack.push(result);
+
+    // if (
+    //   !verify(this._position.attackedSquares[Color.White], this, Color.White) ||
+    //   !verify(this._position.attackedSquares[Color.Black], this, Color.Black)
+    // ) {
+    //   throw Error('attack map out of sync');
+    // }
+
     return result.captured?.piece;
   }
 
@@ -40,6 +49,13 @@ export default class Engine {
     } else {
       throw Error('no last move to undo');
     }
+
+    // if (
+    //   !verify(this._position.attackedSquares[Color.White], this, Color.White) ||
+    //   !verify(this._position.attackedSquares[Color.Black], this, Color.Black)
+    // ) {
+    //   throw Error('attack map out of sync');
+    // }
   }
 
   evaluate(): number {

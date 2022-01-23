@@ -1,3 +1,5 @@
+import equal from 'fast-deep-equal';
+import Engine from '.';
 import {
   Color,
   Square,
@@ -167,3 +169,11 @@ export default class AttackMap {
     }
   }
 }
+
+export const verify = (map: AttackMap, engine: Engine, color: Color) => {
+  const computed = new AttackMap(engine._position, color);
+  return (
+    equal(map._squareControlByPiece, computed._squareControlByPiece) &&
+    equal(map._countMap, computed._countMap)
+  );
+};
