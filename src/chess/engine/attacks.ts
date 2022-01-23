@@ -121,7 +121,9 @@ export const updateAttackedSquares = (
   pieces: Map<Square, Piece>,
   move: Move,
   movedPiece: Piece,
-  isCapture: boolean
+  isCapture: boolean,
+  enPassantCaptureSquare?: Square,
+  castlingRookMove?: Move
 ) => {
   attackedSquares[Color.White].startChangeset();
   attackedSquares[Color.Black].startChangeset();
@@ -151,11 +153,20 @@ export const updateAttackedSquares = (
     const isIncidentFrom = sliderHasVision(piece, square, move.from);
     const isIncidentTo = sliderHasVision(piece, square, move.to);
 
-    // If the sliding piece is incident with a move's from and two squares in
-    // the same ray we need special handling. If the move's to square is
-    // further from the sliding piece we need to add attacks and if it is
-    // closed to the sliding piece we need to remove attacks.
     if (
+      // If the move was one of these special cases do a simpler and slower
+      // update to the attack map.
+      enPassantCaptureSquare ||
+      castlingRookMove
+    ) {
+      attackedSquares[piece.color].removeAttacksForPiece(square);
+      const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
+      attackedSquares[piece.color].addAttacksForPiece(square, newAttacks);
+    } else if (
+      // If the sliding piece is incident with a move's from and two squares in
+      // the same ray we need special handling. If the move's to square is
+      // further from the sliding piece we need to add attacks and if it is
+      // closed to the sliding piece we need to remove attacks.
       isIncidentFrom &&
       isIncidentTo &&
       directionOfMove(square, move.to) === directionOfMove(square, move.from)

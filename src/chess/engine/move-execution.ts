@@ -1,3 +1,4 @@
+import { PIECES } from '../piece-consants';
 import {
   CastlingAvailability,
   Color,
@@ -54,6 +55,9 @@ export const applyMove = (
 ): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
+
+  let enPassantCaptureSquare: Square | undefined;
+  let castlingRookMove: Move | undefined;
 
   if (!piece) {
     throw Error('no piece to move');
@@ -119,18 +123,18 @@ export const applyMove = (
   if (piece.type === PieceType.Pawn) {
     if (position.enPassantSquare === move.to) {
       // This is an en passant capture
-      const capturedSquare =
+      enPassantCaptureSquare =
         piece.color === Color.White ? down(move.to) : up(move.to);
-      captured = pieces.get(capturedSquare);
+      captured = pieces.get(enPassantCaptureSquare);
       if (captured) {
         result.captured = {
-          square: capturedSquare,
+          square: enPassantCaptureSquare,
           piece: captured,
         };
       } else {
         throw Error('no piece captured with en passant capture');
       }
-      pieces.delete(capturedSquare);
+      pieces.delete(enPassantCaptureSquare);
     }
   }
 
@@ -158,31 +162,29 @@ export const applyMove = (
 
     // If the king move is a castle we need to move the corresponding rook.
     if (move.from - move.to === 2) {
-      const rook = {
-        color: piece.color,
-        type: PieceType.Rook,
-      };
-
       // queenside
-      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].queenside;
-      const rookToSquare = piece.color === Color.White ? 3 : 59;
-      position.pieces.delete(rookFromSquare);
-      position.pieces.set(rookToSquare, rook);
-      currentZobrist.updateSquareOccupancy(rookFromSquare, rook);
-      currentZobrist.updateSquareOccupancy(rookToSquare, rook);
-    } else if (move.from - move.to === -2) {
-      const rook = {
-        color: piece.color,
-        type: PieceType.Rook,
+      const rook = PIECES[piece.color][PieceType.Rook];
+      castlingRookMove = {
+        from: ROOK_STARTING_SQUARES[piece.color].queenside,
+        to: piece.color === Color.White ? 3 : 59,
       };
 
+      position.pieces.delete(castlingRookMove.from);
+      position.pieces.set(castlingRookMove.to, rook);
+      currentZobrist.updateSquareOccupancy(castlingRookMove.from, rook);
+      currentZobrist.updateSquareOccupancy(castlingRookMove.to, rook);
+    } else if (move.from - move.to === -2) {
       // kingside
-      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].kingside;
-      const rookToSquare = piece.color === Color.White ? 5 : 61;
-      position.pieces.delete(rookFromSquare);
-      position.pieces.set(rookToSquare, rook);
-      currentZobrist.updateSquareOccupancy(rookFromSquare, rook);
-      currentZobrist.updateSquareOccupancy(rookToSquare, rook);
+      const rook = PIECES[piece.color][PieceType.Rook];
+      castlingRookMove = {
+        from: ROOK_STARTING_SQUARES[piece.color].kingside,
+        to: piece.color === Color.White ? 5 : 61,
+      };
+
+      position.pieces.delete(castlingRookMove.from);
+      position.pieces.set(castlingRookMove.to, rook);
+      currentZobrist.updateSquareOccupancy(castlingRookMove.from, rook);
+      currentZobrist.updateSquareOccupancy(castlingRookMove.to, rook);
     }
   }
 
@@ -216,7 +218,9 @@ export const applyMove = (
       position.pieces,
       move,
       piece,
-      result.captured !== undefined
+      result.captured !== undefined,
+      enPassantCaptureSquare,
+      castlingRookMove
     );
   }
   if (ENABLE_CHECK_TRACKING) {
