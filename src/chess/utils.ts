@@ -7,6 +7,7 @@ import {
   Position,
   PromotionOption,
   RankFile,
+  SlidingPiece,
   Square,
   SquareLabel,
 } from './types';
@@ -94,12 +95,10 @@ export const squareGenerator = function* () {
   }
 };
 
-export const isSlider = (
-  type?: PieceType
-): type is PieceType.Bishop | PieceType.Rook | PieceType.Queen =>
-  type === PieceType.Bishop ||
-  type === PieceType.Queen ||
-  type === PieceType.Rook;
+export const isSlider = (piece: Piece): piece is SlidingPiece =>
+  piece.type === PieceType.Bishop ||
+  piece.type === PieceType.Queen ||
+  piece.type === PieceType.Rook;
 
 export const squaresInclude = (squares: Square[], square: Square): boolean =>
   squares.includes(square);

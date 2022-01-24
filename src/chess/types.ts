@@ -18,6 +18,11 @@ export type Piece = {
   color: Color;
 };
 
+export type SlidingPiece =
+  | { color: Color; type: PieceType.Bishop }
+  | { color: Color; type: PieceType.Rook }
+  | { color: Color; type: PieceType.Queen };
+
 export type Square = number;
 
 export type RankFile = {

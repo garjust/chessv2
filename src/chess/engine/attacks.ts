@@ -6,6 +6,7 @@ import {
   AttackObject,
   Move,
   SquareControlObject,
+  SlidingPiece,
 } from '../types';
 import {
   flipColor,
@@ -29,6 +30,7 @@ import {
 } from './piece-movement';
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';
+import AttackMap from './attack-map';
 
 export const attacksOnSquare = (
   pieces: Map<Square, Piece>,
@@ -116,6 +118,106 @@ const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
   }
 };
 
+const updatePiecesAttacks = (
+  square: Square,
+  piece: SlidingPiece,
+  attackMap: AttackMap,
+  pieces: Map<Square, Piece>,
+  move: Move,
+  isCapture: boolean,
+  enPassantCaptureSquare?: Square,
+  castlingRookMove?: Move
+) => {
+  const isIncidentFrom = sliderHasVision(piece, square, move.from);
+  const isIncidentTo = sliderHasVision(piece, square, move.to);
+
+  if (
+    // If the move was one of these special cases do a simpler and slower
+    // update to the attack map.
+    enPassantCaptureSquare ||
+    castlingRookMove
+  ) {
+    attackMap.removeAttacksForPiece(square);
+    const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
+    attackMap.addAttacksForPiece(square, newAttacks);
+  } else if (
+    // If the sliding piece is incident with a move's from and two squares in
+    // the same ray we need special handling. If the move's to square is
+    // further from the sliding piece we need to add attacks and if it is
+    // closed to the sliding piece we need to remove attacks.
+    isIncidentFrom &&
+    isIncidentTo &&
+    directionOfMove(square, move.to) === directionOfMove(square, move.from)
+  ) {
+    const unit = directionOfMove(square, move.from);
+    const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+
+    const moveUnit = directionOfMove(move.from, move.to);
+
+    if (unit === moveUnit) {
+      // The to square is further away so we add attacks.
+      const newSquaresControlled = rayControlScanner(
+        pieces,
+        { square, piece },
+        ray,
+        move.from
+      );
+      attackMap.addAttacks(square, newSquaresControlled);
+    } else {
+      // If the move captured a piece then there is no change to the squares
+      // the slider controls since the capturing piece moved from further
+      // away and the to square was occupied before the move.
+      if (isCapture) {
+        return;
+      }
+
+      // The to square is closer so we remove attacks.
+      const squaresNoLongerControlled = rayControlScanner(
+        pieces,
+        { square, piece },
+        ray,
+        move.to,
+        move.from
+      );
+      attackMap.removeAttacks(square, squaresNoLongerControlled);
+    }
+  } else {
+    // For the the square the piece has moved from.
+    // - The square no longer has a piece in it and a ray which was
+    //   obstructed is no longer obstructed, therefore we want to add attacks.
+    if (isIncidentFrom) {
+      const unit = directionOfMove(square, move.from);
+      const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+      const newSquaresControlled = rayControlScanner(
+        pieces,
+        { square, piece },
+        ray,
+        move.from
+      );
+
+      attackMap.addAttacks(square, newSquaresControlled);
+    }
+
+    // For the square the piece has moved to.
+    // - If the move was a capture nothing in the attack map should change
+    //   relative to the to square since a piece occupied it before.
+    // - Otherwise the to square now has a piece in it and a ray can now be
+    //   obstructed, therefore we want to remove attacks.
+    if (!isCapture && isIncidentTo) {
+      const unit = directionOfMove(square, move.to);
+      const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+      const squaresNoLongerControlled = rayControlScanner(
+        pieces,
+        { square, piece },
+        ray,
+        move.to
+      );
+
+      attackMap.removeAttacks(square, squaresNoLongerControlled);
+    }
+  }
+};
+
 export const updateAttackedSquares = (
   attackedSquares: AttackedSquares,
   pieces: Map<Square, Piece>,
@@ -142,107 +244,32 @@ export const updateAttackedSquares = (
   );
   attackedSquares[movedPiece.color].addAttacksForPiece(move.to, newAttacks);
 
+  // const visionOfFrom = [
+  //   ...attackedSquares[Color.White].controlOfSquare(move.from),
+  //   ...attackedSquares[Color.Black].controlOfSquare(move.from),
+  // ];
+  // const visionOfTo = [
+  //   ...attackedSquares[Color.White].controlOfSquare(move.from),
+  //   ...attackedSquares[Color.Black].controlOfSquare(move.from),
+  // ];
+
   // Find sliding pieces affected by the moved piece.
   for (const [square, piece] of pieces) {
-    if (square === move.from || square === move.to || !isSlider(piece.type)) {
+    if (square === move.from || square === move.to || !isSlider(piece)) {
       // We have already covered pieces in the move from/to squares or this
       // piece is not a slider.
       continue;
     }
 
-    const isIncidentFrom = sliderHasVision(piece, square, move.from);
-    const isIncidentTo = sliderHasVision(piece, square, move.to);
-
-    if (
-      // If the move was one of these special cases do a simpler and slower
-      // update to the attack map.
-      enPassantCaptureSquare ||
+    updatePiecesAttacks(
+      square,
+      piece,
+      attackedSquares[piece.color],
+      pieces,
+      move,
+      isCapture,
+      enPassantCaptureSquare,
       castlingRookMove
-    ) {
-      attackedSquares[piece.color].removeAttacksForPiece(square);
-      const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
-      attackedSquares[piece.color].addAttacksForPiece(square, newAttacks);
-    } else if (
-      // If the sliding piece is incident with a move's from and two squares in
-      // the same ray we need special handling. If the move's to square is
-      // further from the sliding piece we need to add attacks and if it is
-      // closed to the sliding piece we need to remove attacks.
-      isIncidentFrom &&
-      isIncidentTo &&
-      directionOfMove(square, move.to) === directionOfMove(square, move.from)
-    ) {
-      const unit = directionOfMove(square, move.from);
-      const ray = RAY_BY_DIRECTION[piece.type][square][unit];
-
-      const moveUnit = directionOfMove(move.from, move.to);
-
-      if (unit === moveUnit) {
-        // The to square is further away so we add attacks.
-        const newSquaresControlled = rayControlScanner(
-          pieces,
-          { square, piece },
-          ray,
-          move.from
-        );
-        attackedSquares[piece.color].addAttacks(square, newSquaresControlled);
-      } else {
-        // If the move captured a piece then there is no change to the squares
-        // the slider controls since the capturing piece moved from further
-        // away and the to square was occupied before the move.
-        if (isCapture) {
-          continue;
-        }
-
-        // The to square is closer so we remove attacks.
-        const squaresNoLongerControlled = rayControlScanner(
-          pieces,
-          { square, piece },
-          ray,
-          move.to,
-          move.from
-        );
-        attackedSquares[piece.color].removeAttacks(
-          square,
-          squaresNoLongerControlled
-        );
-      }
-    } else {
-      // For the the square the piece has moved from.
-      // - The square no longer has a piece in it and a ray which was
-      //   obstructed is no longer obstructed, therefore we want to add attacks.
-      if (isIncidentFrom) {
-        const unit = directionOfMove(square, move.from);
-        const ray = RAY_BY_DIRECTION[piece.type][square][unit];
-        const newSquaresControlled = rayControlScanner(
-          pieces,
-          { square, piece },
-          ray,
-          move.from
-        );
-
-        attackedSquares[piece.color].addAttacks(square, newSquaresControlled);
-      }
-
-      // For the square the piece has moved to.
-      // - If the move was a capture nothing in the attack map should change
-      //   relative to the to square since a piece occupied it before.
-      // - Otherwise the to square now has a piece in it and a ray can now be
-      //   obstructed, therefore we want to remove attacks.
-      if (!isCapture && isIncidentTo) {
-        const unit = directionOfMove(square, move.to);
-        const ray = RAY_BY_DIRECTION[piece.type][square][unit];
-        const squaresNoLongerControlled = rayControlScanner(
-          pieces,
-          { square, piece },
-          ray,
-          move.to
-        );
-
-        attackedSquares[piece.color].removeAttacks(
-          square,
-          squaresNoLongerControlled
-        );
-      }
-    }
+    );
   }
 };
