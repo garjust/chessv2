@@ -79,6 +79,8 @@ export const applyMove = (
       },
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
+      // The pin data can be stored in result state because new maps are created
+      // when pin data is updated
       pinsToKing: { ...position.pinsToKing },
       zobrist: currentZobrist.key,
     },
@@ -204,7 +206,6 @@ export const applyMove = (
     position.pinsToKing,
     position.pieces,
     position.kings,
-    position.turn,
     move,
     piece
   );

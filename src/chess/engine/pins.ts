@@ -1,5 +1,4 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
-import { flipColor } from '../utils';
 import { KING_RAYS, QUEEN_RAY_BITARRAYS } from './move-lookup';
 import { KingSquares, KingPins } from './types';
 
@@ -12,7 +11,7 @@ const pinsToSquare = (
   const rays = KING_RAYS[square];
 
   for (const { type, ray } of rays) {
-    // looking for a white piece then a black slider.
+    // looking for a friendly piece then an opponent's slider.
     const friendlyPieces: Square[] = [];
     const openSquares: Square[] = [];
     let opponentPiece: { square: Square; piece: Piece } | undefined;
@@ -79,42 +78,37 @@ export const updatePinsOnKings = (
   pins: KingPins,
   pieces: Map<Square, Piece>,
   kings: KingSquares,
-  currentMove: Color,
   move: Move,
   piece: Piece
 ) => {
-  const playingKing = kings[currentMove];
-  const opponentKing = kings[flipColor(currentMove)];
+  const whiteKing = kings[Color.White];
+  const blackKing = kings[Color.Black];
 
-  if (playingKing) {
+  if (whiteKing) {
     // If the moved piece is the king, recalcuate pins on it.
     //
     // If the moved piece does not enter or leave the king's rays nothing
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      QUEEN_RAY_BITARRAYS[playingKing][move.from] ||
-      QUEEN_RAY_BITARRAYS[playingKing][move.to]
+      QUEEN_RAY_BITARRAYS[whiteKing][move.from] ||
+      QUEEN_RAY_BITARRAYS[whiteKing][move.to]
     ) {
-      pins[currentMove] = pinsToSquare(pieces, playingKing, currentMove);
+      pins[Color.White] = pinsToSquare(pieces, whiteKing, Color.White);
     }
   }
 
-  if (opponentKing) {
+  if (blackKing) {
     // If the moved piece is the king, recalcuate pins on it.
     //
     // If the moved piece does not enter or leave the king's rays nothing
     // needs to be computed.
     if (
       piece.type === PieceType.King ||
-      QUEEN_RAY_BITARRAYS[opponentKing][move.from] ||
-      QUEEN_RAY_BITARRAYS[opponentKing][move.to]
+      QUEEN_RAY_BITARRAYS[blackKing][move.from] ||
+      QUEEN_RAY_BITARRAYS[blackKing][move.to]
     ) {
-      pins[flipColor(currentMove)] = pinsToSquare(
-        pieces,
-        opponentKing,
-        flipColor(currentMove)
-      );
+      pins[Color.Black] = pinsToSquare(pieces, blackKing, Color.Black);
     }
   }
 };
