@@ -66,15 +66,12 @@ export default class AttackMap {
     })();
   }
 
-  controlOfSquare(square: Square): SquareControlObject[] {
-    const attacks: SquareControlObject[] = [];
-    const attacksOnSquareMap = this._squareControlByAttackedSquare.get(square);
-    if (attacksOnSquareMap) {
-      for (const [, squareControl] of attacksOnSquareMap) {
-        attacks.push(squareControl);
-      }
+  controlOfSquare(square: Square) {
+    const map = this._squareControlByAttackedSquare.get(square);
+    if (!map) {
+      throw Error('there should be a map');
     }
-    return attacks;
+    return map.entries();
   }
 
   startChangeset(): void {

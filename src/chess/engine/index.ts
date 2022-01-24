@@ -114,9 +114,15 @@ export default class Engine {
   checks(color: Color): SquareControlObject[] {
     if (ENABLE_ATTACK_MAP) {
       const king = this._position.kings[color];
-      return king
-        ? this._position.attackedSquares[flipColor(color)].controlOfSquare(king)
-        : [];
+      const checks: SquareControlObject[] = [];
+      if (king) {
+        for (const [, squareControl] of this._position.attackedSquares[
+          flipColor(color)
+        ].controlOfSquare(king)) {
+          checks.push(squareControl);
+        }
+      }
+      return checks;
     } else {
       return findChecksOnKing(
         this._position.pieces,

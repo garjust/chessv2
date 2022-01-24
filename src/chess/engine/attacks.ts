@@ -223,25 +223,25 @@ const squaresControllingMoveSquares = (
   attackedSquares: AttackedSquares
 ) => {
   const squares = new Set<Square>();
-  for (const squareControl of attackedSquares[Color.White].controlOfSquare(
+  for (const [square] of attackedSquares[Color.White].controlOfSquare(
     move.from
   )) {
-    squares.add(squareControl.attacker.square);
+    squares.add(square);
   }
-  for (const squareControl of attackedSquares[Color.Black].controlOfSquare(
+  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
     move.from
   )) {
-    squares.add(squareControl.attacker.square);
+    squares.add(square);
   }
-  for (const squareControl of attackedSquares[Color.White].controlOfSquare(
+  for (const [square] of attackedSquares[Color.White].controlOfSquare(
     move.to
   )) {
-    squares.add(squareControl.attacker.square);
+    squares.add(square);
   }
-  for (const squareControl of attackedSquares[Color.Black].controlOfSquare(
+  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
     move.to
   )) {
-    squares.add(squareControl.attacker.square);
+    squares.add(square);
   }
   return squares;
 };
