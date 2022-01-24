@@ -218,6 +218,34 @@ const updatePiecesAttacks = (
   }
 };
 
+const squaresControllingMoveSquares = (
+  move: Move,
+  attackedSquares: AttackedSquares
+) => {
+  const squares = new Set<Square>();
+  for (const squareControl of attackedSquares[Color.White].controlOfSquare(
+    move.from
+  )) {
+    squares.add(squareControl.attacker.square);
+  }
+  for (const squareControl of attackedSquares[Color.Black].controlOfSquare(
+    move.from
+  )) {
+    squares.add(squareControl.attacker.square);
+  }
+  for (const squareControl of attackedSquares[Color.White].controlOfSquare(
+    move.to
+  )) {
+    squares.add(squareControl.attacker.square);
+  }
+  for (const squareControl of attackedSquares[Color.Black].controlOfSquare(
+    move.to
+  )) {
+    squares.add(squareControl.attacker.square);
+  }
+  return squares;
+};
+
 export const updateAttackedSquares = (
   attackedSquares: AttackedSquares,
   pieces: Map<Square, Piece>,
@@ -244,18 +272,15 @@ export const updateAttackedSquares = (
   );
   attackedSquares[movedPiece.color].addAttacksForPiece(move.to, newAttacks);
 
-  // const visionOfFrom = [
-  //   ...attackedSquares[Color.White].controlOfSquare(move.from),
-  //   ...attackedSquares[Color.Black].controlOfSquare(move.from),
-  // ];
-  // const visionOfTo = [
-  //   ...attackedSquares[Color.White].controlOfSquare(move.from),
-  //   ...attackedSquares[Color.Black].controlOfSquare(move.from),
-  // ];
+  const squares = squaresControllingMoveSquares(move, attackedSquares);
 
   // Find sliding pieces affected by the moved piece.
-  for (const [square, piece] of pieces) {
-    if (square === move.from || square === move.to || !isSlider(piece)) {
+  for (const square of squares) {
+    const piece = pieces.get(square);
+    if (!piece) {
+      throw Error('there should be a piece');
+    }
+    if (!isSlider(piece)) {
       // We have already covered pieces in the move from/to squares or this
       // piece is not a slider.
       continue;
