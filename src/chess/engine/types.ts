@@ -1,5 +1,4 @@
 import {
-  AttackObject,
   Color,
   Pin,
   Position as ExternalPosition,

@@ -13,10 +13,10 @@ import {
   PERFT_POSITION_5,
   STARTING_POSITION,
   VIENNA_OPENING,
-} from '../lib/move-generation-perft';
+} from '../lib/perft';
 import './Debug.css';
 import { BUTTON_CSS } from './theme';
-import { loadComputer } from '../workers';
+import { loadComputer, loadPerft } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
 const COMPUTER_DEPTH = 4;
@@ -26,9 +26,7 @@ async function runMoveGenerationTest(
   test: MoveTest,
   toDepth = 5
 ) {
-  const worker = new Worker(
-    new URL('../workers/move-generation-perft', import.meta.url)
-  );
+  const [worker] = await loadPerft();
 
   worker.onmessage = (message: MessageEvent<string>) => {
     logger.next(message.data);

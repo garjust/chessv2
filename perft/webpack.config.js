@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   target: 'node',
-  entry: './src/chess/perft',
+  entry: './src/script/perft',
   mode: 'production',
   module: {
     rules: [

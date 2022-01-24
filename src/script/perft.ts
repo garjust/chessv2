@@ -1,8 +1,8 @@
-import { searchRoot } from './lib/move-generation-perft';
+import { searchRoot } from '../chess/lib/perft';
 import { argv } from 'process';
-import { parseFEN } from './lib/fen';
-import Engine from './engine';
-import { moveFromString, moveString } from './utils';
+import { parseFEN } from '../chess/lib/fen';
+import Engine from '../chess/engine';
+import { moveFromString, moveString } from '../chess/utils';
 import { open } from 'fs/promises';
 
 const DEBUG_FILE = '/tmp/perft-debug';

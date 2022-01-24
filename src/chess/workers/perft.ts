@@ -1,4 +1,4 @@
-import { MoveTest, run } from '../lib/move-generation-perft';
+import { MoveTest, run } from '../lib/perft';
 
 self.onmessage = async (
   message: MessageEvent<{
