@@ -18,20 +18,27 @@ type SquareControlChange = {
   squares: SquareControlObject[];
 };
 
-const EMPTY_ATTACKS: [number, number][] = Array(64)
-  .fill(0)
-  .map((v, i) => [i, v]);
-
 export default class AttackMap {
-  // Store the number of pieces attacking a particular square.
-  _countMap = new Map<Square, number>(EMPTY_ATTACKS);
   // Store all squares controlled by the piece residing in
   // the key square.
   _squareControlByPiece = new Map<Square, SquareControlObject[]>();
+  // Store all squares which attack each square. Use a Square-keyed map so we
+  // can quickly add/remove/enumerate the attacks on a square.
+  _squareControlByAttackedSquare = new Map<
+    Square,
+    Map<Square, SquareControlObject>
+  >();
 
   _updatesStack: SquareControlChange[][] = [];
 
   constructor(position: ExternalPosition, color: Color) {
+    for (let i = 0; i < 64; i++) {
+      this._squareControlByPiece.set(i, []);
+    }
+    for (let i = 0; i < 64; i++) {
+      this._squareControlByAttackedSquare.set(i, new Map());
+    }
+
     for (const [square, piece] of position.pieces) {
       if (piece.color !== color) {
         continue;
@@ -43,15 +50,20 @@ export default class AttackMap {
   }
 
   isAttacked(square: Square): boolean {
-    return (this._countMap.get(square) ?? 0) > 0;
+    return (this._squareControlByAttackedSquare.get(square)?.size ?? 0) > 0;
   }
 
   controlForPiece(square: number): SquareControlObject[] {
     return this._squareControlByPiece.get(square) ?? [];
   }
 
-  attackEntries(): IterableIterator<[number, number]> {
-    return this._countMap.entries();
+  attackCounts(): IterableIterator<[Square, number]> {
+    const byAttackedSquare = this._squareControlByAttackedSquare;
+    return (function* () {
+      for (const [square, map] of byAttackedSquare) {
+        yield [square, map.size];
+      }
+    })();
   }
 
   startChangeset(): void {
@@ -78,10 +90,9 @@ export default class AttackMap {
 
   addAttacksForPiece(square: Square, squares: SquareControlObject[]): void {
     for (const squareControl of squares) {
-      this._countMap.set(
-        squareControl.square,
-        (this._countMap.get(squareControl.square) ?? 0) + 1
-      );
+      this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.set(squareControl.attacker.square, squareControl);
     }
     this._squareControlByPiece.set(square, squares);
   }
@@ -100,10 +111,9 @@ export default class AttackMap {
     }
 
     for (const squareControl of squares) {
-      this._countMap.set(
-        squareControl.square,
-        (this._countMap.get(squareControl.square) ?? 0) + 1
-      );
+      this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.set(squareControl.attacker.square, squareControl);
     }
     const existing = this._squareControlByPiece.get(square);
     if (!existing) {
@@ -123,11 +133,16 @@ export default class AttackMap {
     }
 
     for (const squareControl of squares) {
-      const count = this._countMap.get(squareControl.square);
-      if (!count || count === 0) {
+      const squareControlExists = this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.has(squareControl.attacker.square);
+      if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
-      this._countMap.set(squareControl.square, count - 1);
+
+      this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.delete(squareControl.attacker.square);
     }
     this._squareControlByPiece.set(square, []);
   }
@@ -155,12 +170,16 @@ export default class AttackMap {
     );
 
     for (const squareControl of squares) {
-      const count = this._countMap.get(squareControl.square);
-      if (!count || count === 0) {
+      const squareControlExists = this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.has(squareControl.attacker.square);
+      if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
-      this._countMap.set(squareControl.square, count - 1);
+      this._squareControlByAttackedSquare
+        .get(squareControl.square)
+        ?.delete(squareControl.attacker.square);
     }
 
     for (let i = existing.length - 1; i >= 0; i--) {

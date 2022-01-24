@@ -47,7 +47,7 @@ export const setOverlayForAttacks = (
   map: Map<Square, SquareOverlayType>,
   attacks: AttackMap
 ) => {
-  for (const [square, count] of attacks.attackEntries()) {
+  for (const [square, count] of attacks.attackCounts()) {
     if (count > 0) {
       map.set(square, SquareOverlayType.Attacked);
     }

@@ -146,10 +146,17 @@ export default class Engine {
 const verifyAttackMap = (map: AttackMap, engine: Engine, color: Color) => {
   const computed = new AttackMap(engine._position, color);
 
-  // if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
-  //   console.log('control map is out of sync');
-  // }
-  if (!equal(map._countMap, computed._countMap)) {
-    console.log('attack count map is out of sync');
+  // Note: this code is broken because the equal function wants arrays to be
+  // in the same order which they are not.
+  if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
+    console.log('square-wise map is out of sync');
+  }
+  if (
+    !equal(
+      map._squareControlByAttackedSquare,
+      computed._squareControlByAttackedSquare
+    )
+  ) {
+    console.log('attacked-wise map is out of sync');
   }
 };
