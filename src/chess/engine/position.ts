@@ -1,7 +1,6 @@
 import { Color, Position as ExternalPosition } from '../types';
 import { copyPosition, findKing } from '../utils';
 import AttackMap from './attack-map';
-import { findChecksOnKings } from './checks';
 import { findPinsOnKings } from './pins';
 import { KingSquares, Position } from './types';
 
@@ -20,16 +19,10 @@ const convertToInternal = (position: ExternalPosition): Position => {
 
   const pinsToKing = findPinsOnKings(position.pieces, kings);
 
-  const checks = findChecksOnKings(position.pieces, kings, {
-    enPassantSquare: position.enPassantSquare,
-    castlingAvailability: position.castlingAvailability,
-  });
-
   return {
     ...position,
     kings,
     attackedSquares,
-    checks,
     pinsToKing,
   };
 };

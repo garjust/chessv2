@@ -4,6 +4,7 @@ import {
   Pin,
   Position as ExternalPosition,
   Square,
+  SquareControlObject,
 } from '../types';
 import AttackMap from './attack-map';
 
@@ -21,8 +22,8 @@ export type KingPins = {
 };
 
 export type KingChecks = {
-  [Color.White]: AttackObject[];
-  [Color.Black]: AttackObject[];
+  [Color.White]: SquareControlObject[];
+  [Color.Black]: SquareControlObject[];
 };
 
 export type AttackedSquares = {
@@ -34,5 +35,4 @@ export type Position = ExternalPosition & {
   kings: KingSquares;
   attackedSquares: AttackedSquares;
   pinsToKing: KingPins;
-  checks: KingChecks;
 };

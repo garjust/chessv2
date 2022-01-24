@@ -287,7 +287,7 @@ function handleSetPosition(
   const moves = engine.generateMoves();
   const evaluation = engine.evaluate() / EVALUATION_DIVIDER;
   const zobrist = engine.zobrist;
-  const checks = engine.checks[position.turn];
+  const checks = engine.checks(position.turn);
 
   state = {
     ...state,

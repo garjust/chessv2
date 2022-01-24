@@ -8,7 +8,7 @@ import {
   Square,
   Move,
   MoveWithExtraData,
-  AttackObject,
+  SquareControlObject,
 } from '../types';
 
 export enum SquareLabel {
@@ -69,7 +69,7 @@ export interface State {
   squareOverlay?: Map<Square, SquareOverlayType>;
   position: Position;
   moves: MoveWithExtraData[];
-  checks: AttackObject[];
+  checks: SquareControlObject[];
   evaluation: number;
   zobrist?: [number, number];
   lastMove?: Move;
@@ -134,7 +134,7 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 };
 
 export const checkedSquare = (state: State): Square | undefined =>
-  state.checks.length > 0 ? state.checks[0].attacked.square : undefined;
+  state.checks.length > 0 ? state.checks[0].square : undefined;
 
 export const availableCaptures = (state: State): Move[] =>
   state.moves.filter((move) => move.attack);

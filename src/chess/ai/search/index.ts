@@ -117,7 +117,7 @@ export default class Search {
     // If there are no moves at this node then the game has ended.
     if (moves.length === 0) {
       if (
-        this.context.engine.checks[this.context.engine.position.turn].length > 0
+        this.context.engine.checks(this.context.engine.position.turn).length > 0
       ) {
         return -1 * (MATE_SCORE + depth);
       } else {

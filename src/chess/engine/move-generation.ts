@@ -7,6 +7,7 @@ import {
   AttackObject,
   CastlingAvailability,
   Pin,
+  SquareControlObject,
 } from '../types';
 import {
   flipColor,
@@ -196,13 +197,12 @@ const movesForPositionFromAttacks = (
 };
 
 const moveResolvesCheck = (
-  checks: AttackObject[],
-  move: MoveWithExtraData,
-  { ignoreKing }: { ignoreKing: boolean }
+  checks: SquareControlObject[],
+  move: MoveWithExtraData
 ): boolean => {
   // If the moving piece is a king all it's moves should be retained. Moves
   // into an attacked square are pruned elsewhere.
-  if (ignoreKing && move.piece.type === PieceType.King) {
+  if (move.piece.type === PieceType.King) {
     return true;
   }
 
@@ -221,7 +221,9 @@ const moveResolvesCheck = (
     // the king must move.
     return false;
   } else {
-    throw Error(`called with ${checks.length} not exactly 1 or 2 checks`);
+    throw Error(
+      `called with ${checks.length} checks, not exactly 1 or 2 checks`
+    );
   }
 };
 
@@ -279,25 +281,19 @@ export const generateMoves = (
     attackedSquares,
     pinsToKing,
     kings,
+    checks,
     enPassantSquare,
     castlingAvailability,
   }: {
     attackedSquares: AttackedSquares;
     pinsToKing: KingPins;
-    checks: KingChecks;
     kings: KingSquares;
+    checks: SquareControlObject[];
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
   }
 ): MoveWithExtraData[] => {
-  let checksForPlayer: AttackObject[] = [];
   const king = kings[color];
-  if (king) {
-    checksForPlayer = attacksOnSquare(pieces, flipColor(color), king, {
-      enPassantSquare,
-      skip: [king],
-    });
-  }
 
   let moves: MoveWithExtraData[];
   if (ENABLE_ATTACK_MAP) {
@@ -305,7 +301,7 @@ export const generateMoves = (
       color,
       enPassantSquare,
       castlingAvailability:
-        checksForPlayer.length > 0
+        checks.length > 0
           ? CASTLING_AVAILABILITY_BLOCKED
           : castlingAvailability,
       attackedSquares,
@@ -315,7 +311,7 @@ export const generateMoves = (
       color,
       enPassantSquare,
       castlingAvailability:
-        checksForPlayer.length > 0
+        checks.length > 0
           ? CASTLING_AVAILABILITY_BLOCKED
           : castlingAvailability,
       attackedSquares,
@@ -326,8 +322,8 @@ export const generateMoves = (
     for (let i = moves.length - 1; i >= 0; i--) {
       const move = moves[i];
 
-      if (checksForPlayer.length > 0) {
-        if (!moveResolvesCheck(checksForPlayer, move, { ignoreKing: true })) {
+      if (checks.length > 0) {
+        if (!moveResolvesCheck(checks, move)) {
           moves.splice(i, 1);
           continue;
         }
@@ -339,7 +335,7 @@ export const generateMoves = (
           king,
           move,
           pinsToKing[color],
-          checksForPlayer.length > 0,
+          checks.length > 0,
           ENABLE_ATTACK_MAP ? attackedSquares[flipColor(color)] : undefined
         )
       ) {

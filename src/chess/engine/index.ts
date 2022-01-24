@@ -7,16 +7,14 @@ import {
   Piece,
   Pin,
   Position as ExternalPosition,
+  SquareControlObject,
 } from '../types';
+import { flipColor } from '../utils';
 import AttackMap from './attack-map';
-import { findChecksOnKings } from './checks';
+import { findChecksOnKing } from './checks';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
-import {
-  DEBUG_FLAG,
-  ENABLE_ATTACK_MAP,
-  ENABLE_CHECK_TRACKING,
-} from './global-config';
+import { DEBUG_FLAG, ENABLE_ATTACK_MAP } from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
@@ -88,7 +86,7 @@ export default class Engine {
     return generateMoves(this._position.pieces, this._position.turn, {
       attackedSquares: this._position.attackedSquares,
       pinsToKing: this._position.pinsToKing,
-      checks: this._position.checks,
+      checks: this.checks(this._position.turn),
       kings: this._position.kings,
       enPassantSquare: this._position.enPassantSquare,
       castlingAvailability: this._position.castlingAvailability,
@@ -113,14 +111,22 @@ export default class Engine {
     return this._currentZobrist.key;
   }
 
-  get checks(): KingChecks {
-    if (ENABLE_CHECK_TRACKING) {
-      return this._position.checks;
+  checks(color: Color): SquareControlObject[] {
+    if (ENABLE_ATTACK_MAP) {
+      const king = this._position.kings[color];
+      return king
+        ? this._position.attackedSquares[flipColor(color)].controlOfSquare(king)
+        : [];
     } else {
-      return findChecksOnKings(this._position.pieces, this._position.kings, {
-        enPassantSquare: this._position.enPassantSquare,
-        castlingAvailability: this._position.castlingAvailability,
-      });
+      return findChecksOnKing(
+        this._position.pieces,
+        this._position.kings[color],
+        color,
+        {
+          enPassantSquare: this._position.enPassantSquare,
+          castlingAvailability: this._position.castlingAvailability,
+        }
+      );
     }
   }
 

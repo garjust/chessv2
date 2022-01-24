@@ -66,21 +66,21 @@ export const searchRoot = (
   engine: Engine,
   depth: number
 ): { counter: number; counts: Record<string, number> } => {
-  if (depth === 0) {
-    return { counter: 1, counts: {} };
-  }
-
   const counts: Record<string, number> = {};
+  let counter = 0;
 
   const moves = engine.generateMoves();
   for (const move of moves) {
     engine.applyMove(move);
-    counts[moveString(move, '')] = search(engine, depth - 1);
+    const x = search(engine, depth - 1);
     engine.undoLastMove();
+
+    counts[moveString(move)] = x;
+    counter += x;
   }
 
   return {
-    counter: Object.values(counts).reduce((sum, n) => sum + n, 0),
+    counter,
     counts,
   };
 };
@@ -92,16 +92,14 @@ export const run = (
 ): boolean => {
   const position = parseFEN(test.fen);
   const results: { depth: number; passed: boolean }[] = [];
-  const perMoveCounters: Record<string, number>[] = [];
 
   for (let i = 1; i <= toDepth; i++) {
-    const start = Date.now();
     const engine = new Engine(position);
-    const { counter, counts } = searchRoot(engine, i);
+    const start = Date.now();
+    const { counter } = searchRoot(engine, i);
     const timing = Date.now() - start;
 
     const passed = isCountCorrectForDepthFromStart(i, counter, test);
-    perMoveCounters[i] = counts;
 
     logger(
       `depth=${i}; passed=${passed ? 'yes' : 'no '}; count=${formatNumber(
@@ -114,8 +112,6 @@ export const run = (
     results.push({ depth: i, passed });
   }
   logger('--');
-
-  // console.log('full counts by move', perMoveCounters);
 
   return results.every((result) => result.passed);
 };

@@ -66,6 +66,17 @@ export default class AttackMap {
     })();
   }
 
+  controlOfSquare(square: Square): SquareControlObject[] {
+    const attacks: SquareControlObject[] = [];
+    const attacksOnSquareMap = this._squareControlByAttackedSquare.get(square);
+    if (attacksOnSquareMap) {
+      for (const [, squareControl] of attacksOnSquareMap) {
+        attacks.push(squareControl);
+      }
+    }
+    return attacks;
+  }
+
   startChangeset(): void {
     this._updatesStack.push([]);
   }

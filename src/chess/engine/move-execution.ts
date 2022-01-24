@@ -14,12 +14,11 @@ import {
   isStartPositionPawn,
 } from '../utils';
 import { updateAttackedSquares } from './attacks';
-import { updateChecksOnKings } from './checks';
 import CurrentZobrist from './current-zobrist';
-import { ENABLE_ATTACK_MAP, ENABLE_CHECK_TRACKING } from './global-config';
+import { ENABLE_ATTACK_MAP } from './global-config';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import { KingChecks, KingPins, Position, ZobristKey } from './types';
+import { KingPins, Position, ZobristKey } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -30,7 +29,6 @@ export type MoveResult = {
     castlingAvailability: CastlingAvailability;
     enPassantSquare: Square | null;
     pinsToKing: KingPins;
-    checks: KingChecks;
     zobrist?: ZobristKey;
   };
 };
@@ -82,7 +80,6 @@ export const applyMove = (
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
       pinsToKing: { ...position.pinsToKing },
-      checks: { ...position.checks },
       zobrist: currentZobrist.key,
     },
   };
@@ -223,20 +220,6 @@ export const applyMove = (
       castlingRookMove
     );
   }
-  if (ENABLE_CHECK_TRACKING) {
-    updateChecksOnKings(
-      position.checks,
-      position.pieces,
-      position.kings,
-      position.turn,
-      move,
-      piece,
-      {
-        enPassantSquare: position.enPassantSquare,
-        castlingAvailability: position.castlingAvailability,
-      }
-    );
-  }
 
   if (result.captured) {
     currentZobrist.updateSquareOccupancy(
@@ -326,5 +309,4 @@ export const undoMove = (
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
   position.pinsToKing = result.previousState.pinsToKing;
-  position.checks = result.previousState.checks;
 };
