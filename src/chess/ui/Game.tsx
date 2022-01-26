@@ -15,15 +15,7 @@ import {
 import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { Color } from '../types';
-import {
-  STARTING_POSITION_FEN,
-  VIENNA_OPENING_FEN,
-  VIENNA_GAMBIT_ACCEPTED_FEN,
-  PERFT_5_FEN,
-  BLACK_CHECKMATE_FEN,
-  parseFEN,
-  LADDER_MATE_FEN,
-} from '../lib/fen';
+import { FEN_LIBRARY } from '../lib/fen';
 import { moveActions } from '../workflow/moves-to-actions';
 import DisplayGameFEN from './DisplayGameFen';
 import { BUTTON_CSS } from './theme';
@@ -31,11 +23,11 @@ import Engine from '../engine';
 import { interval, map } from 'rxjs';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 
-const FEN_FOR_INITIAL_POSITION = STARTING_POSITION_FEN;
+const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.PERFT_5_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {
-    engine: new Engine(parseFEN(STARTING_POSITION_FEN)),
+    engine: new Engine(),
   });
 
   updates.subscribe(updateLogger('Chess', [Type.TickPlayersClock]));
@@ -53,7 +45,7 @@ const Game = () => {
   });
 
   function emitExampleGame(): void {
-    emit(setPositionFromFENAction(STARTING_POSITION_FEN));
+    emit(setPositionFromFENAction(FEN_LIBRARY.STARTING_POSITION_FEN));
     moveActions(VIENNA_GAMBIT_ACCEPTED_GAME, 400).subscribe({
       next: (action) => emit(action),
     });

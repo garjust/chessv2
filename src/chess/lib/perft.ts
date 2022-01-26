@@ -1,10 +1,4 @@
-import {
-  BLACK_CHECKMATE_FEN,
-  parseFEN,
-  PERFT_5_FEN,
-  STARTING_POSITION_FEN,
-  VIENNA_OPENING_FEN,
-} from './fen';
+import { parseFEN, FEN_LIBRARY } from './fen';
 import Engine from '../engine';
 import { moveString } from '../utils';
 import { formatNumber } from '../../lib/formatter';
@@ -15,22 +9,22 @@ export type MoveTest = {
 };
 
 export const PERFT_POSITION_5: MoveTest = {
-  fen: PERFT_5_FEN,
+  fen: FEN_LIBRARY.PERFT_5_FEN,
   counts: [44, 1486, 62379, 2103487, 89941194],
 };
 
 export const STARTING_POSITION: MoveTest = {
-  fen: STARTING_POSITION_FEN,
+  fen: FEN_LIBRARY.STARTING_POSITION_FEN,
   counts: [20, 400, 8902, 197281, 4865609, 119060324],
 };
 
 export const VIENNA_OPENING: MoveTest = {
-  fen: VIENNA_OPENING_FEN,
+  fen: FEN_LIBRARY.VIENNA_OPENING_FEN,
   counts: [27, 966, 27249, 951936, 28181171, 982980787],
 };
 
 export const BLACK_CHECKMATE: MoveTest = {
-  fen: BLACK_CHECKMATE_FEN,
+  fen: FEN_LIBRARY.BLACK_CHECKMATE_FEN,
   counts: [30, 847, 24516, 666062, 18526901, 493165553],
 };
 

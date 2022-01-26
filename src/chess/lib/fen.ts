@@ -7,21 +7,44 @@ import {
   FEN_PIECE_TO_PIECE_TYPE,
 } from '../utils';
 
-export const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
-export const STARTING_POSITION_FEN =
+// Basic positions
+// -----------------------------------------------------------------------------
+const BLANK_POSITION_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
+const STARTING_POSITION_FEN =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-export const PERFT_5_FEN =
-  'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8';
-export const VIENNA_GAMBIT_ACCEPTED_FEN =
+// General testing positions
+// -----------------------------------------------------------------------------
+const PERFT_5_FEN = 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8';
+const VIENNA_GAMBIT_ACCEPTED_FEN =
   '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w  - 1 11';
-export const VIENNA_OPENING_FEN =
+const VIENNA_OPENING_FEN =
   'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
 
-export const BLACK_CHECKMATE_FEN =
+// Winning endgame positions
+// -----------------------------------------------------------------------------
+const BLACK_CHECKMATE_FEN =
   '4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24';
+const LADDER_MATE_FEN = '8/8/k7/6QR/8/8/8/7K w  - 20 59';
+const ROOK_ENDGAME_FEN = '3r4/8/3k4/8/8/3K4/8/8 w - - 0 1';
+const QUEEN_ENDGAME_FEN = '8/3K4/4P3/8/8/8/6k1/7q w - - 0 1';
+const FIXED_PAWN_ENDGAME_FEN = '8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1';
 
-export const LADDER_MATE_FEN = '8/8/k7/6QR/8/8/8/7K w  - 20 59';
+// Fen-string handling
+// -----------------------------------------------------------------------------
+
+export const FEN_LIBRARY = {
+  BLANK_POSITION_FEN,
+  STARTING_POSITION_FEN,
+  PERFT_5_FEN,
+  VIENNA_GAMBIT_ACCEPTED_FEN,
+  VIENNA_OPENING_FEN,
+  BLACK_CHECKMATE_FEN,
+  LADDER_MATE_FEN,
+  ROOK_ENDGAME_FEN,
+  QUEEN_ENDGAME_FEN,
+  FIXED_PAWN_ENDGAME_FEN,
+};
 
 const pieceToFenPiece = (piece: Piece): string =>
   piece.color === Color.White

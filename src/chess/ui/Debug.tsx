@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
 import { Registry, LATEST, Version } from '../ai';
-import {
-  parseFEN,
-  PERFT_5_FEN,
-  STARTING_POSITION_FEN,
-  VIENNA_OPENING_FEN,
-} from '../lib/fen';
+import { parseFEN } from '../lib/fen';
 import {
   BLACK_CHECKMATE,
   MoveTest,

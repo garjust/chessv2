@@ -1,5 +1,5 @@
 import equal from 'fast-deep-equal/es6';
-import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../lib/fen';
 import {
   Color,
   Move,
@@ -25,7 +25,9 @@ export default class Engine {
   _moveStack: MoveResult[] = [];
   _currentZobrist: CurrentZobrist;
 
-  constructor(position: ExternalPosition = parseFEN(BLANK_POSITION_FEN)) {
+  constructor(
+    position: ExternalPosition = parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN)
+  ) {
     this._position = copyToInternal(position);
     this._currentZobrist = new CurrentZobrist(position);
   }

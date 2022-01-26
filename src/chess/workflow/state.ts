@@ -1,6 +1,6 @@
 import { Remote } from 'comlink';
 import { ChessComputer } from '../ai/chess-computer';
-import { BLANK_POSITION_FEN, parseFEN } from '../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../lib/fen';
 import {
   Color,
   Position,
@@ -92,7 +92,7 @@ const INITIAL_STATE: State = {
   moves: [],
   checks: [],
   overlayCategory: SquareOverlayCategory.Play,
-  position: parseFEN(BLANK_POSITION_FEN),
+  position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
