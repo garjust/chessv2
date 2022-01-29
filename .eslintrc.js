@@ -8,12 +8,13 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: ['react', 'prettier'],
+  plugins: ['prettier'],
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
+    // 'plugin:react/recommended',
     // 'plugin:react/jsx-runtime',
   ],
+  ignorePatterns: ['**/dist/*', '**/.yarn/*'],
   rules: {
     'prettier/prettier': 'error',
     'no-unused-vars': [

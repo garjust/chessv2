@@ -60,8 +60,8 @@ const isCommand = <A>(value: InternalAction<A>): value is Command =>
 // NOTE(steckel): We previously utilized `instance of Promise` for this
 // use-case but that does not work well where Promise-polyfill libraries must
 // seamlessly integrate.
-const isPromiseLike = (value: any): value is Promise<any> =>
-  typeof value?.then === 'function';
+const isPromiseLike = (value: unknown): value is Promise<unknown> =>
+  value instanceof Promise;
 
 // TODO(steckel): Maybe don't export.
 export const normalizeUpdateAction = <A>(
