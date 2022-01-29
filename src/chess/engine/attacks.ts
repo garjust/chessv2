@@ -31,6 +31,7 @@ import {
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';
 import AttackMap from './attack-map';
+import { PIECES } from '../piece-consants';
 
 export const attacksOnSquare = (
   pieces: Map<Square, Piece>,
@@ -218,6 +219,25 @@ const updatePiecesAttacks = (
   }
 };
 
+const squaresControllingSquare = (
+  controlledSquare: Square,
+  attackedSquares: AttackedSquares
+) => {
+  const squares = new Set<Square>();
+
+  for (const [square] of attackedSquares[Color.White].controlOfSquare(
+    controlledSquare
+  )) {
+    squares.add(square);
+  }
+  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
+    controlledSquare
+  )) {
+    squares.add(square);
+  }
+  return squares;
+};
+
 const squaresControllingMoveSquares = (
   move: Move,
   attackedSquares: AttackedSquares
@@ -246,6 +266,20 @@ const squaresControllingMoveSquares = (
   return squares;
 };
 
+export const updateAttackedSquaresForMove = (
+  pieces: Map<Square, Piece>,
+  map: AttackMap,
+  piece: Piece,
+  move: Move
+) => {
+  map.removeAttacksForPiece(move.from);
+  map.removeAttacksForPiece(move.to);
+
+  // Find the squares that are now attacked by the moved piece.
+  const newAttacks: SquareControlObject[] = forPiece(piece, pieces, move.to);
+  map.addAttacksForPiece(move.to, newAttacks);
+};
+
 export const updateAttackedSquares = (
   attackedSquares: AttackedSquares,
   pieces: Map<Square, Piece>,
@@ -259,28 +293,53 @@ export const updateAttackedSquares = (
   attackedSquares[Color.Black].startChangeset();
 
   const opponentColor = flipColor(movedPiece.color);
-
-  attackedSquares[movedPiece.color].removeAttacksForPiece(move.from);
-  attackedSquares[movedPiece.color].removeAttacksForPiece(move.to);
   attackedSquares[opponentColor].removeAttacksForPiece(move.to);
 
-  // Find the squares that are now attacked by the moved piece.
-  const newAttacks: SquareControlObject[] = forPiece(
-    movedPiece,
+  updateAttackedSquaresForMove(
     pieces,
-    move.to
+    attackedSquares[movedPiece.color],
+    movedPiece,
+    move
   );
-  attackedSquares[movedPiece.color].addAttacksForPiece(move.to, newAttacks);
+  if (castlingRookMove) {
+    updateAttackedSquaresForMove(
+      pieces,
+      attackedSquares[movedPiece.color],
+      PIECES[movedPiece.color][PieceType.Rook],
+      castlingRookMove
+    );
+  }
 
+  // Find pieces possibly affected by the moved piece.
   const squares = squaresControllingMoveSquares(move, attackedSquares);
 
-  // Find sliding pieces affected by the moved piece.
+  if (enPassantCaptureSquare) {
+    attackedSquares[opponentColor].removeAttacksForPiece(
+      enPassantCaptureSquare
+    );
+    const enPassantSquareSquares = squaresControllingSquare(
+      enPassantCaptureSquare,
+      attackedSquares
+    );
+    for (const square of enPassantSquareSquares) {
+      squares.add(square);
+    }
+  }
+
   for (const square of squares) {
+    // Already updated the castled rook.
+    if (
+      castlingRookMove &&
+      (square === castlingRookMove.from || square === castlingRookMove.to)
+    ) {
+      continue;
+    }
+
     const piece = pieces.get(square);
     if (!piece) {
       throw Error('there should be a piece');
     }
-    if (!isSlider(piece)) {
+    if (square === move.from || square === move.to || !isSlider(piece)) {
       // We have already covered pieces in the move from/to squares or this
       // piece is not a slider.
       continue;
