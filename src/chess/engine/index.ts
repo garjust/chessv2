@@ -1,4 +1,4 @@
-import equal from 'fast-deep-equal/es6';
+import { equal } from '../../lib/deep-equal';
 import { FEN_LIBRARY, parseFEN } from '../lib/fen';
 import {
   Color,
@@ -9,7 +9,7 @@ import {
   Position as ExternalPosition,
   SquareControlObject,
 } from '../types';
-import { flipColor } from '../utils';
+import { flipColor, moveString } from '../utils';
 import AttackMap from './attack-map';
 import { findChecksOnKing } from './checks';
 import CurrentZobrist from './current-zobrist';
@@ -37,15 +37,21 @@ export default class Engine {
     this._moveStack.push(result);
 
     if (DEBUG_FLAG) {
+      const moves = [...this._moveStack.map((moveResult) => moveResult.move)];
+
       verifyAttackMap(
         this._position.attackedSquares[Color.White],
         this,
-        Color.White
+        Color.White,
+        moves,
+        'makeMove'
       );
       verifyAttackMap(
         this._position.attackedSquares[Color.Black],
         this,
-        Color.Black
+        Color.Black,
+        moves,
+        'makeMove'
       );
     }
 
@@ -61,15 +67,24 @@ export default class Engine {
     }
 
     if (DEBUG_FLAG) {
+      const moves = [
+        ...this._moveStack.map((moveResult) => moveResult.move),
+        moveResult.move,
+      ];
+
       verifyAttackMap(
         this._position.attackedSquares[Color.White],
         this,
-        Color.White
+        Color.White,
+        moves,
+        'unmakeMove'
       );
       verifyAttackMap(
         this._position.attackedSquares[Color.Black],
         this,
-        Color.Black
+        Color.Black,
+        moves,
+        'unmakeMove'
       );
     }
   }
@@ -157,13 +172,23 @@ export default class Engine {
   }
 }
 
-const verifyAttackMap = (map: AttackMap, engine: Engine, color: Color) => {
+const verifyAttackMap = (
+  map: AttackMap,
+  engine: Engine,
+  color: Color,
+  moves: Move[],
+  lastAction: 'makeMove' | 'unmakeMove'
+) => {
   const computed = new AttackMap(engine._position, color);
 
   // Note: this code is broken because the equal function wants arrays to be
   // in the same order which they are not.
   if (!equal(map._squareControlByPiece, computed._squareControlByPiece)) {
-    console.log('square-wise map is out of sync');
+    console.log(
+      'square-wise map is out of sync',
+      lastAction,
+      moves.map((move) => moveString(move))
+    );
   }
   if (
     !equal(
@@ -171,6 +196,10 @@ const verifyAttackMap = (map: AttackMap, engine: Engine, color: Color) => {
       computed._squareControlByAttackedSquare
     )
   ) {
-    console.log('attacked-wise map is out of sync');
+    console.log(
+      'attacked-wise map is out of sync',
+      lastAction,
+      moves.map((move) => moveString(move))
+    );
   }
 };
