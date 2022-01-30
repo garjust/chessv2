@@ -19,10 +19,10 @@ import { attacksOnSquare } from './attacks';
 import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
 import { KingSquares, KingPins, AttackedSquares } from './types';
 
-const movesForPositionFromAttacks = (
+const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
+  color: Color,
   options: {
-    color?: Color;
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
     attackedSquares: AttackedSquares;
@@ -30,8 +30,7 @@ const movesForPositionFromAttacks = (
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 
-  const { color, enPassantSquare, castlingAvailability, attackedSquares } =
-    options;
+  const { enPassantSquare, castlingAvailability, attackedSquares } = options;
 
   for (const [square, piece] of pieces) {
     if (color && piece.color !== color) {
@@ -204,8 +203,7 @@ export const generateMoves = (
 ): MoveWithExtraData[] => {
   const king = kings[color];
 
-  const moves = movesForPositionFromAttacks(pieces, {
-    color,
+  const moves = pseudoMovesForPosition(pieces, color, {
     enPassantSquare,
     castlingAvailability:
       checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
