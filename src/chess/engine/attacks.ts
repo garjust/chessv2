@@ -40,9 +40,11 @@ export const attacksOnSquare = (
   {
     enPassantSquare,
     skip,
+    opponentAttackMap,
   }: {
     enPassantSquare: Square | null;
     skip: Square[];
+    opponentAttackMap: AttackMap;
   }
 ): AttackObject[] => {
   const attacks: AttackObject[] = [];
@@ -54,6 +56,7 @@ export const attacksOnSquare = (
     kingMoves(pieces, color, square, {
       castlingOnly: false,
       castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
+      opponentAttackMap,
     }),
     bishopMoves(pieces, color, square, { skip }),
     rookMoves(pieces, color, square, { skip }),

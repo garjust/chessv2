@@ -87,6 +87,7 @@ const pseudoMovesForPosition = (
         ...kingMoves(pieces, piece.color, square, {
           castlingOnly: true,
           castlingAvailability,
+          opponentAttackMap: attackedSquares[flipColor(color)],
         })
       );
     } else if (piece.type === PieceType.Pawn) {
@@ -142,16 +143,16 @@ const noCheckFromMove = (
   move: MoveWithExtraData,
   pins: Map<Square, Pin>,
   inCheck: boolean,
-  attackMap: AttackMap
+  opponentAttackMap: AttackMap
 ): boolean => {
   // We need to prune moves that result in a check on ourselves.
   //
   // To do this we track pieces that are pinned to the king as well as
   // looking at king moves.
-  if (!inCheck && attackMap) {
+  if (!inCheck && opponentAttackMap) {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
-      return !attackMap.isAttacked(move.to);
+      return !opponentAttackMap.isAttacked(move.to);
     } else {
       const pin = pins.get(move.from);
       if (!pin) {
@@ -168,6 +169,7 @@ const noCheckFromMove = (
         attacksOnSquare(pieces, flipColor(color), move.to, {
           enPassantSquare: null,
           skip: [king],
+          opponentAttackMap,
         }).length === 0
       );
     } else {

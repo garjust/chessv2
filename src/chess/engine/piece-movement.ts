@@ -14,6 +14,7 @@ import {
   isStartPositionPawn,
   isPromotionPositionPawn,
 } from '../utils';
+import AttackMap from './attack-map';
 import { attacksOnSquare } from './attacks';
 import {
   BISHOP_LOOKUP,
@@ -164,9 +165,11 @@ export const kingMoves = (
   color: Color,
   from: Square,
   {
+    opponentAttackMap,
     castlingOnly,
     castlingAvailability,
   }: {
+    opponentAttackMap: AttackMap;
     castlingOnly: boolean;
     castlingAvailability: CastlingAvailability;
   }
@@ -179,28 +182,35 @@ export const kingMoves = (
   // and the corresponding rook.
   if (
     castlingAvailability[color].kingside &&
+    // Check squares being castled through are empty
     !pieces.get(right(from)) &&
+    !pieces.get(right(from, 2)) &&
     // Also check nothing is attacking the square being castled through
-    // pieceAttacks[flipColor(color)].get(right(from))?.length === 0 &&
+    !opponentAttackMap.isAttacked(right(from)) &&
+    !opponentAttackMap.isAttacked(right(from, 2)) &&
     attacksOnSquare(pieces, flipColor(color), right(from), {
       enPassantSquare: null,
       skip: [from],
-    }).length === 0 &&
-    !pieces.get(right(from, 2))
+      opponentAttackMap,
+    }).length === 0
   ) {
     squares.push(right(from, 2));
   }
   if (
     castlingAvailability[color].queenside &&
+    // Check squares being castled through are empty
     !pieces.get(left(from)) &&
+    !pieces.get(left(from, 2)) &&
+    !pieces.get(left(from, 3)) &&
     // Also check nothing is attacking the square being castled through
-    // pieceAttacks[flipColor(color)].get(left(from))?.length === 0 &&
+    !opponentAttackMap.isAttacked(left(from)) &&
+    !opponentAttackMap.isAttacked(left(from, 2)) &&
+    !opponentAttackMap.isAttacked(left(from, 3)) &&
     attacksOnSquare(pieces, flipColor(color), left(from), {
       enPassantSquare: null,
       skip: [from],
-    }).length === 0 &&
-    !pieces.get(left(from, 2)) &&
-    !pieces.get(left(from, 3))
+      opponentAttackMap,
+    }).length === 0
   ) {
     squares.push(left(from, 2));
   }
