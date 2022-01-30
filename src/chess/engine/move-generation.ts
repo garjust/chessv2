@@ -15,7 +15,6 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import { attacksOnSquare } from './attacks';
 import { squareControlXraysMove } from './move-utils';
 import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
 import { KingSquares, KingPins, AttackedSquares } from './types';

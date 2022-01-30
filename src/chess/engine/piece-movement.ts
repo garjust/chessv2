@@ -15,7 +15,6 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import { attacksOnSquare } from './attacks';
 import {
   BISHOP_LOOKUP,
   KING_LOOKUP,
@@ -185,14 +184,10 @@ export const kingMoves = (
     // Check squares being castled through are empty
     !pieces.get(right(from)) &&
     !pieces.get(right(from, 2)) &&
-    // Also check nothing is attacking the square being castled through
-    !opponentAttackMap.isAttacked(right(from)) &&
-    !opponentAttackMap.isAttacked(right(from, 2)) &&
-    attacksOnSquare(pieces, flipColor(color), right(from), {
-      enPassantSquare: null,
-      skip: [from],
-      opponentAttackMap,
-    }).length === 0
+    // Also check nothing is attacking the square being castled through. It is
+    // still possible the king is skewered to this square by a check but we
+    // will detect that later in move generation
+    !opponentAttackMap.isAttacked(right(from))
   ) {
     squares.push(right(from, 2));
   }
@@ -202,15 +197,10 @@ export const kingMoves = (
     !pieces.get(left(from)) &&
     !pieces.get(left(from, 2)) &&
     !pieces.get(left(from, 3)) &&
-    // Also check nothing is attacking the square being castled through
-    !opponentAttackMap.isAttacked(left(from)) &&
-    !opponentAttackMap.isAttacked(left(from, 2)) &&
-    !opponentAttackMap.isAttacked(left(from, 3)) &&
-    attacksOnSquare(pieces, flipColor(color), left(from), {
-      enPassantSquare: null,
-      skip: [from],
-      opponentAttackMap,
-    }).length === 0
+    // Also check nothing is attacking the square being castled through. It is
+    // still possible the king is skewered to this square by a check but we
+    // will detect that later in move generation
+    !opponentAttackMap.isAttacked(left(from))
   ) {
     squares.push(left(from, 2));
   }
