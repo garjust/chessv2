@@ -143,12 +143,19 @@ const moveResolvesCheck = (
 // looking at king moves.
 const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
-  king: Square,
-  pins: Map<Square, Pin>,
-  checks: SquareControlObject[],
-  opponentAttackMap: AttackMap
+  {
+    kingSquare,
+    pins,
+    checks,
+    opponentAttackMap,
+  }: {
+    kingSquare: Square;
+    pins: Map<Square, Pin>;
+    checks: SquareControlObject[];
+    opponentAttackMap: AttackMap;
+  }
 ): boolean => {
-  if (move.from === king) {
+  if (move.from === kingSquare) {
     // The piece moving is the king. We need to make sure the square it is
     // moving to is not attacked by any pieces.
     if (checks.length === 0) {
@@ -201,7 +208,7 @@ export const generateMoves = (
     castlingAvailability: CastlingAvailability;
   }
 ): MoveWithExtraData[] => {
-  const king = kings[color];
+  const kingSquare = kings[color];
 
   const moves = pseudoMovesForPosition(pieces, color, {
     enPassantSquare,
@@ -210,7 +217,7 @@ export const generateMoves = (
     attackedSquares,
   });
 
-  if (king) {
+  if (kingSquare) {
     for (let i = moves.length - 1; i >= 0; i--) {
       const move = moves[i];
 
@@ -221,13 +228,12 @@ export const generateMoves = (
         }
       }
       if (
-        moveLeavesKingInCheck(
-          move,
-          king,
-          pinsToKing[color],
+        moveLeavesKingInCheck(move, {
+          kingSquare,
+          pins: pinsToKing[color],
           checks,
-          attackedSquares[flipColor(color)]
-        )
+          opponentAttackMap: attackedSquares[flipColor(color)],
+        })
       ) {
         moves.splice(i, 1);
         continue;
