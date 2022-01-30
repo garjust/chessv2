@@ -141,7 +141,7 @@ const moveResolvesCheck = (
 //
 // To do this we track pieces that are pinned to the king as well as
 // looking at king moves.
-const noCheckFromMove = (
+const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
   king: Square,
   pins: Map<Square, Pin>,
@@ -154,17 +154,17 @@ const noCheckFromMove = (
     if (checks.length === 0) {
       // If we are not in check just look for attacks on the destination
       // square
-      return !opponentAttackMap.isAttacked(move.to);
+      return opponentAttackMap.isAttacked(move.to);
     } else {
       // If we are in check first look for attacks on the destination square.
       if (opponentAttackMap.isAttacked(move.to)) {
-        return false;
+        return true;
       }
 
       // Finally we need to consider the case the checking piece is effectively
       // skewering the king to the destination square, meaning the king will
       // still be in check even though that square is not currently attacked.
-      return !checks.some((squareControl) =>
+      return checks.some((squareControl) =>
         squareControlXraysMove(squareControl, move)
       );
     }
@@ -173,12 +173,12 @@ const noCheckFromMove = (
     // to the king.
     const pin = pins.get(move.from);
     if (!pin) {
-      return true;
+      return false;
     }
 
     // The piece moving is absolutely pinned so it may only move within the
     // pinning ray.
-    return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
+    return !pin.legalMoveSquares.includes(move.to) && move.to !== pin.attacker;
   }
 };
 
@@ -221,7 +221,7 @@ export const generateMoves = (
         }
       }
       if (
-        !noCheckFromMove(
+        moveLeavesKingInCheck(
           move,
           king,
           pinsToKing[color],
