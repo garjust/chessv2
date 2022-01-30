@@ -1,10 +1,10 @@
-import { BLACK_CHECKMATE_FEN, LADDER_MATE_FEN, parseFEN } from '../../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import { moveString, squareLabel } from '../../utils';
 import Iterative from '../algorithms/iterative';
 import OrderMoves from '../algorithms/order-moves';
 
 test('alphaBeta finds checkmate in black mate position', async () => {
-  const position = parseFEN(BLACK_CHECKMATE_FEN);
+  const position = parseFEN(FEN_LIBRARY.BLACK_CHECKMATE_FEN);
   const ai = new OrderMoves(6);
 
   const result = await ai.nextMove(position);
@@ -26,7 +26,7 @@ test('alphaBeta finds checkmate in black mate position', async () => {
 // });
 
 test('alphaBeta finds checkmate in ladder mate position', async () => {
-  const position = parseFEN(LADDER_MATE_FEN);
+  const position = parseFEN(FEN_LIBRARY.LADDER_MATE_FEN);
   const ai = new OrderMoves(6);
 
   const result = await ai.nextMove(position);
