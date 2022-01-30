@@ -3,17 +3,11 @@ import {
   Piece,
   PieceType,
   Square,
-  AttackObject,
   Move,
   SquareControlObject,
   SlidingPiece,
 } from '../types';
-import {
-  flipColor,
-  CASTLING_AVAILABILITY_BLOCKED,
-  directionOfMove,
-  isSlider,
-} from '../utils';
+import { flipColor, directionOfMove, isSlider } from '../utils';
 import {
   BISHOP_RAY_BITARRAYS,
   QUEEN_RAY_BITARRAYS,
@@ -21,93 +15,10 @@ import {
   RAY_BY_DIRECTION,
 } from './move-lookup';
 import { rayControlScanner } from './move-utils';
-import {
-  bishopMoves,
-  kingMoves,
-  knightMoves,
-  pawnMoves,
-  rookMoves,
-} from './piece-movement';
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';
 import AttackMap from './attack-map';
 import { PIECES } from '../piece-consants';
-
-export const attacksOnSquare = (
-  pieces: Map<Square, Piece>,
-  attackingColor: Color,
-  square: Square,
-  {
-    enPassantSquare,
-    skip,
-    opponentAttackMap,
-  }: {
-    enPassantSquare: Square | null;
-    skip: Square[];
-    opponentAttackMap: AttackMap;
-  }
-): AttackObject[] => {
-  const attacks: AttackObject[] = [];
-  const color = flipColor(attackingColor);
-
-  // Generate the moves for a super piece of the defending color
-  // on the target square.
-  const superPieceMoves = [
-    kingMoves(pieces, color, square, {
-      castlingOnly: false,
-      castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
-      opponentAttackMap,
-    }),
-    bishopMoves(pieces, color, square, { skip }),
-    rookMoves(pieces, color, square, { skip }),
-    knightMoves(pieces, color, square),
-    pawnMoves(pieces, color, square, {
-      advanceOnly: false,
-      attacksOnly: true,
-      enPassantSquare: enPassantSquare,
-    }),
-  ];
-
-  // Go through each move looking for attacks. An attack is valid if
-  // the attacking and attacked piece are the same type.
-  //
-  // Note: treat bishops and rooks as queens as well
-  for (const movesByPieceType of superPieceMoves) {
-    for (const move of movesByPieceType) {
-      if (move.attack) {
-        const piece = pieces.get(move.to);
-        if (
-          move.attack.attacker.type === PieceType.Bishop ||
-          move.attack.attacker.type === PieceType.Rook
-        ) {
-          if (
-            piece &&
-            (piece.type === move.attack.attacker.type ||
-              piece.type === PieceType.Queen)
-          ) {
-            // We need to reverse the super piece move to find the real attack.
-            attacks.push({
-              attacked: move.attack.attacker,
-              attacker: move.attack.attacked,
-              slideSquares: move.attack.slideSquares,
-            });
-          }
-        } else {
-          if (piece && piece.type === move.attack.attacker.type) {
-            // We need to reverse the super piece move to find the real attack.
-            attacks.push({
-              attacked: move.attack.attacker,
-              attacker: move.attack.attacked,
-              slideSquares: move.attack.slideSquares,
-            });
-          }
-        }
-      }
-    }
-  }
-
-  return attacks;
-};
 
 const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
   switch (piece.type) {
