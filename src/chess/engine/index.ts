@@ -11,14 +11,13 @@ import {
 } from '../types';
 import { flipColor, moveString } from '../utils';
 import AttackMap from './attack-map';
-import { findChecksOnKing } from './checks';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
-import { DEBUG_FLAG, ENABLE_ATTACK_MAP } from './global-config';
+import { DEBUG_FLAG } from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { AttackedSquares, KingChecks, Position, ZobristKey } from './types';
+import { AttackedSquares, Position, ZobristKey } from './types';
 
 export default class Engine {
   _position: Position;
@@ -129,39 +128,20 @@ export default class Engine {
   }
 
   checks(color: Color): SquareControlObject[] {
-    if (ENABLE_ATTACK_MAP) {
-      const king = this._position.kings[color];
-      const checks: SquareControlObject[] = [];
-      if (king) {
-        for (const [, squareControl] of this._position.attackedSquares[
-          flipColor(color)
-        ].controlOfSquare(king)) {
-          checks.push(squareControl);
-        }
+    const king = this._position.kings[color];
+    const checks: SquareControlObject[] = [];
+    if (king) {
+      for (const [, squareControl] of this._position.attackedSquares[
+        flipColor(color)
+      ].controlOfSquare(king)) {
+        checks.push(squareControl);
       }
-      return checks;
-    } else {
-      return findChecksOnKing(
-        this._position.pieces,
-        this._position.kings[color],
-        color,
-        {
-          enPassantSquare: this._position.enPassantSquare,
-          castlingAvailability: this._position.castlingAvailability,
-        }
-      );
     }
+    return checks;
   }
 
   get attacks(): AttackedSquares {
-    if (ENABLE_ATTACK_MAP) {
-      return this._position.attackedSquares;
-    } else {
-      return {
-        [Color.White]: new AttackMap(this._position, Color.White),
-        [Color.Black]: new AttackMap(this._position, Color.Black),
-      };
-    }
+    return this._position.attackedSquares;
   }
 
   get pins(): Pin[] {

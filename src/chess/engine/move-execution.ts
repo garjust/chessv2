@@ -6,7 +6,6 @@ import {
   Piece,
   PieceType,
   Square,
-  SquareControlObject,
 } from '../types';
 import {
   ROOK_STARTING_SQUARES,
@@ -15,7 +14,6 @@ import {
 } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
-import { ENABLE_ATTACK_MAP } from './global-config';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
 import { KingPins, Position, ZobristKey } from './types';
@@ -209,18 +207,15 @@ export const applyMove = (
     move,
     piece
   );
-
-  if (ENABLE_ATTACK_MAP) {
-    updateAttackedSquares(
-      position.attackedSquares,
-      position.pieces,
-      move,
-      piece,
-      result.captured !== undefined,
-      enPassantCaptureSquare,
-      castlingRookMove
-    );
-  }
+  updateAttackedSquares(
+    position.attackedSquares,
+    position.pieces,
+    move,
+    piece,
+    result.captured !== undefined,
+    enPassantCaptureSquare,
+    castlingRookMove
+  );
 
   if (result.captured) {
     currentZobrist.updateSquareOccupancy(
@@ -292,10 +287,8 @@ export const undoMove = (
     }
   }
 
-  if (ENABLE_ATTACK_MAP) {
-    position.attackedSquares[Color.White].undoChangeset();
-    position.attackedSquares[Color.Black].undoChangeset();
-  }
+  position.attackedSquares[Color.White].undoChangeset();
+  position.attackedSquares[Color.Black].undoChangeset();
 
   if (result.previousState.zobrist) {
     currentZobrist.key = result.previousState.zobrist;

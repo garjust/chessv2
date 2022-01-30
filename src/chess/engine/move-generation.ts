@@ -4,7 +4,6 @@ import {
   Piece,
   PieceType,
   Square,
-  AttackObject,
   CastlingAvailability,
   Pin,
   SquareControlObject,
@@ -17,98 +16,8 @@ import {
 } from '../utils';
 import AttackMap from './attack-map';
 import { attacksOnSquare } from './attacks';
-import { ENABLE_ATTACK_MAP } from './global-config';
-import {
-  bishopMoves,
-  expandPromotions,
-  kingMoves,
-  knightMoves,
-  pawnMoves,
-  queenMoves,
-  rookMoves,
-} from './piece-movement';
-import { KingSquares, KingPins, KingChecks, AttackedSquares } from './types';
-
-const movesForPiece = (
-  pieces: Map<Square, Piece>,
-  piece: Piece,
-  square: Square,
-  {
-    enPassantSquare,
-    castlingAvailability,
-    attackedSquares,
-  }: {
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-    attackedSquares: AttackedSquares;
-  }
-) => {
-  const moves: MoveWithExtraData[] = [];
-
-  switch (piece.type) {
-    case PieceType.Bishop:
-      moves.push(...bishopMoves(pieces, piece.color, square, { skip: [] }));
-      break;
-    case PieceType.King:
-      moves.push(
-        ...kingMoves(pieces, piece.color, square, {
-          castlingOnly: false,
-          castlingAvailability,
-        })
-      );
-      break;
-    case PieceType.Knight:
-      moves.push(...knightMoves(pieces, piece.color, square));
-      break;
-    case PieceType.Pawn:
-      moves.push(
-        ...pawnMoves(pieces, piece.color, square, {
-          attacksOnly: false,
-          advanceOnly: false,
-          enPassantSquare,
-        })
-      );
-      break;
-    case PieceType.Queen:
-      moves.push(...queenMoves(pieces, piece.color, square, { skip: [] }));
-      break;
-    case PieceType.Rook:
-      moves.push(...rookMoves(pieces, piece.color, square, { skip: [] }));
-      break;
-  }
-
-  return moves;
-};
-
-const movesForPosition = (
-  pieces: Map<Square, Piece>,
-  options: {
-    color?: Color;
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-    attackedSquares: AttackedSquares;
-  }
-): MoveWithExtraData[] => {
-  const moves: MoveWithExtraData[] = [];
-
-  const { color, enPassantSquare, castlingAvailability, attackedSquares } =
-    options;
-
-  for (const [square, piece] of pieces.entries()) {
-    if (color && piece.color !== color) {
-      continue;
-    }
-    moves.push(
-      ...movesForPiece(pieces, piece, square, {
-        enPassantSquare,
-        castlingAvailability,
-        attackedSquares,
-      })
-    );
-  }
-
-  return moves;
-};
+import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
+import { KingSquares, KingPins, AttackedSquares } from './types';
 
 const movesForPositionFromAttacks = (
   pieces: Map<Square, Piece>,
@@ -234,7 +143,7 @@ const noCheckFromMove = (
   move: MoveWithExtraData,
   pins: Map<Square, Pin>,
   inCheck: boolean,
-  attackMap?: AttackMap
+  attackMap: AttackMap
 ): boolean => {
   // We need to prune moves that result in a check on ourselves.
   //
@@ -243,7 +152,7 @@ const noCheckFromMove = (
   if (!inCheck && attackMap) {
     if (move.from === king) {
       // This is a king move, verify the destination square is not attacked.
-      return !attackMap?.isAttacked(move.to);
+      return !attackMap.isAttacked(move.to);
     } else {
       const pin = pins.get(move.from);
       if (!pin) {
@@ -295,28 +204,13 @@ export const generateMoves = (
 ): MoveWithExtraData[] => {
   const king = kings[color];
 
-  let moves: MoveWithExtraData[];
-  if (ENABLE_ATTACK_MAP) {
-    moves = movesForPositionFromAttacks(pieces, {
-      color,
-      enPassantSquare,
-      castlingAvailability:
-        checks.length > 0
-          ? CASTLING_AVAILABILITY_BLOCKED
-          : castlingAvailability,
-      attackedSquares,
-    });
-  } else {
-    moves = movesForPosition(pieces, {
-      color,
-      enPassantSquare,
-      castlingAvailability:
-        checks.length > 0
-          ? CASTLING_AVAILABILITY_BLOCKED
-          : castlingAvailability,
-      attackedSquares,
-    });
-  }
+  const moves = movesForPositionFromAttacks(pieces, {
+    color,
+    enPassantSquare,
+    castlingAvailability:
+      checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
+    attackedSquares,
+  });
 
   if (king) {
     for (let i = moves.length - 1; i >= 0; i--) {
@@ -336,7 +230,7 @@ export const generateMoves = (
           move,
           pinsToKing[color],
           checks.length > 0,
-          ENABLE_ATTACK_MAP ? attackedSquares[flipColor(color)] : undefined
+          attackedSquares[flipColor(color)]
         )
       ) {
         moves.splice(i, 1);
