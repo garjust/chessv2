@@ -65,7 +65,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['.eslintrc.js', '.prettierrc.js', 'perft/webpack.confg.js'],
+      files: ['.eslintrc.js', '.prettierrc.js', 'config/*.js'],
       parserOptions: {
         sourceType: 'script',
       },

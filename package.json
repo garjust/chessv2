@@ -5,7 +5,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:perft": "webpack-cli -c perft/webpack.config.js",
+    "build:engine": "webpack-cli -c config/engine-webpack.config.js",
+    "build:perft": "webpack-cli -c config/perft-webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js src",
     "test": "react-scripts test",
     "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\"",

@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   target: 'node',
-  entry: './src/script/perft',
+  entry: path.resolve(__dirname, '../src/script/engine'),
   mode: 'production',
   module: {
     rules: [
@@ -20,7 +20,7 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              configFile: 'tsconfig.perft.json',
+              configFile: 'tsconfig.script.json',
             },
           },
         ],
@@ -34,6 +34,7 @@ module.exports = {
     topLevelAwait: true,
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'engine.js',
+    path: path.resolve(__dirname, '../dist'),
   },
 };
