@@ -19,6 +19,26 @@ import { squareControlXraysMove } from './move-utils';
 import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
 import { KingSquares, KingPins, AttackedSquares } from './types';
 
+const buildMove = (
+  squareControl: SquareControlObject,
+  piece: Piece,
+  attackedPiece?: Piece
+): MoveWithExtraData => ({
+  from: squareControl.attacker.square,
+  to: squareControl.square,
+  piece,
+  attack: attackedPiece
+    ? {
+        attacked: {
+          square: squareControl.square,
+          type: attackedPiece.type,
+        },
+        attacker: squareControl.attacker,
+        slideSquares: squareControl.slideSquares,
+      }
+    : undefined,
+});
+
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
@@ -43,7 +63,7 @@ const pseudoMovesForPosition = (
       const attackedPiece = pieces.get(squareControl.square);
 
       // Get rid of attacks on own-pieces.
-      if (attackedPiece && attackedPiece.color === color) {
+      if (attackedPiece?.color === color) {
         continue;
       }
 
@@ -55,21 +75,7 @@ const pseudoMovesForPosition = (
         }
       }
 
-      const move = {
-        from: squareControl.attacker.square,
-        to: squareControl.square,
-        piece,
-        attack: attackedPiece
-          ? {
-              attacked: {
-                square: squareControl.square,
-                type: attackedPiece.type,
-              },
-              attacker: { square, type: piece.type },
-              slideSquares: squareControl.slideSquares,
-            }
-          : undefined,
-      };
+      const move = buildMove(squareControl, piece, attackedPiece);
 
       if (
         piece.type === PieceType.Pawn &&
