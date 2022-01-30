@@ -6,7 +6,7 @@ import {
   Square,
   SquareControlObject,
 } from '../types';
-import { directionOfMove } from '../utils';
+import { directionOfMove, isSlider, isSliderPieceType } from '../utils';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;
@@ -30,7 +30,7 @@ export const squareControlXraysMove = (
   squareControl: SquareControlObject,
   move: Move
 ): boolean =>
-  squareControl.slideSquares.length > 0 &&
+  isSliderPieceType(squareControl.attacker.type) &&
   directionOfMove(squareControl.attacker.square, squareControl.square) ===
     directionOfMove(move.from, move.to);
 

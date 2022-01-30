@@ -10,7 +10,7 @@ import { RAY_BY_DIRECTION } from '../move-lookup';
 import { rayControlScanner, squareControlXraysMove } from '../move-utils';
 
 test('squareControlXraysMove', () => {
-  const squareControl: SquareControlObject = {
+  let squareControl: SquareControlObject = {
     attacker: { square: 34, type: PieceType.Queen },
     square: 13,
     slideSquares: [27, 20],
@@ -26,6 +26,15 @@ test('squareControlXraysMove', () => {
     false
   );
   expect(squareControlXraysMove(squareControl, { from: 14, to: 7 })).toEqual(
+    true
+  );
+
+  squareControl = {
+    attacker: { square: 44, type: PieceType.Queen },
+    square: 52,
+    slideSquares: [],
+  };
+  expect(squareControlXraysMove(squareControl, { from: 52, to: 60 })).toEqual(
     true
   );
 });

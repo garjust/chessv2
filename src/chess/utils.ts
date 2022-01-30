@@ -95,10 +95,15 @@ export const squareGenerator = function* () {
   }
 };
 
+export const isSliderPieceType = (
+  type: PieceType
+): type is PieceType.Bishop | PieceType.Queen | PieceType.Rook =>
+  type === PieceType.Bishop ||
+  type === PieceType.Queen ||
+  type === PieceType.Rook;
+
 export const isSlider = (piece: Piece): piece is SlidingPiece =>
-  piece.type === PieceType.Bishop ||
-  piece.type === PieceType.Queen ||
-  piece.type === PieceType.Rook;
+  isSliderPieceType(piece.type);
 
 export const squaresInclude = (squares: Square[], square: Square): boolean =>
   squares.includes(square);

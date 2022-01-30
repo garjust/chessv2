@@ -23,7 +23,7 @@ import Engine from '../engine';
 import { interval, map } from 'rxjs';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 
-const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.STARTING_POSITION_FEN;
+const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.VIENNA_OPENING_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {

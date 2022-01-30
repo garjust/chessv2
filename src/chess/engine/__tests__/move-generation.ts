@@ -16,3 +16,14 @@ test('move generation bongcloud 1', () => {
   const moves = engine.generateMoves();
   expect(moves.length).toEqual(28);
 });
+
+test('move generation queen checking must be captured', () => {
+  const engine = new Engine(
+    parseFEN(
+      'rnbq1b1r/1pppkppp/4Qn2/p3p3/2B1P3/2N5/PPPP1PPP/R1B1K1NR b KQ - 3 5'
+    )
+  );
+
+  const moves = engine.generateMoves();
+  expect(moves.length).toEqual(2);
+});

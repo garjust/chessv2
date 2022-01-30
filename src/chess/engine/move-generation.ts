@@ -16,6 +16,7 @@ import {
 } from '../utils';
 import AttackMap from './attack-map';
 import { attacksOnSquare } from './attacks';
+import { squareControlXraysMove } from './move-utils';
 import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
 import { KingSquares, KingPins, AttackedSquares } from './types';
 
@@ -142,10 +143,8 @@ const moveResolvesCheck = (
 // To do this we track pieces that are pinned to the king as well as
 // looking at king moves.
 const noCheckFromMove = (
-  pieces: Map<Square, Piece>,
-  color: Color,
-  king: Square,
   move: MoveWithExtraData,
+  king: Square,
   pins: Map<Square, Pin>,
   checks: SquareControlObject[],
   opponentAttackMap: AttackMap
@@ -154,14 +153,20 @@ const noCheckFromMove = (
     // The piece moving is the king. We need to make sure the square it is
     // moving to is not attacked by any pieces.
     if (checks.length === 0) {
+      // If we are not in check just look for attacks on the destination
+      // square
       return !opponentAttackMap.isAttacked(move.to);
     } else {
-      return (
-        attacksOnSquare(pieces, flipColor(color), move.to, {
-          enPassantSquare: null,
-          skip: [king],
-          opponentAttackMap,
-        }).length === 0
+      // If we are in check first look for attacks on the destination square.
+      if (opponentAttackMap.isAttacked(move.to)) {
+        return false;
+      }
+
+      // Finally we need to consider the case the checking piece is effectively
+      // skewering the king to the destination square, meaning the king will
+      // still be in check even though that square is not currently attacked.
+      return !checks.some((squareControl) =>
+        squareControlXraysMove(squareControl, move)
       );
     }
   } else {
@@ -218,10 +223,8 @@ export const generateMoves = (
       }
       if (
         !noCheckFromMove(
-          pieces,
-          color,
-          king,
           move,
+          king,
           pinsToKing[color],
           checks,
           attackedSquares[flipColor(color)]
