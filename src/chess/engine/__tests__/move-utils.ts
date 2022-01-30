@@ -1,11 +1,37 @@
-import { parseFEN, VIENNA_OPENING_FEN } from '../../lib/fen';
-import { Color, DirectionUnit, PieceType } from '../../types';
+import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
+import {
+  Color,
+  DirectionUnit,
+  PieceType,
+  SquareControlObject,
+} from '../../types';
 import { labelToSquare } from '../../utils';
 import { RAY_BY_DIRECTION } from '../move-lookup';
-import { rayControlScanner } from '../move-utils';
+import { rayControlScanner, squareControlXraysMove } from '../move-utils';
+
+test('squareControlXraysMove', () => {
+  const squareControl: SquareControlObject = {
+    attacker: { square: 34, type: PieceType.Queen },
+    square: 13,
+    slideSquares: [27, 20],
+  };
+
+  expect(squareControlXraysMove(squareControl, { from: 0, to: 8 })).toEqual(
+    false
+  );
+  expect(squareControlXraysMove(squareControl, { from: 41, to: 48 })).toEqual(
+    false
+  );
+  expect(squareControlXraysMove(squareControl, { from: 27, to: 36 })).toEqual(
+    false
+  );
+  expect(squareControlXraysMove(squareControl, { from: 14, to: 7 })).toEqual(
+    true
+  );
+});
 
 test('rayControlScanner bishop', () => {
-  const position = parseFEN(VIENNA_OPENING_FEN);
+  const position = parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN);
   const scanningPiece = {
     square: labelToSquare('c4'),
     piece: { type: PieceType.Bishop, color: Color.White },
@@ -47,7 +73,7 @@ test('rayControlScanner bishop', () => {
 });
 
 test('rayControlScanner bishop skipPast', () => {
-  const position = parseFEN(VIENNA_OPENING_FEN);
+  const position = parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN);
   const scanningPiece = {
     square: labelToSquare('c4'),
     piece: { type: PieceType.Bishop, color: Color.White },

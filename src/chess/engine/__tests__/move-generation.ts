@@ -1,8 +1,8 @@
 import Engine from '..';
-import { parseFEN, PERFT_5_FEN } from '../../lib/fen';
+import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
 
 test('move generation perft_5', () => {
-  const engine = new Engine(parseFEN(PERFT_5_FEN));
+  const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
 
   const moves = engine.generateMoves();
   expect(moves.length).toEqual(44);

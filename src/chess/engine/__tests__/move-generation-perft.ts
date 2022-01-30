@@ -1,10 +1,5 @@
 import Engine from '..';
-import {
-  parseFEN,
-  PERFT_5_FEN,
-  STARTING_POSITION_FEN,
-  VIENNA_OPENING_FEN,
-} from '../../lib/fen';
+import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
 import {
   PERFT_POSITION_5,
   searchRoot,
@@ -13,7 +8,7 @@ import {
 } from '../../lib/perft';
 
 test('perft_5', () => {
-  const engine = new Engine(parseFEN(PERFT_5_FEN));
+  const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);
@@ -26,7 +21,7 @@ test('perft_5', () => {
 });
 
 test('starting position', () => {
-  const engine = new Engine(parseFEN(STARTING_POSITION_FEN));
+  const engine = new Engine(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);
@@ -39,7 +34,7 @@ test('starting position', () => {
 });
 
 test('vienna opening', () => {
-  const engine = new Engine(parseFEN(VIENNA_OPENING_FEN));
+  const engine = new Engine(parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);

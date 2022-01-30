@@ -6,6 +6,7 @@ import {
   Square,
   SquareControlObject,
 } from '../types';
+import { directionOfMove } from '../utils';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;
@@ -24,6 +25,14 @@ export const isMoveDown = (move: Move): boolean =>
 
 export const isMoveInFile = (move: Move): boolean =>
   (move.from - move.to) % 8 === 0;
+
+export const squareControlXraysMove = (
+  squareControl: SquareControlObject,
+  move: Move
+): boolean =>
+  squareControl.slideSquares.length > 0 &&
+  directionOfMove(squareControl.attacker.square, squareControl.square) ===
+    directionOfMove(move.from, move.to);
 
 export const rayScanner = (
   pieces: Map<Square, Piece>,
