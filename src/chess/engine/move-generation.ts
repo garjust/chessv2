@@ -105,6 +105,7 @@ const pseudoMovesForPosition = (
   return moves;
 };
 
+// When in check we need to prune moves that do not resolve the check.
 const moveResolvesCheck = (
   checks: SquareControlObject[],
   move: MoveWithExtraData
@@ -131,40 +132,30 @@ const moveResolvesCheck = (
     return false;
   } else {
     throw Error(
-      `called with ${checks.length} checks, not exactly 1 or 2 checks`
+      `called with ${checks.length} checks, there can only ever be 1 or 2 checks`
     );
   }
 };
 
+// We need to prune moves that result in a check on ourselves.
+//
+// To do this we track pieces that are pinned to the king as well as
+// looking at king moves.
 const noCheckFromMove = (
   pieces: Map<Square, Piece>,
   color: Color,
   king: Square,
   move: MoveWithExtraData,
   pins: Map<Square, Pin>,
-  inCheck: boolean,
+  checks: SquareControlObject[],
   opponentAttackMap: AttackMap
 ): boolean => {
-  // We need to prune moves that result in a check on ourselves.
-  //
-  // To do this we track pieces that are pinned to the king as well as
-  // looking at king moves.
-  if (!inCheck && opponentAttackMap) {
-    if (move.from === king) {
-      // This is a king move, verify the destination square is not attacked.
+  if (move.from === king) {
+    // The piece moving is the king. We need to make sure the square it is
+    // moving to is not attacked by any pieces.
+    if (checks.length === 0) {
       return !opponentAttackMap.isAttacked(move.to);
     } else {
-      const pin = pins.get(move.from);
-      if (!pin) {
-        return true;
-      }
-
-      // We are dealing with a pinned piece.
-      return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
-    }
-  } else {
-    if (move.from === king) {
-      // This is a king move, verify the destination square is not attacked.
       return (
         attacksOnSquare(pieces, flipColor(color), move.to, {
           enPassantSquare: null,
@@ -172,15 +163,18 @@ const noCheckFromMove = (
           opponentAttackMap,
         }).length === 0
       );
-    } else {
-      const pin = pins.get(move.from);
-      if (!pin) {
-        return true;
-      }
-
-      // We are dealing with a pinned piece.
-      return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
     }
+  } else {
+    // The piece moving is not the king so we look to see if it is pinned
+    // to the king.
+    const pin = pins.get(move.from);
+    if (!pin) {
+      return true;
+    }
+
+    // The piece moving is absolutely pinned so it may only move within the
+    // pinning ray.
+    return pin.legalMoveSquares.includes(move.to) || move.to === pin.attacker;
   }
 };
 
@@ -229,7 +223,7 @@ export const generateMoves = (
           king,
           move,
           pinsToKing[color],
-          checks.length > 0,
+          checks,
           attackedSquares[flipColor(color)]
         )
       ) {
