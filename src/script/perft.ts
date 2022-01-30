@@ -1,9 +1,10 @@
 import { searchRoot } from '../chess/lib/perft';
 import { argv } from 'process';
+import { open } from 'fs/promises';
+
 import { parseFEN } from '../chess/lib/fen';
 import Engine from '../chess/engine';
 import { moveFromString, moveString } from '../chess/utils';
-import { open } from 'fs/promises';
 
 const DEBUG_FILE = '/tmp/perft-debug';
 const DEBUG = true;
