@@ -16,19 +16,16 @@
 ## TODO
 
 - Decrease weight of moves to squares attacked by pawns
-- Opening book (Kevin will fried liver me)
-- Evaluation of checkmates (M1..N) and actually able to checkmate
+- *Opening book* (Kevin will fried liver me)
 - Evaluation likes pawn cover for king
   - Maybe this means squares that attack the king are blocked or defended (knight attacks squares are defended against, rays to squares near king are blocked by pawns)
 - Disable move ordering in quiescenceSearch
 - Cut% is incorrect because v3 visits more nodes than there are moves
 - *Zobrish hash en passant square*
 - Evaluation function should be able to detect checkmate + draw, allowing mates to be found one-ply less in the search
+  - Requires move generation at leaf nodes
 - *TTable memory is crashing chrome.*
 - *Support common chess computer API*
 - *ELO the computers*
 
 ## Bug Positions
-
-### `rnbqk1nr/pppp1ppp/8/4p3/1b1P4/8/PPPKPPPP/RNBQ1BNR/ w kQ - 2 3`
-King pinned to square behind it, now allowing king to move to square being x-ray attacked by checking piece with *attack moves* scheme
