@@ -5,7 +5,6 @@ import {
   PieceType,
   Square,
   CastlingAvailability,
-  Pin,
   SquareControlObject,
 } from '../types';
 import {
@@ -17,7 +16,8 @@ import {
 import AttackMap from './attack-map';
 import { squareControlXraysMove } from './move-utils';
 import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
-import { KingSquares, KingPins, AttackedSquares } from './types';
+import Pins from './pins';
+import { KingSquares, PinsByColor, AttackedSquares } from './types';
 
 const buildMove = (
   squareControl: SquareControlObject,
@@ -156,7 +156,7 @@ const moveLeavesKingInCheck = (
     opponentAttackMap,
   }: {
     kingSquare: Square;
-    pins: Map<Square, Pin>;
+    pins: Pins;
     checks: SquareControlObject[];
     opponentAttackMap: AttackMap;
   }
@@ -184,7 +184,7 @@ const moveLeavesKingInCheck = (
   } else {
     // The piece moving is not the king so we look to see if it is pinned
     // to the king.
-    const pin = pins.get(move.from);
+    const pin = pins.pinByPinnedPiece(move.from);
     if (!pin) {
       return false;
     }
@@ -200,14 +200,14 @@ export const generateMoves = (
   color: Color,
   {
     attackedSquares,
-    pinsToKing,
+    pins,
     kings,
     checks,
     enPassantSquare,
     castlingAvailability,
   }: {
     attackedSquares: AttackedSquares;
-    pinsToKing: KingPins;
+    pins: Pins;
     kings: KingSquares;
     checks: SquareControlObject[];
     enPassantSquare: Square | null;
@@ -236,7 +236,7 @@ export const generateMoves = (
       if (
         moveLeavesKingInCheck(move, {
           kingSquare,
-          pins: pinsToKing[color],
+          pins,
           checks,
           opponentAttackMap: attackedSquares[flipColor(color)],
         })

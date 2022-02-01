@@ -16,7 +16,7 @@ import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
-import { KingPins, Position, ZobristKey } from './types';
+import { PinsByColor, Position, ZobristKey } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -26,7 +26,7 @@ export type MoveResult = {
     halfMoveCount: number;
     castlingAvailability: CastlingAvailability;
     enPassantSquare: Square | null;
-    pinsToKing: KingPins;
+    absolutePins: PinsByColor;
     zobrist?: ZobristKey;
   };
 };
@@ -79,7 +79,7 @@ export const applyMove = (
       halfMoveCount: position.halfMoveCount,
       // The pin data can be stored in result state because new maps are created
       // when pin data is updated
-      pinsToKing: { ...position.pinsToKing },
+      absolutePins: { ...position.absolutePins },
       zobrist: currentZobrist.key,
     },
   };
@@ -201,7 +201,7 @@ export const applyMove = (
   }
 
   updatePinsOnKings(
-    position.pinsToKing,
+    position.absolutePins,
     position.pieces,
     position.kings,
     move,
@@ -302,5 +302,5 @@ export const undoMove = (
   position.castlingAvailability = result.previousState.castlingAvailability;
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
-  position.pinsToKing = result.previousState.pinsToKing;
+  position.absolutePins = result.previousState.absolutePins;
 };

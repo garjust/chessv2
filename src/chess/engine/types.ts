@@ -1,5 +1,6 @@
 import { Color, Pin, Position as ExternalPosition, Square } from '../types';
 import AttackMap from './attack-map';
+import Pins from './pins';
 
 // Use two 32bit numbers for the zobrist key maintained by the engine.
 export type ZobristKey = [number, number];
@@ -9,9 +10,9 @@ export type KingSquares = {
   [Color.Black]?: Square;
 };
 
-export type KingPins = {
-  [Color.White]: Map<Square, Pin>;
-  [Color.Black]: Map<Square, Pin>;
+export type PinsByColor = {
+  [Color.White]: Pins;
+  [Color.Black]: Pins;
 };
 
 export type AttackedSquares = {
@@ -21,6 +22,6 @@ export type AttackedSquares = {
 
 export type Position = ExternalPosition & {
   kings: KingSquares;
+  absolutePins: PinsByColor;
   attackedSquares: AttackedSquares;
-  pinsToKing: KingPins;
 };

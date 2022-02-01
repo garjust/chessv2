@@ -101,7 +101,7 @@ export default class Engine {
   generateMoves(): MoveWithExtraData[] {
     return generateMoves(this._position.pieces, this._position.turn, {
       attackedSquares: this._position.attackedSquares,
-      pinsToKing: this._position.pinsToKing,
+      pins: this._position.absolutePins[this._position.turn],
       checks: this.checks(this._position.turn),
       kings: this._position.kings,
       enPassantSquare: this._position.enPassantSquare,
@@ -146,8 +146,8 @@ export default class Engine {
 
   get pins(): Pin[] {
     return [
-      ...Array.from(this._position.pinsToKing[Color.White].values()),
-      ...Array.from(this._position.pinsToKing[Color.Black].values()),
+      ...this._position.absolutePins[Color.White].allPins,
+      ...this._position.absolutePins[Color.Black].allPins,
     ];
   }
 }
