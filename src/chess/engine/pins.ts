@@ -3,46 +3,48 @@ import { KING_RAYS, QUEEN_RAY_BITARRAYS } from './move-lookup';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (
-  pins: PinsByColor,
+  pinsByColor: PinsByColor,
   pieces: Map<Square, Piece>,
   kings: KingSquares,
   move: Move,
   piece: Piece
 ) => {
-  const whiteKing = kings[Color.White];
-  const blackKing = kings[Color.Black];
-
-  if (whiteKing) {
-    // If the moved piece is the king, recalcuate pins on it.
-    //
-    // If the moved piece does not enter or leave the king's rays nothing
-    // needs to be computed.
-    if (
-      piece.type === PieceType.King ||
-      QUEEN_RAY_BITARRAYS[whiteKing][move.from] ||
-      QUEEN_RAY_BITARRAYS[whiteKing][move.to]
-    ) {
-      pins[Color.White] = new Pins(pieces, whiteKing, Color.White);
-    }
-  }
-
-  if (blackKing) {
-    // If the moved piece is the king, recalcuate pins on it.
-    //
-    // If the moved piece does not enter or leave the king's rays nothing
-    // needs to be computed.
-    if (
-      piece.type === PieceType.King ||
-      QUEEN_RAY_BITARRAYS[blackKing][move.from] ||
-      QUEEN_RAY_BITARRAYS[blackKing][move.to]
-    ) {
-      pins[Color.Black] = new Pins(pieces, blackKing, Color.Black);
+  for (const color of [Color.White, Color.Black]) {
+    pinsByColor[color].startUpdates();
+    const king = kings[color];
+    if (king) {
+      if (
+        // If the moved piece is the king, recalcuate all pins on it.
+        piece.type === PieceType.King
+      ) {
+        pinsByColor[color].reset(pieces, king, color);
+      } else if (
+        // If the moved piece does not enter or leave the king's rays nothing
+        // needs to be computed.
+        QUEEN_RAY_BITARRAYS[king][move.from] ||
+        QUEEN_RAY_BITARRAYS[king][move.to]
+      ) {
+        pinsByColor[color].reset(pieces, king, color);
+      }
     }
   }
 };
 
+enum UpdateType {
+  AddPin,
+  RemovePin,
+  Reset,
+}
+
+type Update =
+  | { type: UpdateType.AddPin; square: Square }
+  | { type: UpdateType.RemovePin; pin: Pin }
+  | { type: UpdateType.Reset; map: Map<Square, Pin> };
+
 export default class Pins {
   _map = new Map<Square, Pin>();
+
+  _updatesStack: Update[][] = [];
 
   constructor(
     pieces: Map<Square, Piece>,
@@ -52,6 +54,69 @@ export default class Pins {
     if (!kingSquare) {
       return;
     }
+    this.reset(pieces, kingSquare, color, false);
+  }
+
+  startUpdates(): void {
+    this._updatesStack.push([]);
+  }
+
+  revert(): void {
+    const updates = this._updatesStack.pop() ?? [];
+    for (const change of updates) {
+      switch (change.type) {
+        case UpdateType.AddPin:
+          this.remove(change.square, false);
+          break;
+        case UpdateType.RemovePin:
+          this.add(change.pin, false);
+          break;
+        case UpdateType.Reset:
+          this._map = change.map;
+          break;
+      }
+    }
+  }
+
+  add(pin: Pin, cache = true) {
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: UpdateType.AddPin,
+        square: pin.pinned,
+      });
+    }
+    this._map.set(pin.pinned, pin);
+  }
+
+  remove(square: Square, cache = true) {
+    const pin = this._map.get(square);
+    if (!pin) {
+      throw Error('cannot remove no pin');
+    }
+
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: UpdateType.RemovePin,
+        pin,
+      });
+    }
+    this._map.delete(square);
+  }
+
+  reset(
+    pieces: Map<Square, Piece>,
+    kingSquare: Square,
+    color: Color,
+    cache = true
+  ) {
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: UpdateType.Reset,
+        map: this._map,
+      });
+    }
+
+    this._map = new Map<Square, Pin>();
 
     const rays = KING_RAYS[kingSquare];
 

@@ -6,14 +6,14 @@ import {
 } from '../types';
 import { forPiece } from './piece-movement-control';
 
-enum ChangeType {
+enum UpdateType {
   FullRemove,
   PartialRemove,
   PartialAdd,
 }
 
-type SquareControlChange = {
-  type: ChangeType;
+type Update = {
+  type: UpdateType;
   square: Square;
   squares: SquareControlObject[];
 };
@@ -29,7 +29,7 @@ export default class AttackMap {
     Map<Square, SquareControlObject>
   >();
 
-  _updatesStack: SquareControlChange[][] = [];
+  _updatesStack: Update[][] = [];
 
   constructor(position: ExternalPosition, color: Color) {
     for (let i = 0; i < 64; i++) {
@@ -74,22 +74,22 @@ export default class AttackMap {
     return map.entries();
   }
 
-  startChangeset(): void {
+  startUpdates(): void {
     this._updatesStack.push([]);
   }
 
-  undoChangeset(): void {
+  revert(): void {
     const removals = this._updatesStack.pop() ?? [];
     for (const change of removals) {
       switch (change.type) {
-        case ChangeType.FullRemove:
+        case UpdateType.FullRemove:
           this.removeAttacksForPiece(change.square, false);
           this.addAttacksForPiece(change.square, change.squares);
           break;
-        case ChangeType.PartialRemove:
+        case UpdateType.PartialRemove:
           this.addAttacks(change.square, change.squares, false);
           break;
-        case ChangeType.PartialAdd:
+        case UpdateType.PartialAdd:
           this.removeAttacks(change.square, change.squares, false);
           break;
       }
@@ -112,7 +112,7 @@ export default class AttackMap {
   ): void {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
-        type: ChangeType.PartialAdd,
+        type: UpdateType.PartialAdd,
         square,
         squares,
       });
@@ -134,7 +134,7 @@ export default class AttackMap {
     const squares = this._squareControlByPiece.get(square) ?? [];
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
-        type: ChangeType.FullRemove,
+        type: UpdateType.FullRemove,
         square,
         squares,
       });
@@ -167,7 +167,7 @@ export default class AttackMap {
 
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
-        type: ChangeType.PartialRemove,
+        type: UpdateType.PartialRemove,
         square,
         squares,
       });

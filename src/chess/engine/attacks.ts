@@ -203,8 +203,8 @@ export const updateAttackedSquares = (
   enPassantCaptureSquare?: Square,
   castlingRookMove?: Move
 ) => {
-  attackedSquares[Color.White].startChangeset();
-  attackedSquares[Color.Black].startChangeset();
+  attackedSquares[Color.White].startUpdates();
+  attackedSquares[Color.Black].startUpdates();
 
   const opponentColor = flipColor(movedPiece.color);
   attackedSquares[opponentColor].removeAttacksForPiece(move.to);
