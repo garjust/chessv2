@@ -1,5 +1,10 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
-import { KING_RAYS, QUEEN_RAY_BITARRAYS } from './move-lookup';
+import { directionOfMove } from '../utils';
+import {
+  KING_RAYS,
+  QUEEN_RAY_BITARRAYS,
+  RAY_BY_DIRECTION,
+} from './move-lookup';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (
@@ -19,9 +24,17 @@ export const updatePinsOnKings = (
       ) {
         pinsByColor[color].reset(pieces, king, color);
       } else if (
-        // If the moved piece does not enter or leave the king's rays nothing
-        // needs to be computed.
-        QUEEN_RAY_BITARRAYS[king][move.from] ||
+        // If the move from square interacts with any king ray we may need
+        // to remove or add a pin.
+        QUEEN_RAY_BITARRAYS[king][move.from]
+      ) {
+        // const unit = directionOfMove(king, move.from);
+        // const ray = RAY_BY_DIRECTION[PieceType.Queen][king][unit];
+
+        pinsByColor[color].reset(pieces, king, color);
+      } else if (
+        // If the move to square interacts with any king ray we may need
+        // to remove or add a pin.
         QUEEN_RAY_BITARRAYS[king][move.to]
       ) {
         pinsByColor[color].reset(pieces, king, color);

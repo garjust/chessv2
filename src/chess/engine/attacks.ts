@@ -59,7 +59,7 @@ const updatePiecesAttacks = (
     // If the sliding piece is incident with a move's from and two squares in
     // the same ray we need special handling. If the move's to square is
     // further from the sliding piece we need to add attacks and if it is
-    // closed to the sliding piece we need to remove attacks.
+    // closer to the sliding piece we need to remove attacks.
     isIncidentFrom &&
     isIncidentTo &&
     directionOfMove(square, move.to) === directionOfMove(square, move.from)
