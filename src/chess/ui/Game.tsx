@@ -22,8 +22,9 @@ import { BUTTON_CSS } from './theme';
 import Engine from '../engine';
 import { interval, map } from 'rxjs';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
+import DisplayClock from './DisplayClock';
 
-const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.VIENNA_OPENING_FEN;
+const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.STARTING_POSITION_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {
@@ -104,6 +105,8 @@ const Game = () => {
             Example game
           </button>
         </div>
+
+        <DisplayClock style={{ gridArea: 'clock' }} />
 
         <DisplayGameState style={{ gridArea: 'state' }} />
         <DisplayGameFEN style={{ gridArea: 'fen' }} />

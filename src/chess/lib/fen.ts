@@ -20,6 +20,8 @@ const VIENNA_GAMBIT_ACCEPTED_FEN =
   '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w  - 1 11';
 const VIENNA_OPENING_FEN =
   'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
+const KEVIN_FRIED_LIVER_BUSTED =
+  'r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R w KQ - 2 8';
 
 // Winning endgame positions
 // -----------------------------------------------------------------------------
@@ -44,6 +46,7 @@ export const FEN_LIBRARY = {
   ROOK_ENDGAME_FEN,
   QUEEN_ENDGAME_FEN,
   FIXED_PAWN_ENDGAME_FEN,
+  KEVIN_FRIED_LIVER_BUSTED,
 };
 
 const pieceToFenPiece = (piece: Piece): string =>
