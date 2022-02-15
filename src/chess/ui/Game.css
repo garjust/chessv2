@@ -2,7 +2,7 @@
   display: grid;
   gap: 16px;
   grid-template:
-    "board state clock" min-content
-    "buttons state clock" auto
-    "fen state lock" 100% / max-content auto auto
+    "board clock state" min-content
+    "buttons x state" auto
+    "fen fen state" 100% / max-content min-content auto
 }

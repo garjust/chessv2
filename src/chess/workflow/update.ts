@@ -353,18 +353,25 @@ function handleSetPositionFromFEN(
 function handleTickPlayersClock(state: State): Update<State, Action> {
   const { position, clocks } = state;
   const tick = Date.now();
-  const clock = clocks[position.turn] - (tick - clocks.lastTick);
+
+  const turnClock = clocks[position.turn];
 
   state = {
     ...state,
     clocks: {
       ...clocks,
-      [position.turn]: clock,
       lastTick: tick,
     },
   };
 
-  if (clock <= 0) {
+  if (turnClock > 0) {
+    state.clocks[position.turn] = Math.max(
+      turnClock - (tick - clocks.lastTick),
+      0
+    );
+  }
+
+  if (state.clocks[position.turn] <= 0) {
     state = { ...state, winner: flipColor(position.turn) };
   }
 

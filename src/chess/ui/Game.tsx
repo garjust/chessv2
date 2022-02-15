@@ -34,7 +34,7 @@ const Game = () => {
   updates.subscribe(updateLogger('Chess', [Type.TickPlayersClock]));
 
   useEffect(() => {
-    const ticker = interval(1_000).pipe(map(() => tickPlayersClockAction()));
+    const ticker = interval(100).pipe(map(() => tickPlayersClockAction()));
     const subscription = ticker.subscribe(emit);
     return () => {
       subscription.unsubscribe();
