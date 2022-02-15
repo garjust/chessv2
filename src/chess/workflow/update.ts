@@ -272,6 +272,11 @@ function handleMovePiece(
   return [
     {
       ...state,
+      clocks: {
+        ...state.clocks,
+        [state.position.turn]:
+          state.clocks[state.position.turn] + state.clocks.plusTime * 1000,
+      },
       lastMove: move,
     },
     () => setPositionAction(engine.position),

@@ -55,6 +55,8 @@ export interface State {
   boardOrientation: Color;
   squareLabels: SquareLabel;
   clocks: {
+    gameLength: number;
+    plusTime: number;
     lastTick: number;
     [Color.White]: number;
     [Color.Black]: number;
@@ -75,14 +77,19 @@ export interface State {
   lastMove?: Move;
 }
 
+const GAME_LENGTH = 300;
+const PLUS_TIME = 5;
+
 const INITIAL_STATE: State = {
   debugVersion: 0,
   boardOrientation: Color.White,
   squareLabels: SquareLabel.None,
   clocks: {
     lastTick: Date.now(),
-    [Color.White]: 600 * 1000,
-    [Color.Black]: 600 * 1000,
+    gameLength: GAME_LENGTH,
+    plusTime: PLUS_TIME,
+    [Color.White]: GAME_LENGTH * 1000,
+    [Color.Black]: GAME_LENGTH * 1000,
   },
   players: {
     [Color.White]: HumanPlayer,
