@@ -1,5 +1,5 @@
 import { formatNumber } from '../../../lib/formatter';
-import { moveString } from '../../utils';
+import { moveString } from '../../move-notation';
 import { humanEvaluation } from './score-utils';
 import State from './state';
 import SearchTree from './tree-diagnostics';

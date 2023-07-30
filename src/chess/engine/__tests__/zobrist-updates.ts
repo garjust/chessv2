@@ -1,7 +1,7 @@
 import Engine from '..';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../../lib/example-games';
 import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
-import { moveFromString } from '../../utils';
+import { moveFromString } from '../../move-notation';
 
 test('vienna accepted game', () => {
   const engine = new Engine(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));

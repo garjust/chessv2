@@ -1,5 +1,5 @@
 import { Move } from '../../types';
-import { moveString } from '../../utils';
+import { moveString } from '../../move-notation';
 
 let idCounter = 1;
 

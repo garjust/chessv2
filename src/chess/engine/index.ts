@@ -1,5 +1,6 @@
 import { equal } from '../../lib/deep-equal';
 import { FEN_LIBRARY, parseFEN } from '../lib/fen';
+import { moveString } from '../move-notation';
 import {
   Color,
   Move,
@@ -9,7 +10,7 @@ import {
   Position as ExternalPosition,
   SquareControlObject,
 } from '../types';
-import { flipColor, moveString } from '../utils';
+import { flipColor } from '../utils';
 import AttackMap from './attack-map';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';

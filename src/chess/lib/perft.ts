@@ -1,6 +1,6 @@
 import { parseFEN, FEN_LIBRARY } from './fen';
 import Engine from '../engine';
-import { moveString } from '../utils';
+import { moveString } from '../move-notation';
 import { formatNumber } from '../../lib/formatter';
 
 export type MoveTest = {

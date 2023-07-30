@@ -2,7 +2,7 @@ import Search from '.';
 import Engine from '../../engine';
 import { EVALUATION_DIVIDER, MATE_SCORE } from '../../engine/evaluation';
 import { Move, MoveWithExtraData } from '../../types';
-import { moveString } from '../../utils';
+import { moveString } from '../../move-notation';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';

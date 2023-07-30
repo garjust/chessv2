@@ -4,7 +4,7 @@ import { open } from 'fs/promises';
 
 import { parseFEN } from '../chess/lib/fen';
 import Engine from '../chess/engine';
-import { moveFromString, moveString } from '../chess/utils';
+import { moveFromString, moveString } from '../chess/move-notation';
 
 const DEBUG_FILE = '/tmp/perft-debug';
 const DEBUG = true;
