@@ -1,17 +1,10 @@
 import readline from 'readline';
-import { open } from 'fs/promises';
-
 import init, { createState } from '../chess/lib/uci';
 import { parse } from '../chess/lib/uci/parse-cli-command';
 import Engine from '../chess/engine';
+import { UCICommandAction } from '../chess/lib/uci/action';
 
-const DEBUG_FILE = '/tmp/engine-debug';
 const DEBUG = true;
-
-const debugFile = await open(DEBUG_FILE, 'a');
-if (DEBUG) {
-  debugFile.write(`engine boot\n`);
-}
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -25,18 +18,10 @@ const { emit } = init(createState(), {
 });
 
 if (DEBUG) {
-  debugFile.write('listening to stin\n');
+  emit(UCICommandAction.debugAction(true));
 }
 
 rl.on('line', (line) => {
-  if (DEBUG) {
-    debugFile.write(`in < "${line}"`);
-  }
-
   const action = parse(line);
-  if (DEBUG) {
-    debugFile.write(`parsed action: ${action}`);
-  }
-
   emit(action);
 });

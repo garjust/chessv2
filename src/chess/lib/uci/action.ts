@@ -1,4 +1,4 @@
-import { UCIResponse } from './uci-response';
+import { UCIResponse, EngineOptionName } from './uci-response';
 
 export type GoCommand = Partial<{
   searchmoves: string[];
@@ -35,8 +35,12 @@ export declare namespace Type {
   }
 }
 
+// Spec: https://backscattering.de/chess/uci/
 export declare namespace Action {
   export namespace UCICommand {
+    // Initialization command. engine should expect this command after start
+    // to set UCI mode. More useful when an engine program can operate in other
+    // modes.
     export interface UCI {
       readonly type: Type.UCICommand.UCI;
     }
@@ -46,13 +50,18 @@ export declare namespace Action {
       readonly value: boolean;
     }
 
+    // Used to synchronize with the engine.
+    // - Should always be sent after initialization before a first search
+    // - Can be sent when engine is calculating (and respond immediately without
+    // interupting search)
     export interface IsReady {
       readonly type: Type.UCICommand.IsReady;
     }
 
+    // Set an option the engine supports
     export interface SetOption {
       readonly type: Type.UCICommand.SetOption;
-      readonly name: string;
+      readonly name: EngineOptionName;
       readonly value: string;
     }
 
@@ -60,29 +69,35 @@ export declare namespace Action {
       readonly type: Type.UCICommand.Register;
     }
 
+    // Instruct the engine the next position and search will be a new game
     export interface UCINewGame {
       readonly type: Type.UCICommand.UCINewGame;
     }
 
+    // Set the chess position.
     export interface Position {
       readonly type: Type.UCICommand.Position;
       readonly fen: string;
       readonly moves: string[];
     }
 
+    // Run a search in the current position!
     export interface Go {
       readonly type: Type.UCICommand.Go;
       readonly command: GoCommand;
     }
 
+    // Stop caluclating as soon as possible.
     export interface Stop {
       readonly type: Type.UCICommand.Stop;
     }
 
+    //
     export interface PonderHit {
       readonly type: Type.UCICommand.PonderHit;
     }
 
+    // Quit the engine program.
     export interface Quit {
       readonly type: Type.UCICommand.Quit;
     }
@@ -114,9 +129,9 @@ const uciAction = (): Action.UCICommand.UCI => ({
   type: Type.UCICommand.UCI,
 });
 
-const debugAction = ([value]: string[]): Action.UCICommand.Debug => ({
+const debugAction = (value: boolean): Action.UCICommand.Debug => ({
   type: Type.UCICommand.Debug,
-  value: value === 'on' ? true : false,
+  value,
 });
 
 const isReadyAction = (): Action.UCICommand.IsReady => ({
@@ -124,7 +139,7 @@ const isReadyAction = (): Action.UCICommand.IsReady => ({
 });
 
 const setOptionAction = (
-  name: string,
+  name: EngineOptionName,
   value: string
 ): Action.UCICommand.SetOption => ({
   type: Type.UCICommand.SetOption,

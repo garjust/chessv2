@@ -3,12 +3,14 @@ import { Update } from '../../../lib/workflow';
 import Engine from '../../engine';
 import { moveFromString } from '../../utils';
 import { parseFEN } from '../fen';
-import { respondAction } from './action';
+import { UCICommandAction, respondAction } from './action';
 import { State, Action, Type } from './index';
 import { toUCIString, UCIResponse, UCIResponseType } from './uci-response';
+import { ChessComputer } from '../../ai/chess-computer';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
+  ai: ChessComputer;
   engine: Engine;
   sendUCIResponse: (response: string) => void;
 };
@@ -25,8 +27,8 @@ function handleUCI(state: State): Update<State, Action> {
       name: 'justin uci computer v1',
       author: 'garjust',
     },
-    { type: UCIResponseType.Option },
-    { type: UCIResponseType.Option },
+    { type: UCIResponseType.Option, name: 'Hash' },
+    { type: UCIResponseType.Option, name: 'OwnBook' },
     { type: UCIResponseType.UCIOk },
   ];
 
@@ -63,13 +65,14 @@ function handlePosition(
 ): Update<State, Action> {
   const { fen, moves } = action;
 
-  context.engine.position = parseFEN(fen);
+  const position = parseFEN(fen);
+  context.engine.position = position;
   for (const moveString of moves) {
     const move = moveFromString(moveString);
     context.engine.applyMove(move);
   }
 
-  return [state, null];
+  return [{ ...state, positionForGo: context.engine.position }, null];
 }
 
 function handleGo(
@@ -78,13 +81,22 @@ function handleGo(
   context: Context
 ): Update<State, Action> {
   // Call engine to do stuff.
+  const nextMove = context.ai.nextMove(context.engine.position, 500);
+  nextMove.then();
 
-  return [state, null];
+  return [
+    state,
+    () =>
+      from(
+        nextMove.then((move) =>
+          respondAction({ type: UCIResponseType.BestMove, move })
+        )
+      ),
+  ];
 }
 
 function handleStop(state: State, context: Context): Update<State, Action> {
   // TODO: call engine to stop the search.
-
   return [state, null];
 }
 

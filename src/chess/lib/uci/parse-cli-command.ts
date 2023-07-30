@@ -44,6 +44,9 @@ const parseGoCommand = (parts: string[]): GoCommand => {
       case 'infinite':
         result.infinite = true;
         break;
+      default:
+        console.log('blah');
+        break;
     }
   }
 
@@ -84,6 +87,9 @@ export const parse = (commandString: string): Action => {
       return UCICommandAction.ponderHitAction();
     case 'quit':
       return UCICommandAction.quitAction();
+    default:
+      console.log('blah');
+      break;
   }
 
   throw Error(`unrecognized UCI command: "${commandString}"`);
