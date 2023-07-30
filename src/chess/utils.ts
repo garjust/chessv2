@@ -159,9 +159,6 @@ export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
   }
 };
 
-export const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
-  PIECE_TYPE_TO_FEN_PIECE[type];
-
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White
     ? square >= 8 * WHITE_PAWN_STARTING_RANK &&

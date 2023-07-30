@@ -1,3 +1,4 @@
+import { moveString } from '../../move-notation';
 import { Move } from '../../types';
 
 export enum UCIResponseType {
@@ -68,9 +69,9 @@ export const toUCIString = (response: UCIResponse): string[] => {
     case UCIResponseType.ReadyOk:
       return ['readyok\n'];
     case UCIResponseType.BestMove:
-      str = `bestmove ${response.move}`;
+      str = `bestmove ${moveString(response.move)}`;
       if (response.ponder !== undefined) {
-        str += ` ponder ${response.ponder}`;
+        str += ` ponder ${moveString(response.ponder)}`;
       }
       return [`${str}\n`];
     case UCIResponseType.CopyProtection:

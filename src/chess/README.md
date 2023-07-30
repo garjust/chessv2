@@ -34,6 +34,9 @@ Engine searching can be loaded in two ways:
   - Requires move generation at leaf nodes
 - *TTable memory is crashing chrome.*
 - *Support UCI*
+   - Move notation
+   - Refactor chess ui control of chess ai to use UCI
+   - Chess AI using UCI needs multiple threads
 - *ELO the computers*
 
 ## Bug Positions
