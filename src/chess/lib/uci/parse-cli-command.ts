@@ -1,6 +1,7 @@
 import { Action } from '.';
 import { FEN_LIBRARY } from '../fen';
 import { GoCommand, UCICommandAction } from './action';
+import { EngineOptionName } from './uci-response';
 
 const parseGoCommand = (parts: string[]): GoCommand => {
   const result: GoCommand = {};
@@ -60,12 +61,15 @@ export const parse = (commandString: string): Action => {
     case 'uci':
       return UCICommandAction.uciAction();
     case 'debug':
-      return UCICommandAction.debugAction(args);
+      // eslint-disable-next-line no-case-declarations
+      const [boolValue] = args;
+      return UCICommandAction.debugAction(boolValue == 'true');
     case 'isready':
       return UCICommandAction.isReadyAction();
     case 'setoption': {
       const [, name, , value] = args;
-      return UCICommandAction.setOptionAction(name, value);
+      // TODO: validation of option name
+      return UCICommandAction.setOptionAction(name as EngineOptionName, value);
     }
     case 'register':
       return UCICommandAction.registerAction();
