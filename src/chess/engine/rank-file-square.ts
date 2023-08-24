@@ -30,7 +30,7 @@ export const downRight = (square: RankFile, n = 1): RankFile =>
 
 const rayGenerator = function* (
   square: RankFile,
-  scanFn: (square: RankFile) => RankFile
+  scanFn: (square: RankFile) => RankFile,
 ) {
   while (isLegalSquare(square)) {
     yield square;

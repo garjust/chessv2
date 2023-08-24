@@ -28,7 +28,7 @@ export const isMoveInFile = (move: Move): boolean =>
 
 export const squareControlXraysMove = (
   squareControl: SquareControlObject,
-  move: Move
+  move: Move,
 ): boolean =>
   isSliderPieceType(squareControl.attacker.type) &&
   directionOfMove(squareControl.attacker.square, squareControl.square) ===
@@ -38,7 +38,7 @@ export const rayScanner = (
   pieces: Map<Square, Piece>,
   scanningPiece: { square: Square; piece: Piece },
   ray: Square[],
-  { skip = [] }: { skip: Square[] }
+  { skip = [] }: { skip: Square[] },
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
   const from = scanningPiece.square;
@@ -85,7 +85,7 @@ export const rayControlScanner = (
   scanningPiece: { square: Square; piece: Piece },
   ray: Square[],
   skipPast?: Square,
-  stopAt?: Square
+  stopAt?: Square,
 ): SquareControlObject[] => {
   const moves: SquareControlObject[] = [];
   const slideSquares: Square[] = [];

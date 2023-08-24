@@ -41,7 +41,7 @@ const updatePiecesAttacks = (
   move: Move,
   isCapture: boolean,
   enPassantCaptureSquare?: Square,
-  castlingRookMove?: Move
+  castlingRookMove?: Move,
 ) => {
   const isIncidentFrom = sliderHasVision(piece, square, move.from);
   const isIncidentTo = sliderHasVision(piece, square, move.to);
@@ -75,7 +75,7 @@ const updatePiecesAttacks = (
         pieces,
         { square, piece },
         ray,
-        move.from
+        move.from,
       );
       attackMap.addAttacks(square, newSquaresControlled);
     } else {
@@ -92,7 +92,7 @@ const updatePiecesAttacks = (
         { square, piece },
         ray,
         move.to,
-        move.from
+        move.from,
       );
       attackMap.removeAttacks(square, squaresNoLongerControlled);
     }
@@ -107,7 +107,7 @@ const updatePiecesAttacks = (
         pieces,
         { square, piece },
         ray,
-        move.from
+        move.from,
       );
 
       attackMap.addAttacks(square, newSquaresControlled);
@@ -125,7 +125,7 @@ const updatePiecesAttacks = (
         pieces,
         { square, piece },
         ray,
-        move.to
+        move.to,
       );
 
       attackMap.removeAttacks(square, squaresNoLongerControlled);
@@ -135,17 +135,17 @@ const updatePiecesAttacks = (
 
 const squaresControllingSquare = (
   controlledSquare: Square,
-  attackedSquares: AttackedSquares
+  attackedSquares: AttackedSquares,
 ) => {
   const squares = new Set<Square>();
 
   for (const [square] of attackedSquares[Color.White].controlOfSquare(
-    controlledSquare
+    controlledSquare,
   )) {
     squares.add(square);
   }
   for (const [square] of attackedSquares[Color.Black].controlOfSquare(
-    controlledSquare
+    controlledSquare,
   )) {
     squares.add(square);
   }
@@ -154,26 +154,26 @@ const squaresControllingSquare = (
 
 const squaresControllingMoveSquares = (
   move: Move,
-  attackedSquares: AttackedSquares
+  attackedSquares: AttackedSquares,
 ) => {
   const squares = new Set<Square>();
   for (const [square] of attackedSquares[Color.White].controlOfSquare(
-    move.from
+    move.from,
   )) {
     squares.add(square);
   }
   for (const [square] of attackedSquares[Color.Black].controlOfSquare(
-    move.from
+    move.from,
   )) {
     squares.add(square);
   }
   for (const [square] of attackedSquares[Color.White].controlOfSquare(
-    move.to
+    move.to,
   )) {
     squares.add(square);
   }
   for (const [square] of attackedSquares[Color.Black].controlOfSquare(
-    move.to
+    move.to,
   )) {
     squares.add(square);
   }
@@ -184,7 +184,7 @@ export const updateAttackedSquaresForMove = (
   pieces: Map<Square, Piece>,
   map: AttackMap,
   piece: Piece,
-  move: Move
+  move: Move,
 ) => {
   map.removeAttacksForPiece(move.from);
   map.removeAttacksForPiece(move.to);
@@ -201,7 +201,7 @@ export const updateAttackedSquares = (
   movedPiece: Piece,
   isCapture: boolean,
   enPassantCaptureSquare?: Square,
-  castlingRookMove?: Move
+  castlingRookMove?: Move,
 ) => {
   attackedSquares[Color.White].startUpdates();
   attackedSquares[Color.Black].startUpdates();
@@ -213,14 +213,14 @@ export const updateAttackedSquares = (
     pieces,
     attackedSquares[movedPiece.color],
     movedPiece,
-    move
+    move,
   );
   if (castlingRookMove) {
     updateAttackedSquaresForMove(
       pieces,
       attackedSquares[movedPiece.color],
       PIECES[movedPiece.color][PieceType.Rook],
-      castlingRookMove
+      castlingRookMove,
     );
   }
 
@@ -229,11 +229,11 @@ export const updateAttackedSquares = (
 
   if (enPassantCaptureSquare) {
     attackedSquares[opponentColor].removeAttacksForPiece(
-      enPassantCaptureSquare
+      enPassantCaptureSquare,
     );
     const enPassantSquareSquares = squaresControllingSquare(
       enPassantCaptureSquare,
-      attackedSquares
+      attackedSquares,
     );
     for (const square of enPassantSquareSquares) {
       squares.add(square);
@@ -267,7 +267,7 @@ export const updateAttackedSquares = (
       move,
       isCapture,
       enPassantCaptureSquare,
-      castlingRookMove
+      castlingRookMove,
     );
   }
 };

@@ -33,7 +33,7 @@ export type Update<S, A> = [S, NextActionFactory<A> | null];
 // FIXME(steckel): How do we have the type system enforce Readonly<T>?
 export type Updater<S, A> = (
   state: Readonly<S>,
-  action: Readonly<A>
+  action: Readonly<A>,
 ) => Update<S, A>;
 
 export type UpdateSubscriber<S, A> = (state: S, action: A) => void;
@@ -65,7 +65,7 @@ const isPromiseLike = (value: unknown): value is Promise<unknown> =>
 
 // TODO(steckel): Maybe don't export.
 export const normalizeUpdateAction = <A>(
-  nextAction: NextAction<A>
+  nextAction: NextAction<A>,
 ): InternalUpdateAction<A> => {
   const observableAction = (() => {
     if (nextAction instanceof Observable) {
@@ -115,14 +115,14 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   const [commands, actions] = partition(
     internalActions,
-    (val: InternalAction<A>) => isCommand(val)
+    (val: InternalAction<A>) => isCommand(val),
   ) as [Observable<Command>, Observable<A>];
 
   // Handle Command.DONE
   commands
     .pipe(
       first((command) => command === Command.Done),
-      catchError(() => empty())
+      catchError(() => empty()),
     )
     .subscribe(() => publicStates.complete());
 
@@ -133,11 +133,11 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       ([state, nextActionFactory]): InternalUpdate<S, A> => [
         state,
         normalizeUpdateAction(nextActionFactory?.() ?? null),
-      ]
+      ],
     ),
     // We need this observable to be hot so that the update function does not
     // receive duplicate invocations for a particular action
-    share()
+    share(),
   );
 
   // This observable powers our public states observable
@@ -145,7 +145,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     map(([state, _]) => state),
     // immediately send the initial state into the observable
     // (aids with updates initial value)
-    startWith(seed)
+    startWith(seed),
   );
 
   // This observable powers our public updates/side-effect observable
@@ -155,7 +155,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     withLatestFrom(actions),
     map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
-    catchError(() => empty())
+    catchError(() => empty()),
   );
 
   // Subscribe to our internal observables to push values into our public
@@ -176,7 +176,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       // do not continue with more actions
       catchError(() => empty()),
       // flat map the next actions observable upward for subscription
-      flatMap(([_, actions]) => actions)
+      flatMap(([_, actions]) => actions),
     )
     .subscribe({
       // forward actions to original actions subject for processing

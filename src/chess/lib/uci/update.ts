@@ -37,7 +37,7 @@ function handleUCI(state: State): Update<State, Action> {
 
 function handleDebug(
   state: State,
-  action: Action.UCICommand.Debug
+  action: Action.UCICommand.Debug,
 ): Update<State, Action> {
   return [{ ...state, debug: action.value }, null];
 }
@@ -61,7 +61,7 @@ function handleUCINewGame(state: State): Update<State, Action> {
 function handlePosition(
   state: State,
   action: Action.UCICommand.Position,
-  context: Context
+  context: Context,
 ): Update<State, Action> {
   const { fen, moves } = action;
 
@@ -78,7 +78,7 @@ function handlePosition(
 function handleGo(
   state: State,
   action: Action.UCICommand.Go,
-  context: Context
+  context: Context,
 ): Update<State, Action> {
   // Call engine to do stuff.
   const nextMove = context.ai.nextMove(context.engine.position, 500);
@@ -89,8 +89,8 @@ function handleGo(
     () =>
       from(
         nextMove.then((move) =>
-          respondAction({ type: UCIResponseType.BestMove, move })
-        )
+          respondAction({ type: UCIResponseType.BestMove, move }),
+        ),
       ),
   ];
 }
@@ -111,7 +111,7 @@ function handleQuit(state: State): Update<State, Action> {
 function handleRespond(
   state: State,
   action: Action.Internal.Respond,
-  context: Context
+  context: Context,
 ): Update<State, Action> {
   toUCIString(action.response).map(context.sendUCIResponse);
 

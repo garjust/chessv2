@@ -12,7 +12,7 @@ export const updatePinsOnKings = (
   pieces: Map<Square, Piece>,
   kings: KingSquares,
   move: Move,
-  piece: Piece
+  piece: Piece,
 ) => {
   for (const color of [Color.White, Color.Black]) {
     pinsByColor[color].startUpdates();
@@ -62,7 +62,7 @@ export default class Pins {
   constructor(
     pieces: Map<Square, Piece>,
     kingSquare: Square | undefined,
-    color: Color
+    color: Color,
   ) {
     if (!kingSquare) {
       return;
@@ -120,7 +120,7 @@ export default class Pins {
     pieces: Map<Square, Piece>,
     kingSquare: Square,
     color: Color,
-    cache = true
+    cache = true,
   ) {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({

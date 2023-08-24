@@ -20,7 +20,7 @@ export const humanEvaluation = (score: number, maxDepth: number): string => {
 
 export const extractPV = (
   table: TranspositionTable<TranspositionTableEntry>,
-  engine: Engine
+  engine: Engine,
 ): Move[] => {
   const pv: Move[] = [];
   let i = 0;

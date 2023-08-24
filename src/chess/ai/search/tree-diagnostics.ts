@@ -97,7 +97,7 @@ const traverse = (node: Node | Root): string => {
     parts.push(child.label);
     if (child.cut) {
       const edgeAttributes = `[label="${mvStr(
-        child.move
+        child.move,
       )}"][style="dotted"][color="red"]`;
       parts.push(`${node.id} -> ${child.id} ${edgeAttributes};`);
     } else {

@@ -31,7 +31,7 @@ export const BLACK_CHECKMATE: MoveTest = {
 const isCountCorrectForDepthFromStart = (
   depth: number,
   count: number,
-  test: MoveTest
+  test: MoveTest,
 ) => {
   return test.counts[depth - 1] === count;
 };
@@ -58,7 +58,7 @@ const search = (engine: Engine, depth: number): number => {
 
 export const searchRoot = (
   engine: Engine,
-  depth: number
+  depth: number,
 ): { counter: number; counts: Record<string, number> } => {
   const counts: Record<string, number> = {};
   let counter = 0;
@@ -82,7 +82,7 @@ export const searchRoot = (
 export const run = (
   logger: (message: string) => void,
   test: MoveTest,
-  toDepth: number
+  toDepth: number,
 ): boolean => {
   const position = parseFEN(test.fen);
   const results: { depth: number; passed: boolean }[] = [];
@@ -97,11 +97,11 @@ export const run = (
 
     logger(
       `depth=${i}; passed=${passed ? 'yes' : 'no '}; count=${formatNumber(
-        counter
+        counter,
       )}; timing=${formatNumber(timing)}ms (${(
         (timing / counter) *
         1000
-      ).toPrecision(5)}μs/node)`
+      ).toPrecision(5)}μs/node)`,
     );
     results.push({ depth: i, passed });
   }

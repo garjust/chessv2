@@ -13,7 +13,7 @@ const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
 export const moveString = (move: Move, delimiter = ''): string =>
   move.promotion
     ? `${squareLabel(move.from)}${delimiter}${squareLabel(
-        move.to
+        move.to,
       )}${pieceTypeToMoveStringCharacter(move.promotion)}`
     : `${squareLabel(move.from)}${delimiter}${squareLabel(move.to)}`;
 

@@ -1,7 +1,7 @@
 export function equal(a: unknown[], b: unknown[]): boolean;
 export function equal(
   a: Map<unknown, unknown>,
-  b: Map<unknown, unknown>
+  b: Map<unknown, unknown>,
 ): boolean;
 export function equal(a: unknown, b: unknown): boolean;
 
@@ -50,7 +50,7 @@ export function equal(a: unknown, b: unknown): boolean {
       if (
         !equal(
           (a as Record<string, unknown>)[key],
-          (b as Record<string, unknown>)[key]
+          (b as Record<string, unknown>)[key],
         )
       ) {
         return false;

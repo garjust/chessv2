@@ -24,11 +24,11 @@ test('move execution perft', () => {
   const time = Date.now() - now;
   console.log(
     `move execution timing: ${time}ms (${((time / N) * 1000).toPrecision(
-      5
-    )}μs/move-unmove)`
+      5,
+    )}μs/move-unmove)`,
   );
 
   expect(formatPosition(engine.position)).toEqual(
-    FEN_LIBRARY.STARTING_POSITION_FEN
+    FEN_LIBRARY.STARTING_POSITION_FEN,
   );
 });

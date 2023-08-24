@@ -140,7 +140,7 @@ const isReadyAction = (): Action.UCICommand.IsReady => ({
 
 const setOptionAction = (
   name: EngineOptionName,
-  value: string
+  value: string,
 ): Action.UCICommand.SetOption => ({
   type: Type.UCICommand.SetOption,
   name,
@@ -157,7 +157,7 @@ const uciNewGameAction = (): Action.UCICommand.UCINewGame => ({
 
 const positionAction = (
   fen: string,
-  moves: string[]
+  moves: string[],
 ): Action.UCICommand.Position => ({
   type: Type.UCICommand.Position,
   fen,
@@ -196,7 +196,7 @@ export const UCICommandAction = {
 };
 
 export const respondAction = (
-  response: UCIResponse
+  response: UCIResponse,
 ): Action.Internal.Respond => ({
   type: Type.Internal.Respond,
   response,

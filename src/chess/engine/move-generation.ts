@@ -22,7 +22,7 @@ import { KingSquares, PinsByColor, AttackedSquares } from './types';
 const buildMove = (
   squareControl: SquareControlObject,
   piece: Piece,
-  attackedPiece?: Piece
+  attackedPiece?: Piece,
 ): MoveWithExtraData => ({
   from: squareControl.attacker.square,
   to: squareControl.square,
@@ -46,7 +46,7 @@ const pseudoMovesForPosition = (
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
     attackedSquares: AttackedSquares;
-  }
+  },
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 
@@ -94,7 +94,7 @@ const pseudoMovesForPosition = (
           castlingOnly: true,
           castlingAvailability,
           opponentAttackMap: attackedSquares[flipColor(color)],
-        })
+        }),
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
@@ -103,7 +103,7 @@ const pseudoMovesForPosition = (
           attacksOnly: false,
           advanceOnly: true,
           enPassantSquare,
-        })
+        }),
       );
     }
   }
@@ -114,7 +114,7 @@ const pseudoMovesForPosition = (
 // When in check we need to prune moves that do not resolve the check.
 const moveResolvesCheck = (
   checks: SquareControlObject[],
-  move: MoveWithExtraData
+  move: MoveWithExtraData,
 ): boolean => {
   // If the moving piece is a king all it's moves should be retained. Moves
   // into an attacked square are pruned elsewhere.
@@ -138,7 +138,7 @@ const moveResolvesCheck = (
     return false;
   } else {
     throw Error(
-      `called with ${checks.length} checks, there can only ever be 1 or 2 checks`
+      `called with ${checks.length} checks, there can only ever be 1 or 2 checks`,
     );
   }
 };
@@ -159,7 +159,7 @@ const moveLeavesKingInCheck = (
     pins: Pins;
     checks: SquareControlObject[];
     opponentAttackMap: AttackMap;
-  }
+  },
 ): boolean => {
   if (move.from === kingSquare) {
     // The piece moving is the king. We need to make sure the square it is
@@ -178,7 +178,7 @@ const moveLeavesKingInCheck = (
       // skewering the king to the destination square, meaning the king will
       // still be in check even though that square is not currently attacked.
       return checks.some((squareControl) =>
-        squareControlXraysMove(squareControl, move)
+        squareControlXraysMove(squareControl, move),
       );
     }
   } else {
@@ -212,7 +212,7 @@ export const generateMoves = (
     checks: SquareControlObject[];
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
-  }
+  },
 ): MoveWithExtraData[] => {
   const kingSquare = kings[color];
 

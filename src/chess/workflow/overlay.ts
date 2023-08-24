@@ -9,7 +9,7 @@ import {
 
 export const setOverlayForPlay = (
   map: Map<Square, SquareOverlayType>,
-  state: State
+  state: State,
 ): void => {
   const { position, selectedSquare, lastMove, moves } = state;
 
@@ -29,7 +29,7 @@ export const setOverlayForPlay = (
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
       const candidateSquares = moves.filter(
-        (move) => move.from === selectedSquare
+        (move) => move.from === selectedSquare,
       );
 
       candidateSquares.forEach(({ to: square }) => {
@@ -45,7 +45,7 @@ export const setOverlayForPlay = (
 
 export const setOverlayForAttacks = (
   map: Map<Square, SquareOverlayType>,
-  attacks: AttackMap
+  attacks: AttackMap,
 ) => {
   for (const [square, count] of attacks.attackCounts()) {
     if (count > 0) {
@@ -56,7 +56,7 @@ export const setOverlayForAttacks = (
 
 export const setOverlayForPins = (
   map: Map<Square, SquareOverlayType>,
-  pins: Pin[]
+  pins: Pin[],
 ) => {
   // Do each type of square involved in the pin one at a time so that we don't
   // color over squares as much as possible.

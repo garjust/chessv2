@@ -108,7 +108,7 @@ export default class AttackMap {
   addAttacks(
     square: Square,
     squares: SquareControlObject[],
-    cache = true
+    cache = true,
   ): void {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
@@ -158,7 +158,7 @@ export default class AttackMap {
   removeAttacks(
     square: Square,
     squares: SquareControlObject[],
-    cache = true
+    cache = true,
   ): void {
     const existing = this._squareControlByPiece.get(square);
     if (!existing) {
@@ -174,7 +174,7 @@ export default class AttackMap {
     }
 
     const squaresToRemove = squares.map(
-      (squareControl) => squareControl.square
+      (squareControl) => squareControl.square,
     );
 
     for (const squareControl of squares) {

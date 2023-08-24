@@ -10,7 +10,7 @@ import { down, left, right, up, rayControlScanner } from './move-utils';
 
 export const pawnMoves = (
   color: Color,
-  from: Square
+  from: Square,
 ): SquareControlObject[] => {
   const squares: SquareControlObject[] = [];
   const advanceFn = color === Color.White ? up : down;
@@ -55,33 +55,33 @@ export const kingMoves = (from: Square): SquareControlObject[] => {
 export const bishopMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
 ): SquareControlObject[] =>
   BISHOP_LOOKUP[from].flatMap((ray) =>
     rayControlScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
-      ray
-    )
+      ray,
+    ),
   );
 
 export const rookMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
 ): SquareControlObject[] =>
   ROOK_LOOKUP[from].flatMap((ray) =>
     rayControlScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Rook } },
-      ray
-    )
+      ray,
+    ),
   );
 
 export const queenMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
 ): SquareControlObject[] => [
   ...bishopMoves(pieces, color, from),
   ...rookMoves(pieces, color, from),
@@ -90,7 +90,7 @@ export const queenMoves = (
 export const forPiece = (
   piece: Piece,
   pieces: Map<Square, Piece>,
-  square: Square
+  square: Square,
 ): SquareControlObject[] => {
   switch (piece.type) {
     case PieceType.Bishop:

@@ -26,7 +26,7 @@ export default class Engine {
   _currentZobrist: CurrentZobrist;
 
   constructor(
-    position: ExternalPosition = parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN)
+    position: ExternalPosition = parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
   ) {
     this._position = copyToInternal(position);
     this._currentZobrist = new CurrentZobrist(position);
@@ -44,14 +44,14 @@ export default class Engine {
         this,
         Color.White,
         moves,
-        'makeMove'
+        'makeMove',
       );
       verifyAttackMap(
         this._position.attackedSquares[Color.Black],
         this,
         Color.Black,
         moves,
-        'makeMove'
+        'makeMove',
       );
     }
 
@@ -77,14 +77,14 @@ export default class Engine {
         this,
         Color.White,
         moves,
-        'unmakeMove'
+        'unmakeMove',
       );
       verifyAttackMap(
         this._position.attackedSquares[Color.Black],
         this,
         Color.Black,
         moves,
-        'unmakeMove'
+        'unmakeMove',
       );
     }
   }
@@ -158,7 +158,7 @@ const verifyAttackMap = (
   engine: Engine,
   color: Color,
   moves: Move[],
-  lastAction: 'makeMove' | 'unmakeMove'
+  lastAction: 'makeMove' | 'unmakeMove',
 ) => {
   const computed = new AttackMap(engine._position, color);
 
@@ -168,19 +168,19 @@ const verifyAttackMap = (
     console.log(
       'square-wise map is out of sync',
       lastAction,
-      moves.map((move) => moveString(move))
+      moves.map((move) => moveString(move)),
     );
   }
   if (
     !equal(
       map._squareControlByAttackedSquare,
-      computed._squareControlByAttackedSquare
+      computed._squareControlByAttackedSquare,
     )
   ) {
     console.log(
       'attacked-wise map is out of sync',
       lastAction,
-      moves.map((move) => moveString(move))
+      moves.map((move) => moveString(move)),
     );
   }
 };

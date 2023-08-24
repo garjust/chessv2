@@ -25,7 +25,7 @@ const moveList =
     : movesString.split(' ').map((moveString) => moveFromString(moveString));
 if (DEBUG) {
   debugFile.write(
-    `parsed moves: ${moveList.map((move) => moveString(move)).join('-')}\n`
+    `parsed moves: ${moveList.map((move) => moveString(move)).join('-')}\n`,
   );
 }
 

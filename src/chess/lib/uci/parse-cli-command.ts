@@ -79,7 +79,7 @@ export const parse = (commandString: string): Action => {
       const [fen, ...moves] = args;
       return UCICommandAction.positionAction(
         fen === 'startpos' ? FEN_LIBRARY.STARTING_POSITION_FEN : fen,
-        moves
+        moves,
       );
     }
     case 'go': {

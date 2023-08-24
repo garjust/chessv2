@@ -17,16 +17,16 @@ test('squareControlXraysMove', () => {
   };
 
   expect(squareControlXraysMove(squareControl, { from: 0, to: 8 })).toEqual(
-    false
+    false,
   );
   expect(squareControlXraysMove(squareControl, { from: 41, to: 48 })).toEqual(
-    false
+    false,
   );
   expect(squareControlXraysMove(squareControl, { from: 27, to: 36 })).toEqual(
-    false
+    false,
   );
   expect(squareControlXraysMove(squareControl, { from: 14, to: 7 })).toEqual(
-    true
+    true,
   );
 
   squareControl = {
@@ -35,7 +35,7 @@ test('squareControlXraysMove', () => {
     slideSquares: [],
   };
   expect(squareControlXraysMove(squareControl, { from: 52, to: 60 })).toEqual(
-    true
+    true,
   );
 });
 
@@ -96,7 +96,7 @@ test('rayControlScanner bishop skipPast', () => {
     position.pieces,
     scanningPiece,
     ray,
-    53
+    53,
   );
   expect(squareControl).toEqual([
     {
@@ -112,7 +112,7 @@ test('rayControlScanner bishop skipPast', () => {
 
 test('rayControlScanner queen skipPast through own piece', () => {
   const position = parseFEN(
-    'rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2'
+    'rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2',
   );
   const scanningPiece = {
     square: labelToSquare('d1'),
@@ -127,7 +127,7 @@ test('rayControlScanner queen skipPast through own piece', () => {
     position.pieces,
     scanningPiece,
     ray,
-    35
+    35,
   );
   // No square control because a piece is blocking the ray before the skipPast
   // square.
@@ -136,7 +136,7 @@ test('rayControlScanner queen skipPast through own piece', () => {
 
 test('rayControlScanner queen skipPast is a1', () => {
   const position = parseFEN(
-    'r1bqkbnr/pppppppp/n7/8/8/P7/RPPPPPPP/1NBQKBNR b Kkq - 2 2'
+    'r1bqkbnr/pppppppp/n7/8/8/P7/RPPPPPPP/1NBQKBNR b Kkq - 2 2',
   );
   const scanningPiece = {
     square: labelToSquare('d1'),
@@ -152,7 +152,7 @@ test('rayControlScanner queen skipPast is a1', () => {
     scanningPiece,
     ray,
     // The bug here was the 0-square being treated as false
-    0
+    0,
   );
   // No square control because a piece is blocking the ray before the skipPast
   // square.
@@ -161,7 +161,7 @@ test('rayControlScanner queen skipPast is a1', () => {
 
 test('rayControlScanner rook skipPast through opponent piece', () => {
   const position = parseFEN(
-    'rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3'
+    'rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3',
   );
   const scanningPiece = {
     square: labelToSquare('a1'),
@@ -179,7 +179,7 @@ test('rayControlScanner rook skipPast through opponent piece', () => {
     scanningPiece,
     ray,
     move.to,
-    move.from
+    move.from,
   );
 
   expect(squareControl).toEqual([

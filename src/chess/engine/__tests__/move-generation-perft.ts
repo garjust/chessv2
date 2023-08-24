@@ -16,7 +16,7 @@ test('perft_5', () => {
 
   expect(counter).toEqual(PERFT_POSITION_5.counts[4]);
   console.log(
-    `perft_5 position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`
+    `perft_5 position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`,
   );
 });
 
@@ -29,7 +29,7 @@ test('starting position', () => {
 
   expect(counter).toEqual(STARTING_POSITION.counts[4]);
   console.log(
-    `starting position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`
+    `starting position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`,
   );
 });
 
@@ -43,7 +43,7 @@ test('vienna opening', () => {
   expect(counter).toEqual(VIENNA_OPENING.counts[4]);
   console.log(
     `vienna opening position: ${((timing / counter) * 1000).toPrecision(
-      5
-    )}μs/node`
+      5,
+    )}μs/node`,
   );
 });

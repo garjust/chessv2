@@ -46,7 +46,7 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
 export const applyMove = (
   position: Position,
   move: Move,
-  currentZobrist: CurrentZobrist
+  currentZobrist: CurrentZobrist,
 ): MoveResult => {
   const { pieces } = position;
   let piece = position.pieces.get(move.from);
@@ -203,7 +203,7 @@ export const applyMove = (
     position.pieces,
     position.kings,
     move,
-    piece
+    piece,
   );
   updateAttackedSquares(
     position.attackedSquares,
@@ -212,13 +212,13 @@ export const applyMove = (
     piece,
     result.captured !== undefined,
     enPassantCaptureSquare,
-    castlingRookMove
+    castlingRookMove,
   );
 
   if (result.captured) {
     currentZobrist.updateSquareOccupancy(
       result.captured.square,
-      result.captured.piece
+      result.captured.piece,
     );
   }
   currentZobrist.updateTurn();
@@ -239,7 +239,7 @@ export const applyMove = (
 export const undoMove = (
   position: Position,
   result: MoveResult,
-  currentZobrist: CurrentZobrist
+  currentZobrist: CurrentZobrist,
 ): void => {
   const { move } = result;
   let piece = position.pieces.get(move.to);

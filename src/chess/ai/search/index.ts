@@ -23,7 +23,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.engine.generateMoves(),
-      depth
+      depth,
     );
 
     bestMove = moves[0];
@@ -75,7 +75,7 @@ export default class Search {
   async searchNodes(
     depth: number,
     alpha: number,
-    beta: number
+    beta: number,
   ): Promise<number> {
     if (await this.context.state.timeoutReached()) {
       throw new TimeoutError();
@@ -111,7 +111,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.engine.generateMoves(),
-      depth
+      depth,
     );
 
     // If there are no moves at this node then the game has ended.
@@ -183,7 +183,7 @@ export default class Search {
     }
 
     const moves = this.context.quiescenceOrderMoves(
-      this.context.engine.generateAttackingMoves()
+      this.context.engine.generateAttackingMoves(),
     );
 
     for (const move of moves) {

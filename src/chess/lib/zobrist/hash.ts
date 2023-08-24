@@ -3,7 +3,7 @@ import { Type, ZobristNumbers } from './types';
 
 export const hash = (
   position: Position,
-  zobristNumbers: ZobristNumbers<number>
+  zobristNumbers: ZobristNumbers<number>,
 ) => {
   let h = 0;
 
@@ -33,7 +33,7 @@ export const hash = (
 
 export const hash64 = (
   position: Position,
-  zobristNumbers: ZobristNumbers<bigint>
+  zobristNumbers: ZobristNumbers<bigint>,
 ) => {
   let h = 0n;
 

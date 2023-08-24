@@ -5,7 +5,7 @@ import Pins from '../pins';
 test('pins', () => {
   // Vienna gambit accepted with moreee pinsss.
   const position = parseFEN(
-    '2k2bnr/pppr1p2/2n3p1/3NPB1p/5Bb1/5N2/PPP3PP/R2K3R w  - 2 14'
+    '2k2bnr/pppr1p2/2n3p1/3NPB1p/5Bb1/5N2/PPP3PP/R2K3R w  - 2 14',
   );
   const absolutePins = {
     [Color.White]: new Pins(position.pieces, 3, Color.White),

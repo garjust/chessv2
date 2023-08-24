@@ -5,7 +5,7 @@ export type Bitboard = bigint;
 
 export const board = (
   position: Position,
-  { pieceType, color }: { pieceType?: PieceType; color?: Color }
+  { pieceType, color }: { pieceType?: PieceType; color?: Color },
 ): bigint => {
   let n = ZERO;
 

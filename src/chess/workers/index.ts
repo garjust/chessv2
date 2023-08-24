@@ -13,7 +13,7 @@ export const loadPerft = async (): Promise<
 };
 
 export const loadEngine = async (
-  position?: Position
+  position?: Position,
 ): Promise<[engine: Remote<Engine>, cleanup: () => void]> => {
   const worker = new Worker(new URL('./engine', import.meta.url));
   const RemoteEngine = wrap<{ new (position?: Position): Engine }>(worker);
@@ -34,7 +34,7 @@ export const loadComputer = async (
 export const loadTimer = async (
   label: string,
   timeout: number,
-  autoStart = true
+  autoStart = true,
 ): Promise<[timer: Remote<Timer>, cleanup: () => void]> => {
   const worker = new Worker(new URL('./timer', import.meta.url));
   const RemoteTimer = wrap<TimerConstructor>(worker);

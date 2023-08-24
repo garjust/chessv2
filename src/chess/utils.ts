@@ -96,7 +96,7 @@ export const squareGenerator = function* () {
 };
 
 export const isSliderPieceType = (
-  type: PieceType
+  type: PieceType,
 ): type is PieceType.Bishop | PieceType.Queen | PieceType.Rook =>
   type === PieceType.Bishop ||
   type === PieceType.Queen ||
@@ -168,12 +168,12 @@ export const isStartPositionPawn = (color: Color, square: Square): boolean =>
 
 export const isPromotionPositionPawn = (
   color: Color,
-  square: Square
+  square: Square,
 ): boolean => isStartPositionPawn(flipColor(color), square);
 
 export const findKing = (
   position: Position,
-  color: Color
+  color: Color,
 ): Square | undefined => {
   for (const [square, piece] of position.pieces) {
     if (piece.type === PieceType.King && piece.color === color) {

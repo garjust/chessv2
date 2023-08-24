@@ -109,7 +109,7 @@ export const createState = (overrides: Partial<State> = {}): State => ({
 
 export const pieceInSquare = (
   state: State,
-  square: Square
+  square: Square,
 ): Piece | undefined => state.position.pieces.get(square);
 
 export const squareIsSelected = (state: State, square: Square) =>

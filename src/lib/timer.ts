@@ -8,7 +8,7 @@ export type TimerConstructor = {
       tickRate?: number;
       autoStart?: boolean;
       debug?: boolean;
-    }
+    },
   ): Timer;
 };
 
@@ -23,7 +23,12 @@ export default class Timer {
 
   constructor(
     timeout: number,
-    { tickRate = 50, label = 'anonymous', debug = false, autoStart = true } = {}
+    {
+      tickRate = 50,
+      label = 'anonymous',
+      debug = false,
+      autoStart = true,
+    } = {},
   ) {
     this.value = timeout;
     this.label = label;
@@ -34,8 +39,8 @@ export default class Timer {
       console.log(
         '[TIMER]',
         `created timer ${label}: ${formatNumber(
-          timeout
-        )}ms; tickRate=${tickRate}ms`
+          timeout,
+        )}ms; tickRate=${tickRate}ms`,
       );
     }
 
@@ -56,7 +61,7 @@ export default class Timer {
     if (this._debug) {
       console.log(
         '[TIMER]',
-        `started ${this.label}: ${formatNumber(this.value)}ms`
+        `started ${this.label}: ${formatNumber(this.value)}ms`,
       );
     }
 

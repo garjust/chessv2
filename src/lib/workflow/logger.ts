@@ -6,7 +6,7 @@ interface ActionWithType {
 export const updateLogger =
   <S, A extends ActionWithType>(
     workflowName: string,
-    ignoreList: string[] = []
+    ignoreList: string[] = [],
   ) =>
   ([[before, after], action]: [[S, S], A]) => {
     if (ignoreList.includes(action.type)) {
@@ -16,7 +16,7 @@ export const updateLogger =
     console.groupCollapsed(
       `%c${workflowName} Workflow Update:`,
       'font-weight: bold; color: orange;',
-      action.type
+      action.type,
     );
 
     console.log('%c \u2B07 previous state', 'color: Crimson', before);

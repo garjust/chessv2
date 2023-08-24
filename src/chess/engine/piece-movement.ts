@@ -28,7 +28,7 @@ export const expandPromotions = (move: MoveWithExtraData) =>
     (pieceType) => ({
       ...move,
       promotion: pieceType as PromotionOption,
-    })
+    }),
   );
 
 export const expandAllPromotions = (moves: MoveWithExtraData[]) =>
@@ -46,7 +46,7 @@ export const pawnMoves = (
     attacksOnly: boolean;
     advanceOnly: boolean;
     enPassantSquare: Square | null;
-  }
+  },
 ): MoveWithExtraData[] => {
   let squares: MoveWithExtraData[] = [];
   const opponentColor = flipColor(color);
@@ -136,7 +136,7 @@ export const pawnMoves = (
 export const knightMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  from: Square
+  from: Square,
 ): MoveWithExtraData[] =>
   KNIGHT_LOOKUP[from]
     .filter((to) => pieces.get(to)?.color !== color)
@@ -171,7 +171,7 @@ export const kingMoves = (
     opponentAttackMap: AttackMap;
     castlingOnly: boolean;
     castlingAvailability: CastlingAvailability;
-  }
+  },
 ): MoveWithExtraData[] => {
   const squares = castlingOnly
     ? []
@@ -229,37 +229,37 @@ export const bishopMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-  { skip = [] }: { skip: Square[] }
+  { skip = [] }: { skip: Square[] },
 ): MoveWithExtraData[] =>
   BISHOP_LOOKUP[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
       ray,
-      { skip }
-    )
+      { skip },
+    ),
   );
 
 export const rookMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-  { skip = [] }: { skip: Square[] }
+  { skip = [] }: { skip: Square[] },
 ): MoveWithExtraData[] =>
   ROOK_LOOKUP[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Rook } },
       ray,
-      { skip }
-    )
+      { skip },
+    ),
   );
 
 export const queenMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-  options: { skip: Square[] }
+  options: { skip: Square[] },
 ): MoveWithExtraData[] => [
   ...bishopMoves(pieces, color, from, options),
   ...rookMoves(pieces, color, from, options),

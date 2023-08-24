@@ -116,7 +116,7 @@ export const changeOverlayAction = (): Action.ChangeOverlay => ({
 
 export const chessComputerLoadedAction = (
   instance: ChessComputerWrapped,
-  color: Color
+  color: Color,
 ): Action.ChessComputerLoaded => ({
   type: Type.ChessComputerLoaded,
   instance,
@@ -133,7 +133,7 @@ export const flipBoardAction = (): Action.FlipBoard => ({
 });
 
 export const loadChessComputerAction = (
-  playingAs: Color
+  playingAs: Color,
 ): Action.LoadChessComputer => ({
   type: Type.LoadChessComputer,
   playingAs,
@@ -148,7 +148,7 @@ export const previousPositionAction = (): Action.PreviousPosition => ({
 });
 
 export const receiveComputerMoveAction = (
-  move: Move
+  move: Move,
 ): Action.ReceiveComputerMove => ({
   type: Type.ReceiveComputerMove,
   move,
@@ -169,7 +169,7 @@ export const setPositionAction = (position: Position): Action.SetPosition => ({
 });
 
 export const setPositionFromFENAction = (
-  fenString: string
+  fenString: string,
 ): Action.SetPositionFromFEN => ({
   type: Type.SetPositionFromFEN,
   fenString,

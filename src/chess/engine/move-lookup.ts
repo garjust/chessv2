@@ -136,7 +136,7 @@ for (const { rank, file } of squareGenerator()) {
 //
 // For each square, all squares for rays which intersect it.
 const BISHOP_RAYS_FLAT: Square[][] = BISHOP_LOOKUP.map((raySet) =>
-  raySet.flat()
+  raySet.flat(),
 );
 const ROOK_RAYS_FLAT: Square[][] = ROOK_LOOKUP.map((raySet) => raySet.flat());
 const QUEEN_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
@@ -151,7 +151,7 @@ export const BISHOP_RAY_BITARRAYS: boolean[][] = BISHOP_RAYS_FLAT.map(
     const array = Array(64);
     squares.forEach((x) => (array[x] = true));
     return array;
-  }
+  },
 );
 export const ROOK_RAY_BITARRAYS: boolean[][] = ROOK_RAYS_FLAT.map((squares) => {
   const array = Array(64);
@@ -163,7 +163,7 @@ export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
     const array = Array(64);
     squares.forEach((x) => (array[x] = true));
     return array;
-  }
+  },
 );
 
 export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
@@ -171,7 +171,7 @@ export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
     const array = Array(64);
     squares.forEach((x) => (array[x] = true));
     return array;
-  }
+  },
 );
 
 export const RAY_BY_DIRECTION = {

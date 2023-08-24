@@ -27,7 +27,7 @@ const Board = ({ squareSize, style }: BoardProps) => {
         key={rankFileToSquare(square)}
         square={rankFileToSquare(square)}
         color={(square.rank + square.file) % 2 == 0 ? Color.Black : Color.White}
-      />
+      />,
     );
   }
 

@@ -12,7 +12,7 @@ const moveWeight = (
   tableMove?: Move,
   pvMove?: Move,
   killerMove?: Move,
-  historyTable?: HistoryTable
+  historyTable?: HistoryTable,
 ): number => {
   let n = 0;
 
@@ -32,8 +32,8 @@ const moveWeight = (
       Math.min(
         PieceValue[move.attack.attacked.type] -
           PieceValue[move.attack.attacker.type],
-        1000
-      )
+        1000,
+      ),
     );
   } else if (historyTable) {
     // assign value using history heuristic
@@ -52,7 +52,7 @@ export const orderMoves = (
   tableMove?: Move,
   pvMove?: Move,
   killerMove?: Move,
-  historyTable?: HistoryTable
+  historyTable?: HistoryTable,
 ): MoveWithExtraData[] => {
   const sortBy = (move: MoveWithExtraData) => {
     if (!move.weight) {
@@ -61,7 +61,7 @@ export const orderMoves = (
         tableMove,
         pvMove,
         killerMove,
-        historyTable
+        historyTable,
       );
     }
 

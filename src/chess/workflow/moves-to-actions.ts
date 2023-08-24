@@ -6,12 +6,12 @@ import { moveFromString } from '../move-notation';
 
 export const moveActions = (
   moves: string[],
-  actionDelay = 0
+  actionDelay = 0,
 ): Observable<Action> =>
   from(moves).pipe(
     map(moveFromString),
     map((move) => [move.from, move.to]),
     mergeMap(([squareA, squareB]) => from([squareA, squareB])),
     map(clickSquareAction),
-    delayOperator(actionDelay)
+    delayOperator(actionDelay),
   );

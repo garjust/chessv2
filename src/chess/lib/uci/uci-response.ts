@@ -40,7 +40,7 @@ const OptionHash = {
 };
 
 function optionToResponse(
-  option: Record<string, string | number | boolean>
+  option: Record<string, string | number | boolean>,
 ): string {
   let str = '';
   for (const [k, v] of Object.entries(option)) {

@@ -44,7 +44,7 @@ export default class Context {
     label: string,
     maxDepth: number,
     engine: Engine,
-    config: Partial<SearchConfiguration> = {}
+    config: Partial<SearchConfiguration> = {},
   ) {
     this.label = label;
     this.engine = engine;
@@ -54,7 +54,7 @@ export default class Context {
 
   // Run a search with diagnostics.
   async withDiagnostics(
-    maxDepth: number
+    maxDepth: number,
   ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
     const result = await this.run(maxDepth);
@@ -88,7 +88,7 @@ export default class Context {
 
   orderMoves(
     moves: MoveWithExtraData[],
-    currentDepth: number
+    currentDepth: number,
   ): MoveWithExtraData[] {
     if (this.configuration.moveOrdering) {
       return orderMoves(
@@ -104,7 +104,7 @@ export default class Context {
           : undefined,
         this.configuration.moveOrderingHeuristics.historyTable
           ? this.state.historyTable
-          : undefined
+          : undefined,
       );
     } else {
       return moves;

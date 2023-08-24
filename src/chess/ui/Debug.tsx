@@ -19,7 +19,7 @@ const COMPUTER_DEPTH = 4;
 async function runMoveGenerationTest(
   logger: Subject<string>,
   test: MoveTest,
-  toDepth = 5
+  toDepth = 5,
 ) {
   const [worker] = await loadPerft();
 
@@ -51,20 +51,20 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
 
 async function runComputerNextMoveTest(
   logger: Observer<string>,
-  test: MoveTest
+  test: MoveTest,
 ) {
   const computers = await Promise.all(
     Object.keys(Registry).map(async (version) => {
       const [ai, cleanup] = await loadComputer(
         version as Version,
-        COMPUTER_DEPTH
+        COMPUTER_DEPTH,
       );
       return {
         version: version as Version,
         ai,
         cleanup,
       };
-    })
+    }),
   );
 
   for (const { version, ai, cleanup } of computers) {

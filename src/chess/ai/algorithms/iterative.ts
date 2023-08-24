@@ -65,12 +65,12 @@ export default class Iterative implements ChessComputer {
 
     const [timer, timerCleanup] = await loadTimer(
       `${this.label}-search`,
-      timeout
+      timeout,
     );
     const [depthTimer, depthTimerCleanup] = await loadTimer(
       `${this.label}-search-for-depth`,
       0,
-      false
+      false,
     );
     this.context.state.timer = depthTimer;
 
@@ -94,7 +94,7 @@ export default class Iterative implements ChessComputer {
         '[intermediate result]:',
         this.diagnostics?.result?.logStringLight,
         this.diagnostics.result?.evaluation,
-        this.diagnostics?.result?.principleVariation
+        this.diagnostics?.result?.principleVariation,
       );
     }
 

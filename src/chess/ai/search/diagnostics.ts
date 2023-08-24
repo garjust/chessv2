@@ -107,11 +107,11 @@ export default class Diagnotics {
     const timing = Date.now() - this.start;
     const totalNodes = Object.values(this.plyCounters).reduce(
       (sum, plyCounter) => sum + plyCounter.nodes,
-      0
+      0,
     );
     const totalCuts = Object.values(this.plyCounters).reduce(
       (sum, plyCounter) => sum + plyCounter.cuts,
-      0
+      0,
     );
 
     const stateData: StateData | undefined = state
@@ -128,12 +128,12 @@ export default class Diagnotics {
       logString: `${this.label} ${moveString(move)}: depth=${
         this.maxDepth
       }; timing=${formatNumber(timing)}ms; nodes=${formatNumber(
-        totalNodes
+        totalNodes,
       )}; (${((timing / totalNodes) * 1000).toPrecision(
-        5
+        5,
       )}μs/node); cuts=${formatNumber(totalCuts)}`,
       logStringLight: `depth=${this.maxDepth}; timing=${formatNumber(
-        timing
+        timing,
       )}ms; nodes=${formatNumber(totalNodes)}`,
       move: moveString(move),
       evaluation: humanEvaluation(result.bestScore.score, this.maxDepth),

@@ -54,7 +54,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
 
               return move;
             })
-            .then((move) => receiveComputerMoveAction(move))
+            .then((move) => receiveComputerMoveAction(move)),
         ),
     ];
   } else {
@@ -88,7 +88,7 @@ function handleChangeOverlay(state: State): Update<State, Action> {
 
 function handleChessComputerLoaded(
   state: State,
-  action: Action.ChessComputerLoaded
+  action: Action.ChessComputerLoaded,
 ): Update<State, Action> {
   const { instance, color } = action;
 
@@ -106,7 +106,7 @@ function handleChessComputerLoaded(
 
 function handleClickSquare(
   state: State,
-  action: Action.ClickSquare
+  action: Action.ClickSquare,
 ): Update<State, Action> {
   const { square } = action;
   const { position } = state;
@@ -144,7 +144,7 @@ function handleFlipBoard(state: State): Update<State, Action> {
 
 function handleLoadChessComputer(
   state: State,
-  action: Action.LoadChessComputer
+  action: Action.LoadChessComputer,
 ): Update<State, Action> {
   const { playingAs } = action;
   const { players } = state;
@@ -162,9 +162,9 @@ function handleLoadChessComputer(
             .then(([instance, cleanup, label]) =>
               chessComputerLoadedAction(
                 { ai: instance, label, cleanup, __computer: true },
-                playingAs
-              )
-            )
+                playingAs,
+              ),
+            ),
         ),
     ];
   } else {
@@ -178,7 +178,7 @@ function handleLoadChessComputer(
 
 function handleOverlaySquares(
   state: State,
-  context: Context
+  context: Context,
 ): Update<State, Action> {
   const squareOverlay = new Map<Square, SquareOverlayType>();
   const { overlayCategory } = state;
@@ -203,7 +203,7 @@ function handleOverlaySquares(
 
 function handlePreviousPosition(
   state: State,
-  { engine }: Context
+  { engine }: Context,
 ): Update<State, Action> {
   engine.undoLastMove();
   play(Sound.Move);
@@ -216,7 +216,7 @@ function handlePreviousPosition(
 
 function handleReceiveComputerMove(
   state: State,
-  action: Action.ReceiveComputerMove
+  action: Action.ReceiveComputerMove,
 ): Update<State, Action> {
   const { move } = action;
   return [state, () => movePieceAction(move)];
@@ -229,7 +229,7 @@ function handleResetOverlay(state: State): Update<State, Action> {
 function handleMovePiece(
   state: State,
   action: Action.MovePiece,
-  { engine }: Context
+  { engine }: Context,
 ): Update<State, Action> {
   const { move } = action;
   const legalMoves = state.moves;
@@ -242,7 +242,7 @@ function handleMovePiece(
       move.from,
       '\u2B95',
       move.to,
-      state.position
+      state.position,
     );
     return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
   }
@@ -286,7 +286,7 @@ function handleMovePiece(
 function handleSetPosition(
   state: State,
   action: Action.SetPosition,
-  { engine }: Context
+  { engine }: Context,
 ): Update<State, Action> {
   const { position } = action;
   const moves = engine.generateMoves();
@@ -347,7 +347,7 @@ function handleSetPosition(
 function handleSetPositionFromFEN(
   state: State,
   action: Action.SetPositionFromFEN,
-  { engine }: Context
+  { engine }: Context,
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
   engine.position = position;
@@ -372,7 +372,7 @@ function handleTickPlayersClock(state: State): Update<State, Action> {
   if (turnClock > 0) {
     state.clocks[position.turn] = Math.max(
       turnClock - (tick - clocks.lastTick),
-      0
+      0,
     );
   }
 

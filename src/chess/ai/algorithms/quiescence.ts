@@ -41,7 +41,7 @@ export default class Quiescence implements ChessComputer {
     this.engine.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
-      this.maxDepth
+      this.maxDepth,
     );
 
     this.diagnostics = diagnostics;

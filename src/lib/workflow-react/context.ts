@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Workflow } from '../workflow';
 
 export const contextFactory = <S, A>(
-  initialState: S
+  initialState: S,
 ): {
   WorkflowContext: React.Context<Workflow<S, A>>;
   useWorkflow: <R>(render: (state: S) => R) => {
