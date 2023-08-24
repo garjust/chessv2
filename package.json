@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "build:engine": "webpack-cli -c config/engine-webpack.config.js",
     "build:perft": "webpack-cli -c config/perft-webpack.config.js",
