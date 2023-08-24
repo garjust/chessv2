@@ -15,16 +15,6 @@ module.exports = {
     // 'plugin:react/jsx-runtime',
   ],
   ignorePatterns: ['**/dist/*', '**/.yarn/*'],
-  rules: {
-    'prettier/prettier': 'error',
-    'no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
-    ],
-  },
   settings: {
     react: {
       createClass: 'createReactClass', // Regex for Component Factory to use,
@@ -62,6 +52,17 @@ module.exports = {
       'Hyperlink',
       { name: 'Link', linkAttribute: 'to' },
     ],
+  },
+  rules: {
+    'prettier/prettier': 'error',
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
+    '@typescript-eslint/no-empty-function': 'off',
   },
   overrides: [
     {
