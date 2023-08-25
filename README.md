@@ -6,6 +6,11 @@
 - Enable corepack `corepack enable` to automatically install the preffered bundling tool `yarn`
 - `yarn start`
 
+### Testing
+
+- Run `yarn test` from CLI to run test suite
+- If using VSCode install the Vitest extension and enable watch mode!
+
 ## Installing cutechess-cli (OSX)
 
 ### Compile from source
