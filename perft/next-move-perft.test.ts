@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
-import { FEN_LIBRARY, parseFEN } from '../lib/fen';
-import { squareLabel } from '../utils';
-import { moveString } from '../move-notation';
-import Iterative from './algorithms/iterative';
-import OrderMoves from './algorithms/order-moves';
+import { FEN_LIBRARY, parseFEN } from '../src/chess/lib/fen';
+import { squareLabel } from '../src/chess/utils';
+import { moveString } from '../src/chess/move-notation';
+import Iterative from '../src/chess/ai/algorithms/iterative';
+import OrderMoves from '../src/chess/ai/algorithms/order-moves';
 
 test('alphaBeta finds checkmate in black mate position', async () => {
   const position = parseFEN(FEN_LIBRARY.BLACK_CHECKMATE_FEN);

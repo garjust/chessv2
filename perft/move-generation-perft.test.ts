@@ -1,12 +1,12 @@
 import { expect, test } from 'vitest';
-import Engine from '.';
-import { parseFEN, FEN_LIBRARY } from '../lib/fen';
+import Engine from '../src/chess/engine';
+import { parseFEN, FEN_LIBRARY } from '../src/chess/lib/fen';
 import {
   PERFT_POSITION_5,
   searchRoot,
   STARTING_POSITION,
   VIENNA_OPENING,
-} from '../lib/perft';
+} from '../src/chess/lib/perft';
 
 test('perft_5', () => {
   const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));

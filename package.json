@@ -9,7 +9,7 @@
     "build:engine": "webpack-cli -c config/engine-webpack.config.js",
     "build:perft": "webpack-cli -c config/perft-webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js src",
-    "test": "vitest",
+    "test": "vitest src/",
     "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""
   },
   "dependencies": {

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import Engine from '../../engine';
-import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
-import { orderMoves } from './move-ordering';
+import Engine from '../src/chess/engine';
+import { parseFEN, FEN_LIBRARY } from '../src/chess/lib/fen';
+import { orderMoves } from '../src/chess/ai/search/move-ordering';
 
 const N = 100_000;
 
