@@ -1,6 +1,7 @@
-import Engine from '../../../engine';
-import { parseFEN, FEN_LIBRARY } from '../../../lib/fen';
-import { orderMoves } from '../move-ordering';
+import { expect, test } from 'vitest';
+import Engine from '../../engine';
+import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
+import { orderMoves } from './move-ordering';
 
 const N = 100_000;
 

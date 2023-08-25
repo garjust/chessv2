@@ -1,7 +1,9 @@
-import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
-import { moveString, squareLabel } from '../../utils';
-import Iterative from '../algorithms/iterative';
-import OrderMoves from '../algorithms/order-moves';
+import { expect, test } from 'vitest';
+import { FEN_LIBRARY, parseFEN } from '../lib/fen';
+import { squareLabel } from '../utils';
+import { moveString } from '../move-notation';
+import Iterative from './algorithms/iterative';
+import OrderMoves from './algorithms/order-moves';
 
 test('alphaBeta finds checkmate in black mate position', async () => {
   const position = parseFEN(FEN_LIBRARY.BLACK_CHECKMATE_FEN);

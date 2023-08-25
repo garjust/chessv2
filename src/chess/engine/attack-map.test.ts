@@ -1,5 +1,6 @@
-import Engine from '..';
-import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
+import { expect, test } from 'vitest';
+import Engine from '.';
+import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 
 test('pawn capture pawn position', () => {
   const position = parseFEN(

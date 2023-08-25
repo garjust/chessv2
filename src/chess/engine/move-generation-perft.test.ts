@@ -1,11 +1,12 @@
-import Engine from '..';
-import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
+import { expect, test } from 'vitest';
+import Engine from '.';
+import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import {
   PERFT_POSITION_5,
   searchRoot,
   STARTING_POSITION,
   VIENNA_OPENING,
-} from '../../lib/perft';
+} from '../lib/perft';
 
 test('perft_5', () => {
   const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));

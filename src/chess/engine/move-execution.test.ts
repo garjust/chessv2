@@ -1,8 +1,9 @@
-import Engine from '..';
-import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../../lib/example-games';
-import { formatPosition, parseFEN, FEN_LIBRARY } from '../../lib/fen';
-import { moveFromString } from '../../move-notation';
-import { Move } from '../../types';
+import { expect, test } from 'vitest';
+import Engine from '.';
+import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
+import { formatPosition, parseFEN, FEN_LIBRARY } from '../lib/fen';
+import { moveFromString } from '../move-notation';
+import { Move } from '../types';
 
 const N = 1000;
 const MOVES: Move[] = VIENNA_GAMBIT_ACCEPTED_GAME.map(moveFromString);

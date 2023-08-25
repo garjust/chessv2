@@ -1,6 +1,7 @@
-import init, { createState, Action } from '..';
-import Engine from '../../../engine';
-import { UCICommandAction } from '../action';
+import { expect, test } from 'vitest';
+import init, { createState, Action } from '.';
+import Engine from '../../engine';
+import { UCICommandAction } from './action';
 
 test('example interaction with engine in UCI', () => {
   let responses: string[] = [];

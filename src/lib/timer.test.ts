@@ -1,4 +1,5 @@
-import Timer from '../timer';
+import { expect, test } from 'vitest';
+import Timer from './timer';
 
 test('timer works', () => {
   jest.useFakeTimers();

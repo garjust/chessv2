@@ -1,5 +1,6 @@
-import Engine from '..';
-import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
+import { expect, test } from 'vitest';
+import Engine from '.';
+import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 
 test('move generation perft_5', () => {
   const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));

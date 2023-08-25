@@ -1,8 +1,9 @@
-import { parseFEN, FEN_LIBRARY } from '../../fen';
+import { expect, test } from 'vitest';
+import { parseFEN, FEN_LIBRARY } from '../fen';
 
-import { makeNumbers as makeNumbers32 } from '../numbers-32bit';
-import { makeNumbers as makeNumbers64 } from '../numbers-64bit';
-import { StatefulHash, StatefulHash64 } from '../stateful-hash';
+import { makeNumbers as makeNumbers32 } from './numbers-32bit';
+import { makeNumbers as makeNumbers64 } from './numbers-64bit';
+import { StatefulHash, StatefulHash64 } from './stateful-hash';
 
 const N = 1_000_000;
 

@@ -1,4 +1,5 @@
-import { toUCIString, UCIResponseType } from '../uci-response';
+import { expect, test } from 'vitest';
+import { toUCIString, UCIResponseType } from './uci-response';
 
 test('responses', () => {
   expect(toUCIString({ type: UCIResponseType.UCIOk })).toEqual(['uciok']);

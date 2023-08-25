@@ -1,6 +1,7 @@
-import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
-import { Color } from '../../types';
-import Pins from '../pins';
+import { expect, test } from 'vitest';
+import { parseFEN, FEN_LIBRARY } from '../lib/fen';
+import { Color } from '../types';
+import Pins from './pins';
 
 test('pins', () => {
   // Vienna gambit accepted with moreee pinsss.

@@ -1,5 +1,5 @@
-import { DirectionUnit } from '../types';
-import { directionOfMove } from '../utils';
+import { DirectionUnit } from './types';
+import { directionOfMove } from './utils';
 
 test('directionOfMove', () => {
   expect(directionOfMove(35, 34)).toEqual(DirectionUnit.Left);
