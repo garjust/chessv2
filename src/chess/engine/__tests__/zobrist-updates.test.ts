@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import Engine from '..';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../../lib/example-games';
 import { parseFEN, FEN_LIBRARY } from '../../lib/fen';

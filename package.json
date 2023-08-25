@@ -9,13 +9,10 @@
     "build:engine": "webpack-cli -c config/engine-webpack.config.js",
     "build:perft": "webpack-cli -c config/perft-webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js src",
-    "test": "react-scripts test",
+    "test": "vitest",
     "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""
   },
   "dependencies": {
-    "@testing-library/jest-dom": "^6.1.1",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^29.5.4",
     "@types/node": "^20.5.4",
     "@types/react": "^18.2.21",
@@ -28,6 +25,9 @@
     "web-vitals": "^3.4.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.1",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "@vitejs/plugin-react": "^4.0.4",
@@ -35,11 +35,13 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.2",
+    "jest": "^29.6.4",
     "prettier": "^3.0.2",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",
     "vite-plugin-svgr": "^3.2.0",
+    "vitest": "^0.34.2",
     "webpack-cli": "^5.1.4"
   },
   "browserslist": {
