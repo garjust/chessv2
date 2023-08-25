@@ -62,7 +62,6 @@ module.exports = {
         varsIgnorePattern: '^_',
       },
     ],
-    '@typescript-eslint/no-empty-function': 'off',
   },
   overrides: [
     {

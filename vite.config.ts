@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import svgr from "vite-plugin-svgr";
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(() => {
   return {
@@ -8,5 +8,6 @@ export default defineConfig(() => {
       outDir: 'build',
     },
     plugins: [svgr(), react()],
+    clearScreen: false,
   };
 });
