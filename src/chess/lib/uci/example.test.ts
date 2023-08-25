@@ -2,12 +2,14 @@ import { expect, test } from 'vitest';
 import init, { createState, Action } from '.';
 import Engine from '../../engine';
 import { UCICommandAction } from './action';
+import Iterative from '../../ai/algorithms/iterative';
 
 test('example interaction with engine in UCI', () => {
   let responses: string[] = [];
 
   const { emit } = init(createState(), {
     engine: new Engine(),
+    ai: new Iterative(4),
     sendUCIResponse: (response: string) => responses.push(response),
   });
 

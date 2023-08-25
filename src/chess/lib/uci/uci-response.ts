@@ -42,11 +42,11 @@ const OptionHash = {
 function optionToResponse(
   option: Record<string, string | number | boolean>,
 ): string {
-  let str = '';
+  let str = 'option';
   for (const [k, v] of Object.entries(option)) {
-    str += `${k} ${v} `;
+    str += ` ${k} ${v}`;
   }
-  return str.trim();
+  return str;
 }
 
 export type UCIResponse =
@@ -63,17 +63,17 @@ export const toUCIString = (response: UCIResponse): string[] => {
   let str: string;
   switch (response.type) {
     case UCIResponseType.Id:
-      return [`id name ${response.name}\n`, `id author ${response.author}\n`];
+      return [`id name ${response.name}`, `id author ${response.author}`];
     case UCIResponseType.UCIOk:
-      return ['uciok\n'];
+      return ['uciok'];
     case UCIResponseType.ReadyOk:
-      return ['readyok\n'];
+      return ['readyok'];
     case UCIResponseType.BestMove:
       str = `bestmove ${moveString(response.move)}`;
       if (response.ponder !== undefined) {
         str += ` ponder ${moveString(response.ponder)}`;
       }
-      return [`${str}\n`];
+      return [`${str}`];
     case UCIResponseType.CopyProtection:
       throw Error('engine is not copyrighted');
     case UCIResponseType.Registration:

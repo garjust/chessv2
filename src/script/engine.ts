@@ -16,7 +16,7 @@ const rl = readline.createInterface({
 const { emit } = init(createState(), {
   engine: new Engine(),
   ai: new Iterative(10),
-  sendUCIResponse: rl.write,
+  sendUCIResponse: (response: string) => rl.write(`${response}\n`),
 });
 
 if (DEBUG) {
