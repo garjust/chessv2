@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import { DirectionUnit } from './types';
 import { directionOfMove } from './utils';
 
