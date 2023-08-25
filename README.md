@@ -1,6 +1,10 @@
 # chessv2
 
-`yarn start`
+## Dev setup
+
+- With NVM installed the correct version of node will be autoselected. If not `.nvmrc` contains the correct node version.
+- Enable corepack `corepack enable` to automatically install the preffered bundling tool `yarn`
+- `yarn start`
 
 ## Installing cutechess-cli (OSX)
 
