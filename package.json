@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
     "build:engine": "webpack-cli -c config/engine-webpack.config.js",
     "build:perft": "webpack-cli -c config/perft-webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js src",
     "test": "react-scripts test",
-    "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\"",
-    "eject": "react-scripts eject"
+    "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""
   },
   "dependencies": {
     "@testing-library/jest-dom": "^6.1.1",
@@ -24,20 +24,22 @@
     "fast-sort": "^3.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "rxjs": "^7.8.1",
-    "typescript": "^5.1.6",
     "web-vitals": "^3.4.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
+    "@vitejs/plugin-react": "^4.0.4",
     "eslint": "^8.47.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.2",
     "prettier": "^3.0.2",
     "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9",
+    "vite-plugin-svgr": "^3.2.0",
     "webpack-cli": "^5.1.4"
   },
   "browserslist": {

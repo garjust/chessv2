@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const captureAudio = require('./audio-files/capture.ogg');
-const moveAudio = require('./audio-files/move.ogg');
-const notifyAudio = require('./audio-files/notify.ogg');
+import captureAudio from './audio-files/capture.ogg';
+import moveAudio from './audio-files/move.ogg';
+import notifyAudio from './audio-files/notify.ogg';
 /* eslint-enable @typescript-eslint/no-var-requires */
 
 export enum Sound {
