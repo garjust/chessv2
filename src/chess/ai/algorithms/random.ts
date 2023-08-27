@@ -5,7 +5,7 @@ import Engine from '../../engine';
 import Diagnotics from '../search/diagnostics';
 
 // Just randomly pick a move, with a tiny bit of intelligence to make
-//  non-sliding piece moves more often.
+// non-sliding piece moves more often.
 export default class Random implements ChessComputer {
   engine: Engine;
   diagnostics: Diagnotics;

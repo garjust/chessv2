@@ -4,7 +4,7 @@ import Engine from '../../engine';
 import { UCICommandAction } from './action';
 import Iterative from '../../ai/algorithms/iterative';
 
-test('example interaction with engine in UCI', () => {
+test('example interaction with UCI engine worker', () => {
   let responses: string[] = [];
 
   const { emit } = init(createState(), {

@@ -4,6 +4,7 @@ import { Registry, Version } from '../ai';
 import { ChessComputer, ChessComputerConstructor } from '../ai/chess-computer';
 import Engine from '../engine';
 import { Position } from '../types';
+import { UCIChessComputer } from '../ai/uci-computer';
 
 export const loadPerft = async (): Promise<
   [worker: Worker, cleanup: () => void]
@@ -34,6 +35,25 @@ export const loadComputer = async (
   });
   const registry = wrap<typeof Registry>(worker);
   const instance = await new registry[version](...args);
+  return [instance, () => worker.terminate()];
+};
+
+export const loadUCIComputer = async (
+  responseFunc: (response: string) => void,
+  version: Version,
+  ...args: ConstructorParameters<ChessComputerConstructor>
+): Promise<[uciComputer: Remote<UCIChessComputer>, cleanup: () => void]> => {
+  const worker = new Worker(new URL('./uci-ai', import.meta.url), {
+    type: 'module',
+  });
+  const computer = new Registry[version](...args);
+  const RemoteUCIChesComputer = wrap<{
+    new (
+      computer: ChessComputer,
+      responseFunc: (response: string) => void,
+    ): UCIChessComputer;
+  }>(worker);
+  const instance = await new RemoteUCIChesComputer(computer, responseFunc);
   return [instance, () => worker.terminate()];
 };
 
