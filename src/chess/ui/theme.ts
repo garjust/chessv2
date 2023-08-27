@@ -37,8 +37,3 @@ export const BOARD_SQUARE_SELECTED: React.CSSProperties = {
   backgroundColor: 'rgba(83, 141, 199, 0.8)',
   boxShadow: 'inset 0 0 8px 2px rgb(83, 141, 199)',
 };
-
-export const BUTTON_CSS: React.CSSProperties = {
-  padding: 16,
-  cursor: 'pointer',
-};

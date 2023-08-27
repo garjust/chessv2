@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Game from './chess/ui/Game';
 import Debug from './chess/ui/Debug';
-import { BUTTON_CSS } from './chess/ui/theme';
 
 enum Screen {
   Game,
@@ -17,15 +16,13 @@ const App = () => {
 
   return (
     <div
+      className="theme app-container dark-mode"
       style={{
         minHeight: '100vh',
-        margin: 24,
+        padding: 24,
       }}
     >
-      <button
-        onClick={toggleScreen}
-        style={{ ...BUTTON_CSS, marginBottom: 16, padding: 4 }}
-      >
+      <button onClick={toggleScreen} style={{ marginBottom: 16, padding: 4 }}>
         Switch Screen
       </button>
       {screen === Screen.Game ? <Game /> : <Debug />}

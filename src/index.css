@@ -1,13 +1,51 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.theme {
+   --theme-black: #222831;
+   --theme-background-dark: #242424;
+   --theme-font-dark: #EEFFFF;
+   --theme-primary: #9fd3c7;
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+  --font-family-monospaced: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+.regular-mode {
+  --color-black: var(--theme-black);
+  --color-background: var(--theme-background-dark);
+  --color-font: var(--theme-font-dark);
+  --color-primary: var(--theme-primary);
+}
+
+.dark-mode {
+  --color-black: var(--theme-black);
+  --color-background: var(--theme-background-dark);
+  --color-font: var(--theme-font-dark);
+  --color-primary: var(--theme-primary);
+}
+
+.app-container {
+  background-color: var(--color-background);
+  color: var(--color-font);
+
+  font-family: var(--font-family);
+}
+
+code, pre {
+  font-family: var(--font-family-monospaced)
+}
+
+button {
+  font-family: inherit;
+  padding: 16px;
+  font-size: 16px;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-black);
+  color: var(--color-black);
+  cursor: pointer;
 }

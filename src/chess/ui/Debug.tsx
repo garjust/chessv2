@@ -10,7 +10,6 @@ import {
   VIENNA_OPENING,
 } from '../lib/perft';
 import './Debug.css';
-import { BUTTON_CSS } from './theme';
 import { loadComputer, loadPerft } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
@@ -120,65 +119,46 @@ const Debug = () => {
         }}
       >
         <button
-          style={BUTTON_CSS}
           onClick={() => runMoveGenerationTest(logger, STARTING_POSITION)}
         >
           Move generation perft
         </button>
 
-        <button
-          style={BUTTON_CSS}
-          onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5)}
-        >
+        <button onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5)}>
           Move generation perft PERFT_5
         </button>
 
-        <button
-          style={BUTTON_CSS}
-          onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING)}
-        >
+        <button onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING)}>
           Move generation perft VIENNA
         </button>
 
-        <button
-          style={BUTTON_CSS}
-          onClick={() => runMoveGenerationTest(logger, BLACK_CHECKMATE)}
-        >
+        <button onClick={() => runMoveGenerationTest(logger, BLACK_CHECKMATE)}>
           Move generation perft BLACK MATE
         </button>
 
         <button
-          style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION)}
         >
           Move AI perft
         </button>
 
         <button
-          style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, PERFT_POSITION_5)}
         >
           Move AI perft PERFT_5
         </button>
 
-        <button
-          style={BUTTON_CSS}
-          onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING)}
-        >
+        <button onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING)}>
           Move AI perft VIENNA
         </button>
 
         <button
-          style={BUTTON_CSS}
           onClick={() => runComputerNextMoveTest(logger, BLACK_CHECKMATE)}
         >
           Move AI perft BLACK MATE
         </button>
 
-        <button
-          style={BUTTON_CSS}
-          onClick={() => runSingleComputerNextMoveTest(logger)}
-        >
+        <button onClick={() => runSingleComputerNextMoveTest(logger)}>
           Single Move AI perft
         </button>
       </div>
