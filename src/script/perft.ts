@@ -2,7 +2,7 @@ import { searchRoot } from '../chess/lib/perft';
 import { argv } from 'process';
 import { open } from 'fs/promises';
 
-import { parseFEN } from '../chess/lib/fen';
+import { parseFEN, isValid } from '../chess/lib/fen';
 import Engine from '../chess/engine';
 import { moveFromString, moveString } from '../chess/move-notation';
 
@@ -18,6 +18,9 @@ if (depth.length == 0) {
 }
 if (fen.length == 0) {
   throw Error('perft was not passed a FEN string');
+}
+if (!isValid(fen)) {
+  throw Error(`perft was not passed a valid FEN: "${fen}"`);
 }
 
 if (DEBUG) {

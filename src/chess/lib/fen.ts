@@ -17,7 +17,7 @@ const STARTING_POSITION_FEN =
 // -----------------------------------------------------------------------------
 const PERFT_5_FEN = 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8';
 const VIENNA_GAMBIT_ACCEPTED_FEN =
-  '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w  - 1 11';
+  '2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w - - 1 11';
 const VIENNA_OPENING_FEN =
   'rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3';
 const KEVIN_FRIED_LIVER_BUSTED =
@@ -27,7 +27,7 @@ const KEVIN_FRIED_LIVER_BUSTED =
 // -----------------------------------------------------------------------------
 const BLACK_CHECKMATE_FEN =
   '4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24';
-const LADDER_MATE_FEN = '8/8/k7/6QR/8/8/8/7K w  - 20 59';
+const LADDER_MATE_FEN = '8/8/k7/6QR/8/8/8/7K w - - 20 59';
 const ROOK_ENDGAME_FEN = '3r4/8/3k4/8/8/3K4/8/8 w - - 0 1';
 const QUEEN_ENDGAME_FEN = '8/3K4/4P3/8/8/8/6k1/7q w - - 0 1';
 const FIXED_PAWN_ENDGAME_FEN = '8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1';
@@ -47,6 +47,25 @@ export const FEN_LIBRARY = {
   QUEEN_ENDGAME_FEN,
   FIXED_PAWN_ENDGAME_FEN,
   KEVIN_FRIED_LIVER_BUSTED,
+};
+
+export const isValid = (fenString: string): boolean => {
+  const parts = fenString.split(' ');
+  if (parts.length != 6) {
+    return false;
+  }
+
+  const [
+    piecePlacements,
+    activeColor,
+    castlingAvailability,
+    enPassantSquare,
+    halfMoveClock,
+    fullMoveNumber,
+  ] = parts;
+  // TODO: more validation
+
+  return true;
 };
 
 const pieceToFenPiece = (piece: Piece): string =>

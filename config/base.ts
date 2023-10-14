@@ -12,7 +12,6 @@ export function base(): Plugin {
         build: {
           outDir: 'build',
         },
-        plugins: [svgr(), react()],
         clearScreen: false,
       };
     },
