@@ -1,6 +1,4 @@
 /// <reference types="vitest" />
-import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';
 import type { Plugin } from 'vite';
 import path from 'path';
 
