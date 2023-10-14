@@ -12,6 +12,14 @@ const DEBUG = true;
 const debugFile = await open(DEBUG_FILE, 'a');
 
 const [, , depth, fen, movesString] = argv;
+
+if (depth.length == 0) {
+  throw Error('perft was not passed a search depth');
+}
+if (fen.length == 0) {
+  throw Error('perft was not passed a FEN string');
+}
+
 if (DEBUG) {
   debugFile.write(`PERFT CALL ===================\n`);
   debugFile.write(`args ${depth} ${fen} ${movesString}\n`);

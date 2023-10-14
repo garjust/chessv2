@@ -5,9 +5,9 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "build:engine": "vite build -c config/engine-vite.config.ts",
+    "build:perft": "vite build -c config/perft-vite.config.ts",
     "serve": "vite preview",
-    "build:engine": "webpack-cli -c config/engine-webpack.config.js",
-    "build:perft": "webpack-cli -c config/perft-webpack.config.js",
     "lint": "eslint --ext .ts,.tsx,.js src",
     "test": "vitest src/",
     "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""

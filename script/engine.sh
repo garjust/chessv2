@@ -1,1 +1,1 @@
-node dist/engine.js
+node build/engine.mjs

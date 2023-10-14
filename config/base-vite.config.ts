@@ -1,0 +1,11 @@
+/// <reference types="vitest" />
+import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
+
+export default {
+  build: {
+    outDir: 'build',
+  },
+  plugins: [svgr(), react()],
+  clearScreen: false,
+};
