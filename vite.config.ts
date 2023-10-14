@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
-import baseConfig from './config/base-vite.config';
+import { base } from './config/base';
 
-export default defineConfig(() => {
-  return baseConfig;
+export default defineConfig({
+  plugins: [base()],
 });
