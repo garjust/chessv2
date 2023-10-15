@@ -63,15 +63,13 @@ export default class Iterative implements ChessComputer {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    const [timer, timerCleanup] = await loadTimer(
-      `${this.label}-search`,
-      timeout,
-    );
-    const [depthTimer, depthTimerCleanup] = await loadTimer(
-      `${this.label}-search-for-depth`,
-      0,
-      false,
-    );
+    const [timer, timerCleanup] = await loadTimer(timeout, {
+      label: `${this.label}-search`,
+    });
+    const [depthTimer, depthTimerCleanup] = await loadTimer(0, {
+      autoStart: false,
+      label: `${this.label}-search-for-depth`,
+    });
     this.context.state.timer = depthTimer;
 
     for (let i = INITIAL_DEPTH; i <= this.maxDepth; i++) {
