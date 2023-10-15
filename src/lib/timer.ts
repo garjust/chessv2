@@ -19,7 +19,7 @@ export default class Timer {
 
   value;
   _lastTick = 0;
-  _tickerId?: NodeJS.Timer;
+  _tickerId?: NodeJS.Timeout;
 
   constructor(
     timeout: number,
