@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-svgr/client" />
 export { ReactComponent as Bishop } from './bishop.svg';
 export { ReactComponent as King } from './king.svg';
 export { ReactComponent as Knight } from './knight.svg';
