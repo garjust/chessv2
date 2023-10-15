@@ -2,8 +2,6 @@ import { Remote, wrap } from 'comlink';
 import Timer, { TimerConstructor } from '../../lib/timer';
 import { Registry, Version } from '../ai';
 import { ChessComputer, ChessComputerConstructor } from '../ai/chess-computer';
-import Engine from '../engine';
-import { Position } from '../types';
 import { UCIChessComputer } from '../ai/uci-computer';
 
 export const loadPerft = async (): Promise<
@@ -13,17 +11,6 @@ export const loadPerft = async (): Promise<
     type: 'module',
   });
   return [worker, () => worker.terminate()];
-};
-
-export const loadEngine = async (
-  position?: Position,
-): Promise<[engine: Remote<Engine>, cleanup: () => void]> => {
-  const worker = new Worker(new URL('./engine', import.meta.url), {
-    type: 'module',
-  });
-  const RemoteEngine = wrap<{ new (position?: Position): Engine }>(worker);
-  const engine = await new RemoteEngine(position);
-  return [engine, () => worker.terminate()];
 };
 
 export const loadComputer = async (
