@@ -1,5 +1,5 @@
 import { Remote, wrap } from 'comlink';
-import Timer, { TimerConstructor } from '../../lib/timer';
+import Timer from '../../lib/timer';
 import { Registry, Version } from '../ai';
 import { ChessComputer, ChessComputerConstructor } from '../ai/chess-computer';
 import { UCIChessComputer } from '../ai/uci-computer';
@@ -49,11 +49,22 @@ export const loadTimer = async (
   timeout: number,
   autoStart = true,
 ): Promise<[timer: Remote<Timer>, cleanup: () => void]> => {
-  const worker = new Worker(new URL('./timer', import.meta.url), {
-    type: 'module',
-  });
-  const RemoteTimer = wrap<TimerConstructor>(worker);
-  const timer = await new RemoteTimer(timeout, { label, autoStart });
+  if (Worker) {
+    const worker = new Worker(new URL('./timer', import.meta.url), {
+      type: 'module',
+    });
+    const RemoteTimer = wrap<typeof Timer>(worker);
+    const timer = await new RemoteTimer(timeout, { label, autoStart });
+    return [timer, () => worker.terminate()];
+  } else {
+    const { Worker } = await import('node:worker_threads');
+    const { default: nodeEndpoint } = await import(
+      'comlink/dist/esm/node-adapter'
+    );
 
-  return [timer, () => worker.terminate()];
+    const worker = new Worker(new URL('./timer', import.meta.url));
+    const RemoteTimer = wrap<typeof Timer>(nodeEndpoint(worker));
+    const timer = await new RemoteTimer(timeout, { label, autoStart });
+    return [timer, () => worker.terminate()];
+  }
 };

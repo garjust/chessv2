@@ -1,17 +1,5 @@
 import { formatNumber } from './formatter';
 
-export type TimerConstructor = {
-  new (
-    timeout: number,
-    options: {
-      label?: string;
-      tickRate?: number;
-      autoStart?: boolean;
-      debug?: boolean;
-    },
-  ): Timer;
-};
-
 export default class Timer {
   readonly label;
   readonly tickRate;
