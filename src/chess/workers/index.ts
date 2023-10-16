@@ -5,14 +5,14 @@ import { ChessComputer, ChessComputerConstructor } from '../ai/chess-computer';
 import { UCIChessComputer } from '../ai/uci-computer';
 import nodeEndpoint from 'comlink/dist/esm/node-adapter';
 
-// export const loadPerft = async (): Promise<
-//   [worker: Worker, cleanup: () => void]
-// > => {
-//   const worker = new Worker(new URL('./perft', import.meta.url), {
-//     type: 'module',
-//   });
-//   return [worker, () => worker.terminate()];
-// };
+export const loadPerft = async (): Promise<
+  [worker: Worker, cleanup: () => void]
+> => {
+  const worker = new Worker(new URL('./perft', import.meta.url), {
+    type: 'module',
+  });
+  return [worker, () => worker.terminate()];
+};
 
 export const loadComputer = async (
   version: Version,
