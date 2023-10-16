@@ -1,7 +1,7 @@
 import { Update } from '../../lib/workflow';
 import { Color, PieceType, Square } from '../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN } from '../lib/fen';
+import { parseFEN, formatPosition } from '../lib/fen';
 import {
   movePieceAction,
   overlaySquaresAction,
@@ -27,29 +27,41 @@ import {
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
-import { loadComputer } from '../workers';
+import { loadSearchEngine } from '../workers';
 import { EVALUATION_DIVIDER } from '../engine/evaluation';
-import { Version, LATEST } from '../ai';
+import { Version, LATEST } from '../ai/registry';
+import { UCICommandAction } from '../lib/uci/action';
+import { UCIResponse } from '../lib/uci/uci-response';
 
 export type Context = {
   engine: Engine;
 };
 
-const COMPUTER_VERISON: Version = LATEST;
+const COMPUTER_VERSION: Version = LATEST;
 
 function handleAttemptComputerMove(state: State): Update<State, Action> {
   const { position, players } = state;
   const playerForTurn = players[position.turn];
 
   if (playerForTurn !== HumanPlayer) {
+    playerForTurn.searchEngine.emit(
+      // TODO: pass moves?
+      UCICommandAction.positionAction(formatPosition(state.position), []),
+    );
     return [
       state,
       () =>
         from(
-          playerForTurn.ai
-            .nextMove(position)
+          playerForTurn.searchEngine
+            // TODO: wait for result somehow
+            .emit(
+              UCICommandAction.goAction({
+                depth: 10,
+              }),
+            )
             .then(async (move) => {
-              const diagnostics = await playerForTurn.ai.diagnosticsResult;
+              const diagnostics =
+                await playerForTurn.searchEngine.diagnosticsResult;
               console.log(diagnostics?.logString, diagnostics);
 
               return move;
@@ -151,17 +163,33 @@ function handleLoadChessComputer(
   const player = players[playingAs];
 
   if (player === HumanPlayer) {
+    const responseFunc = (response: UCIResponse) => {};
     return [
       state,
       () =>
         from(
-          loadComputer(COMPUTER_VERISON)
+          loadSearchEngine(COMPUTER_VERSION, 10)
             .then(([instance, cleanup]) => {
+              console.log('stuff');
+
+              instance.emit(UCICommandAction.uciAction());
+              // TOOD: wait for uciok
+
+              instance.emit(UCICommandAction.uciNewGameAction());
+              instance.emit(UCICommandAction.isReadyAction());
+              // TODO: wait for the readyok somehow.
+              console.log('stuff');
               return Promise.all([instance, cleanup, instance.label]);
             })
             .then(([instance, cleanup, label]) =>
               chessComputerLoadedAction(
-                { ai: instance, label, cleanup, __computer: true },
+                {
+                  searchEngine: instance,
+                  responseFunc,
+                  label,
+                  cleanup,
+                  __computer: true,
+                },
                 playingAs,
               ),
             ),

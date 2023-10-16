@@ -1,8 +1,6 @@
 import { Remote, wrap } from 'comlink';
 import Timer from '../../lib/timer';
-import { Registry, Version } from '../ai';
-import { ChessComputer, ChessComputerConstructor } from '../ai/chess-computer';
-import { UCIChessComputer } from '../ai/uci-computer';
+import { SearchEngine } from '../ai/search-engine';
 import nodeEndpoint from 'comlink/dist/esm/node-adapter';
 
 export const loadPerft = async (): Promise<
@@ -14,46 +12,45 @@ export const loadPerft = async (): Promise<
   return [worker, () => worker.terminate()];
 };
 
-export const loadComputer = async (
-  version: Version,
-  ...args: ConstructorParameters<ChessComputerConstructor>
-): Promise<[computer: Remote<ChessComputer>, cleanup: () => void]> => {
-  let RemoteClass: Remote<typeof Registry>;
+export const loadSearchEngine = async (
+  ...args: ConstructorParameters<typeof SearchEngine>
+): Promise<[uciComputer: Remote<SearchEngine>, cleanup: () => void]> => {
+  let RemoteClass: Remote<typeof SearchEngine>;
   let cleanup: () => void;
 
   if (Worker) {
-    const worker = new Worker(new URL('./ai', import.meta.url), {
+    const worker = new Worker(new URL('./search-engine', import.meta.url), {
       type: 'module',
     });
-    RemoteClass = wrap<typeof Registry>(worker);
+    RemoteClass = wrap<typeof SearchEngine>(worker);
     cleanup = () => worker.terminate();
   } else {
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./ai', import.meta.url));
-    RemoteClass = wrap<typeof Registry>(nodeEndpoint(worker));
+    const worker = new Worker(new URL('./search-engine', import.meta.url));
+    RemoteClass = wrap<typeof SearchEngine>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
 
-  const instance = await new RemoteClass[version](...args);
+  const instance = await new RemoteClass(...args);
   return [instance, cleanup];
 };
 
-export const loadUCIComputer = async (
-  ...args: ConstructorParameters<typeof UCIChessComputer>
-): Promise<[uciComputer: Remote<UCIChessComputer>, cleanup: () => void]> => {
-  let RemoteClass: Remote<typeof UCIChessComputer>;
+export const WHATDO = async (
+  ...args: ConstructorParameters<typeof SearchEngine>
+): Promise<[uciComputer: Remote<SearchEngine>, cleanup: () => void]> => {
+  let RemoteClass: Remote<typeof SearchEngine>;
   let cleanup: () => void;
 
   if (Worker) {
-    const worker = new Worker(new URL('./uci-ai', import.meta.url), {
+    const worker = new Worker(new URL('./search-engine', import.meta.url), {
       type: 'module',
     });
-    RemoteClass = wrap<typeof UCIChessComputer>(worker);
+    RemoteClass = wrap<typeof SearchEngine>(worker);
     cleanup = () => worker.terminate();
   } else {
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./uci-ai', import.meta.url));
-    RemoteClass = wrap<typeof UCIChessComputer>(nodeEndpoint(worker));
+    const worker = new Worker(new URL('./search-engine', import.meta.url));
+    RemoteClass = wrap<typeof SearchEngine>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
 

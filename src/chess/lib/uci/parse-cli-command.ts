@@ -63,7 +63,7 @@ export const parse = (commandString: string): Action => {
     case 'debug':
       // eslint-disable-next-line no-case-declarations
       const [boolValue] = args;
-      return UCICommandAction.debugAction(boolValue == 'true');
+      return UCICommandAction.debugAction(boolValue == 'on');
     case 'isready':
       return UCICommandAction.isReadyAction();
     case 'setoption': {

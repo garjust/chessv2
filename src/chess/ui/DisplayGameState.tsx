@@ -1,6 +1,6 @@
 import React from 'react';
 import { State } from '../workflow';
-import { ChessComputerWrapped } from '../workflow/state';
+import { WrappedSearchEngine } from '../workflow/state';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
 import { useWorkflow } from './workflow';
@@ -44,7 +44,7 @@ function replacer(key: string, value: unknown) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((value as any).__computer) {
-      return (value as ChessComputerWrapped).label;
+      return (value as WrappedSearchEngine).label;
     }
   }
 

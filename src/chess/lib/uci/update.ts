@@ -12,7 +12,7 @@ import { moveFromString } from '../../move-notation';
 export type Context = {
   ai: ChessComputer;
   engine: Engine;
-  sendUCIResponse: (response: string) => void;
+  sendUCIResponse: (response: UCIResponse) => void;
 };
 
 const respondWith =
@@ -113,8 +113,7 @@ function handleRespond(
   action: Action.Internal.Respond,
   context: Context,
 ): Update<State, Action> {
-  toUCIString(action.response).map(context.sendUCIResponse);
-
+  context.sendUCIResponse(action.response);
   return [state, null];
 }
 

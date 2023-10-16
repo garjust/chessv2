@@ -1,5 +1,5 @@
 import { Color, Move, Position, Square } from '../types';
-import { ChessComputerWrapped } from './state';
+import { WrappedSearchEngine } from './state';
 
 export enum Type {
   AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
@@ -30,7 +30,7 @@ export declare namespace Action {
 
   export interface ChessComputerLoaded {
     readonly type: Type.ChessComputerLoaded;
-    readonly instance: ChessComputerWrapped;
+    readonly instance: WrappedSearchEngine;
     readonly color: Color;
   }
 
@@ -115,7 +115,7 @@ export const changeOverlayAction = (): Action.ChangeOverlay => ({
 });
 
 export const chessComputerLoadedAction = (
-  instance: ChessComputerWrapped,
+  instance: WrappedSearchEngine,
   color: Color,
 ): Action.ChessComputerLoaded => ({
   type: Type.ChessComputerLoaded,

@@ -1,29 +1,30 @@
 import readline from 'readline';
-import init, { createState } from '../chess/lib/uci';
-import { parse } from '../chess/lib/uci/parse-cli-command';
-import Engine from '../chess/engine';
 import { UCICommandAction } from '../chess/lib/uci/action';
-import Iterative from '../chess/ai/algorithms/iterative';
+import { LATEST, Version } from '../chess/ai/registry';
+import { SearchEngine } from '../chess/ai/search-engine';
+import { parse } from '../chess/lib/uci/parse-cli-command';
+import { UCIResponse, toUCIString } from '../chess/lib/uci/uci-response';
 
 const DEBUG = true;
+
+const SEARCH_VERSION: Version = LATEST;
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   terminal: false,
 });
+const responseFunc = (response: UCIResponse) => {
+  toUCIString(response).map((str: string) => rl.write(`${str}\n`));
+};
 
-const { emit } = init(createState(), {
-  engine: new Engine(),
-  ai: new Iterative(10),
-  sendUCIResponse: (response: string) => rl.write(`${response}\n`),
-});
+const searchEngine = new SearchEngine(SEARCH_VERSION, 10, responseFunc);
 
 if (DEBUG) {
-  emit(UCICommandAction.debugAction(true));
+  searchEngine.emit(UCICommandAction.debugAction(true));
 }
 
 rl.on('line', (line) => {
   const action = parse(line);
-  emit(action);
+  searchEngine.emit(action);
 });

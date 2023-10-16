@@ -13,7 +13,3 @@ export interface UCIChessComputerI {
   get diagnosticsResult(): DiagnosticsResult | null;
   get label(): string;
 }
-
-export interface ChessComputerConstructor {
-  new (maxDepth?: number): ChessComputer;
-}

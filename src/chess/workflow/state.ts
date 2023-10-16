@@ -1,5 +1,4 @@
 import { Remote } from 'comlink';
-import { ChessComputer } from '../ai/chess-computer';
 import { FEN_LIBRARY, parseFEN } from '../lib/fen';
 import {
   Color,
@@ -10,6 +9,8 @@ import {
   MoveWithExtraData,
   SquareControlObject,
 } from '../types';
+import { SearchEngine } from '../ai/search-engine';
+import { UCIResponse } from '../lib/uci/uci-response';
 
 export enum SquareLabel {
   None = 'NONE',
@@ -37,9 +38,10 @@ export enum SquareOverlayCategory {
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
-export type ChessComputerWrapped = {
-  ai: Remote<ChessComputer>;
+export type WrappedSearchEngine = {
+  searchEngine: Remote<SearchEngine>;
   label: string;
+  responseFunc: (response: UCIResponse) => void;
   cleanup: () => void;
   // This property is here to indicate to JSON.stringify replacer function
   // what type of object this is to avoid serializing the comlink remote
@@ -48,7 +50,7 @@ export type ChessComputerWrapped = {
   __computer: true;
 };
 
-export type Player = typeof HumanPlayer | ChessComputerWrapped;
+export type Player = typeof HumanPlayer | WrappedSearchEngine;
 
 export interface State {
   debugVersion?: number;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { Registry, LATEST, Version } from '../ai';
+import { Registry, LATEST, Version } from '../ai/registry';
 import { parseFEN } from '../lib/fen';
 import {
   BLACK_CHECKMATE,
@@ -10,7 +10,7 @@ import {
   VIENNA_OPENING,
 } from '../lib/perft';
 import './Debug.css';
-import { loadComputer, loadPerft } from '../workers';
+import { loadSearchEngine, loadPerft } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
 const COMPUTER_DEPTH = 4;
@@ -29,7 +29,11 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const [ai, cleanup] = await loadComputer(LATEST, COMPUTER_DEPTH);
+  const [ai, cleanup] = await loadSearchEngine(
+    LATEST,
+    COMPUTER_DEPTH,
+    (response: string) => {},
+  );
 
   const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
 
