@@ -10,20 +10,26 @@ import { UCIResponse } from '../lib/uci/uci-response';
 // workflow actions
 export class SearchEngine {
   private ai: ChessComputer;
-  emit: (action: Action) => void;
+  #emit: (action: Action) => void;
 
   constructor(
     computer: Version,
     maxDepth: number,
-    responseFunc: (response: UCIResponse) => void,
+    // responseFunc: (response: UCIResponse) => void,
   ) {
+    throw Error('ahhhh');
+    console.log('booting engine');
     this.ai = new Registry[computer](maxDepth);
     const { emit } = init(createState(), {
       engine: new Engine(),
       ai: this.ai,
       sendUCIResponse: responseFunc,
     });
-    this.emit = emit;
+    this.#emit = emit;
+  }
+
+  emit(action: Action) {
+    this.#emit(action);
   }
 
   get diagnosticsResult() {

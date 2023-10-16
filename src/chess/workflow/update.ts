@@ -170,15 +170,12 @@ function handleLoadChessComputer(
         from(
           loadSearchEngine(COMPUTER_VERSION, 10)
             .then(([instance, cleanup]) => {
-              console.log('stuff');
-
               instance.emit(UCICommandAction.uciAction());
               // TOOD: wait for uciok
 
               instance.emit(UCICommandAction.uciNewGameAction());
               instance.emit(UCICommandAction.isReadyAction());
               // TODO: wait for the readyok somehow.
-              console.log('stuff');
               return Promise.all([instance, cleanup, instance.label]);
             })
             .then(([instance, cleanup, label]) =>
