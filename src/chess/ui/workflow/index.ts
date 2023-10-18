@@ -4,10 +4,11 @@ import type { Action } from './action';
 import { update, Context } from './update';
 
 export type { State } from './state';
-export { createState } from './state';
-export type { Action } from './action';
-export { Type } from './action';
+export type { Action, Type } from './action';
 export type { Context } from './update';
+
+export { createState } from './state';
+export * from './action';
 export { update } from './update';
 
 const init = (seed: State, context: Context) =>

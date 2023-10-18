@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState, Type } from './workflow';
+import init, { createState } from './workflow';
 import { updateLogger } from '../../lib/workflow';
 import {
+  Type,
   setPositionFromFENAction,
   tickPlayersClockAction,
 } from './workflow/action';

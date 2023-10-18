@@ -3,14 +3,22 @@ import { Color, PieceType, Square } from '../../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../../utils';
 import { parseFEN, formatPosition } from '../../lib/fen';
 import {
+  Type,
   movePieceAction,
   overlaySquaresAction,
   setPositionAction,
   attemptComputerMoveAction,
   receiveComputerMoveAction,
   chessComputerLoadedAction,
+  ChessComputerLoadedAction,
+  ClickSquareAction,
+  LoadChessComputerAction,
+  ReceiveComputerMoveAction,
+  MovePieceAction,
+  SetPositionAction,
+  SetPositionFromFENAction,
 } from './action';
-import { State, Action, Type } from './index';
+import { State, Action } from './index';
 import {
   SquareOverlayType,
   pieceInSquare,
@@ -96,7 +104,7 @@ function handleChangeOverlay(state: State): Update<State, Action> {
 
 function handleChessComputerLoaded(
   state: State,
-  action: Action.ChessComputerLoaded,
+  action: ChessComputerLoadedAction,
 ): Update<State, Action> {
   const { instance, color } = action;
 
@@ -114,7 +122,7 @@ function handleChessComputerLoaded(
 
 function handleClickSquare(
   state: State,
-  action: Action.ClickSquare,
+  action: ClickSquareAction,
 ): Update<State, Action> {
   const { square } = action;
   const { position } = state;
@@ -152,7 +160,7 @@ function handleFlipBoard(state: State): Update<State, Action> {
 
 function handleLoadChessComputer(
   state: State,
-  action: Action.LoadChessComputer,
+  action: LoadChessComputerAction,
 ): Update<State, Action> {
   const { playingAs } = action;
   const { players } = state;
@@ -244,7 +252,7 @@ function handlePreviousPosition(
 
 function handleReceiveComputerMove(
   state: State,
-  action: Action.ReceiveComputerMove,
+  action: ReceiveComputerMoveAction,
 ): Update<State, Action> {
   const { move } = action;
   return [state, () => movePieceAction(move)];
@@ -256,7 +264,7 @@ function handleResetOverlay(state: State): Update<State, Action> {
 
 function handleMovePiece(
   state: State,
-  action: Action.MovePiece,
+  action: MovePieceAction,
   { engine }: Context,
 ): Update<State, Action> {
   const { move } = action;
@@ -313,7 +321,7 @@ function handleMovePiece(
 
 function handleSetPosition(
   state: State,
-  action: Action.SetPosition,
+  action: SetPositionAction,
   { engine }: Context,
 ): Update<State, Action> {
   const { position } = action;
@@ -374,7 +382,7 @@ function handleSetPosition(
 
 function handleSetPositionFromFEN(
   state: State,
-  action: Action.SetPositionFromFEN,
+  action: SetPositionFromFENAction,
   { engine }: Context,
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);

@@ -19,166 +19,164 @@ export enum Type {
   ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
 }
 
-export declare namespace Action {
-  export interface AttemptComputerMove {
-    readonly type: Type.AttemptComputerMove;
-  }
+export interface AttemptComputerMoveAction {
+  readonly type: Type.AttemptComputerMove;
+}
 
-  export interface ChangeOverlay {
-    readonly type: Type.ChangeOverlay;
-  }
+export interface ChangeOverlayAction {
+  readonly type: Type.ChangeOverlay;
+}
 
-  export interface ChessComputerLoaded {
-    readonly type: Type.ChessComputerLoaded;
-    readonly instance: WrappedSearchEngine;
-    readonly color: Color;
-  }
+export interface ChessComputerLoadedAction {
+  readonly type: Type.ChessComputerLoaded;
+  readonly instance: WrappedSearchEngine;
+  readonly color: Color;
+}
 
-  export interface ClickSquare {
-    readonly type: Type.ClickSquare;
-    readonly square: Square;
-  }
+export interface ClickSquareAction {
+  readonly type: Type.ClickSquare;
+  readonly square: Square;
+}
 
-  export interface FlipBoard {
-    readonly type: Type.FlipBoard;
-  }
+export interface FlipBoardAction {
+  readonly type: Type.FlipBoard;
+}
 
-  export interface LoadChessComputer {
-    readonly type: Type.LoadChessComputer;
-    readonly playingAs: Color;
-  }
+export interface LoadChessComputerAction {
+  readonly type: Type.LoadChessComputer;
+  readonly playingAs: Color;
+}
 
-  export interface MovePiece {
-    readonly type: Type.MovePiece;
-    readonly move: Move;
-  }
+export interface MovePieceAction {
+  readonly type: Type.MovePiece;
+  readonly move: Move;
+}
 
-  export interface OverlaySquares {
-    readonly type: Type.OverlaySquares;
-  }
+export interface OverlaySquaresAction {
+  readonly type: Type.OverlaySquares;
+}
 
-  export interface PreviousPosition {
-    readonly type: Type.PreviousPosition;
-  }
+export interface PreviousPositionAction {
+  readonly type: Type.PreviousPosition;
+}
 
-  export interface ReceiveComputerMove {
-    readonly type: Type.ReceiveComputerMove;
-    readonly move: Move;
-  }
+export interface ReceiveComputerMoveAction {
+  readonly type: Type.ReceiveComputerMove;
+  readonly move: Move;
+}
 
-  export interface ResetOverlay {
-    readonly type: Type.ResetOverlay;
-  }
+export interface ResetOverlayAction {
+  readonly type: Type.ResetOverlay;
+}
 
-  export interface SetPosition {
-    readonly type: Type.SetPosition;
-    readonly position: Position;
-  }
+export interface SetPositionAction {
+  readonly type: Type.SetPosition;
+  readonly position: Position;
+}
 
-  export interface SetPositionFromFEN {
-    readonly type: Type.SetPositionFromFEN;
-    readonly fenString: string;
-  }
+export interface SetPositionFromFENAction {
+  readonly type: Type.SetPositionFromFEN;
+  readonly fenString: string;
+}
 
-  export interface TickPlayersClock {
-    readonly type: Type.TickPlayersClock;
-  }
+export interface TickPlayersClockAction {
+  readonly type: Type.TickPlayersClock;
+}
 
-  export interface ToggleSquareLabels {
-    readonly type: Type.ToggleSquareLabels;
-  }
+export interface ToggleSquareLabelsAction {
+  readonly type: Type.ToggleSquareLabels;
 }
 
 export type Action =
-  | Action.AttemptComputerMove
-  | Action.ChangeOverlay
-  | Action.ChessComputerLoaded
-  | Action.ClickSquare
-  | Action.FlipBoard
-  | Action.LoadChessComputer
-  | Action.OverlaySquares
-  | Action.PreviousPosition
-  | Action.ReceiveComputerMove
-  | Action.ResetOverlay
-  | Action.MovePiece
-  | Action.SetPosition
-  | Action.SetPositionFromFEN
-  | Action.TickPlayersClock
-  | Action.ToggleSquareLabels;
+  | AttemptComputerMoveAction
+  | ChangeOverlayAction
+  | ChessComputerLoadedAction
+  | ClickSquareAction
+  | FlipBoardAction
+  | LoadChessComputerAction
+  | OverlaySquaresAction
+  | PreviousPositionAction
+  | ReceiveComputerMoveAction
+  | ResetOverlayAction
+  | MovePieceAction
+  | SetPositionAction
+  | SetPositionFromFENAction
+  | TickPlayersClockAction
+  | ToggleSquareLabelsAction;
 
-export const attemptComputerMoveAction = (): Action.AttemptComputerMove => ({
+export const attemptComputerMoveAction = (): AttemptComputerMoveAction => ({
   type: Type.AttemptComputerMove,
 });
 
-export const changeOverlayAction = (): Action.ChangeOverlay => ({
+export const changeOverlayAction = (): ChangeOverlayAction => ({
   type: Type.ChangeOverlay,
 });
 
 export const chessComputerLoadedAction = (
   instance: WrappedSearchEngine,
   color: Color,
-): Action.ChessComputerLoaded => ({
+): ChessComputerLoadedAction => ({
   type: Type.ChessComputerLoaded,
   instance,
   color,
 });
 
-export const clickSquareAction = (square: Square): Action.ClickSquare => ({
+export const clickSquareAction = (square: Square): ClickSquareAction => ({
   type: Type.ClickSquare,
   square,
 });
 
-export const flipBoardAction = (): Action.FlipBoard => ({
+export const flipBoardAction = (): FlipBoardAction => ({
   type: Type.FlipBoard,
 });
 
 export const loadChessComputerAction = (
   playingAs: Color,
-): Action.LoadChessComputer => ({
+): LoadChessComputerAction => ({
   type: Type.LoadChessComputer,
   playingAs,
 });
 
-export const overlaySquaresAction = (): Action.OverlaySquares => ({
+export const overlaySquaresAction = (): OverlaySquaresAction => ({
   type: Type.OverlaySquares,
 });
 
-export const previousPositionAction = (): Action.PreviousPosition => ({
+export const previousPositionAction = (): PreviousPositionAction => ({
   type: Type.PreviousPosition,
 });
 
 export const receiveComputerMoveAction = (
   move: Move,
-): Action.ReceiveComputerMove => ({
+): ReceiveComputerMoveAction => ({
   type: Type.ReceiveComputerMove,
   move,
 });
 
-export const resetOverlayAction = (): Action.ResetOverlay => ({
+export const resetOverlayAction = (): ResetOverlayAction => ({
   type: Type.ResetOverlay,
 });
 
-export const movePieceAction = (move: Move): Action.MovePiece => ({
+export const movePieceAction = (move: Move): MovePieceAction => ({
   type: Type.MovePiece,
   move,
 });
 
-export const setPositionAction = (position: Position): Action.SetPosition => ({
+export const setPositionAction = (position: Position): SetPositionAction => ({
   type: Type.SetPosition,
   position,
 });
 
 export const setPositionFromFENAction = (
   fenString: string,
-): Action.SetPositionFromFEN => ({
+): SetPositionFromFENAction => ({
   type: Type.SetPositionFromFEN,
   fenString,
 });
 
-export const tickPlayersClockAction = (): Action.TickPlayersClock => ({
+export const tickPlayersClockAction = (): TickPlayersClockAction => ({
   type: Type.TickPlayersClock,
 });
 
-export const toggleSquareLabelsAction = (): Action.ToggleSquareLabels => ({
+export const toggleSquareLabelsAction = (): ToggleSquareLabelsAction => ({
   type: Type.ToggleSquareLabels,
 });
