@@ -2,8 +2,16 @@ import { from } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Engine from '../../engine';
 import { parseFEN } from '../fen';
-import { respondAction } from './action';
-import { State, Action, Type } from './index';
+import {
+  Action,
+  DebugAction,
+  GoAction,
+  InternalType,
+  PositionAction,
+  RespondAction,
+  respondAction,
+} from './action';
+import { State, Type } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
 import { ChessComputer } from '../../ai/chess-computer';
 import { moveFromString } from '../../move-notation';
@@ -35,10 +43,7 @@ function handleUCI(state: State): Update<State, Action> {
   return [state, respondWith(...responses)];
 }
 
-function handleDebug(
-  state: State,
-  action: Action.UCICommand.Debug,
-): Update<State, Action> {
+function handleDebug(state: State, action: DebugAction): Update<State, Action> {
   return [{ ...state, debug: action.value }, null];
 }
 
@@ -60,7 +65,7 @@ function handleUCINewGame(state: State): Update<State, Action> {
 
 function handlePosition(
   state: State,
-  action: Action.UCICommand.Position,
+  action: PositionAction,
   context: Context,
 ): Update<State, Action> {
   const { fen, moves } = action;
@@ -77,7 +82,7 @@ function handlePosition(
 
 function handleGo(
   state: State,
-  action: Action.UCICommand.Go,
+  action: GoAction,
   context: Context,
 ): Update<State, Action> {
   // Call engine to do stuff.
@@ -110,7 +115,7 @@ function handleQuit(state: State): Update<State, Action> {
 
 function handleRespond(
   state: State,
-  action: Action.Internal.Respond,
+  action: RespondAction,
   context: Context,
 ): Update<State, Action> {
   context.sendUCIResponse(action.response);
@@ -121,29 +126,29 @@ export const update =
   (context: Context) =>
   (state: State, action: Action): Update<State, Action> => {
     switch (action.type) {
-      case Type.UCICommand.UCI:
+      case Type.UCI:
         return handleUCI(state);
-      case Type.UCICommand.Debug:
+      case Type.Debug:
         return handleDebug(state, action);
-      case Type.UCICommand.IsReady:
+      case Type.IsReady:
         return handleIsReady(state);
-      case Type.UCICommand.SetOption:
+      case Type.SetOption:
         return handleSetOption(state);
-      case Type.UCICommand.Register:
+      case Type.Register:
         return handleRegister(state);
-      case Type.UCICommand.UCINewGame:
+      case Type.UCINewGame:
         return handleUCINewGame(state);
-      case Type.UCICommand.Position:
+      case Type.Position:
         return handlePosition(state, action, context);
-      case Type.UCICommand.Go:
+      case Type.Go:
         return handleGo(state, action, context);
-      case Type.UCICommand.Stop:
+      case Type.Stop:
         return handleStop(state, context);
-      case Type.UCICommand.PonderHit:
+      case Type.PonderHit:
         return handlePonderHit(state);
-      case Type.UCICommand.Quit:
+      case Type.Quit:
         return handleQuit(state);
-      case Type.Internal.Respond:
+      case InternalType.Respond:
         return handleRespond(state, action, context);
     }
   };

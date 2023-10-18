@@ -15,189 +15,165 @@ export type GoCommand = Partial<{
   infinite: boolean;
 }>;
 
-export declare namespace Type {
-  enum UCICommand {
-    UCI = 'UCI',
-    Debug = 'DEBUG',
-    IsReady = 'IS_READY',
-    SetOption = 'SET_OPTION',
-    Register = 'REGISTER',
-    UCINewGame = 'UCI_NEW_GAME',
-    Position = 'POSITION',
-    Go = 'GO',
-    Stop = 'STOP',
-    PonderHit = 'PONDER_HIT',
-    Quit = 'QUIT',
-  }
+export enum Type {
+  UCI = 'UCI',
+  Debug = 'DEBUG',
+  IsReady = 'IS_READY',
+  SetOption = 'SET_OPTION',
+  Register = 'REGISTER',
+  UCINewGame = 'UCI_NEW_GAME',
+  Position = 'POSITION',
+  Go = 'GO',
+  Stop = 'STOP',
+  PonderHit = 'PONDER_HIT',
+  Quit = 'QUIT',
+}
 
-  enum Internal {
-    Respond = 'RESPOND',
-  }
+export enum InternalType {
+  Respond = 'RESPOND',
 }
 
 // Spec: https://backscattering.de/chess/uci/
-export declare namespace Action {
-  export namespace UCICommand {
-    // Initialization command. engine should expect this command after start
-    // to set UCI mode. More useful when an engine program can operate in other
-    // modes.
-    export interface UCI {
-      readonly type: Type.UCICommand.UCI;
-    }
+// Initialization command. engine should expect this command after start
+// to set UCI mode. More useful when an engine program can operate in other
+// modes.
+export interface UCIAction {
+  readonly type: Type.UCI;
+}
 
-    export interface Debug {
-      readonly type: Type.UCICommand.Debug;
-      readonly value: boolean;
-    }
+export interface DebugAction {
+  readonly type: Type.Debug;
+  readonly value: boolean;
+}
 
-    // Used to synchronize with the engine.
-    // - Should always be sent after initialization before a first search
-    // - Can be sent when engine is calculating (and respond immediately without
-    // interupting search)
-    export interface IsReady {
-      readonly type: Type.UCICommand.IsReady;
-    }
+// Used to synchronize with the engine.
+// - Should always be sent after initialization before a first search
+// - Can be sent when engine is calculating (and respond immediately without
+// interupting search)
+export interface IsReadyAction {
+  readonly type: Type.IsReady;
+}
 
-    // Set an option the engine supports
-    export interface SetOption {
-      readonly type: Type.UCICommand.SetOption;
-      readonly name: EngineOptionName;
-      readonly value: string;
-    }
+// Set an option the engine supports
+export interface SetOptionAction {
+  readonly type: Type.SetOption;
+  readonly name: EngineOptionName;
+  readonly value: string;
+}
 
-    export interface Register {
-      readonly type: Type.UCICommand.Register;
-    }
+export interface RegisterAction {
+  readonly type: Type.Register;
+}
 
-    // Instruct the engine the next position and search will be a new game
-    export interface UCINewGame {
-      readonly type: Type.UCICommand.UCINewGame;
-    }
+// Instruct the engine the next position and search will be a new game
+export interface UCINewGameAction {
+  readonly type: Type.UCINewGame;
+}
 
-    // Set the chess position.
-    export interface Position {
-      readonly type: Type.UCICommand.Position;
-      readonly fen: string;
-      readonly moves: string[];
-    }
+// Set the chess position.
+export interface PositionAction {
+  readonly type: Type.Position;
+  readonly fen: string;
+  readonly moves: string[];
+}
 
-    // Run a search in the current position!
-    export interface Go {
-      readonly type: Type.UCICommand.Go;
-      readonly command: GoCommand;
-    }
+// Run a search in the current position!
+export interface GoAction {
+  readonly type: Type.Go;
+  readonly command: GoCommand;
+}
 
-    // Stop caluclating as soon as possible.
-    export interface Stop {
-      readonly type: Type.UCICommand.Stop;
-    }
+// Stop caluclating as soon as possible.
+export interface StopAction {
+  readonly type: Type.Stop;
+}
 
-    //
-    export interface PonderHit {
-      readonly type: Type.UCICommand.PonderHit;
-    }
+//
+export interface PonderHitAction {
+  readonly type: Type.PonderHit;
+}
 
-    // Quit the engine program.
-    export interface Quit {
-      readonly type: Type.UCICommand.Quit;
-    }
-  }
+// Quit the engine program.
+export interface QuitAction {
+  readonly type: Type.Quit;
+}
 
-  export namespace Internal {
-    export interface Respond {
-      readonly type: Type.Internal.Respond;
-      readonly response: UCIResponse;
-    }
-  }
+export interface RespondAction {
+  readonly type: InternalType.Respond;
+  readonly response: UCIResponse;
 }
 
 export type Action =
-  | Action.UCICommand.UCI
-  | Action.UCICommand.Debug
-  | Action.UCICommand.IsReady
-  | Action.UCICommand.SetOption
-  | Action.UCICommand.Register
-  | Action.UCICommand.UCINewGame
-  | Action.UCICommand.Position
-  | Action.UCICommand.Go
-  | Action.UCICommand.Stop
-  | Action.UCICommand.PonderHit
-  | Action.UCICommand.Quit
-  | Action.Internal.Respond;
+  | UCIAction
+  | DebugAction
+  | IsReadyAction
+  | SetOptionAction
+  | RegisterAction
+  | UCINewGameAction
+  | PositionAction
+  | GoAction
+  | StopAction
+  | PonderHitAction
+  | QuitAction
+  | RespondAction;
 
-const uciAction = (): Action.UCICommand.UCI => ({
-  type: Type.UCICommand.UCI,
+export const uciAction = (): UCIAction => ({
+  type: Type.UCI,
 });
 
-const debugAction = (value: boolean): Action.UCICommand.Debug => ({
-  type: Type.UCICommand.Debug,
+export const debugAction = (value: boolean): DebugAction => ({
+  type: Type.Debug,
   value,
 });
 
-const isReadyAction = (): Action.UCICommand.IsReady => ({
-  type: Type.UCICommand.IsReady,
+export const isReadyAction = (): IsReadyAction => ({
+  type: Type.IsReady,
 });
 
-const setOptionAction = (
+export const setOptionAction = (
   name: EngineOptionName,
   value: string,
-): Action.UCICommand.SetOption => ({
-  type: Type.UCICommand.SetOption,
+): SetOptionAction => ({
+  type: Type.SetOption,
   name,
   value,
 });
 
-const registerAction = (): Action.UCICommand.Register => ({
-  type: Type.UCICommand.Register,
+export const registerAction = (): RegisterAction => ({
+  type: Type.Register,
 });
 
-const uciNewGameAction = (): Action.UCICommand.UCINewGame => ({
-  type: Type.UCICommand.UCINewGame,
+export const uciNewGameAction = (): UCINewGameAction => ({
+  type: Type.UCINewGame,
 });
 
-const positionAction = (
+export const positionAction = (
   fen: string,
   moves: string[],
-): Action.UCICommand.Position => ({
-  type: Type.UCICommand.Position,
+): PositionAction => ({
+  type: Type.Position,
   fen,
   moves,
 });
 
-const goAction = (command: GoCommand): Action.UCICommand.Go => ({
-  type: Type.UCICommand.Go,
+export const goAction = (command: GoCommand): GoAction => ({
+  type: Type.Go,
   command,
 });
 
-const stopAction = (): Action.UCICommand.Stop => ({
-  type: Type.UCICommand.Stop,
+export const stopAction = (): StopAction => ({
+  type: Type.Stop,
 });
 
-const ponderHitAction = (): Action.UCICommand.PonderHit => ({
-  type: Type.UCICommand.PonderHit,
+export const ponderHitAction = (): PonderHitAction => ({
+  type: Type.PonderHit,
 });
 
-const quitAction = (): Action.UCICommand.Quit => ({
-  type: Type.UCICommand.Quit,
+export const quitAction = (): QuitAction => ({
+  type: Type.Quit,
 });
 
-export const UCICommandAction = {
-  uciAction,
-  debugAction,
-  isReadyAction,
-  setOptionAction,
-  registerAction,
-  uciNewGameAction,
-  positionAction,
-  goAction,
-  stopAction,
-  ponderHitAction,
-  quitAction,
-};
-
-export const respondAction = (
-  response: UCIResponse,
-): Action.Internal.Respond => ({
-  type: Type.Internal.Respond,
+export const respondAction = (response: UCIResponse): RespondAction => ({
+  type: InternalType.Respond,
   response,
 });

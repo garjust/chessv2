@@ -30,8 +30,14 @@ import {
 import { loadSearchEngine } from '../workers';
 import { EVALUATION_DIVIDER } from '../engine/evaluation';
 import { Version, LATEST } from '../ai/registry';
-import { UCICommandAction } from '../lib/uci/action';
 import { UCIResponse } from '../lib/uci/uci-response';
+import {
+  goAction,
+  isReadyAction,
+  positionAction,
+  uciAction,
+  uciNewGameAction,
+} from '../lib/uci';
 
 export type Context = {
   engine: Engine;
@@ -46,7 +52,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   if (playerForTurn !== HumanPlayer) {
     playerForTurn.searchEngine.emit(
       // TODO: pass moves?
-      UCICommandAction.positionAction(formatPosition(state.position), []),
+      positionAction(formatPosition(state.position), []),
     );
     return [
       state,
@@ -55,7 +61,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
           playerForTurn.searchEngine
             // TODO: wait for result somehow
             .emit(
-              UCICommandAction.goAction({
+              goAction({
                 depth: 10,
               }),
             )
@@ -66,7 +72,13 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
 
               return move;
             })
-            .then((move) => receiveComputerMoveAction(move)),
+            .then((move) =>
+              // TODO: fix move
+              receiveComputerMoveAction({
+                from: 0,
+                to: 0,
+              }),
+            ),
         ),
     ];
   } else {
@@ -170,11 +182,11 @@ function handleLoadChessComputer(
         from(
           loadSearchEngine(COMPUTER_VERSION, 10, responseFunc)
             .then(([instance, cleanup]) => {
-              instance.emit(UCICommandAction.uciAction());
+              instance.emit(uciAction());
               // TOOD: wait for uciok
 
-              instance.emit(UCICommandAction.uciNewGameAction());
-              instance.emit(UCICommandAction.isReadyAction());
+              instance.emit(uciNewGameAction());
+              instance.emit(isReadyAction());
               // TODO: wait for the readyok somehow.
               return Promise.all([instance, cleanup, instance.label]);
             })
