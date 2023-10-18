@@ -13,15 +13,14 @@ export class Engine {
   #emit: (action: Action) => void;
 
   constructor(
-    computer: Version,
+    version: Version,
     maxDepth: number,
     responseFunc: (response: UCIResponse) => void,
   ) {
-    console.log('booting engine');
-    this.searchExecutor = new Registry[computer](maxDepth);
+    this.searchExecutor = new Registry[version](maxDepth);
     const { emit } = init(createState(), {
       engine: new Core(),
-      ai: this.searchExecutor,
+      executor: this.searchExecutor,
       sendUCIResponse: responseFunc,
     });
     this.#emit = emit;

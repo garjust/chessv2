@@ -6,6 +6,7 @@ import Context from '../lib/context';
 import { loadTimer } from '../../workers';
 import TimeoutError from '../lib/timeout-error';
 import { SearchResult } from '../lib/types';
+import Logger from '../../../lib/logger';
 
 const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
@@ -28,14 +29,15 @@ const TIMEOUT = 10_000;
 //   would otherwise be (better move ordering, more TTable hits, etc).
 export default class Iterative implements SearchExecutorI {
   maxDepth: number;
-  engine: Core;
+  core: Core;
   diagnostics?: Diagnotics;
   context: Context;
+  logger: Logger;
 
   constructor(maxDepth = MAX_DEPTH) {
     this.maxDepth = maxDepth;
-    this.engine = new Core();
-    this.context = new Context(this.label, maxDepth, this.engine, {
+    this.core = new Core();
+    this.context = new Context(this.label, maxDepth, this.core, {
       pruneNodes: true,
       quiescenceSearch: true,
       moveOrdering: true,
@@ -47,6 +49,7 @@ export default class Iterative implements SearchExecutorI {
       },
       pruneFromTTable: true,
     });
+    this.logger = new Logger('iterative-executor');
   }
 
   get diagnosticsResult() {
@@ -59,7 +62,7 @@ export default class Iterative implements SearchExecutorI {
 
   async nextMove(position: Position, timeout = TIMEOUT) {
     this.diagnostics = undefined;
-    this.engine.position = position;
+    this.core.position = position;
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
@@ -88,8 +91,8 @@ export default class Iterative implements SearchExecutorI {
       await depthTimer.stop();
 
       this.diagnostics = diagnostics;
-      console.log(
-        '[intermediate result]:',
+      this.logger.debug(
+        'intermediate result:',
         this.diagnostics?.result?.logStringLight,
         this.diagnostics.result?.evaluation,
         this.diagnostics?.result?.principleVariation,

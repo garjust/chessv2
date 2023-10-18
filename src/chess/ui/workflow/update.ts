@@ -31,13 +31,7 @@ import { loadEngine } from '../../workers';
 import { EVALUATION_DIVIDER } from '../../core/evaluation';
 import { Version, LATEST } from '../../engine/registry';
 import { UCIResponse } from '../../engine/workflow/uci-response';
-import {
-  goAction,
-  isReadyAction,
-  positionAction,
-  uciAction,
-  uciNewGameAction,
-} from '../../engine/workflow';
+import * as EngineWorkflow from '../../engine/workflow';
 
 export type Context = {
   engine: Core;
@@ -52,7 +46,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   if (playerForTurn !== HumanPlayer) {
     playerForTurn.searchEngine.emit(
       // TODO: pass moves?
-      positionAction(formatPosition(state.position), []),
+      EngineWorkflow.positionAction(formatPosition(state.position), []),
     );
     return [
       state,
@@ -60,11 +54,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
         from(
           playerForTurn.searchEngine
             // TODO: wait for result somehow
-            .emit(
-              goAction({
-                depth: 10,
-              }),
-            )
+            .emit(EngineWorkflow.goAction())
             .then(async (move) => {
               const diagnostics =
                 await playerForTurn.searchEngine.diagnosticsResult;
@@ -72,13 +62,7 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
 
               return move;
             })
-            .then((move) =>
-              // TODO: fix move
-              receiveComputerMoveAction({
-                from: 0,
-                to: 0,
-              }),
-            ),
+            .then((move) => receiveComputerMoveAction(move)),
         ),
     ];
   } else {
@@ -175,18 +159,25 @@ function handleLoadChessComputer(
   const player = players[playingAs];
 
   if (player === HumanPlayer) {
+    // This function needs to be attached to the workflow observables system.
+    // - Emit an "EngineRespond" action?
+    //    if doing this handleEngineRespond could depending on the UCI response
+    //    further emit actions (this is good)
+    // - Do I need to be able to BLOCK waiting for a response? Probably not.
+    //    if anything maybe a loading/waiting indicator/state.
     const responseFunc = (response: UCIResponse) => {};
+
     return [
       state,
       () =>
         from(
           loadEngine(COMPUTER_VERSION, 10, responseFunc)
             .then(([instance, cleanup]) => {
-              instance.emit(uciAction());
+              instance.emit(EngineWorkflow.uciAction());
               // TOOD: wait for uciok
 
-              instance.emit(uciNewGameAction());
-              instance.emit(isReadyAction());
+              instance.emit(EngineWorkflow.uciNewGameAction());
+              instance.emit(EngineWorkflow.isReadyAction());
               // TODO: wait for the readyok somehow.
               return Promise.all([instance, cleanup, instance.label]);
             })

@@ -15,7 +15,7 @@ test('example interaction with UCI engine worker', () => {
 
   const { emit } = init(createState(), {
     engine: new Core(),
-    ai: new Iterative(4),
+    executor: new Iterative(4),
     sendUCIResponse: (response) => responses.push(response),
   });
 

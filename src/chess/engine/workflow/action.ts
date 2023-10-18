@@ -156,9 +156,9 @@ export const positionAction = (
   moves,
 });
 
-export const goAction = (command: GoCommand): GoAction => ({
+export const goAction = (command?: GoCommand): GoAction => ({
   type: Type.Go,
-  command,
+  command: command ? command : {},
 });
 
 export const stopAction = (): StopAction => ({

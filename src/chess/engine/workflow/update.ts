@@ -19,7 +19,7 @@ import { moveFromString } from '../../move-notation';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
-  ai: SearchExecutorI;
+  executor: SearchExecutorI;
   engine: Core;
   sendUCIResponse: (response: UCIResponse) => void;
 };
@@ -87,7 +87,7 @@ function handleGo(
   context: Context,
 ): Update<State, Action> {
   // Call engine to do stuff.
-  const nextMove = context.ai.nextMove(context.engine.position, 500);
+  const nextMove = context.executor.nextMove(context.engine.position, 500);
   nextMove.then();
 
   return [
