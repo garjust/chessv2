@@ -20,7 +20,7 @@ import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
 import { AttackedSquares, Position, ZobristKey } from './types';
 
-export default class Engine {
+export default class Core {
   _position: Position;
   _moveStack: MoveResult[] = [];
   _currentZobrist: CurrentZobrist;
@@ -155,7 +155,7 @@ export default class Engine {
 
 const verifyAttackMap = (
   map: AttackMap,
-  engine: Engine,
+  engine: Core,
   color: Color,
   moves: Move[],
   lastAction: 'makeMove' | 'unmakeMove',

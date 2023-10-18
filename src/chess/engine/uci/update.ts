@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 import { Update } from '../../../lib/workflow';
-import Engine from '../../engine';
-import { parseFEN } from '../fen';
+import Core from '../../core';
+import { parseFEN } from '../../lib/fen';
 import {
   Type,
   Action,
@@ -14,13 +14,13 @@ import {
 } from './action';
 import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
-import { ChessComputer } from '../../ai/chess-computer';
+import { SearchExecutorI } from '../search-executor';
 import { moveFromString } from '../../move-notation';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
-  ai: ChessComputer;
-  engine: Engine;
+  ai: SearchExecutorI;
+  engine: Core;
   sendUCIResponse: (response: UCIResponse) => void;
 };
 

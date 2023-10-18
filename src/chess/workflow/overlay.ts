@@ -1,4 +1,4 @@
-import AttackMap from '../engine/attack-map';
+import AttackMap from '../core/attack-map';
 import { Pin, Square } from '../types';
 import {
   State,

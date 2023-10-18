@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import Engine from '.';
+import Core from '.';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 import { formatPosition, parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { moveFromString } from '../move-notation';
@@ -9,7 +9,7 @@ const N = 1000;
 const MOVES: Move[] = VIENNA_GAMBIT_ACCEPTED_GAME.map(moveFromString);
 
 test('move execution perft', () => {
-  const engine = new Engine(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
+  const engine = new Core(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
   const moves = MOVES;
 
   const now = Date.now();

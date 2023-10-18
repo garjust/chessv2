@@ -1,22 +1,22 @@
-import { ChessComputer } from '../chess-computer';
+import { SearchExecutorI } from '../search-executor';
 import { Position } from '../../types';
-import Engine from '../../engine';
-import Diagnotics from '../search/diagnostics';
-import Context from '../search/context';
+import Core from '../../core';
+import Diagnotics from '../lib/diagnostics';
+import Context from '../lib/context';
 
 const MAX_DEPTH = 4;
 
 // The most basic tree search algorithm (minimax) but optimized to a single
 // recursive function.
-export default class Negamax implements ChessComputer {
+export default class Negamax implements SearchExecutorI {
   maxDepth: number;
-  engine: Engine;
+  engine: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
   constructor(maxDepth = MAX_DEPTH) {
     this.maxDepth = maxDepth;
-    this.engine = new Engine();
+    this.engine = new Core();
     this.context = new Context(this.label, maxDepth, this.engine);
   }
 

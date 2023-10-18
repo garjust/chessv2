@@ -1,6 +1,6 @@
 import Search from '.';
-import Engine from '../../engine';
-import { EVALUATION_DIVIDER, MATE_SCORE } from '../../engine/evaluation';
+import Core from '../../core';
+import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
 import { Move, MoveWithExtraData } from '../../types';
 import { moveString } from '../../move-notation';
 import Diagnostics from './diagnostics';
@@ -35,7 +35,7 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
 // PV from the state, etc.
 export default class Context {
   readonly label: string;
-  readonly engine: Engine;
+  readonly engine: Core;
   readonly configuration: SearchConfiguration;
   readonly state: State;
   diagnostics?: Diagnostics;
@@ -43,7 +43,7 @@ export default class Context {
   constructor(
     label: string,
     maxDepth: number,
-    engine: Engine,
+    engine: Core,
     config: Partial<SearchConfiguration> = {},
   ) {
     this.label = label;

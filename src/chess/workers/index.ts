@@ -1,10 +1,9 @@
 import { Remote, wrap, proxy } from 'comlink';
 import Timer from '../../lib/timer';
-import { SearchEngine } from '../ai/search-engine';
+import { Engine } from '../engine/engine';
 import nodeEndpoint from 'comlink/dist/esm/node-adapter';
 import Logger from '../../lib/logger';
-import { ChessComputerConstructor } from '../ai/chess-computer';
-import { Version } from '../ai/registry';
+import { SearchExecutor } from '../engine/search-executor';
 
 export const loadPerft = async (): Promise<
   [worker: Worker, cleanup: () => void]
@@ -15,9 +14,9 @@ export const loadPerft = async (): Promise<
   return [worker, () => worker.terminate()];
 };
 
-export const loadSearchEngine = async (
-  ...args: ConstructorParameters<typeof SearchEngine>
-): Promise<[uciComputer: Remote<SearchEngine>, cleanup: () => void]> => {
+export const loadEngine = async (
+  ...args: ConstructorParameters<typeof Engine>
+): Promise<[engine: Remote<Engine>, cleanup: () => void]> => {
   const logger = new Logger('worker-init');
 
   for (const arg of args) {
@@ -26,63 +25,62 @@ export const loadSearchEngine = async (
     }
   }
 
-  let RemoteClass: Remote<typeof SearchEngine>;
+  let RemoteClass: Remote<typeof Engine>;
   let cleanup: () => void;
 
   if (Worker) {
-    logger.debug('loading search-engine web worker');
-    const worker = new Worker(new URL('./search-engine', import.meta.url), {
+    logger.debug('loading engine web worker');
+    const worker = new Worker(new URL('./engine', import.meta.url), {
       type: 'module',
     });
     worker.addEventListener('error', (event) => {
-      logger.error('search-engine web worker crashed', event.message, event);
+      logger.error('engine web worker crashed', event.message, event);
     });
-    RemoteClass = wrap<typeof SearchEngine>(worker);
+    RemoteClass = wrap<typeof Engine>(worker);
     cleanup = () => worker.terminate();
   } else {
     logger.debug('loading search engine thread');
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./search-engine', import.meta.url));
-    RemoteClass = wrap<typeof SearchEngine>(nodeEndpoint(worker));
+    const worker = new Worker(new URL('./engine', import.meta.url));
+    RemoteClass = wrap<typeof Engine>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
 
-  logger.debug('creating remote SearchEngine instance');
+  logger.debug('creating remote Engine instance');
   const instance = await new RemoteClass(...args);
-  logger.debug('created remote SearchEngine instance');
+  logger.debug('created remote Engine instance');
   return [instance, cleanup];
 };
 
-export const loadChessComputer = async (
-  version: Version,
-  ...args: ChessComputerConstructor
-): Promise<[uciComputer: Remote<ChessComputer>, cleanup: () => void]> => {
+export const loadSearchExecutor = async (
+  ...args: ConstructorParameters<typeof SearchExecutor>
+): Promise<[executor: Remote<SearchExecutor>, cleanup: () => void]> => {
   const logger = new Logger('worker-init');
 
-  let RemoteClass: Remote<typeof SearchEngine>;
+  let RemoteClass: Remote<typeof SearchExecutor>;
   let cleanup: () => void;
 
   if (Worker) {
-    logger.debug('loading search-engine web worker');
-    const worker = new Worker(new URL('./search-engine', import.meta.url), {
+    logger.debug('loading search-executor web worker');
+    const worker = new Worker(new URL('./search-executor', import.meta.url), {
       type: 'module',
     });
     worker.addEventListener('error', (event) => {
-      logger.error('search-engine web worker crashed', event.message, event);
+      logger.error('search-executor web worker crashed', event.message, event);
     });
-    RemoteClass = wrap<typeof SearchEngine>(worker);
+    RemoteClass = wrap<typeof SearchExecutor>(worker);
     cleanup = () => worker.terminate();
   } else {
-    logger.debug('loading search engine thread');
+    logger.debug('loading search-executor thread');
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./search-engine', import.meta.url));
-    RemoteClass = wrap<typeof SearchEngine>(nodeEndpoint(worker));
+    const worker = new Worker(new URL('./search-executor', import.meta.url));
+    RemoteClass = wrap<typeof SearchExecutor>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
 
-  logger.debug('creating remote SearchEngine instance');
+  logger.debug('creating remote SearchExecutor instance');
   const instance = await new RemoteClass(...args);
-  logger.debug('created remote SearchEngine instance');
+  logger.debug('created remote SearchExecutor instance');
   return [instance, cleanup];
 };
 

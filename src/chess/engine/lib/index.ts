@@ -1,4 +1,4 @@
-import { DRAW_SCORE, MATE_SCORE } from '../../engine/evaluation';
+import { DRAW_SCORE, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
 import type Context from './context';
 import TimeoutError from './timeout-error';

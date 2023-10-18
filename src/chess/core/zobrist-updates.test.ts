@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest';
-import Engine from '.';
+import Core from '.';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { moveFromString } from '../move-notation';
 
 test('vienna accepted game', () => {
-  const engine = new Engine(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
+  const engine = new Core(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
   const moves = VIENNA_GAMBIT_ACCEPTED_GAME.map(moveFromString);
   const initialZobrist = engine.zobrist;
 

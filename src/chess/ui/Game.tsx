@@ -11,7 +11,7 @@ import { WorkflowContext } from './workflow';
 import DisplayGameState from './DisplayGameState';
 import { FEN_LIBRARY } from '../lib/fen';
 import DisplayGameFEN from './DisplayGameFen';
-import Engine from '../engine';
+import Core from '../core';
 import { interval, map } from 'rxjs';
 import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
@@ -20,7 +20,7 @@ const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.STARTING_POSITION_FEN;
 
 const Game = () => {
   const { states, emit, updates } = init(createState(), {
-    engine: new Engine(),
+    engine: new Core(),
   });
 
   updates.subscribe(updateLogger('Chess', [Type.TickPlayersClock]));

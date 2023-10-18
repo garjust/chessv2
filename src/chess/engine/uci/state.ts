@@ -1,5 +1,5 @@
 import { Position } from '../../types';
-import { FEN_LIBRARY, parseFEN } from '../fen';
+import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 
 export interface State {
   debug: boolean;

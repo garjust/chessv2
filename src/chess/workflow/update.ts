@@ -20,27 +20,27 @@ import {
   SquareOverlayCategory,
 } from './state';
 import { from } from 'rxjs';
-import Engine from '../engine';
+import Core from '../core';
 import { play, Sound } from '../ui/audio';
 import {
   setOverlayForAttacks,
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
-import { loadSearchEngine } from '../workers';
-import { EVALUATION_DIVIDER } from '../engine/evaluation';
-import { Version, LATEST } from '../ai/registry';
-import { UCIResponse } from '../lib/uci/uci-response';
+import { loadEngine } from '../workers';
+import { EVALUATION_DIVIDER } from '../core/evaluation';
+import { Version, LATEST } from '../engine/registry';
+import { UCIResponse } from '../engine/uci/uci-response';
 import {
   goAction,
   isReadyAction,
   positionAction,
   uciAction,
   uciNewGameAction,
-} from '../lib/uci';
+} from '../engine/uci';
 
 export type Context = {
-  engine: Engine;
+  engine: Core;
 };
 
 const COMPUTER_VERSION: Version = LATEST;
@@ -180,7 +180,7 @@ function handleLoadChessComputer(
       state,
       () =>
         from(
-          loadSearchEngine(COMPUTER_VERSION, 10, responseFunc)
+          loadEngine(COMPUTER_VERSION, 10, responseFunc)
             .then(([instance, cleanup]) => {
               instance.emit(uciAction());
               // TOOD: wait for uciok

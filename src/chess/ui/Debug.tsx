@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { Registry, LATEST, Version } from '../ai/registry';
+import { Registry, LATEST, Version } from '../engine/registry';
 import { parseFEN } from '../lib/fen';
 import {
   BLACK_CHECKMATE,
@@ -10,7 +10,7 @@ import {
   VIENNA_OPENING,
 } from '../lib/perft';
 import './Debug.css';
-import { loadSearchEngine, loadPerft } from '../workers';
+import { loadPerft, loadSearchExecutor } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
 const COMPUTER_DEPTH = 4;
@@ -29,19 +29,17 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const [ai, cleanup] = await loadSearchEngine(
+  const [searchExecutor, cleanup] = await loadSearchExecutor(
     LATEST,
     COMPUTER_DEPTH,
-    // TODO: fix response func
-    () => {},
   );
 
   const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
 
   for (const test of tests) {
-    await ai.nextMove(parseFEN(test.fen));
+    await searchExecutor.nextMove(parseFEN(test.fen));
 
-    const diagnosticsResult = await ai.diagnosticsResult;
+    const diagnosticsResult = await searchExecutor.diagnosticsResult;
     if (diagnosticsResult) {
       logger.next(diagnosticsResult.logString);
       console.log(diagnosticsResult.label, diagnosticsResult);
@@ -57,30 +55,28 @@ async function runComputerNextMoveTest(
   logger: Observer<string>,
   test: MoveTest,
 ) {
-  const computers = await Promise.all(
+  const searchExecutors = await Promise.all(
     Object.keys(Registry).map(async (version) => {
-      const [ai, cleanup] = await loadSearchEngine(
+      const [searchExecutor, cleanup] = await loadSearchExecutor(
         version as Version,
         COMPUTER_DEPTH,
-        // TODO: fix response func
-        () => {},
       );
       return {
         version: version as Version,
-        ai,
+        searchExecutor,
         cleanup,
       };
     }),
   );
 
-  for (const { version, ai, cleanup } of computers) {
+  for (const { version, searchExecutor, cleanup } of searchExecutors) {
     if (EXCLUDED_COMPUTERS.includes(version)) {
       continue;
     }
 
-    await ai.nextMove(parseFEN(test.fen));
+    await searchExecutor.nextMove(parseFEN(test.fen));
 
-    const diagnosticsResult = await ai.diagnosticsResult;
+    const diagnosticsResult = await searchExecutor.diagnosticsResult;
     if (diagnosticsResult) {
       logger.next(diagnosticsResult.logString);
       console.log(diagnosticsResult.label, diagnosticsResult);

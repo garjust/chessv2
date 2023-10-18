@@ -1,11 +1,11 @@
-import { ChessComputer } from '../chess-computer';
+import { SearchExecutorI } from '../search-executor';
 import { Position } from '../../types';
-import Engine from '../../engine';
-import Diagnotics from '../search/diagnostics';
-import Context from '../search/context';
+import Core from '../../core';
+import Diagnotics from '../lib/diagnostics';
+import Context from '../lib/context';
 import { loadTimer } from '../../workers';
-import TimeoutError from '../search/timeout-error';
-import { SearchResult } from '../search/types';
+import TimeoutError from '../lib/timeout-error';
+import { SearchResult } from '../lib/types';
 
 const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
@@ -26,15 +26,15 @@ const TIMEOUT = 10_000;
 //   than an immediate search at depth N. This is because we create state
 //   during each iteration which can make future iterations faster than they
 //   would otherwise be (better move ordering, more TTable hits, etc).
-export default class Iterative implements ChessComputer {
+export default class Iterative implements SearchExecutorI {
   maxDepth: number;
-  engine: Engine;
+  engine: Core;
   diagnostics?: Diagnotics;
   context: Context;
 
   constructor(maxDepth = MAX_DEPTH) {
     this.maxDepth = maxDepth;
-    this.engine = new Engine();
+    this.engine = new Core();
     this.context = new Context(this.label, maxDepth, this.engine, {
       pruneNodes: true,
       quiescenceSearch: true,

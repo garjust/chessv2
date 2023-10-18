@@ -9,8 +9,8 @@ import {
   MoveWithExtraData,
   SquareControlObject,
 } from '../types';
-import { SearchEngine } from '../ai/search-engine';
-import { UCIResponse } from '../lib/uci/uci-response';
+import { Engine } from '../engine/engine';
+import { UCIResponse } from '../engine/uci/uci-response';
 
 export enum SquareLabel {
   None = 'NONE',
@@ -39,7 +39,7 @@ export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
 export type WrappedSearchEngine = {
-  searchEngine: Remote<SearchEngine>;
+  searchEngine: Remote<Engine>;
   label: string;
   responseFunc: (response: UCIResponse) => void;
   cleanup: () => void;

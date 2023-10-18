@@ -1,8 +1,8 @@
-import { ChessComputer } from '../chess-computer';
+import { SearchExecutorI } from '../search-executor';
 import { Position } from '../../types';
-import Engine from '../../engine';
-import Diagnotics from '../search/diagnostics';
-import Context from '../search/context';
+import Core from '../../core';
+import Diagnotics from '../lib/diagnostics';
+import Context from '../lib/context';
 
 const MAX_DEPTH = 4;
 
@@ -12,15 +12,15 @@ const MAX_DEPTH = 4;
 // This fixes the so called "horizon effect" where the position at a leaf
 // node has an important capture available on the next move. The quiescence
 // search fixes this by only searching capturing moves (to unlimited depth).
-export default class Quiescence implements ChessComputer {
+export default class Quiescence implements SearchExecutorI {
   maxDepth: number;
-  engine: Engine;
+  engine: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
   constructor(maxDepth = MAX_DEPTH) {
     this.maxDepth = maxDepth;
-    this.engine = new Engine();
+    this.engine = new Core();
     this.context = new Context(this.label, maxDepth, this.engine, {
       pruneNodes: true,
       quiescenceSearch: true,

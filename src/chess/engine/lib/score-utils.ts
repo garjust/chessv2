@@ -1,5 +1,5 @@
-import Engine from '../../engine';
-import { EVALUATION_DIVIDER, MATE_SCORE } from '../../engine/evaluation';
+import Core from '../../core';
+import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
 import TranspositionTable from './transposition-table';
 import { NodeType, TranspositionTableEntry } from './types';
@@ -20,7 +20,7 @@ export const humanEvaluation = (score: number, maxDepth: number): string => {
 
 export const extractPV = (
   table: TranspositionTable<TranspositionTableEntry>,
-  engine: Engine,
+  engine: Core,
 ): Move[] => {
   const pv: Move[] = [];
   let i = 0;

@@ -1,5 +1,5 @@
 import { sort } from 'fast-sort';
-import { PieceValue } from '../../engine/evaluation';
+import { PieceValue } from '../../core/evaluation';
 import { squareValueDiff } from '../../lib/heatmaps';
 import { Move, MoveWithExtraData } from '../../types';
 import { moveEquals } from '../../utils';

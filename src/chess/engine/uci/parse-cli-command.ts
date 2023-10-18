@@ -1,5 +1,5 @@
 import { Action } from '.';
-import { FEN_LIBRARY } from '../fen';
+import { FEN_LIBRARY } from '../../lib/fen';
 import {
   GoCommand,
   debugAction,

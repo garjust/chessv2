@@ -1,5 +1,5 @@
 import { parseFEN, FEN_LIBRARY } from './fen';
-import Engine from '../engine';
+import Core from '../core';
 import { moveString } from '../move-notation';
 import { formatNumber } from '../../lib/formatter';
 
@@ -36,7 +36,7 @@ const isCountCorrectForDepthFromStart = (
   return test.counts[depth - 1] === count;
 };
 
-const search = (engine: Engine, depth: number): number => {
+const search = (engine: Core, depth: number): number => {
   const moves = engine.generateMoves();
 
   if (depth === 0) {
@@ -57,7 +57,7 @@ const search = (engine: Engine, depth: number): number => {
 };
 
 export const searchRoot = (
-  engine: Engine,
+  engine: Core,
   depth: number,
 ): { counter: number; counts: Record<string, number> } => {
   const counts: Record<string, number> = {};
@@ -88,7 +88,7 @@ export const run = (
   const results: { depth: number; passed: boolean }[] = [];
 
   for (let i = 1; i <= toDepth; i++) {
-    const engine = new Engine(position);
+    const engine = new Core(position);
     const start = Date.now();
     const { counter } = searchRoot(engine, i);
     const timing = Date.now() - start;

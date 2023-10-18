@@ -6,15 +6,15 @@ import init, {
   setOptionAction,
   uciNewGameAction,
 } from '.';
-import Engine from '../../engine';
-import Iterative from '../../ai/algorithms/iterative';
+import Core from '../../core';
+import Iterative from '../algorithms/iterative';
 import { UCIResponse, toUCI } from './uci-response';
 
 test('example interaction with UCI engine worker', () => {
   let responses: UCIResponse[] = [];
 
   const { emit } = init(createState(), {
-    engine: new Engine(),
+    engine: new Core(),
     ai: new Iterative(4),
     sendUCIResponse: (response) => responses.push(response),
   });

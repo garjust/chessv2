@@ -1,17 +1,17 @@
-import { ChessComputer } from '../chess-computer';
+import { SearchExecutorI } from '../search-executor';
 import { Move, Piece, PieceType, Position, Square } from '../../types';
 import { pluck } from '../../../lib/array';
-import Engine from '../../engine';
-import Diagnotics from '../search/diagnostics';
+import Core from '../../core';
+import Diagnotics from '../lib/diagnostics';
 
 // Just randomly pick a move, with a tiny bit of intelligence to make
 // non-sliding piece moves more often.
-export default class Random implements ChessComputer {
-  engine: Engine;
+export default class Random implements SearchExecutorI {
+  engine: Core;
   diagnostics: Diagnotics;
 
   constructor() {
-    this.engine = new Engine();
+    this.engine = new Core();
     this.diagnostics = new Diagnotics(this.label, 0);
   }
 
