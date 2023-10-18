@@ -39,15 +39,15 @@ const OptionHash = {
   max: 1024,
 };
 
-function optionToResponse(
+const optionToResponse = (
   option: Record<string, string | number | boolean>,
-): string {
+): string => {
   let str = 'option';
   for (const [k, v] of Object.entries(option)) {
     str += ` ${k} ${v}`;
   }
   return str;
-}
+};
 
 export type UCIResponse =
   | { type: UCIResponseType.Id; name: string; author: 'garjust' }
@@ -59,7 +59,7 @@ export type UCIResponse =
   | { type: UCIResponseType.Info; data: Record<InfoKey, string> }
   | { type: UCIResponseType.Option; name: EngineOptionName };
 
-export const toUCIString = (response: UCIResponse): string[] => {
+const toUCIString = (response: UCIResponse): string[] => {
   let str: string;
   switch (response.type) {
     case UCIResponseType.Id:
@@ -89,3 +89,6 @@ export const toUCIString = (response: UCIResponse): string[] => {
       }
   }
 };
+
+export const toUCI = (...responses: UCIResponse[]): string[] =>
+  responses.map((r) => toUCIString(r)).flat();

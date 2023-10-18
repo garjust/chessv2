@@ -32,7 +32,8 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
   const [ai, cleanup] = await loadSearchEngine(
     LATEST,
     COMPUTER_DEPTH,
-    (response: string) => {},
+    // TODO: fix response func
+    () => {},
   );
 
   const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
@@ -58,9 +59,11 @@ async function runComputerNextMoveTest(
 ) {
   const computers = await Promise.all(
     Object.keys(Registry).map(async (version) => {
-      const [ai, cleanup] = await loadComputer(
+      const [ai, cleanup] = await loadSearchEngine(
         version as Version,
         COMPUTER_DEPTH,
+        // TODO: fix response func
+        () => {},
       );
       return {
         version: version as Version,

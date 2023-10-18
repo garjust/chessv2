@@ -1,4 +1,3 @@
-import { Action } from '../lib/uci';
 import { Move, Position } from '../types';
 import { DiagnosticsResult } from './search/diagnostics';
 
@@ -8,8 +7,4 @@ export interface ChessComputer {
   get label(): string;
 }
 
-export interface UCIChessComputerI {
-  send(uciMessage: string): void;
-  get diagnosticsResult(): DiagnosticsResult | null;
-  get label(): string;
-}
+export type ChessComputerConstructor = [maxDepth: number];

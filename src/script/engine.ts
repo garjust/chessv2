@@ -1,9 +1,9 @@
 import readline from 'readline';
-import { UCICommandAction } from '../chess/lib/uci/action';
 import { LATEST, Version } from '../chess/ai/registry';
 import { SearchEngine } from '../chess/ai/search-engine';
 import { parse } from '../chess/lib/uci/parse-cli-command';
-import { UCIResponse, toUCIString } from '../chess/lib/uci/uci-response';
+import { UCIResponse, toUCI } from '../chess/lib/uci/uci-response';
+import { debugAction } from '../chess/lib/uci';
 
 const DEBUG = true;
 
@@ -15,13 +15,13 @@ const rl = readline.createInterface({
   terminal: false,
 });
 const responseFunc = (response: UCIResponse) => {
-  toUCIString(response).map((str: string) => rl.write(`${str}\n`));
+  toUCI(response).map((str: string) => rl.write(`${str}\n`));
 };
 
 const searchEngine = new SearchEngine(SEARCH_VERSION, 10, responseFunc);
 
 if (DEBUG) {
-  searchEngine.emit(UCICommandAction.debugAction(true));
+  searchEngine.emit(debugAction(true));
 }
 
 rl.on('line', (line) => {

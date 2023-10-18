@@ -1,21 +1,27 @@
 import { expect, test } from 'vitest';
-import init, { createState, Action } from '.';
+import init, {
+  createState,
+  uciAction,
+  isReadyAction,
+  setOptionAction,
+  uciNewGameAction,
+} from '.';
 import Engine from '../../engine';
-import { UCICommandAction } from './action';
 import Iterative from '../../ai/algorithms/iterative';
+import { UCIResponse, toUCI } from './uci-response';
 
 test('example interaction with UCI engine worker', () => {
-  let responses: string[] = [];
+  let responses: UCIResponse[] = [];
 
   const { emit } = init(createState(), {
     engine: new Engine(),
     ai: new Iterative(4),
-    sendUCIResponse: (response: string) => responses.push(response),
+    sendUCIResponse: (response) => responses.push(response),
   });
 
-  emit(UCICommandAction.uciAction());
+  emit(uciAction());
 
-  expect(responses).toEqual([
+  expect(toUCI(...responses)).toEqual([
     'id name justin uci computer v1',
     'id author garjust',
     'option name Hash type spin default 128 min 128 max 1024',
@@ -24,11 +30,11 @@ test('example interaction with UCI engine worker', () => {
   ]);
   responses = [];
 
-  emit(UCICommandAction.setOptionAction('Hash', '512'));
-  emit(UCICommandAction.setOptionAction('OwnBook', 'false'));
-  emit(UCICommandAction.isReadyAction());
+  emit(setOptionAction('Hash', '512'));
+  emit(setOptionAction('OwnBook', 'false'));
+  emit(isReadyAction());
 
   expect(responses).toEqual(['readyok']);
 
-  emit(UCICommandAction.uciNewGameAction());
+  emit(uciNewGameAction());
 });

@@ -3,6 +3,7 @@ import { Update } from '../../../lib/workflow';
 import Engine from '../../engine';
 import { parseFEN } from '../fen';
 import {
+  Type,
   Action,
   DebugAction,
   GoAction,
@@ -11,7 +12,7 @@ import {
   RespondAction,
   respondAction,
 } from './action';
-import { State, Type } from './index';
+import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
 import { ChessComputer } from '../../ai/chess-computer';
 import { moveFromString } from '../../move-notation';

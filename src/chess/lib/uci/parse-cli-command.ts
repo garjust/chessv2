@@ -1,6 +1,19 @@
 import { Action } from '.';
 import { FEN_LIBRARY } from '../fen';
-import { GoCommand, UCICommandAction } from './action';
+import {
+  GoCommand,
+  debugAction,
+  goAction,
+  isReadyAction,
+  ponderHitAction,
+  positionAction,
+  quitAction,
+  registerAction,
+  setOptionAction,
+  stopAction,
+  uciAction,
+  uciNewGameAction,
+} from './action';
 import { EngineOptionName } from './uci-response';
 
 const parseGoCommand = (parts: string[]): GoCommand => {
@@ -59,38 +72,38 @@ export const parse = (commandString: string): Action => {
 
   switch (command) {
     case 'uci':
-      return UCICommandAction.uciAction();
+      return uciAction();
     case 'debug':
       // eslint-disable-next-line no-case-declarations
       const [boolValue] = args;
-      return UCICommandAction.debugAction(boolValue == 'on');
+      return debugAction(boolValue == 'on');
     case 'isready':
-      return UCICommandAction.isReadyAction();
+      return isReadyAction();
     case 'setoption': {
       const [, name, , value] = args;
       // TODO: validation of option name
-      return UCICommandAction.setOptionAction(name as EngineOptionName, value);
+      return setOptionAction(name as EngineOptionName, value);
     }
     case 'register':
-      return UCICommandAction.registerAction();
+      return registerAction();
     case 'ucinewgame':
-      return UCICommandAction.uciNewGameAction();
+      return uciNewGameAction();
     case 'position': {
       const [fen, ...moves] = args;
-      return UCICommandAction.positionAction(
+      return positionAction(
         fen === 'startpos' ? FEN_LIBRARY.STARTING_POSITION_FEN : fen,
         moves,
       );
     }
     case 'go': {
-      return UCICommandAction.goAction(parseGoCommand(args));
+      return goAction(parseGoCommand(args));
     }
     case 'stop':
-      return UCICommandAction.stopAction();
+      return stopAction();
     case 'ponderhit':
-      return UCICommandAction.ponderHitAction();
+      return ponderHitAction();
     case 'quit':
-      return UCICommandAction.quitAction();
+      return quitAction();
     default:
       console.log('blah');
       break;
