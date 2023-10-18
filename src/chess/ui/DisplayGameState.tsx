@@ -1,9 +1,9 @@
 import React from 'react';
-import { State } from '../workflow';
-import { WrappedSearchEngine } from '../workflow/state';
+import { State } from './workflow';
+import { WrappedSearchEngine } from './workflow/state';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
-import { useWorkflow } from './workflow';
+import { useWorkflow } from './workflow-context';
 import { formatAsBytes, formatBits } from '../../lib/bits';
 
 export type DisplayGameStateProps = {

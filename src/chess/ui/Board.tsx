@@ -1,10 +1,10 @@
 import React from 'react';
-import { State } from '../workflow';
+import { State } from './workflow';
 import { Color } from '../types';
 import { rankFileToSquare, squareGenerator } from '../utils';
 import './Board.css';
 import Square from './Square';
-import { useWorkflow } from './workflow';
+import { useWorkflow } from './workflow-context';
 
 export type BoardProps = {
   squareSize: number;

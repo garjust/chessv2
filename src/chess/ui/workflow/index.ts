@@ -1,4 +1,4 @@
-import { workflow } from '../../lib/workflow';
+import { workflow } from '../../../lib/workflow';
 import type { State } from './state';
 import type { Action } from './action';
 import { update, Context } from './update';

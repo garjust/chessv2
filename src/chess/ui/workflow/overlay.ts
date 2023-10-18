@@ -1,5 +1,5 @@
-import AttackMap from '../core/attack-map';
-import { Pin, Square } from '../types';
+import AttackMap from '../../core/attack-map';
+import { Pin, Square } from '../../types';
 import {
   State,
   checkedSquare,

@@ -1,9 +1,9 @@
 import readline from 'readline';
 import { LATEST, Version } from '../chess/engine/registry';
 import { Engine } from '../chess/engine/engine';
-import { parse } from '../chess/engine/uci/parse-cli-command';
-import { UCIResponse, toUCI } from '../chess/engine/uci/uci-response';
-import { debugAction } from '../chess/engine/uci';
+import { parse } from '../chess/engine/workflow/parse-cli-command';
+import { UCIResponse, toUCI } from '../chess/engine/workflow/uci-response';
+import { debugAction } from '../chess/engine/workflow';
 
 const DEBUG = true;
 

@@ -1,15 +1,15 @@
 import { Registry, Version } from './registry';
 import Core from '../core';
-import init, { Action, createState } from './uci';
+import init, { Action, createState } from './workflow';
 import { SearchExecutorI } from './search-executor';
-import { UCIResponse } from './uci/uci-response';
+import { UCIResponse } from './workflow/uci-response';
 
 // Class representing a chess engine which communicates via the UCI protocol.
 //
 // This class does not handle UCI messages directly, instead processing UCI
 // workflow actions.
 export class Engine {
-  private ai: SearchExecutorI;
+  private searchExecutor: SearchExecutorI;
   #emit: (action: Action) => void;
 
   constructor(
@@ -18,10 +18,10 @@ export class Engine {
     responseFunc: (response: UCIResponse) => void,
   ) {
     console.log('booting engine');
-    this.ai = new Registry[computer](maxDepth);
+    this.searchExecutor = new Registry[computer](maxDepth);
     const { emit } = init(createState(), {
       engine: new Core(),
-      ai: this.ai,
+      ai: this.searchExecutor,
       sendUCIResponse: responseFunc,
     });
     this.#emit = emit;
@@ -32,10 +32,10 @@ export class Engine {
   }
 
   get diagnosticsResult() {
-    return this.ai.diagnosticsResult;
+    return this.searchExecutor.diagnosticsResult;
   }
 
   get label() {
-    return this.ai.label;
+    return this.searchExecutor.label;
   }
 }

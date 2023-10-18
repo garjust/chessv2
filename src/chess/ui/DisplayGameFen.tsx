@@ -1,7 +1,7 @@
 import React from 'react';
-import { State } from '../workflow';
+import { State } from './workflow';
 import { formatPosition } from '../lib/fen';
-import { useWorkflow } from './workflow';
+import { useWorkflow } from './workflow-context';
 
 export type DisplayGameFENProps = {
   style?: React.CSSProperties;

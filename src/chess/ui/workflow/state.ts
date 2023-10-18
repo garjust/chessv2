@@ -1,5 +1,5 @@
 import { Remote } from 'comlink';
-import { FEN_LIBRARY, parseFEN } from '../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import {
   Color,
   Position,
@@ -8,9 +8,9 @@ import {
   Move,
   MoveWithExtraData,
   SquareControlObject,
-} from '../types';
-import { Engine } from '../engine/engine';
-import { UCIResponse } from '../engine/uci/uci-response';
+} from '../../types';
+import { Engine } from '../../engine/engine';
+import { UCIResponse } from '../../engine/workflow/uci-response';
 
 export enum SquareLabel {
   None = 'NONE',

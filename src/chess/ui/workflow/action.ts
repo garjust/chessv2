@@ -1,4 +1,4 @@
-import { Color, Move, Position, Square } from '../types';
+import { Color, Move, Position, Square } from '../../types';
 import { WrappedSearchEngine } from './state';
 
 export enum Type {

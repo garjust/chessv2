@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState, Type } from '../workflow';
+import init, { createState, Type } from './workflow';
 import { updateLogger } from '../../lib/workflow';
 import {
   setPositionFromFENAction,
   tickPlayersClockAction,
-} from '../workflow/action';
-import { WorkflowContext } from './workflow';
+} from './workflow/action';
+import { WorkflowContext } from './workflow-context';
 import DisplayGameState from './DisplayGameState';
 import { FEN_LIBRARY } from '../lib/fen';
 import DisplayGameFEN from './DisplayGameFen';

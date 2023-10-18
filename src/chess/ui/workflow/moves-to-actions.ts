@@ -1,8 +1,8 @@
 import { from, map, mergeMap, Observable } from 'rxjs';
 import { clickSquareAction } from './action';
 import { Action } from '.';
-import { delayOperator } from '../../lib/operators';
-import { moveFromString } from '../move-notation';
+import { delayOperator } from '../../../lib/operators';
+import { moveFromString } from '../../move-notation';
 
 export const moveActions = (
   moves: string[],

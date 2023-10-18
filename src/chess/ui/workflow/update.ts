@@ -1,7 +1,7 @@
-import { Update } from '../../lib/workflow';
-import { Color, PieceType, Square } from '../types';
-import { flipColor, isPromotionPositionPawn, movesIncludes } from '../utils';
-import { parseFEN, formatPosition } from '../lib/fen';
+import { Update } from '../../../lib/workflow';
+import { Color, PieceType, Square } from '../../types';
+import { flipColor, isPromotionPositionPawn, movesIncludes } from '../../utils';
+import { parseFEN, formatPosition } from '../../lib/fen';
 import {
   movePieceAction,
   overlaySquaresAction,
@@ -20,24 +20,24 @@ import {
   SquareOverlayCategory,
 } from './state';
 import { from } from 'rxjs';
-import Core from '../core';
-import { play, Sound } from '../ui/audio';
+import Core from '../../core';
+import { play, Sound } from '../audio';
 import {
   setOverlayForAttacks,
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
-import { loadEngine } from '../workers';
-import { EVALUATION_DIVIDER } from '../core/evaluation';
-import { Version, LATEST } from '../engine/registry';
-import { UCIResponse } from '../engine/uci/uci-response';
+import { loadEngine } from '../../workers';
+import { EVALUATION_DIVIDER } from '../../core/evaluation';
+import { Version, LATEST } from '../../engine/registry';
+import { UCIResponse } from '../../engine/workflow/uci-response';
 import {
   goAction,
   isReadyAction,
   positionAction,
   uciAction,
   uciNewGameAction,
-} from '../engine/uci';
+} from '../../engine/workflow';
 
 export type Context = {
   engine: Core;
