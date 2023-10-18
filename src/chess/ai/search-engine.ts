@@ -1,6 +1,6 @@
 import { Registry, Version } from './registry';
 import Engine from '../engine';
-import init, { Action, createState } from '../lib/uci';
+import init, { x, Action, createState } from '../lib/uci';
 import { ChessComputer } from './chess-computer';
 import { UCIResponse } from '../lib/uci/uci-response';
 
@@ -15,17 +15,20 @@ export class SearchEngine {
   constructor(
     computer: Version,
     maxDepth: number,
-    // responseFunc: (response: UCIResponse) => void,
+    responseFunc: (response: UCIResponse) => void,
   ) {
-    throw Error('ahhhh');
     console.log('booting engine');
     this.ai = new Registry[computer](maxDepth);
-    const { emit } = init(createState(), {
-      engine: new Engine(),
-      ai: this.ai,
-      sendUCIResponse: responseFunc,
-    });
-    this.#emit = emit;
+    x;
+    // const x = createState;
+    // init;
+    // createState;
+    // const { emit } = init(createState(), {
+    //   engine: new Engine(),
+    //   ai: this.ai,
+    //   sendUCIResponse: responseFunc,
+    // });
+    // this.#emit = emit;
   }
 
   emit(action: Action) {

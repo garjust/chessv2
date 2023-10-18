@@ -2,9 +2,9 @@ import { from } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Engine from '../../engine';
 import { parseFEN } from '../fen';
-import { UCICommandAction, respondAction } from './action';
+import { respondAction } from './action';
 import { State, Action, Type } from './index';
-import { toUCIString, UCIResponse, UCIResponseType } from './uci-response';
+import { UCIResponse, UCIResponseType } from './uci-response';
 import { ChessComputer } from '../../ai/chess-computer';
 import { moveFromString } from '../../move-notation';
 

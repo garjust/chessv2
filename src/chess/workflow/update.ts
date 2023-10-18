@@ -168,7 +168,7 @@ function handleLoadChessComputer(
       state,
       () =>
         from(
-          loadSearchEngine(COMPUTER_VERSION, 10)
+          loadSearchEngine(COMPUTER_VERSION, 10, responseFunc)
             .then(([instance, cleanup]) => {
               instance.emit(UCICommandAction.uciAction());
               // TOOD: wait for uciok
