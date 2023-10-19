@@ -1,3 +1,5 @@
+import { Version } from '../registry';
+import { ExecutorInstance } from './state';
 import { UCIResponse, EngineOptionName } from './uci-response';
 
 export type GoCommand = Partial<{
@@ -31,6 +33,8 @@ export enum Type {
 
 export enum InternalType {
   Respond = 'RESPOND',
+  LoadSearchExecutor = 'LOAD_SEARCH_EXECUTOR',
+  LoadSearchExecutorDone = 'LOAD_SEARCH_EXECUTOR_DONE',
 }
 
 // Spec: https://backscattering.de/chess/uci/
@@ -103,6 +107,17 @@ export interface RespondAction {
   readonly response: UCIResponse;
 }
 
+export interface LoadSearchExecutorAction {
+  readonly type: InternalType.LoadSearchExecutor;
+  readonly version: Version;
+  readonly maxDepth: number;
+}
+
+export interface LoadSearchExecutorDoneAction {
+  readonly type: InternalType.LoadSearchExecutorDone;
+  readonly instance: ExecutorInstance;
+}
+
 export type Action =
   | UCIAction
   | DebugAction
@@ -115,7 +130,9 @@ export type Action =
   | StopAction
   | PonderHitAction
   | QuitAction
-  | RespondAction;
+  | RespondAction
+  | LoadSearchExecutorAction
+  | LoadSearchExecutorDoneAction;
 
 export const uciAction = (): UCIAction => ({
   type: Type.UCI,
@@ -176,4 +193,20 @@ export const quitAction = (): QuitAction => ({
 export const respondAction = (response: UCIResponse): RespondAction => ({
   type: InternalType.Respond,
   response,
+});
+
+export const loadSearchExecutorAction = (
+  version: Version,
+  maxDepth: number,
+): LoadSearchExecutorAction => ({
+  type: InternalType.LoadSearchExecutor,
+  version,
+  maxDepth,
+});
+
+export const loadSearchExecutorDoneAction = (
+  instance: ExecutorInstance,
+): LoadSearchExecutorDoneAction => ({
+  type: InternalType.LoadSearchExecutorDone,
+  instance,
 });

@@ -1,6 +1,6 @@
 import { UCIResponse } from '../../engine/workflow/uci-response';
 import { Color, Move, Position, Square } from '../../types';
-import { EngineInstance, Player } from './state';
+import { EngineInstance } from './state';
 
 export enum Type {
   AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',

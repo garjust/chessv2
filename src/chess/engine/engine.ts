@@ -1,8 +1,13 @@
 import { Registry, Version } from './registry';
 import Core from '../core';
-import init, { Action, createState } from './workflow';
+import init, {
+  Action,
+  createState,
+  loadSearchExecutorAction,
+} from './workflow';
 import { SearchExecutorI } from './search-executor';
 import { UCIResponse } from './workflow/uci-response';
+import { updateLogger } from '../../lib/workflow';
 
 // Class representing a chess engine which communicates via the UCI protocol.
 //
@@ -18,12 +23,16 @@ export class Engine {
     responseFunc: (response: UCIResponse) => void,
   ) {
     this.searchExecutor = new Registry[version](maxDepth);
-    const { emit } = init(createState(), {
+    const { emit, updates } = init(createState(), {
       engine: new Core(),
       executor: this.searchExecutor,
       sendUCIResponse: responseFunc,
     });
     this.#emit = emit;
+
+    updates.subscribe(updateLogger('Engine'));
+
+    emit(loadSearchExecutorAction(version, maxDepth));
   }
 
   emit(action: Action) {

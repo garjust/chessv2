@@ -47,6 +47,7 @@ import {
   UCIResponseType,
 } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
+import { Engine } from '../../engine/engine';
 
 export type Context = {
   engine: Core;
@@ -65,31 +66,10 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
       // TODO: pass moves?
       EngineWorkflow.positionAction(formatPosition(state.position), []),
     );
-    return [
-      state,
-      () =>
-        from(
-          instance.engine
-            // TODO: wait for result somehow
-            .emit(EngineWorkflow.goAction())
-            .then(async (move) => {
-              const diagnostics = await instance.engine.diagnosticsResult;
-              console.log(diagnostics?.logString, diagnostics);
-
-              return move;
-            })
-            .then((move) =>
-              // TODO: fix next move
-              receiveComputerMoveAction({
-                from: 0,
-                to: 0,
-              }),
-            ),
-        ),
-    ];
-  } else {
-    return [state, null];
+    instance.engine.emit(EngineWorkflow.goAction());
   }
+
+  return [state, null];
 }
 
 function handleChangeOverlay(state: State): Update<State, Action> {
@@ -122,12 +102,17 @@ function handleChessComputerLoaded(
 ): Update<State, Action> {
   const { instance, color } = action;
 
+  instance.engine.emit(EngineWorkflow.uciAction());
+
   return [
     {
       ...state,
+      engines: Object.assign({}, state.engines, {
+        [instance.id]: instance,
+      }),
       players: {
         ...state.players,
-        [color]: instance,
+        [color]: { engineId: instance.id },
       },
     },
     attemptComputerMoveAction,
@@ -182,17 +167,21 @@ function handleEngineResponse(
   switch (response.type) {
     case UCIResponseType.UCIOk:
       validateState(instance, UCIState.WaitingForUCIOk);
-      instance.engine.emit(EngineWorkflow.uciNewGameAction());
       instance.engine.emit(EngineWorkflow.isReadyAction());
       // TODO: update engine instance state
       return [state, null];
     case UCIResponseType.ReadyOk:
       validateState(instance, UCIState.WaitingForReadyOk);
+      instance.engine.emit(EngineWorkflow.uciNewGameAction());
       // TODO: update engine instance state
       return [state, null];
     case UCIResponseType.BestMove:
       validateState(instance, UCIState.WaitingForMove);
-      // TODO: update engine instance state
+      console.log(
+        instance.engine.diagnosticsResult?.logString,
+        instance.engine.diagnosticsResult,
+      );
+
       return [state, () => receiveComputerMoveAction(response.move)];
   }
 
@@ -206,7 +195,7 @@ function handleFlipBoard(state: State): Update<State, Action> {
 }
 
 function createEngineId() {
-  return `engine-${Math.trunc(Math.random() * 10)}`;
+  return `engine-${Math.trunc(Math.random() * 1000000)}`;
 }
 
 function handleLoadChessComputer(
@@ -222,35 +211,31 @@ function handleLoadChessComputer(
     // - Emit an "EngineRespond" action?
     //    if doing this handleEngineRespond could depending on the UCI response
     //    further emit actions (this is good)
-    const responseFunc = (response: UCIResponse) => {};
+    const responseFunc = (response: UCIResponse) => {
+      console.debug('UCI RESPONSE', response);
+    };
+
+    const engine = new Engine(COMPUTER_VERSION, 10, responseFunc);
+    engine.emit(EngineWorkflow.uciAction());
 
     return [
       state,
       () =>
-        from(
-          loadEngine(COMPUTER_VERSION, 10, responseFunc)
-            .then(([instance, cleanup]) => {
-              return Promise.all([instance, cleanup, instance.label]);
-            })
-            .then(([instance, cleanup, label]) =>
-              chessComputerLoadedAction(
-                {
-                  id: createEngineId(),
-                  label,
-                  uciState: UCIState.Boot,
-                  engine: instance,
-                  cleanup,
-                  __computer: true,
-                },
-                playingAs,
-              ),
-            ),
+        chessComputerLoadedAction(
+          {
+            id: createEngineId(),
+            label: engine.label,
+            uciState: UCIState.Boot,
+            engine,
+            __computer: true,
+          },
+          playingAs,
         ),
     ];
   } else {
-    const instance = getEngineInstance(state, player.engineId);
-
-    instance.cleanup();
+    // const instance = getEngineInstance(state, player.engineId);
+    // TODO: remove old engine.
+    // TODO: check if I need to cleanup the webworkers inside the engine.
     return [
       { ...state, players: { ...players, [playingAs]: HumanPlayer } },
       null,

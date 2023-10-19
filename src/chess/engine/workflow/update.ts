@@ -11,11 +11,15 @@ import {
   PositionAction,
   RespondAction,
   respondAction,
+  LoadSearchExecutorAction,
+  LoadSearchExecutorDoneAction,
+  loadSearchExecutorDoneAction,
 } from './action';
 import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
 import { SearchExecutorI } from '../search-executor';
 import { moveFromString } from '../../move-notation';
+import { loadSearchExecutor } from '../../workers';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
@@ -123,6 +127,32 @@ function handleRespond(
   return [state, null];
 }
 
+function handleLoadSearchExecutor(
+  state: State,
+  action: LoadSearchExecutorAction,
+): Update<State, Action> {
+  return [
+    state,
+    () =>
+      from(
+        loadSearchExecutor(action.version, 10).then(([executor, cleanup]) =>
+          loadSearchExecutorDoneAction({
+            executor,
+            cleanup,
+            __computer: true,
+          }),
+        ),
+      ),
+  ];
+}
+
+function handleLoadSearchExecutorDone(
+  state: State,
+  action: LoadSearchExecutorDoneAction,
+): Update<State, Action> {
+  return [{ ...state, executorInstance: action.instance }, null];
+}
+
 export const update =
   (context: Context) =>
   (state: State, action: Action): Update<State, Action> => {
@@ -151,5 +181,9 @@ export const update =
         return handleQuit(state);
       case InternalType.Respond:
         return handleRespond(state, action, context);
+      case InternalType.LoadSearchExecutor:
+        return handleLoadSearchExecutor(state, action);
+      case InternalType.LoadSearchExecutorDone:
+        return handleLoadSearchExecutorDone(state, action);
     }
   };

@@ -44,16 +44,11 @@ export enum UCIState {
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
-type EngineId = {
-  engineId: string;
-};
-
 export type EngineInstance = {
   id: string;
   label: string;
   uciState: UCIState;
-  engine: Remote<Engine>;
-  cleanup: () => void;
+  engine: Engine;
   // This property is here to indicate to JSON.stringify replacer function
   // what type of object this is to avoid serializing the comlink remote
   // object. JSON.stringify does something to the wrapped WebWorker before
@@ -61,7 +56,11 @@ export type EngineInstance = {
   __computer: true;
 };
 
-export type Player = typeof HumanPlayer | EngineId;
+export type Player =
+  | typeof HumanPlayer
+  | {
+      engineId: string;
+    };
 
 export interface State {
   debugVersion?: number;

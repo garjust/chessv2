@@ -2,14 +2,14 @@ import { moveString } from '../../move-notation';
 import { Move } from '../../types';
 
 export enum UCIResponseType {
-  Id,
-  UCIOk,
-  ReadyOk,
-  BestMove,
-  CopyProtection,
-  Registration,
-  Info,
-  Option,
+  Id = 'ID',
+  UCIOk = 'UCIOK',
+  ReadyOk = 'READYOK',
+  BestMove = 'BEST_MOVE',
+  CopyProtection = 'COPY_PROTECTION',
+  Registration = 'REGISTRATION',
+  Info = 'INFO',
+  Option = 'OPTION',
 }
 
 type InfoKey =
