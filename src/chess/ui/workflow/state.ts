@@ -10,7 +10,6 @@ import {
   SquareControlObject,
 } from '../../types';
 import { Engine } from '../../engine/engine';
-import { UCIResponse } from '../../engine/workflow/uci-response';
 
 export enum SquareLabel {
   None = 'NONE',
@@ -35,13 +34,25 @@ export enum SquareOverlayCategory {
   Heatmap = 'HEATMAP',
 }
 
+export enum UCIState {
+  Boot = 'BOOT',
+  WaitingForUCIOk = 'WAITING_FOR_UCIOK',
+  WaitingForReadyOk = 'WAITING_FOR_READYOK',
+  WaitingForMove = 'WAITING_FOR_MOVE',
+}
+
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
-export type WrappedSearchEngine = {
-  searchEngine: Remote<Engine>;
+type EngineId = {
+  engineId: string;
+};
+
+export type EngineInstance = {
+  id: string;
   label: string;
-  responseFunc: (response: UCIResponse) => void;
+  uciState: UCIState;
+  engine: Remote<Engine>;
   cleanup: () => void;
   // This property is here to indicate to JSON.stringify replacer function
   // what type of object this is to avoid serializing the comlink remote
@@ -50,7 +61,7 @@ export type WrappedSearchEngine = {
   __computer: true;
 };
 
-export type Player = typeof HumanPlayer | WrappedSearchEngine;
+export type Player = typeof HumanPlayer | EngineId;
 
 export interface State {
   debugVersion?: number;
@@ -63,6 +74,7 @@ export interface State {
     [Color.White]: number;
     [Color.Black]: number;
   };
+  engines: Record<string, EngineInstance>;
   players: {
     [Color.White]: Player;
     [Color.Black]: Player;
@@ -93,6 +105,7 @@ const INITIAL_STATE: State = {
     [Color.White]: GAME_LENGTH * 1000,
     [Color.Black]: GAME_LENGTH * 1000,
   },
+  engines: {},
   players: {
     [Color.White]: HumanPlayer,
     [Color.Black]: HumanPlayer,
@@ -150,3 +163,11 @@ export const availableCaptures = (state: State): Move[] =>
 
 export const showHeatmap = (state: State) =>
   state.overlayCategory === SquareOverlayCategory.Heatmap;
+
+export const getEngineInstance = (state: State, id: string): EngineInstance => {
+  const instance = state.engines[id];
+  if (instance === undefined) {
+    throw Error(`failed to find engine ${id}`);
+  }
+  return instance;
+};

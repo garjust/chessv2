@@ -1,11 +1,13 @@
+import { UCIResponse } from '../../engine/workflow/uci-response';
 import { Color, Move, Position, Square } from '../../types';
-import { WrappedSearchEngine } from './state';
+import { EngineInstance, Player } from './state';
 
 export enum Type {
   AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
   ChangeOverlay = 'CHANGE_OVERLAY',
   ChessComputerLoaded = 'CHESS_COMPUTER_LOADED',
   ClickSquare = 'CLICK_SQUARE',
+  EngineResponse = 'ENGINE_RESPONSE',
   FlipBoard = 'FLIP_BOARD',
   LoadChessComputer = 'LOAD_CHESS_COMPUTER',
   MovePiece = 'MOVE_PIECE',
@@ -29,13 +31,19 @@ export interface ChangeOverlayAction {
 
 export interface ChessComputerLoadedAction {
   readonly type: Type.ChessComputerLoaded;
-  readonly instance: WrappedSearchEngine;
+  readonly instance: EngineInstance;
   readonly color: Color;
 }
 
 export interface ClickSquareAction {
   readonly type: Type.ClickSquare;
   readonly square: Square;
+}
+
+export interface EngineResponseAction {
+  readonly type: Type.EngineResponse;
+  engineId: string;
+  response: UCIResponse;
 }
 
 export interface FlipBoardAction {
@@ -92,6 +100,7 @@ export type Action =
   | ChangeOverlayAction
   | ChessComputerLoadedAction
   | ClickSquareAction
+  | EngineResponseAction
   | FlipBoardAction
   | LoadChessComputerAction
   | OverlaySquaresAction
@@ -113,7 +122,7 @@ export const changeOverlayAction = (): ChangeOverlayAction => ({
 });
 
 export const chessComputerLoadedAction = (
-  instance: WrappedSearchEngine,
+  instance: EngineInstance,
   color: Color,
 ): ChessComputerLoadedAction => ({
   type: Type.ChessComputerLoaded,
@@ -124,6 +133,15 @@ export const chessComputerLoadedAction = (
 export const clickSquareAction = (square: Square): ClickSquareAction => ({
   type: Type.ClickSquare,
   square,
+});
+
+export const engineResponseAction = (
+  engineId: string,
+  response: UCIResponse,
+): EngineResponseAction => ({
+  type: Type.EngineResponse,
+  engineId,
+  response,
 });
 
 export const flipBoardAction = (): FlipBoardAction => ({

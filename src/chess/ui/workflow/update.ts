@@ -17,6 +17,7 @@ import {
   MovePieceAction,
   SetPositionAction,
   SetPositionFromFENAction,
+  EngineResponseAction,
 } from './action';
 import { State, Action } from './index';
 import {
@@ -26,6 +27,9 @@ import {
   Draw,
   SquareLabel,
   SquareOverlayCategory,
+  UCIState,
+  EngineInstance,
+  getEngineInstance,
 } from './state';
 import { from } from 'rxjs';
 import Core from '../../core';
@@ -38,7 +42,10 @@ import {
 import { loadEngine } from '../../workers';
 import { EVALUATION_DIVIDER } from '../../core/evaluation';
 import { Version, LATEST } from '../../engine/registry';
-import { UCIResponse } from '../../engine/workflow/uci-response';
+import {
+  UCIResponse,
+  UCIResponseType,
+} from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 
 export type Context = {
@@ -52,7 +59,9 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   const playerForTurn = players[position.turn];
 
   if (playerForTurn !== HumanPlayer) {
-    playerForTurn.searchEngine.emit(
+    const instance = getEngineInstance(state, playerForTurn.engineId);
+
+    instance.engine.emit(
       // TODO: pass moves?
       EngineWorkflow.positionAction(formatPosition(state.position), []),
     );
@@ -60,17 +69,22 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
       state,
       () =>
         from(
-          playerForTurn.searchEngine
+          instance.engine
             // TODO: wait for result somehow
             .emit(EngineWorkflow.goAction())
             .then(async (move) => {
-              const diagnostics =
-                await playerForTurn.searchEngine.diagnosticsResult;
+              const diagnostics = await instance.engine.diagnosticsResult;
               console.log(diagnostics?.logString, diagnostics);
 
               return move;
             })
-            .then((move) => receiveComputerMoveAction(move)),
+            .then((move) =>
+              // TODO: fix next move
+              receiveComputerMoveAction({
+                from: 0,
+                to: 0,
+              }),
+            ),
         ),
     ];
   } else {
@@ -152,10 +166,47 @@ function handleClickSquare(
   return [state, overlaySquaresAction];
 }
 
+const validateState = (engine: EngineInstance, state: UCIState): void => {
+  if (engine.uciState !== state) {
+    throw Error(`engine ${engine.label} not in state ${state}`);
+  }
+};
+
+function handleEngineResponse(
+  state: State,
+  action: EngineResponseAction,
+): Update<State, Action> {
+  const instance = getEngineInstance(state, action.engineId);
+
+  const response = action.response;
+  switch (response.type) {
+    case UCIResponseType.UCIOk:
+      validateState(instance, UCIState.WaitingForUCIOk);
+      instance.engine.emit(EngineWorkflow.uciNewGameAction());
+      instance.engine.emit(EngineWorkflow.isReadyAction());
+      // TODO: update engine instance state
+      return [state, null];
+    case UCIResponseType.ReadyOk:
+      validateState(instance, UCIState.WaitingForReadyOk);
+      // TODO: update engine instance state
+      return [state, null];
+    case UCIResponseType.BestMove:
+      validateState(instance, UCIState.WaitingForMove);
+      // TODO: update engine instance state
+      return [state, () => receiveComputerMoveAction(response.move)];
+  }
+
+  return [state, null];
+}
+
 function handleFlipBoard(state: State): Update<State, Action> {
   const newOrientation = flipColor(state.boardOrientation);
 
   return [{ ...state, boardOrientation: newOrientation }, null];
+}
+
+function createEngineId() {
+  return `engine-${Math.trunc(Math.random() * 10)}`;
 }
 
 function handleLoadChessComputer(
@@ -171,8 +222,6 @@ function handleLoadChessComputer(
     // - Emit an "EngineRespond" action?
     //    if doing this handleEngineRespond could depending on the UCI response
     //    further emit actions (this is good)
-    // - Do I need to be able to BLOCK waiting for a response? Probably not.
-    //    if anything maybe a loading/waiting indicator/state.
     const responseFunc = (response: UCIResponse) => {};
 
     return [
@@ -181,20 +230,15 @@ function handleLoadChessComputer(
         from(
           loadEngine(COMPUTER_VERSION, 10, responseFunc)
             .then(([instance, cleanup]) => {
-              instance.emit(EngineWorkflow.uciAction());
-              // TOOD: wait for uciok
-
-              instance.emit(EngineWorkflow.uciNewGameAction());
-              instance.emit(EngineWorkflow.isReadyAction());
-              // TODO: wait for the readyok somehow.
               return Promise.all([instance, cleanup, instance.label]);
             })
             .then(([instance, cleanup, label]) =>
               chessComputerLoadedAction(
                 {
-                  searchEngine: instance,
-                  responseFunc,
+                  id: createEngineId(),
                   label,
+                  uciState: UCIState.Boot,
+                  engine: instance,
                   cleanup,
                   __computer: true,
                 },
@@ -204,7 +248,9 @@ function handleLoadChessComputer(
         ),
     ];
   } else {
-    player.cleanup();
+    const instance = getEngineInstance(state, player.engineId);
+
+    instance.cleanup();
     return [
       { ...state, players: { ...players, [playingAs]: HumanPlayer } },
       null,
@@ -454,6 +500,8 @@ export const update =
         return handleChessComputerLoaded(state, action);
       case Type.ClickSquare:
         return handleClickSquare(state, action);
+      case Type.EngineResponse:
+        return handleEngineResponse(state, action);
       case Type.FlipBoard:
         return handleFlipBoard(state);
       case Type.LoadChessComputer:
