@@ -48,6 +48,7 @@ import {
 } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
+import Logger from '../../../lib/logger';
 
 export type Context = {
   engine: Core;
@@ -206,13 +207,15 @@ function handleLoadChessComputer(
   const { players } = state;
   const player = players[playingAs];
 
+  const logger = new Logger('uci-response');
+
   if (player === HumanPlayer) {
     // This function needs to be attached to the workflow observables system.
     // - Emit an "EngineRespond" action?
     //    if doing this handleEngineRespond could depending on the UCI response
     //    further emit actions (this is good)
     const responseFunc = (response: UCIResponse) => {
-      console.debug('UCI RESPONSE', response);
+      logger.debug(response.type, response);
     };
 
     const engine = new Engine(COMPUTER_VERSION, 10, responseFunc);
