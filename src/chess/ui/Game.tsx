@@ -3,19 +3,13 @@ import Board from './Board';
 import './Game.css';
 import { WorkflowContext } from './workflow-context';
 import DisplayGameState from './DisplayGameState';
-import { FEN_LIBRARY } from '../lib/fen';
 import DisplayGameFEN from './DisplayGameFen';
 import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
 import { Orchestrator } from './orchestrator';
 
-const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.STARTING_POSITION_FEN;
-
 const Game = () => {
-  const [orchestrator, setOrchestrator] = useState<Orchestrator>();
-  useEffect(() => {
-    setOrchestrator(new Orchestrator());
-  }, []);
+  const [orchestrator, _] = useState<Orchestrator>(new Orchestrator());
 
   return (
     <div className="game">

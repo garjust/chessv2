@@ -24,7 +24,7 @@ export const updateLogger = <S, A extends ActionWithType>(
 ) => {
   const color = pick(COLORS);
 
-  console.log(`%c${workflowName} worfklow logger INIT`, `color: ${color};`);
+  console.log(`%c${workflowName} workflow logger INIT`, `color: ${color};`);
 
   return ([[before, after], action]: [[S, S], A]) => {
     if (ignoreList.includes(action.type)) {

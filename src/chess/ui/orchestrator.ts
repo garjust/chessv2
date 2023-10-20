@@ -20,14 +20,11 @@ export class Orchestrator {
     this.workflow = init(createState(), {
       engine: new Core(),
     });
-
     this.workflow.updates.subscribe(
       updateLogger('Chess', [Type.TickPlayersClock]),
     );
-
     const ticker = interval(100).pipe(map(() => tickPlayersClockAction()));
     ticker.subscribe(this.workflow.emit);
-
     this.workflow.emit(setPositionFromFENAction(FEN_FOR_INITIAL_POSITION));
   }
 }

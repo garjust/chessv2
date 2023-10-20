@@ -3,16 +3,12 @@ import Game from './chess/ui/Game';
 import Debug from './chess/ui/Debug';
 
 enum Screen {
-  Game,
-  Debug,
+  Game = 'GAME',
+  Debug = 'DEBUG',
 }
 
 const App = () => {
   const [screen, setScreen] = useState(Screen.Game);
-
-  const toggleScreen = () => {
-    setScreen(screen === Screen.Game ? Screen.Debug : Screen.Game);
-  };
 
   return (
     <div
@@ -22,10 +18,16 @@ const App = () => {
         padding: 24,
       }}
     >
-      <button onClick={toggleScreen} style={{ marginBottom: 16, padding: 4 }}>
+      <button
+        onClick={() => {
+          setScreen(screen === Screen.Game ? Screen.Debug : Screen.Game);
+        }}
+        style={{ marginBottom: 16, padding: 4 }}
+      >
         Switch Screen
       </button>
-      {screen === Screen.Game ? <Game /> : <Debug />}
+      {screen === Screen.Game ? <Game /> : <></>}
+      {screen === Screen.Debug ? <Debug /> : <></>}
     </div>
   );
 };
