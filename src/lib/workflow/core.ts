@@ -46,8 +46,7 @@ export type Work<A> =
   | Observable<A | Command | null | never>
   | Promise<A | Command | null | never>
   | A
-  | Command
-  | null;
+  | Command;
 
 export type LazyWork<A> = () => Work<A>;
 
@@ -62,7 +61,7 @@ export type Update<S, A> = [S, LazyWork<A> | null];
  */
 type Updater<S, A> = (state: Readonly<S>, action: Readonly<A>) => Update<S, A>;
 
-type InternalAction<A> = A | Command;
+type InternalAction<A> = A | Command | null;
 type InternalUpdateAction<A> = Observable<InternalAction<A>>;
 type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 
