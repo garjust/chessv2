@@ -1,4 +1,4 @@
-import { EMPTY, Observable, Subject, empty, from, of, partition } from 'rxjs';
+import { EMPTY, Observable, Subject, from, of, partition } from 'rxjs';
 import {
   catchError,
   filter,
@@ -11,17 +11,37 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
+/** Built-in "action" */
 export enum Command {
-  Done = 'SECRET_KEY__DO_NOT__USE__OR_WE_WILL_ADD_MORE_UNDERSCORES/DONE',
+  /** Instruct the workflow that it should complete all observables. */
+  Done = 'command__DONE',
 }
 
-type NextActionObservable<A> = Observable<A | Command | null | never>;
-
-type NextActionPromise<A> = Promise<A | Command | null | never>;
+/**
+ * Object returned by the core workflow initialization function. Includes a
+ * function to emit actions to the workflow and observables output by the
+ * workflow.
+ */
+export interface Workflow<S, A> {
+  /**
+   * Emit actions to the workflow.
+   */
+  emit: (action: A) => void;
+  /**
+   * Observable of states from the workflow. Subscribe to receive
+   * the latest states.
+   */
+  states: Observable<S>;
+  /**
+   * Observable of actions that have been emitted to the workflow.
+   * Includes before and after states with the action that caused the state change.
+   */
+  updates: Observable<[[S, S], A]>;
+}
 
 export type NextAction<A> =
-  | NextActionObservable<A>
-  | NextActionPromise<A>
+  | Observable<A | Command | null | never>
+  | Promise<A | Command | null | never>
   | A
   | Command
   | null;
@@ -44,33 +64,15 @@ type InternalUpdateAction<A> = Observable<InternalAction<A>>;
 
 type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 
-export interface Workflow<S, A> {
-  emit: (action: A) => void;
-  states: Observable<S>;
-  updates: Observable<[[S, S], A]>;
-}
-
-// TODO(steckel): Don't export.
-export const nonNullable = <T>(value: T): value is NonNullable<T> =>
-  value != null;
-
-// const isWorkflowNextAction = <A>(
-//   value: InternalAction<A>,
-// ): value is WorkflowNextAction<unkown> => {
-//   return false;
-// };
+const nonNullable = <T>(value: T): value is NonNullable<T> => value != null;
 
 const isCommand = <A>(value: InternalAction<A>): value is Command =>
   value === Command.Done;
 
-// NOTE(steckel): We previously utilized `instance of Promise` for this
-// use-case but that does not work well where Promise-polyfill libraries must
-// seamlessly integrate.
 const isPromiseLike = (value: unknown): value is Promise<unknown> =>
   value instanceof Promise;
 
-// TODO(steckel): Maybe don't export.
-export const normalizeUpdateAction = <A>(
+const normalizeUpdateAction = <A>(
   nextAction: NextAction<A>,
 ): InternalUpdateAction<A> => {
   const observableAction = (() => {
@@ -81,7 +83,7 @@ export const normalizeUpdateAction = <A>(
     } else if (nextAction !== null) {
       return of(nextAction);
     } else {
-      return empty();
+      return EMPTY;
     }
   })();
 
@@ -127,7 +129,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   commands
     .pipe(
       first((command) => command === Command.Done),
-      catchError(() => empty()),
+      catchError(() => EMPTY),
     )
     .subscribe(() => publicStates.complete());
 

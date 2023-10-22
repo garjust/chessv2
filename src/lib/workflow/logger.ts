@@ -4,26 +4,30 @@ interface ActionWithType {
   type: string;
 }
 
-const COLORS = [
-  'orange',
-  'yellow',
-  'aqua',
-  'aquamarine',
-  'darkseagreen',
-  'greenyellow',
-  'yellowgreen',
-  'skyblue',
-  'plum',
-  'chartreuse',
-];
+const pickColor = (() => {
+  const colors = [
+    'skyblue',
+    'orange',
+    'greenyellow',
+    'yellow',
+    'darkseagreen',
+    'plum',
+    'aquamarine',
+  ];
+  let index = Math.floor(Math.random() * colors.length);
+
+  return () => {
+    index = (index + 1) % colors.length;
+    return colors[index];
+  };
+})();
 
 /* eslint-disable no-console */
 export const updateLogger = <S, A extends ActionWithType>(
   workflowName: string,
   ignoreList: string[] = [],
 ) => {
-  const color = pick(COLORS);
-
+  const color = pickColor();
   console.log(`%c${workflowName} workflow logger INIT`, `color: ${color};`);
 
   return ([[before, after], action]: [[S, S], A]) => {
