@@ -1,13 +1,13 @@
 import { expect, test } from 'vitest';
-import Engine from '../src/chess/engine';
+import Core from '../src/chess/core';
 import { parseFEN, FEN_LIBRARY } from '../src/chess/lib/fen';
-import { orderMoves } from '../src/chess/ai/search/move-ordering';
+import { orderMoves } from '../src/chess/engine/lib/move-ordering';
 
 const N = 100_000;
 
 test('perft of move ordering', () => {
   const position = parseFEN(FEN_LIBRARY.PERFT_5_FEN);
-  const engine = new Engine(position);
+  const engine = new Core(position);
   const moves = engine.generateMoves();
 
   const start = Date.now();

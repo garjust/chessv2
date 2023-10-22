@@ -2,7 +2,7 @@ import './GameControlPanel.css';
 import { VIENNA_GAMBIT_ACCEPTED_GAME } from '../lib/example-games';
 import { FEN_LIBRARY } from '../lib/fen';
 import { Color } from '../types';
-import { State } from '../workflow';
+import { State } from './workflow';
 import {
   changeOverlayAction,
   flipBoardAction,
@@ -10,9 +10,9 @@ import {
   previousPositionAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
-} from '../workflow/action';
-import { moveActions } from '../workflow/moves-to-actions';
-import { useWorkflow } from './workflow';
+} from './workflow/action';
+import { moveActions } from './workflow/moves-to-actions';
+import { useWorkflow } from './workflow-context';
 
 const render = (state: State) => ({
   state,

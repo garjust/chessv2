@@ -1,9 +1,9 @@
 import React from 'react';
-import { State } from '../workflow';
-import { ChessComputerWrapped } from '../workflow/state';
+import { State } from './workflow';
+import { EngineInstance } from './workflow/state';
 import { Square } from '../types';
 import { squareLabel } from '../utils';
-import { useWorkflow } from './workflow';
+import { useWorkflow } from './workflow-context';
 import { formatAsBytes, formatBits } from '../../lib/bits';
 
 export type DisplayGameStateProps = {
@@ -44,7 +44,7 @@ function replacer(key: string, value: unknown) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((value as any).__computer) {
-      return (value as ChessComputerWrapped).label;
+      return (value as EngineInstance).label;
     }
   }
 

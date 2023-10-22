@@ -1,25 +1,26 @@
 # chess engine
 
 - `chess/` The chess game
-  - `ai/` Search algorithm implementations
+  - `core/` The core chess logic. Supports functionality needed for humans to play a game of chess (move validation, move execution, board state)
+  - `engine/` Search engine implementation
     - `algorithms/` Each individual algorithm and configuration
-    - `search/` The actual search function and supporting code
-  - `engine/` The core chess engine. Supports functionality needed for humans to play a game of chess (move gen, move execution)
+    - `lib/` Supporting code for the search engine
+    - `workflow/` Workflow implementing UCI protocol for the search engine
   - `lib/` Reusable chess libraries across the whole application
   - `ui/` React UI for the chess game
-  - `workers/` WebWorker scripts for multi-threading
-  - `workflow/` The state workflow which controls the game ui
+    - `workflow/` The workflow which controls the game ui
+  - `workers/` Scripts and loading logic for concurrency
 - `lib/`
   - `workflow/` Workflow core library
   - `workflow-react/` Integration of the core workflow library with react
 
 ## App control
 
-The chess UI is a React application controlled by the UI workflow which embeds an engine instance.
+The chess UI is a React application controlled by the UI workflow which embeds a chess core.
 
-Engine searching can be loaded in two ways:
-1. The JavaScript engine/search written here can be loaded in-browser and controlled via UCI
-2. Other installed engine binaries that are running on the machine can be connected to via socket and controlled via UCI
+A chess engine can be loaded in two ways:
+1. The JavaScript engine written here can be loaded in-browser and controlled via UCI
+2. Other installed engine binaries that are running on the machine can be connected to via socket and controlled via UCI *TODO*
 
 ## TODO
 

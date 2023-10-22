@@ -1,54 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Board from './Board';
 import './Game.css';
-import init, { createState, Type } from '../workflow';
-import { updateLogger } from '../../lib/workflow';
-import {
-  setPositionFromFENAction,
-  tickPlayersClockAction,
-} from '../workflow/action';
-import { WorkflowContext } from './workflow';
+import { WorkflowContext } from './workflow-context';
 import DisplayGameState from './DisplayGameState';
-import { FEN_LIBRARY } from '../lib/fen';
 import DisplayGameFEN from './DisplayGameFen';
-import Engine from '../engine';
-import { interval, map } from 'rxjs';
 import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
-
-const FEN_FOR_INITIAL_POSITION = FEN_LIBRARY.STARTING_POSITION_FEN;
+import { Orchestrator } from './orchestrator';
 
 const Game = () => {
-  const { states, emit, updates } = init(createState(), {
-    engine: new Engine(),
-  });
-
-  updates.subscribe(updateLogger('Chess', [Type.TickPlayersClock]));
-
-  useEffect(() => {
-    const ticker = interval(100).pipe(map(() => tickPlayersClockAction()));
-    const subscription = ticker.subscribe(emit);
-    return () => {
-      subscription.unsubscribe();
-    };
-  });
-
-  useEffect(() => {
-    emit(setPositionFromFENAction(FEN_FOR_INITIAL_POSITION));
-  });
+  const [orchestrator, _] = useState<Orchestrator>(new Orchestrator());
 
   return (
     <div className="game">
-      <WorkflowContext.Provider value={{ states, emit, updates }}>
-        <Board squareSize={64} style={{ gridArea: 'board' }} />
+      {orchestrator ? (
+        <WorkflowContext.Provider value={orchestrator.workflow}>
+          <Board squareSize={64} style={{ gridArea: 'board' }} />
 
-        <GameControlPanel />
+          <GameControlPanel />
 
-        <DisplayClock style={{ gridArea: 'clock' }} />
+          <DisplayClock style={{ gridArea: 'clock' }} />
 
-        <DisplayGameState style={{ gridArea: 'state' }} />
-        <DisplayGameFEN style={{ gridArea: 'fen' }} />
-      </WorkflowContext.Provider>
+          <DisplayGameState style={{ gridArea: 'state' }} />
+          <DisplayGameFEN style={{ gridArea: 'fen' }} />
+        </WorkflowContext.Provider>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

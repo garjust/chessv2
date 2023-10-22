@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import Engine from '../src/chess/engine';
+import Core from '../src/chess/core';
 import { parseFEN, FEN_LIBRARY } from '../src/chess/lib/fen';
 import {
   PERFT_POSITION_5,
@@ -9,7 +9,7 @@ import {
 } from '../src/chess/lib/perft';
 
 test('perft_5', () => {
-  const engine = new Engine(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
+  const engine = new Core(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);
@@ -22,7 +22,7 @@ test('perft_5', () => {
 });
 
 test('starting position', () => {
-  const engine = new Engine(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
+  const engine = new Core(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);
@@ -35,7 +35,7 @@ test('starting position', () => {
 });
 
 test('vienna opening', () => {
-  const engine = new Engine(parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN));
+  const engine = new Core(parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN));
 
   const start = Date.now();
   const { counter } = searchRoot(engine, 5);

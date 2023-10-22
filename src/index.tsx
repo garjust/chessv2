@@ -11,6 +11,8 @@ if (container == null) {
 
 const root = createRoot(container);
 root.render(
+  // NOTE: Strict mode causes components to render twice in development (mount
+  // and then re-mount).
   <React.StrictMode>
     <App />
   </React.StrictMode>,

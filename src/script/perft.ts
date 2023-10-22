@@ -3,7 +3,7 @@ import { argv } from 'process';
 import { open } from 'fs/promises';
 
 import { parseFEN, isValid } from '../chess/lib/fen';
-import Engine from '../chess/engine';
+import Core from '../chess/core';
 import { moveFromString, moveString } from '../chess/move-notation';
 
 const DEBUG_FILE = '/tmp/perft-debug';
@@ -40,7 +40,7 @@ if (DEBUG) {
   );
 }
 
-const engine = new Engine(position);
+const engine = new Core(position);
 
 for (const move of moveList) {
   engine.applyMove(move);

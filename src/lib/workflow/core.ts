@@ -54,6 +54,12 @@ export interface Workflow<S, A> {
 export const nonNullable = <T>(value: T): value is NonNullable<T> =>
   value != null;
 
+// const isWorkflowNextAction = <A>(
+//   value: InternalAction<A>,
+// ): value is WorkflowNextAction<unkown> => {
+//   return false;
+// };
+
 const isCommand = <A>(value: InternalAction<A>): value is Command =>
   value === Command.Done;
 
@@ -113,12 +119,11 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   const internalActions = new Subject<InternalAction<A>>();
 
+  // Handle Command.DONE
   const [commands, actions] = partition(
     internalActions,
     (val: InternalAction<A>) => isCommand(val),
   ) as [Observable<Command>, Observable<A>];
-
-  // Handle Command.DONE
   commands
     .pipe(
       first((command) => command === Command.Done),

@@ -9,7 +9,7 @@ import {
   SquareLabel,
   SquareOverlayType,
   showHeatmap,
-} from '../workflow/state';
+} from './workflow/state';
 import {
   BOARD_SQUARE_BLACK,
   BOARD_SQUARE_CAPTURABLE,
@@ -20,8 +20,8 @@ import {
   BOARD_SQUARE_LAST_MOVE,
   BOARD_SQUARE_ATTACKED,
 } from './theme';
-import { useWorkflow } from './workflow';
-import { clickSquareAction } from '../workflow/action';
+import { useWorkflow } from './workflow-context';
+import { clickSquareAction } from './workflow/action';
 import Piece from './Piece';
 import { HEATMAPS, HEATMAP_MULTIPLIER } from '../lib/heatmaps';
 

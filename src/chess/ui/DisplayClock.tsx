@@ -1,7 +1,7 @@
 import React from 'react';
 import { Color } from '../types';
-import { State } from '../workflow';
-import { useWorkflow } from './workflow';
+import { State } from './workflow';
+import { useWorkflow } from './workflow-context';
 
 export type DisplayClockProps = {
   style?: React.CSSProperties;
