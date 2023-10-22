@@ -1,10 +1,10 @@
-import { Observable, Subject, empty, from, of, partition } from 'rxjs';
+import { EMPTY, Observable, Subject, empty, from, of, partition } from 'rxjs';
 import {
   catchError,
   filter,
   first,
-  flatMap,
   map,
+  mergeMap,
   pairwise,
   share,
   startWith,
@@ -160,7 +160,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     withLatestFrom(actions),
     map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
-    catchError(() => empty()),
+    catchError(() => EMPTY),
   );
 
   // Subscribe to our internal observables to push values into our public
@@ -179,9 +179,9 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     .pipe(
       // swallow errors from upstream and end the observable gracefully;
       // do not continue with more actions
-      catchError(() => empty()),
+      catchError(() => EMPTY),
       // flat map the next actions observable upward for subscription
-      flatMap(([_, actions]) => actions),
+      mergeMap(([_, actions]) => actions),
     )
     .subscribe({
       // forward actions to original actions subject for processing
