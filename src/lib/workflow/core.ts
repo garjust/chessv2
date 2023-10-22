@@ -19,11 +19,14 @@ type NextActionObservable<A> = Observable<A | Command | null | never>;
 
 type NextActionPromise<A> = Promise<A | Command | null | never>;
 
+type WorkflowNextAction<A> = [Workflow<unknown, A>, A];
+
 export type NextAction<A> =
   | NextActionObservable<A>
   | NextActionPromise<A>
   | A
   | Command
+  | WorkflowNextAction<any>[]
   | null;
 
 export type NextActionFactory<A> = () => NextAction<A>;
@@ -54,6 +57,12 @@ export interface Workflow<S, A> {
 export const nonNullable = <T>(value: T): value is NonNullable<T> =>
   value != null;
 
+// const isWorkflowNextAction = <A>(
+//   value: InternalAction<A>,
+// ): value is WorkflowNextAction<unkown> => {
+//   return false;
+// };
+
 const isCommand = <A>(value: InternalAction<A>): value is Command =>
   value === Command.Done;
 
@@ -72,6 +81,12 @@ export const normalizeUpdateAction = <A>(
       return nextAction;
     } else if (isPromiseLike(nextAction)) {
       return from(nextAction);
+    } else if (nextAction instanceof Array) {
+      // This is a Workflow action
+      for (const [workflow, action] of nextAction) {
+        workflow.emit(action);
+      }
+      return empty();
     } else if (nextAction !== null) {
       return of(nextAction);
     } else {
@@ -113,12 +128,11 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   const internalActions = new Subject<InternalAction<A>>();
 
+  // Handle Command.DONE
   const [commands, actions] = partition(
     internalActions,
     (val: InternalAction<A>) => isCommand(val),
   ) as [Observable<Command>, Observable<A>];
-
-  // Handle Command.DONE
   commands
     .pipe(
       first((command) => command === Command.Done),

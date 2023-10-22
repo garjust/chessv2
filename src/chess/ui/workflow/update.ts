@@ -61,12 +61,19 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
   if (playerForTurn !== HumanPlayer) {
     const instance = getEngineInstance(state, playerForTurn.engineId);
     validateState(instance, UCIState.Idle);
-    instance.engine.emit(
-      // TODO: pass moves I think?
-      // Yeah I think so, and pass "startpos" as the fen string.
-      EngineWorkflow.positionAction(formatPosition(state.position), []),
-    );
-    instance.engine.emit(EngineWorkflow.goAction());
+
+    return [
+      engineStateAs(state, instance.id, UCIState.WaitingForMove),
+      () => [
+        [
+          instance.engine.workflow,
+          // TODO: pass moves I think?
+          // Yeah I think so, and pass "startpos" as the fen string.
+          EngineWorkflow.positionAction(formatPosition(state.position), []),
+        ],
+        [instance.engine.workflow, EngineWorkflow.goAction()],
+      ],
+    ];
   }
 
   return [state, null];
@@ -175,18 +182,23 @@ function handleEngineResponse(
   const response = action.response;
   switch (response.type) {
     case UCIResponseType.UCIOk:
+      console.debug('receive UCIOk', state);
       validateState(instance, UCIState.WaitingForUCIOk);
 
-      instance.engine.emit(EngineWorkflow.isReadyAction());
+      // TODO: move these emit's into a subsequent action. Placed here they are
+      // "blocking".
+      // Idea: can I modify workflow core to be able to return these here.
+      // instance.engine.emit(EngineWorkflow.isReadyAction());
 
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
-        null,
+        () => [[instance.engine.workflow, EngineWorkflow.isReadyAction()]],
       ];
     case UCIResponseType.ReadyOk:
+      console.debug('receive ReadyOk', state);
       validateState(instance, UCIState.WaitingForReadyOk);
 
-      instance.engine.emit(EngineWorkflow.uciNewGameAction());
+      // instance.engine.emit(EngineWorkflow.uciNewGameAction());
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
