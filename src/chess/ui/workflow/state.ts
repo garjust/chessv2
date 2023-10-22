@@ -35,7 +35,7 @@ export enum SquareOverlayCategory {
 }
 
 export enum UCIState {
-  Boot = 'BOOT',
+  Idle = 'IDLE',
   WaitingForUCIOk = 'WAITING_FOR_UCIOK',
   WaitingForReadyOk = 'WAITING_FOR_READYOK',
   WaitingForMove = 'WAITING_FOR_MOVE',
@@ -169,4 +169,24 @@ export const getEngineInstance = (state: State, id: string): EngineInstance => {
     throw Error(`failed to find engine ${id}`);
   }
   return instance;
+};
+
+export const engineStateAs = (
+  state: State,
+  engineId: string,
+  uciState: UCIState,
+): State => ({
+  ...state,
+  engines: {
+    ...state.engines,
+    [engineId]: {
+      ...state.engines[engineId],
+      uciState,
+    },
+  },
+});
+
+export const isWaitingForEngine = (state: State, engineId: string): boolean => {
+  const player = state.players[state.position.turn];
+  return player !== HumanPlayer && player.engineId === engineId;
 };

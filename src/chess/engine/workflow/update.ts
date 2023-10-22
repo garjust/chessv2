@@ -25,7 +25,6 @@ import { loadSearchExecutor } from '../../workers';
 export type Context = {
   executor: SearchExecutorI;
   engine: Core;
-  sendUCIResponse: (response: UCIResponse) => void;
 };
 
 const respondWith =
@@ -92,7 +91,6 @@ function handleGo(
 ): Update<State, Action> {
   // Call engine to do stuff.
   const nextMove = context.executor.nextMove(context.engine.position, 500);
-  nextMove.then();
 
   return [
     state,
@@ -118,12 +116,8 @@ function handleQuit(state: State): Update<State, Action> {
   throw Error('quit I guess');
 }
 
-function handleRespond(
-  state: State,
-  action: RespondAction,
-  context: Context,
-): Update<State, Action> {
-  context.sendUCIResponse(action.response);
+function handleRespond(state: State, _: RespondAction): Update<State, Action> {
+  // No-op action used for communicating externally.
   return [state, null];
 }
 
@@ -180,7 +174,7 @@ export const update =
       case Type.Quit:
         return handleQuit(state);
       case InternalType.Respond:
-        return handleRespond(state, action, context);
+        return handleRespond(state, action);
       case InternalType.LoadSearchExecutor:
         return handleLoadSearchExecutor(state, action);
       case InternalType.LoadSearchExecutorDone:

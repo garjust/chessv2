@@ -18,7 +18,7 @@ export class Orchestrator {
 
   constructor() {
     this.workflow = init(createState(), {
-      engine: new Core(),
+      core: new Core(),
     });
     this.workflow.updates.subscribe(
       updateLogger('Chess', [Type.TickPlayersClock]),

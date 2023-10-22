@@ -18,6 +18,7 @@ import {
   SetPositionAction,
   SetPositionFromFENAction,
   EngineResponseAction,
+  engineResponseAction,
 } from './action';
 import { State, Action } from './index';
 import {
@@ -30,8 +31,10 @@ import {
   UCIState,
   EngineInstance,
   getEngineInstance,
+  engineStateAs,
+  isWaitingForEngine,
 } from './state';
-import { from } from 'rxjs';
+import { concat, from, map, of } from 'rxjs';
 import Core from '../../core';
 import { play, Sound } from '../audio';
 import {
@@ -39,19 +42,14 @@ import {
   setOverlayForPins,
   setOverlayForPlay,
 } from './overlay';
-import { loadEngine } from '../../workers';
 import { EVALUATION_DIVIDER } from '../../core/evaluation';
 import { Version, LATEST } from '../../engine/registry';
-import {
-  UCIResponse,
-  UCIResponseType,
-} from '../../engine/workflow/uci-response';
+import { UCIResponseType } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
-import Logger from '../../../lib/logger';
 
 export type Context = {
-  engine: Core;
+  core: Core;
 };
 
 const COMPUTER_VERSION: Version = LATEST;
@@ -62,9 +60,10 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
 
   if (playerForTurn !== HumanPlayer) {
     const instance = getEngineInstance(state, playerForTurn.engineId);
-
+    validateState(instance, UCIState.Idle);
     instance.engine.emit(
-      // TODO: pass moves?
+      // TODO: pass moves I think?
+      // Yeah I think so, and pass "startpos" as the fen string.
       EngineWorkflow.positionAction(formatPosition(state.position), []),
     );
     instance.engine.emit(EngineWorkflow.goAction());
@@ -104,6 +103,9 @@ function handleChessComputerLoaded(
   const { instance, color } = action;
 
   instance.engine.emit(EngineWorkflow.uciAction());
+  instance.uciState = UCIState.WaitingForUCIOk;
+
+  window.DEBUG_EMIT = (action) => instance.engine.emit(action);
 
   return [
     {
@@ -116,7 +118,13 @@ function handleChessComputerLoaded(
         [color]: { engineId: instance.id },
       },
     },
-    attemptComputerMoveAction,
+    () =>
+      instance.engine.responses.pipe(
+        map((response) => {
+          console.debug('engineResponseAction');
+          return engineResponseAction(instance.id, response);
+        }),
+      ),
   ];
 }
 
@@ -168,14 +176,25 @@ function handleEngineResponse(
   switch (response.type) {
     case UCIResponseType.UCIOk:
       validateState(instance, UCIState.WaitingForUCIOk);
+
       instance.engine.emit(EngineWorkflow.isReadyAction());
-      // TODO: update engine instance state
-      return [state, null];
+
+      return [
+        engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
+        null,
+      ];
     case UCIResponseType.ReadyOk:
       validateState(instance, UCIState.WaitingForReadyOk);
+
       instance.engine.emit(EngineWorkflow.uciNewGameAction());
-      // TODO: update engine instance state
-      return [state, null];
+
+      return [
+        engineStateAs(state, instance.id, UCIState.Idle),
+        isWaitingForEngine(state, instance.id)
+          ? attemptComputerMoveAction
+          : null,
+      ];
+
     case UCIResponseType.BestMove:
       validateState(instance, UCIState.WaitingForMove);
       console.log(
@@ -183,7 +202,10 @@ function handleEngineResponse(
         instance.engine.diagnosticsResult,
       );
 
-      return [state, () => receiveComputerMoveAction(response.move)];
+      return [
+        engineStateAs(state, instance.id, UCIState.Idle),
+        () => receiveComputerMoveAction(response.move),
+      ];
   }
 
   return [state, null];
@@ -207,19 +229,8 @@ function handleLoadChessComputer(
   const { players } = state;
   const player = players[playingAs];
 
-  const logger = new Logger('uci-response');
-
   if (player === HumanPlayer) {
-    // This function needs to be attached to the workflow observables system.
-    // - Emit an "EngineRespond" action?
-    //    if doing this handleEngineRespond could depending on the UCI response
-    //    further emit actions (this is good)
-    const responseFunc = (response: UCIResponse) => {
-      logger.debug(response.type, response);
-    };
-
-    const engine = new Engine(COMPUTER_VERSION, 10, responseFunc);
-    engine.emit(EngineWorkflow.uciAction());
+    const engine = new Engine(COMPUTER_VERSION, 10);
 
     return [
       state,
@@ -228,7 +239,7 @@ function handleLoadChessComputer(
           {
             id: createEngineId(),
             label: engine.label,
-            uciState: UCIState.Boot,
+            uciState: UCIState.Idle,
             engine,
             __computer: true,
           },
@@ -258,13 +269,13 @@ function handleOverlaySquares(
       setOverlayForPlay(squareOverlay, state);
       break;
     case SquareOverlayCategory.AttacksForWhite:
-      setOverlayForAttacks(squareOverlay, context.engine.attacks[Color.White]);
+      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.White]);
       break;
     case SquareOverlayCategory.AttacksForBlack:
-      setOverlayForAttacks(squareOverlay, context.engine.attacks[Color.Black]);
+      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.Black]);
       break;
     case SquareOverlayCategory.Pins:
-      setOverlayForPins(squareOverlay, context.engine.pins);
+      setOverlayForPins(squareOverlay, context.core.pins);
       break;
   }
 
@@ -273,7 +284,7 @@ function handleOverlaySquares(
 
 function handlePreviousPosition(
   state: State,
-  { engine }: Context,
+  { core: engine }: Context,
 ): Update<State, Action> {
   engine.undoLastMove();
   play(Sound.Move);
@@ -299,7 +310,7 @@ function handleResetOverlay(state: State): Update<State, Action> {
 function handleMovePiece(
   state: State,
   action: MovePieceAction,
-  { engine }: Context,
+  { core: engine }: Context,
 ): Update<State, Action> {
   const { move } = action;
   const legalMoves = state.moves;
@@ -356,7 +367,7 @@ function handleMovePiece(
 function handleSetPosition(
   state: State,
   action: SetPositionAction,
-  { engine }: Context,
+  { core: engine }: Context,
 ): Update<State, Action> {
   const { position } = action;
   const moves = engine.generateMoves();
@@ -417,7 +428,7 @@ function handleSetPosition(
 function handleSetPositionFromFEN(
   state: State,
   action: SetPositionFromFENAction,
-  { engine }: Context,
+  { core: engine }: Context,
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
   engine.position = position;

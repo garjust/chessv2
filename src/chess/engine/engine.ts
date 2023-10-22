@@ -6,9 +6,14 @@ import init, {
   createState,
   loadSearchExecutorAction,
 } from './workflow';
+import { InternalType, RespondAction } from './workflow/action';
 import { SearchExecutorI } from './search-executor';
 import { UCIResponse } from './workflow/uci-response';
 import { Workflow, updateLogger } from '../../lib/workflow';
+import { Observable, filter, map } from 'rxjs';
+
+const isRespondAction = (action: Action): action is RespondAction =>
+  action.type === InternalType.Respond;
 
 // Class representing a chess engine which communicates via the UCI protocol.
 //
@@ -18,16 +23,11 @@ export class Engine {
   private searchExecutor: SearchExecutorI;
   private workflow: Workflow<State, Action>;
 
-  constructor(
-    version: Version,
-    maxDepth: number,
-    responseFunc: (response: UCIResponse) => void,
-  ) {
+  constructor(version: Version, maxDepth: number) {
     this.searchExecutor = new Registry[version](maxDepth);
     this.workflow = init(createState(), {
       engine: new Core(),
       executor: this.searchExecutor,
-      sendUCIResponse: responseFunc,
     });
 
     this.workflow.updates.subscribe(updateLogger('Engine'));
@@ -45,5 +45,13 @@ export class Engine {
 
   get label() {
     return this.searchExecutor.label;
+  }
+
+  get responses(): Observable<UCIResponse> {
+    return this.workflow.updates.pipe(
+      map(([_, action]) => action),
+      filter(isRespondAction),
+      map((action) => action.response),
+    );
   }
 }
