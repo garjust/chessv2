@@ -39,29 +39,31 @@ export interface Workflow<S, A> {
   updates: Observable<[[S, S], A]>;
 }
 
-export type NextAction<A> =
+/**
+ * Valid work that can be performed by the workflow.
+ */
+export type Work<A> =
   | Observable<A | Command | null | never>
   | Promise<A | Command | null | never>
   | A
   | Command
   | null;
 
-export type NextActionFactory<A> = () => NextAction<A>;
+export type LazyWork<A> = () => Work<A>;
 
-export type Update<S, A> = [S, NextActionFactory<A> | null];
+/**
+ * An update returned by an updater function. Actions emitted to the workflow
+ * are handled by the updater returning a new state S and more work to perform.
+ */
+export type Update<S, A> = [S, LazyWork<A> | null];
 
-// FIXME(steckel): How do we have the type system enforce Readonly<T>?
-export type Updater<S, A> = (
-  state: Readonly<S>,
-  action: Readonly<A>,
-) => Update<S, A>;
-
-export type UpdateSubscriber<S, A> = (state: S, action: A) => void;
+/**
+ * A workflow instance needs to define and provide a valid updater function.
+ */
+type Updater<S, A> = (state: Readonly<S>, action: Readonly<A>) => Update<S, A>;
 
 type InternalAction<A> = A | Command;
-
 type InternalUpdateAction<A> = Observable<InternalAction<A>>;
-
 type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 
 const nonNullable = <T>(value: T): value is NonNullable<T> => value != null;
@@ -72,16 +74,14 @@ const isCommand = <A>(value: InternalAction<A>): value is Command =>
 const isPromiseLike = (value: unknown): value is Promise<unknown> =>
   value instanceof Promise;
 
-const normalizeUpdateAction = <A>(
-  nextAction: NextAction<A>,
-): InternalUpdateAction<A> => {
+const normalizeWork = <A>(work: Work<A>): InternalUpdateAction<A> => {
   const observableAction = (() => {
-    if (nextAction instanceof Observable) {
-      return nextAction;
-    } else if (isPromiseLike(nextAction)) {
-      return from(nextAction);
-    } else if (nextAction !== null) {
-      return of(nextAction);
+    if (work instanceof Observable) {
+      return work;
+    } else if (isPromiseLike(work)) {
+      return from(work);
+    } else if (work !== null) {
+      return of(work);
     } else {
       return EMPTY;
     }
@@ -118,7 +118,8 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   // Public side-effect subject. This will be exposed publically as a hot
   // observable for workflow side-effects.
   const publicUpdates = new Subject<[[S, S], A]>();
-
+  // Internal actions subject. This subject is the "root" observable of the
+  // workflow.
   const internalActions = new Subject<InternalAction<A>>();
 
   // Handle Command.DONE
@@ -137,9 +138,9 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   const actionHandler: Observable<InternalUpdate<S, A>> = actions.pipe(
     update(updater, seed),
     map(
-      ([state, nextActionFactory]): InternalUpdate<S, A> => [
+      ([state, lazyWork]): InternalUpdate<S, A> => [
         state,
-        normalizeUpdateAction(nextActionFactory?.() ?? null),
+        normalizeWork(lazyWork?.() ?? null),
       ],
     ),
     // We need this observable to be hot so that the update function does not

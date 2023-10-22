@@ -138,7 +138,7 @@ function handleChessComputerLoaded(
           new Promise<null>((resolve) => {
             setTimeout(() => {
               instance.engine.emit(EngineWorkflow.uciAction());
-              return resolve(null);
+              resolve(null);
             }, 1);
           }),
         ),
@@ -201,7 +201,7 @@ function handleEngineResponse(
           new Promise((resolve) => {
             setTimeout(() => {
               instance.engine.emit(EngineWorkflow.isReadyAction());
-              return resolve(null);
+              resolve(null);
             }, 1);
           }),
       ];
