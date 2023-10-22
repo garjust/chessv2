@@ -63,9 +63,23 @@ export class Engine {
     return this.searchExecutor.label;
   }
 
-  // ...Don't need replay subject if we emit the first actions async:
-  // adding a timeout in the promises causes handleChessComputerLoaded to fully
-  // "resolve" creating the subscription.
+  // Return an observable of UCIResponse objects.
+  //
+  // Extra note:
+  // If there is a problem with timing of subscribing to the observable returned
+  // here a ReplaySubject can be used:
+  //
+  // const responses = new ReplaySubject<UCIResponse>();
+  // this.workflow.updates
+  //   .pipe(
+  //     map(([_, action]) => action),
+  //     filter(isRespondAction),
+  //     map((action) => action.response),
+  //   )
+  //   .subscribe((response) => {
+  //     responses.next(response);
+  //   });
+  // this.responses = responses.asObservable();
   get responses(): Observable<UCIResponse> {
     return this.workflow.updates.pipe(
       map(([_, action]) => action),
