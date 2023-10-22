@@ -19,14 +19,11 @@ type NextActionObservable<A> = Observable<A | Command | null | never>;
 
 type NextActionPromise<A> = Promise<A | Command | null | never>;
 
-type WorkflowNextAction<A> = [Workflow<unknown, A>, A];
-
 export type NextAction<A> =
   | NextActionObservable<A>
   | NextActionPromise<A>
   | A
   | Command
-  | WorkflowNextAction<any>[]
   | null;
 
 export type NextActionFactory<A> = () => NextAction<A>;
@@ -81,12 +78,6 @@ export const normalizeUpdateAction = <A>(
       return nextAction;
     } else if (isPromiseLike(nextAction)) {
       return from(nextAction);
-    } else if (nextAction instanceof Array) {
-      // This is a Workflow action
-      for (const [workflow, action] of nextAction) {
-        workflow.emit(action);
-      }
-      return empty();
     } else if (nextAction !== null) {
       return of(nextAction);
     } else {

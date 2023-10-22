@@ -34,7 +34,7 @@ import {
   engineStateAs,
   isWaitingForEngine,
 } from './state';
-import { concat, from, map, of } from 'rxjs';
+import { from, map, merge } from 'rxjs';
 import Core from '../../core';
 import { play, Sound } from '../audio';
 import {
@@ -64,15 +64,18 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
 
     return [
       engineStateAs(state, instance.id, UCIState.WaitingForMove),
-      () => [
-        [
-          instance.engine.workflow,
-          // TODO: pass moves I think?
-          // Yeah I think so, and pass "startpos" as the fen string.
-          EngineWorkflow.positionAction(formatPosition(state.position), []),
-        ],
-        [instance.engine.workflow, EngineWorkflow.goAction()],
-      ],
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            // TODO: pass moves I think?
+            // Yeah I think so, and pass "startpos" as the fen string.
+            instance.engine.emit(
+              EngineWorkflow.positionAction(formatPosition(state.position), []),
+            );
+            instance.engine.emit(EngineWorkflow.goAction());
+            resolve(null);
+          }, 1);
+        }),
     ];
   }
 
@@ -109,10 +112,7 @@ function handleChessComputerLoaded(
 ): Update<State, Action> {
   const { instance, color } = action;
 
-  instance.engine.emit(EngineWorkflow.uciAction());
   instance.uciState = UCIState.WaitingForUCIOk;
-
-  window.DEBUG_EMIT = (action) => instance.engine.emit(action);
 
   return [
     {
@@ -126,11 +126,22 @@ function handleChessComputerLoaded(
       },
     },
     () =>
-      instance.engine.responses.pipe(
-        map((response) => {
-          console.debug('engineResponseAction');
-          return engineResponseAction(instance.id, response);
-        }),
+      merge(
+        // Here is where we link the workflows together by returning an
+        // observable here parent actions mapped from child actions.
+        instance.engine.responses.pipe(
+          map((response) => {
+            return engineResponseAction(instance.id, response);
+          }),
+        ),
+        from(
+          new Promise<null>((resolve) => {
+            setTimeout(() => {
+              instance.engine.emit(EngineWorkflow.uciAction());
+              return resolve(null);
+            }, 1);
+          }),
+        ),
       ),
   ];
 }
@@ -182,23 +193,20 @@ function handleEngineResponse(
   const response = action.response;
   switch (response.type) {
     case UCIResponseType.UCIOk:
-      console.debug('receive UCIOk', state);
       validateState(instance, UCIState.WaitingForUCIOk);
-
-      // TODO: move these emit's into a subsequent action. Placed here they are
-      // "blocking".
-      // Idea: can I modify workflow core to be able to return these here.
-      // instance.engine.emit(EngineWorkflow.isReadyAction());
 
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
-        () => [[instance.engine.workflow, EngineWorkflow.isReadyAction()]],
+        () =>
+          new Promise((resolve) => {
+            setTimeout(() => {
+              instance.engine.workflow.emit(EngineWorkflow.isReadyAction());
+              return resolve(null);
+            }, 1);
+          }),
       ];
     case UCIResponseType.ReadyOk:
-      console.debug('receive ReadyOk', state);
       validateState(instance, UCIState.WaitingForReadyOk);
-
-      // instance.engine.emit(EngineWorkflow.uciNewGameAction());
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),

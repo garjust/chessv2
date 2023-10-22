@@ -10,7 +10,7 @@ import { InternalType, RespondAction } from './workflow/action';
 import { SearchExecutorI } from './search-executor';
 import { UCIResponse } from './workflow/uci-response';
 import { Workflow, updateLogger } from '../../lib/workflow';
-import { Observable, filter, map } from 'rxjs';
+import { Observable, ReplaySubject, filter, map } from 'rxjs';
 
 const isRespondAction = (action: Action): action is RespondAction =>
   action.type === InternalType.Respond;
@@ -22,6 +22,7 @@ const isRespondAction = (action: Action): action is RespondAction =>
 export class Engine {
   private searchExecutor: SearchExecutorI;
   workflow: Workflow<State, Action>;
+  // responses: Observable<UCIResponse>;
 
   constructor(version: Version, maxDepth: number) {
     this.searchExecutor = new Registry[version](maxDepth);
@@ -31,6 +32,21 @@ export class Engine {
     });
 
     this.workflow.updates.subscribe(updateLogger('Engine'));
+
+    // Expose responses using a ReplaySubject. This prevents us from needing to
+    // create the subscription to the responses observable before the first
+    // action is emitted.
+    // const responses = new ReplaySubject<UCIResponse>();
+    // this.workflow.updates
+    //   .pipe(
+    //     map(([_, action]) => action),
+    //     filter(isRespondAction),
+    //     map((action) => action.response),
+    //   )
+    //   .subscribe((response) => {
+    //     responses.next(response);
+    //   });
+    // this.responses = responses.asObservable();
 
     this.workflow.emit(loadSearchExecutorAction(version, maxDepth));
   }
@@ -47,6 +63,9 @@ export class Engine {
     return this.searchExecutor.label;
   }
 
+  // ...Don't need replay subject if we emit the first actions async:
+  // adding a timeout in the promises causes handleChessComputerLoaded to fully
+  // "resolve" creating the subscription.
   get responses(): Observable<UCIResponse> {
     return this.workflow.updates.pipe(
       map(([_, action]) => action),
