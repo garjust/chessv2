@@ -14,11 +14,12 @@ const rl = readline.createInterface({
   output: process.stdout,
   terminal: false,
 });
-const responseFunc = (response: UCIResponse) => {
-  toUCI(response).map((str: string) => rl.write(`${str}\n`));
-};
 
-const searchEngine = new Engine(SEARCH_VERSION, 10, responseFunc);
+const searchEngine = new Engine(SEARCH_VERSION, 10);
+
+searchEngine.responses.subscribe((response: UCIResponse) => {
+  toUCI(response).map((str: string) => rl.write(`${str}\n`));
+});
 
 if (DEBUG) {
   searchEngine.emit(debugAction(true));

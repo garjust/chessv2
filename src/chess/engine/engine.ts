@@ -21,7 +21,7 @@ const isRespondAction = (action: Action): action is RespondAction =>
 // workflow actions.
 export class Engine {
   private searchExecutor: SearchExecutorI;
-  workflow: Workflow<State, Action>;
+  private workflow: Workflow<State, Action>;
 
   constructor(version: Version, maxDepth: number) {
     this.searchExecutor = new Registry[version](maxDepth);

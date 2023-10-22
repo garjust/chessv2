@@ -200,7 +200,7 @@ function handleEngineResponse(
         () =>
           new Promise((resolve) => {
             setTimeout(() => {
-              instance.engine.workflow.emit(EngineWorkflow.isReadyAction());
+              instance.engine.emit(EngineWorkflow.isReadyAction());
               return resolve(null);
             }, 1);
           }),
