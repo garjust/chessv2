@@ -1,4 +1,3 @@
-import { Remote } from 'comlink';
 import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import {
   Color,
@@ -46,7 +45,7 @@ export const Draw = Symbol('DRAW');
 
 export type EngineInstance = {
   id: string;
-  label: string;
+  label?: string;
   uciState: UCIState;
   engine: Engine;
   // This property is here to indicate to JSON.stringify replacer function

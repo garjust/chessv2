@@ -10,11 +10,14 @@ import {
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
+import makeSentinel from 'mutation-sentinel';
 
 /** Built-in "action" */
 export enum Command {
   /** Instruct the workflow that it should complete all observables. */
   Done = 'command__DONE',
+  /** Enable automatically detecting mutations in all state objects */
+  EnableMutationDetection = 'command__ENABLE_MUTATION_DETECTION',
 }
 
 /**
@@ -26,7 +29,7 @@ export interface Workflow<S, A> {
   /**
    * Emit actions to the workflow.
    */
-  emit: (action: A) => void;
+  emit: (action: A | Command) => void;
   /**
    * Observable of states from the workflow. Subscribe to receive
    * the latest states.
@@ -68,7 +71,7 @@ type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 const nonNullable = <T>(value: T): value is NonNullable<T> => value != null;
 
 const isCommand = <A>(value: InternalAction<A>): value is Command =>
-  value === Command.Done;
+  value === Command.Done || value === Command.EnableMutationDetection;
 
 const isPromiseLike = (value: unknown): value is Promise<unknown> =>
   value instanceof Promise;
@@ -121,7 +124,9 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   // workflow.
   const internalActions = new Subject<InternalAction<A>>();
 
-  // Handle Command.DONE
+  let enableMutationDetection = false;
+
+  // Handle Commands
   const [commands, actions] = partition(
     internalActions,
     (val: InternalAction<A>) => isCommand(val),
@@ -132,6 +137,14 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       catchError(() => EMPTY),
     )
     .subscribe(() => publicStates.complete());
+  commands
+    .pipe(
+      first((command) => command === Command.EnableMutationDetection),
+      catchError(() => EMPTY),
+    )
+    .subscribe(() => {
+      enableMutationDetection = true;
+    });
 
   // This observable receives actions and invokes the updater function
   const actionHandler: Observable<InternalUpdate<S, A>> = actions.pipe(
@@ -150,6 +163,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   // This observable powers our public states observable
   const states: Observable<S> = actionHandler.pipe(
     map(([state, _]) => state),
+    map((state) => (enableMutationDetection ? makeSentinel(state) : state)),
     // immediately send the initial state into the observable
     // (aids with updates initial value)
     startWith(seed),
@@ -193,9 +207,8 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       error: (err) => internalActions.error(err),
     });
 
-  // TODO(steckel): Consider transforming states with `.pipe(distinctUntilChanged)`
   return {
-    emit: (action: A) => internalActions.next(action),
+    emit: (action: A | Command) => internalActions.next(action),
     states: publicStates.asObservable().pipe(share()),
     updates: publicUpdates.asObservable().pipe(share()),
   };

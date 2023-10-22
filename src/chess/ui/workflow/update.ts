@@ -130,7 +130,13 @@ function handleChessComputerLoaded(
             return engineResponseAction(instance.id, response);
           }),
         ),
-        from(delayEmit(instance.engine, EngineWorkflow.uciAction())),
+        from(
+          delayEmit(
+            instance.engine,
+            EngineWorkflow.uciAction(),
+            EngineWorkflow.debugAction(true),
+          ),
+        ),
       ),
   ];
 }
@@ -181,6 +187,22 @@ function handleEngineResponse(
 
   const response = action.response;
   switch (response.type) {
+    case UCIResponseType.Id:
+      return [
+        {
+          ...state,
+          engines: {
+            ...state.engines,
+            [instance.id]: {
+              ...state.engines[instance.id],
+              label: response.name,
+            },
+          },
+        },
+        null,
+      ];
+    case UCIResponseType.Option:
+      return [state, null];
     case UCIResponseType.UCIOk:
       validateState(instance, UCIState.WaitingForUCIOk);
 
@@ -209,9 +231,9 @@ function handleEngineResponse(
         engineStateAs(state, instance.id, UCIState.Idle),
         () => receiveComputerMoveAction(response.move),
       ];
+    default:
+      throw Error(`dont know how to handle UCIResponse ${response.type}`);
   }
-
-  return [state, null];
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {
@@ -241,7 +263,6 @@ function handleLoadChessComputer(
         chessComputerLoadedAction(
           {
             id: createEngineId(),
-            label: engine.label,
             uciState: UCIState.Idle,
             engine,
             __computer: true,

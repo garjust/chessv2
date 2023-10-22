@@ -10,7 +10,8 @@ import { InternalType, RespondAction } from './workflow/action';
 import { SearchExecutorI } from './search-executor';
 import { UCIResponse } from './workflow/uci-response';
 import { Workflow, updateLogger } from '../../lib/workflow';
-import { Observable, ReplaySubject, filter, map } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
+import { immutableStateWatcher } from '../../lib/workflow/logger';
 
 const isRespondAction = (action: Action): action is RespondAction =>
   action.type === InternalType.Respond;
@@ -31,6 +32,7 @@ export class Engine {
     });
 
     this.workflow.updates.subscribe(updateLogger('Engine'));
+    // this.workflow.states.subscribe(immutableStateWatcher());
 
     this.workflow.emit(loadSearchExecutorAction(version, maxDepth));
   }
