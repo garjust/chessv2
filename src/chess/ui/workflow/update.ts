@@ -47,6 +47,7 @@ import { Version, LATEST } from '../../engine/registry';
 import { UCIResponseType } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
+import { delayEmit } from '../../../lib/workflow/util';
 
 export type Context = {
   core: Core;
@@ -65,17 +66,12 @@ function handleAttemptComputerMove(state: State): Update<State, Action> {
     return [
       engineStateAs(state, instance.id, UCIState.WaitingForMove),
       () =>
-        new Promise((resolve) => {
-          setTimeout(() => {
-            // TODO: pass moves I think?
-            // Yeah I think so, and pass "startpos" as the fen string.
-            instance.engine.emit(
-              EngineWorkflow.positionAction(formatPosition(state.position), []),
-            );
-            instance.engine.emit(EngineWorkflow.goAction());
-            resolve(null);
-          }, 1);
-        }),
+        delayEmit(
+          instance.engine,
+          // TODO: provide moves so far & pass "startpos"
+          EngineWorkflow.positionAction(formatPosition(state.position), []),
+          EngineWorkflow.goAction(),
+        ),
     ];
   }
 
@@ -134,14 +130,7 @@ function handleChessComputerLoaded(
             return engineResponseAction(instance.id, response);
           }),
         ),
-        from(
-          new Promise<null>((resolve) => {
-            setTimeout(() => {
-              instance.engine.emit(EngineWorkflow.uciAction());
-              resolve(null);
-            }, 1);
-          }),
-        ),
+        from(delayEmit(instance.engine, EngineWorkflow.uciAction())),
       ),
   ];
 }
@@ -197,13 +186,7 @@ function handleEngineResponse(
 
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
-        () =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              instance.engine.emit(EngineWorkflow.isReadyAction());
-              resolve(null);
-            }, 1);
-          }),
+        () => delayEmit(instance.engine, EngineWorkflow.isReadyAction()),
       ];
     case UCIResponseType.ReadyOk:
       validateState(instance, UCIState.WaitingForReadyOk);
