@@ -341,7 +341,7 @@ function handleMovePiece(
 
   if (!movesIncludes(legalMoves, move)) {
     const piece = pieceInSquare(state, move.from);
-    console.log(
+    console.warn(
       'illegal move!',
       piece,
       move.from,
