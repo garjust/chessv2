@@ -357,7 +357,7 @@ function handleMovePiece(
     throw Error('there should be a piece to move');
   }
 
-  // Check if the move is a promotion. Since there is no UI we need to auto-promot
+  // Check if the move is a promotion. Since there is no UI we need to auto-promote
   // as queen for human players.
   if (
     pieceToMove.type === PieceType.Pawn &&

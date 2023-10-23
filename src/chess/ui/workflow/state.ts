@@ -61,33 +61,33 @@ export type Player =
       engineId: string;
     };
 
-export interface State {
-  readonly debugVersion?: number;
-  readonly boardOrientation: Color;
-  readonly squareLabels: SquareLabel;
-  readonly clocks: {
-    readonly gameLength: number;
-    readonly plusTime: number;
-    readonly lastTick: number;
-    readonly [Color.White]: number;
-    readonly [Color.Black]: number;
-  };
-  readonly engines: Record<string, EngineInstance>;
-  readonly players: {
-    readonly [Color.White]: Player;
-    readonly [Color.Black]: Player;
-  };
-  readonly winner?: Color | typeof Draw;
-  readonly selectedSquare?: Square;
-  readonly overlayCategory: SquareOverlayCategory;
-  readonly squareOverlay: Record<Square, SquareOverlayType>;
-  readonly position: Position;
-  readonly moves: MoveWithExtraData[];
-  readonly checks: SquareControlObject[];
-  readonly evaluation: number;
-  readonly zobrist?: [number, number];
-  readonly lastMove?: Move;
-}
+export type State = Readonly<{
+  debugVersion?: number;
+  boardOrientation: Color;
+  squareLabels: SquareLabel;
+  clocks: Readonly<{
+    gameLength: number;
+    plusTime: number;
+    lastTick: number;
+    [Color.White]: number;
+    [Color.Black]: number;
+  }>;
+  engines: Readonly<Record<string, EngineInstance>>;
+  players: Readonly<{
+    [Color.White]: Player;
+    [Color.Black]: Player;
+  }>;
+  winner?: Color | typeof Draw;
+  selectedSquare?: Square;
+  overlayCategory: SquareOverlayCategory;
+  squareOverlay: Record<Square, SquareOverlayType>;
+  position: Readonly<Position>;
+  moves: Readonly<MoveWithExtraData[]>;
+  checks: Readonly<SquareControlObject[]>;
+  evaluation: number;
+  zobrist?: Readonly<[number, number]>;
+  lastMove?: Move;
+}>;
 
 const GAME_LENGTH = 300;
 const PLUS_TIME = 5;

@@ -13,11 +13,11 @@ export type ExecutorInstance = {
   __computer: true;
 };
 
-export interface State {
+export type State = Readonly<{
   debug: boolean;
-  positionForGo: Position;
-  executorInstance: ExecutorInstance | null;
-}
+  positionForGo: Readonly<Position>;
+  executorInstance: Readonly<ExecutorInstance> | null;
+}>;
 
 const INITIAL_STATE: State = {
   debug: false,

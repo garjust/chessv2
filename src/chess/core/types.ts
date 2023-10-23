@@ -1,4 +1,4 @@
-import { Color, Pin, Position as ExternalPosition, Square } from '../types';
+import { Color, Position as ExternalPosition, Square } from '../types';
 import AttackMap from './attack-map';
 import Pins from './pins';
 

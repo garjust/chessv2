@@ -111,7 +111,7 @@ export const squaresInclude = (squares: Square[], square: Square): boolean =>
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
   Boolean(a && b && a.from === b.from && a.to === b.to);
 
-export const movesIncludes = (moves: Move[], move: Move): boolean =>
+export const movesIncludes = (moves: Readonly<Move[]>, move: Move): boolean =>
   moves.some((x) => moveEquals(x, move));
 
 export const isLegalSquare = (square: Square): boolean =>

@@ -3,7 +3,7 @@ import Timer from '../../../lib/timer';
 import HistoryTable from './history-table';
 import PVTable from './pv-table';
 import TranspositionTable from './transposition-table';
-import { Move, Position } from '../../types';
+import { Move } from '../../types';
 import { TranspositionTableEntry } from './types';
 
 // Communication with web workers is slow, too slow to do at every node.
