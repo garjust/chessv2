@@ -36,7 +36,7 @@ const makeRender =
   ({ square }: Pick<SquareProps, 'square'>) =>
   (state: State) => ({
     piece: pieceInSquare(state, square),
-    overlay: state.squareOverlay?.get(square),
+    overlay: state.squareOverlay[square],
     isClickable: isSquareClickable(state, square),
     squareLabels: state.squareLabels,
     showHeatmap: showHeatmap(state),

@@ -51,26 +51,3 @@ export const updateLogger = <S, A extends ActionWithType>(
   };
 };
 /* eslint-enable no-console */
-
-export const immutableStateWatcher = <S extends object>(
-  matchFn: (state: S) => string = JSON.stringify,
-) => {
-  const stateHistory: { state: S; blob: string }[] = [];
-  const logger = new Logger('state-watcher');
-
-  const review = () => {
-    for (const { state, blob } of stateHistory) {
-      if (matchFn(state) !== blob) {
-        logger.warn(
-          `detected a state mutation`,
-          stateHistory[stateHistory.length - 1],
-        );
-      }
-    }
-  };
-
-  return (state: S) => {
-    stateHistory.push({ state, blob: matchFn(state) });
-    review();
-  };
-};

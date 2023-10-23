@@ -8,23 +8,23 @@ import {
 } from './state';
 
 export const setOverlayForPlay = (
-  map: Map<Square, SquareOverlayType>,
+  map: Record<Square, SquareOverlayType>,
   state: State,
 ): void => {
   const { position, selectedSquare, lastMove, moves } = state;
 
   if (lastMove) {
-    map.set(lastMove.from, SquareOverlayType.LastMove);
-    map.set(lastMove.to, SquareOverlayType.LastMove);
+    map[lastMove.from] = SquareOverlayType.LastMove;
+    map[lastMove.to] = SquareOverlayType.LastMove;
   }
 
   const check = checkedSquare(state);
   if (check) {
-    map.set(check, SquareOverlayType.Check);
+    map[check] = SquareOverlayType.Check;
   }
 
   if (selectedSquare !== undefined) {
-    map.set(selectedSquare, SquareOverlayType.SelectedPiece);
+    map[selectedSquare] = SquareOverlayType.SelectedPiece;
 
     const piece = pieceInSquare(state, selectedSquare);
     if (piece) {
@@ -34,9 +34,9 @@ export const setOverlayForPlay = (
 
       candidateSquares.forEach(({ to: square }) => {
         if (position.pieces.has(square)) {
-          map.set(square, SquareOverlayType.Capturable);
+          map[square] = SquareOverlayType.Capturable;
         } else {
-          map.set(square, SquareOverlayType.Movable);
+          map[square] = SquareOverlayType.Movable;
         }
       });
     }
@@ -44,31 +44,31 @@ export const setOverlayForPlay = (
 };
 
 export const setOverlayForAttacks = (
-  map: Map<Square, SquareOverlayType>,
+  map: Record<Square, SquareOverlayType>,
   attacks: AttackMap,
 ) => {
   for (const [square, count] of attacks.attackCounts()) {
     if (count > 0) {
-      map.set(square, SquareOverlayType.Attacked);
+      map[square] = SquareOverlayType.Attacked;
     }
   }
 };
 
 export const setOverlayForPins = (
-  map: Map<Square, SquareOverlayType>,
+  map: Record<Square, SquareOverlayType>,
   pins: Pin[],
 ) => {
   // Do each type of square involved in the pin one at a time so that we don't
   // color over squares as much as possible.
   for (const pin of pins) {
     for (const square of pin.legalMoveSquares) {
-      map.set(square, SquareOverlayType.Movable);
+      map[square] = SquareOverlayType.Movable;
     }
   }
   for (const pin of pins) {
-    map.set(pin.attacker, SquareOverlayType.SelectedPiece);
+    map[pin.attacker] = SquareOverlayType.SelectedPiece;
   }
   for (const pin of pins) {
-    map.set(pin.pinned, SquareOverlayType.Capturable);
+    map[pin.pinned] = SquareOverlayType.Capturable;
   }
 };

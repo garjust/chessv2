@@ -285,7 +285,7 @@ function handleOverlaySquares(
   state: State,
   context: Context,
 ): Update<State, Action> {
-  const squareOverlay = new Map<Square, SquareOverlayType>();
+  const squareOverlay: Record<Square, SquareOverlayType> = {};
   const { overlayCategory } = state;
 
   switch (overlayCategory) {
@@ -328,7 +328,7 @@ function handleReceiveComputerMove(
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
-  return [{ ...state, squareOverlay: undefined }, null];
+  return [{ ...state, squareOverlay: {} }, null];
 }
 
 function handleMovePiece(
@@ -471,15 +471,12 @@ function handleTickPlayersClock(state: State): Update<State, Action> {
     clocks: {
       ...clocks,
       lastTick: tick,
+      [position.turn]:
+        turnClock > 0
+          ? Math.max(turnClock - (tick - clocks.lastTick), 0)
+          : state.clocks[position.turn],
     },
   };
-
-  if (turnClock > 0) {
-    state.clocks[position.turn] = Math.max(
-      turnClock - (tick - clocks.lastTick),
-      0,
-    );
-  }
 
   if (state.clocks[position.turn] <= 0) {
     state = { ...state, winner: flipColor(position.turn) };

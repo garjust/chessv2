@@ -62,31 +62,31 @@ export type Player =
     };
 
 export interface State {
-  debugVersion?: number;
-  boardOrientation: Color;
-  squareLabels: SquareLabel;
-  clocks: {
-    gameLength: number;
-    plusTime: number;
-    lastTick: number;
-    [Color.White]: number;
-    [Color.Black]: number;
+  readonly debugVersion?: number;
+  readonly boardOrientation: Color;
+  readonly squareLabels: SquareLabel;
+  readonly clocks: {
+    readonly gameLength: number;
+    readonly plusTime: number;
+    readonly lastTick: number;
+    readonly [Color.White]: number;
+    readonly [Color.Black]: number;
   };
-  engines: Record<string, EngineInstance>;
-  players: {
-    [Color.White]: Player;
-    [Color.Black]: Player;
+  readonly engines: Record<string, EngineInstance>;
+  readonly players: {
+    readonly [Color.White]: Player;
+    readonly [Color.Black]: Player;
   };
-  winner?: Color | typeof Draw;
-  selectedSquare?: Square;
-  overlayCategory: SquareOverlayCategory;
-  squareOverlay?: Map<Square, SquareOverlayType>;
-  position: Position;
-  moves: MoveWithExtraData[];
-  checks: SquareControlObject[];
-  evaluation: number;
-  zobrist?: [number, number];
-  lastMove?: Move;
+  readonly winner?: Color | typeof Draw;
+  readonly selectedSquare?: Square;
+  readonly overlayCategory: SquareOverlayCategory;
+  readonly squareOverlay: Record<Square, SquareOverlayType>;
+  readonly position: Position;
+  readonly moves: MoveWithExtraData[];
+  readonly checks: SquareControlObject[];
+  readonly evaluation: number;
+  readonly zobrist?: [number, number];
+  readonly lastMove?: Move;
 }
 
 const GAME_LENGTH = 300;
@@ -112,6 +112,7 @@ const INITIAL_STATE: State = {
   moves: [],
   checks: [],
   overlayCategory: SquareOverlayCategory.Play,
+  squareOverlay: {},
   position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
 };
 
@@ -129,7 +130,7 @@ export const squareIsSelected = (state: State, square: Square) =>
   state.selectedSquare === square;
 
 export const squareOverlay = (state: State, square: Square) =>
-  state.squareOverlay?.get(square);
+  state.squareOverlay[square];
 
 export const isSquareClickable = (state: State, square: Square): boolean => {
   if (
