@@ -20,6 +20,7 @@ export class Orchestrator {
     this.workflow = init(createState(), {
       core: new Core(),
     });
+
     this.workflow.updates.subscribe(
       updateLogger('Chess', [Type.TickPlayersClock]),
     );

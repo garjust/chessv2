@@ -6,6 +6,7 @@ import {
   mergeMap,
   pairwise,
   share,
+  shareReplay,
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -157,7 +158,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   );
 
   // This observable powers our public states observable.
-  const states: Observable<S> = actionHandler.pipe(
+  const states$: Observable<S> = actionHandler.pipe(
     map(([state, _]) => state),
     // immediately send the initial state into the observable
     // (aids with updates initial value)
@@ -165,7 +166,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   );
 
   // This observable powers our public updates/side-effect observable
-  const updates = states.pipe(
+  const updates$: Observable<[[S, S], A]> = states$.pipe(
     // select previous and next state
     pairwise(),
     withLatestFrom(actions$),
@@ -178,8 +179,8 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   // Subscribe to our internal observables to push values into our public
   // subjects
-  updates.subscribe(publicUpdates$);
-  states.subscribe(publicStates$);
+  updates$.subscribe(publicUpdates$);
+  states$.subscribe(publicStates$);
 
   // This observable extracts any next actions from the result of calling the
   // updater function
