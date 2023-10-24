@@ -10,12 +10,8 @@ import {
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
-
-/** Built-in "action" */
-export enum Command {
-  /** Instruct the workflow that it should complete all observables. */
-  Done = 'command__DONE',
-}
+import { tag } from 'rxjs-spy/operators/tag';
+import { Command, commandExecutor, isCommand } from './commands';
 
 /**
  * Object returned by the core workflow initialization function. Includes a
@@ -61,14 +57,11 @@ export type Update<S, A> = [S, LazyWork<A> | null];
  */
 type Updater<S, A> = (state: Readonly<S>, action: Readonly<A>) => Update<S, A>;
 
-type InternalAction<A> = A | Command | null;
-type InternalUpdateAction<A> = Observable<InternalAction<A>>;
+type RootEvent<A> = A | Command | null;
+type InternalUpdateAction<A> = Observable<RootEvent<A>>;
 type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
 
 const nonNullable = <T>(value: T): value is NonNullable<T> => value != null;
-
-const isCommand = <A>(value: InternalAction<A>): value is Command =>
-  value === Command.Done;
 
 const isPromiseLike = (value: unknown): value is Promise<unknown> =>
   value instanceof Promise;
@@ -89,6 +82,13 @@ const normalizeWork = <A>(work: Work<A>): InternalUpdateAction<A> => {
   return observableAction.pipe(filter(nonNullable));
 };
 
+/**
+ * Rx operator which executes the passed updater function against observable
+ * events.
+ * @param updater Updater function to execute on every event.
+ * @param seed Initial state for updater function.
+ * @returns Rx operator
+ */
 const update =
   <S, A>(updater: Updater<S, A>, seed: S) =>
   (source: Observable<A>) =>
@@ -110,31 +110,36 @@ const update =
       return () => subscription.unsubscribe();
     });
 
+/**
+ * Creates a workflow instance with state S on the set of actions A.
+ *
+ * @param updater Update function for the workflow. Handles actions returning
+ * new state and further actions.
+ * @param seed Initial state object for the workflow.
+ * @returns A workflow object containing an emit function and observables.
+ */
 const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
-  // Public states subject. This will be exposed publically as a hot
+  // Root subject. This subject acts as the "root" observable of
+  // the workflow. We define it as a subject so that an emit function can
+  // push events into it.
+  const root$ = new Subject<RootEvent<A>>();
+
+  // Define the emit function that will be exposed.
+  const publicEmit = (action: A) => root$.next(action);
+  // Public states subject. This will be exposed as a hot
   // observable for workflow state.
-  const publicStates = new Subject<S>();
-  // Public side-effect subject. This will be exposed publically as a hot
+  const publicStates$ = new Subject<S>();
+  // Public side-effect subject. This will be exposed as a hot
   // observable for workflow side-effects.
-  const publicUpdates = new Subject<[[S, S], A]>();
-  // Internal actions subject. This subject is the "root" observable of the
-  // workflow.
-  const internalActions = new Subject<InternalAction<A>>();
+  const publicUpdates$ = new Subject<[[S, S], A]>();
 
-  // Handle Commands
-  const [commands, actions] = partition(
-    internalActions,
-    (val: InternalAction<A>) => isCommand(val),
-  ) as [Observable<Command>, Observable<A>];
-  commands
-    .pipe(
-      first((command) => command === Command.Done),
-      catchError(() => EMPTY),
-    )
-    .subscribe(() => publicStates.complete());
+  // Split out commands from our root observable.
+  const [commands$, actions$] = partition(root$, isCommand);
+  commands$.subscribe(commandExecutor(root$));
 
-  // This observable receives actions and invokes the updater function
-  const actionHandler: Observable<InternalUpdate<S, A>> = actions.pipe(
+  // This observable receives actions and invokes the updater function.
+  const actionHandler: Observable<InternalUpdate<S, A>> = actions$.pipe(
+    filter(nonNullable),
     update(updater, seed),
     map(
       ([state, lazyWork]): InternalUpdate<S, A> => [
@@ -147,7 +152,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     share(),
   );
 
-  // This observable powers our public states observable
+  // This observable powers our public states observable.
   const states: Observable<S> = actionHandler.pipe(
     map(([state, _]) => state),
     // immediately send the initial state into the observable
@@ -159,7 +164,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   const updates = states.pipe(
     // select previous and next state
     pairwise(),
-    withLatestFrom(actions),
+    withLatestFrom(actions$),
     map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
     // catchError(() => EMPTY),
@@ -167,8 +172,8 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   // Subscribe to our internal observables to push values into our public
   // subjects
-  updates.subscribe(publicUpdates);
-  states.subscribe(publicStates);
+  updates.subscribe(publicUpdates$);
+  states.subscribe(publicStates$);
 
   // This observable extracts any next actions from the result of calling the
   // updater function
@@ -180,12 +185,12 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       // flat map the next actions observable upward for subscription
       mergeMap(([_, actions]) => actions),
     )
-    .subscribe(internalActions);
+    .subscribe(root$);
 
   return {
-    emit: (action: A | Command) => internalActions.next(action),
-    states: publicStates.asObservable().pipe(share()),
-    updates: publicUpdates.asObservable().pipe(share()),
+    emit: publicEmit,
+    states: publicStates$.asObservable().pipe(share()),
+    updates: publicUpdates$.asObservable().pipe(share()),
   };
 };
 
