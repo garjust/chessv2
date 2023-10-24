@@ -102,10 +102,11 @@ const update =
           subscriber.error(err);
         }
       };
-      const error = (err: Error) => {
-        subscriber.error(err);
-      };
-      const subscription = source.subscribe({ next, error });
+      const subscription = source.subscribe({
+        next,
+        error: (err) => subscriber.error(err),
+        complete: () => subscriber.complete(),
+      });
       return () => subscription.unsubscribe();
     });
 

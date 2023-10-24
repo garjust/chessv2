@@ -30,11 +30,8 @@ test('counter workflow', () => {
 
   // expect(statesResults).toEqual([{ count: 10 }, { count: 12 }, 'complete']);
   expect(statesResults).toEqual([{ count: 12 }, 'complete']);
-  // expect(updatesResults).toEqual([
-  //   [[{ count: 10 }, { count: 12 }], { type: Type.Increment, value: 1 }],
-  //   'complete',
-  // ]);
   expect(updatesResults).toEqual([
     [[{ count: 10 }, { count: 12 }], { type: Type.Increment, value: 1 }],
+    'complete',
   ]);
 });
