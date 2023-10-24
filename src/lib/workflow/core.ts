@@ -171,6 +171,8 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     withLatestFrom(actions$),
     map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
+    // TODO: Currently multiplexing errors into publicUpdates and publicStates.
+    // Do we actually want this? It needs to be in updates for logging
     // catchError(() => EMPTY),
   );
 

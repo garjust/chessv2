@@ -51,8 +51,13 @@ export const updateLogger = <S, A extends ActionWithType>(
       console.groupEnd();
     },
     error(err: unknown) {
-      console.log('invocation');
       console.error(`${workflowName} ERROR`, err);
+    },
+    complete() {
+      console.log(
+        `%c${workflowName} Completed`,
+        `font-weight: bold; color: ${color};`,
+      );
     },
   };
 };
