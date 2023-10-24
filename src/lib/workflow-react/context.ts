@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
 import { Workflow } from '../workflow';
+import { Command } from '../workflow/commands';
 
 export const contextFactory = <S, A>(
   initialState: S,
@@ -13,7 +14,7 @@ export const contextFactory = <S, A>(
 } => {
   const reactContext = React.createContext({
     states: new Observable<S>(),
-    emit: (_: A) => {
+    emit: (_: A | Command) => {
       /* do nothing, this is just an empty default */
     },
     updates: new Observable<[[S, S], A]>(),

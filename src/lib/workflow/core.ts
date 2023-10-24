@@ -2,7 +2,6 @@ import { EMPTY, Observable, Subject, from, of, partition } from 'rxjs';
 import {
   catchError,
   filter,
-  first,
   map,
   mergeMap,
   pairwise,
@@ -10,7 +9,6 @@ import {
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
-import { tag } from 'rxjs-spy/operators/tag';
 import { Command, commandExecutor, isCommand } from './commands';
 import { isPromiseLike, nonNullable } from './util';
 
@@ -23,7 +21,7 @@ export interface Workflow<S, A> {
   /**
    * Emit actions to the workflow.
    */
-  emit: (action: A) => void;
+  emit: (action: A | Command) => void;
   /**
    * Observable of states from the workflow. Subscribe to receive
    * the latest states.
@@ -126,7 +124,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   const root$ = new Subject<RootEvent<A>>();
 
   // Define the emit function that will be exposed.
-  const publicEmit = (action: A) => root$.next(action);
+  const publicEmit = (action: A | Command) => root$.next(action);
   // Public states subject. This will be exposed as a hot
   // observable for workflow state.
   const publicStates$ = new Subject<S>();
