@@ -12,6 +12,7 @@ import {
 } from 'rxjs/operators';
 import { tag } from 'rxjs-spy/operators/tag';
 import { Command, commandExecutor, isCommand } from './commands';
+import { isPromiseLike, nonNullable } from './util';
 
 /**
  * Object returned by the core workflow initialization function. Includes a
@@ -44,7 +45,7 @@ export type Work<A> =
   | A
   | Command;
 
-export type LazyWork<A> = () => Work<A>;
+type LazyWork<A> = () => Work<A>;
 
 /**
  * An update returned by an updater function. Actions emitted to the workflow
@@ -57,16 +58,13 @@ export type Update<S, A> = [S, LazyWork<A> | null];
  */
 type Updater<S, A> = (state: Readonly<S>, action: Readonly<A>) => Update<S, A>;
 
-type RootEvent<A> = A | Command | null;
-type InternalUpdateAction<A> = Observable<RootEvent<A>>;
-type InternalUpdate<S, A> = [S, InternalUpdateAction<A>];
+type RootEvent<A> = A | Command;
+type UpdateEvent<S, A> = [S, Observable<RootEvent<A> | null>];
 
-const nonNullable = <T>(value: T): value is NonNullable<T> => value != null;
-
-const isPromiseLike = (value: unknown): value is Promise<unknown> =>
-  value instanceof Promise;
-
-const normalizeWork = <A>(work: Work<A>): InternalUpdateAction<A> => {
+/**
+ * Normalize work into an observable.
+ */
+const normalizeWork = <A>(work: Work<A>): Observable<RootEvent<A> | null> => {
   const observableAction = (() => {
     if (work instanceof Observable) {
       return work;
@@ -85,6 +83,9 @@ const normalizeWork = <A>(work: Work<A>): InternalUpdateAction<A> => {
 /**
  * Rx operator which executes the passed updater function against observable
  * events.
+ *
+ * rx_f: A -> Update<S, A>
+ *
  * @param updater Updater function to execute on every event.
  * @param seed Initial state for updater function.
  * @returns Rx operator
@@ -137,12 +138,16 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   const [commands$, actions$] = partition(root$, isCommand);
   commands$.subscribe(commandExecutor(root$));
 
-  // This observable receives actions and invokes the updater function.
-  const actionHandler: Observable<InternalUpdate<S, A>> = actions$.pipe(
-    filter(nonNullable),
+  /**
+   * This observable receives actions and invokes the updater function returning
+   * an observable of further actions.
+   *
+   * rx_f: A -> [S, Observable<A | Command>]
+   */
+  const actionHandler: Observable<UpdateEvent<S, A>> = actions$.pipe(
     update(updater, seed),
     map(
-      ([state, lazyWork]): InternalUpdate<S, A> => [
+      ([state, lazyWork]): UpdateEvent<S, A> => [
         state,
         normalizeWork(lazyWork?.() ?? null),
       ],
@@ -182,8 +187,10 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       // swallow errors from upstream and end the observable gracefully;
       // do not continue with more actions
       catchError(() => EMPTY),
-      // flat map the next actions observable upward for subscription
+      // flat map the next actions observable upward for subscription.
       mergeMap(([_, actions]) => actions),
+      // Remove null next actions.
+      filter(nonNullable),
     )
     .subscribe(root$);
 
