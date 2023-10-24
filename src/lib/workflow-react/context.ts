@@ -12,7 +12,7 @@ export const contextFactory = <S, A>(
     emit: (action: A) => void;
   };
 } => {
-  const reactContext = React.createContext({
+  const reactContext = React.createContext<Workflow<S, A>>({
     states: new Observable<S>(),
     emit: (_: A | Command) => {
       /* do nothing, this is just an empty default */
