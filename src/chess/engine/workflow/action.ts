@@ -166,7 +166,7 @@ export const uciNewGameAction = (): UCINewGameAction => ({
 
 export const positionAction = (
   fen: string,
-  moves: string[],
+  moves: string[] = [],
 ): PositionAction => ({
   type: Type.Position,
   fen,
