@@ -1,11 +1,6 @@
 import { Registry, Version } from './registry';
 import Core from '../core';
-import init, {
-  Action,
-  State,
-  createState,
-  loadSearchExecutorAction,
-} from './workflow';
+import init, { Action, State, createState } from './workflow';
 import { InternalType, RespondAction } from './workflow/action';
 import { SearchExecutorI } from './search-executor';
 import { UCIResponse } from './workflow/uci-response';
@@ -20,18 +15,25 @@ const isRespondAction = (action: Action): action is RespondAction =>
 // This class does not handle UCI messages directly, instead processing UCI
 // workflow actions.
 export class Engine {
+  // TODO: remove
   private searchExecutor: SearchExecutorI;
-  workflow: Workflow<State, Action>;
+  private workflow: Workflow<State, Action>;
 
   constructor(version: Version, maxDepth: number) {
     this.searchExecutor = new Registry[version](maxDepth);
-    this.workflow = init(createState(), {
-      engine: new Core(),
-      executor: this.searchExecutor,
-    });
+    this.workflow = init(
+      createState({
+        config: {
+          version,
+          maxDepth,
+        },
+      }),
+      {
+        engine: new Core(),
+        executor: this.searchExecutor,
+      },
+    );
     this.workflow.updates.subscribe(updateLogger('Engine'));
-
-    this.workflow.emit(loadSearchExecutorAction(version, maxDepth));
   }
 
   emit(action: Action) {

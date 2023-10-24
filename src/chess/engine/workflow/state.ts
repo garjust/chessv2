@@ -2,6 +2,7 @@ import { Position } from '../../types';
 import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import { SearchExecutor } from '../search-executor';
 import { Remote } from 'comlink';
+import { Version } from '../registry';
 
 export type ExecutorInstance = {
   executor: Remote<SearchExecutor>;
@@ -16,12 +17,20 @@ export type ExecutorInstance = {
 export type State = Readonly<{
   debug: boolean;
   positionForGo: Readonly<Position>;
+  config: Readonly<{
+    version: Version;
+    maxDepth: number;
+  }>;
   executorInstance: Readonly<ExecutorInstance> | null;
 }>;
 
 const INITIAL_STATE: State = {
   debug: false,
   positionForGo: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
+  config: {
+    version: 'Random',
+    maxDepth: 1,
+  },
   executorInstance: null,
 };
 
