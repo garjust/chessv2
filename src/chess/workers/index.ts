@@ -28,7 +28,7 @@ export const loadEngine = async (
   let RemoteClass: Remote<typeof Engine>;
   let cleanup: () => void;
 
-  if (Worker) {
+  if (typeof Worker !== 'undefined') {
     logger.debug('loading engine web worker');
     const worker = new Worker(new URL('./engine', import.meta.url), {
       type: 'module',
@@ -60,7 +60,7 @@ export const loadSearchExecutor = async (
   let RemoteClass: Remote<typeof SearchExecutor>;
   let cleanup: () => void;
 
-  if (Worker) {
+  if (typeof Worker !== 'undefined') {
     logger.debug('loading search-executor web worker');
     const worker = new Worker(new URL('./search-executor', import.meta.url), {
       type: 'module',
@@ -92,7 +92,7 @@ export const loadTimer = async (
   let RemoteClass: Remote<typeof Timer>;
   let cleanup: () => void;
 
-  if (Worker) {
+  if (typeof Worker !== 'undefined') {
     logger.debug('loading timer web worker');
     const worker = new Worker(new URL('./timer', import.meta.url), {
       type: 'module',

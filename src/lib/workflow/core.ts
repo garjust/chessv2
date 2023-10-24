@@ -121,8 +121,6 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   // workflow.
   const internalActions = new Subject<InternalAction<A>>();
 
-  const enableMutationDetection = false;
-
   // Handle Commands
   const [commands, actions] = partition(
     internalActions,
@@ -164,18 +162,13 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     withLatestFrom(actions),
     map(([states, action]): [[S, S], A] => [states, action]),
     // swallow errors from upstream and end the observable gracefully
-    catchError(() => EMPTY),
+    // catchError(() => EMPTY),
   );
 
   // Subscribe to our internal observables to push values into our public
   // subjects
-  updates.subscribe({
-    next: (value) => publicUpdates.next(value),
-  });
-  states.subscribe({
-    next: (value) => publicStates.next(value),
-    error: (err) => publicStates.error(err),
-  });
+  updates.subscribe(publicUpdates);
+  states.subscribe(publicStates);
 
   // This observable extracts any next actions from the result of calling the
   // updater function
@@ -187,13 +180,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
       // flat map the next actions observable upward for subscription
       mergeMap(([_, actions]) => actions),
     )
-    .subscribe({
-      // forward actions to original actions subject for processing
-      next: (action) => internalActions.next(action),
-      // forward errors to original actions subject to publish error within
-      // the public states observable
-      error: (err) => internalActions.error(err),
-    });
+    .subscribe(internalActions);
 
   return {
     emit: (action: A | Command) => internalActions.next(action),

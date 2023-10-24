@@ -32,22 +32,28 @@ export const updateLogger = <S, A extends ActionWithType>(
   const color = pickColor();
   console.log(`%c${workflowName} workflow logger INIT`, `color: ${color};`);
 
-  return ([[before, after], action]: [[S, S], A]) => {
-    if (ignoreList.includes(action.type)) {
-      return;
-    }
+  return {
+    next([[before, after], action]: [[S, S], A]) {
+      if (ignoreList.includes(action.type)) {
+        return;
+      }
 
-    console.groupCollapsed(
-      `%c${workflowName} Workflow Update:`,
-      `font-weight: bold; color: ${color};`,
-      action.type,
-    );
+      console.groupCollapsed(
+        `%c${workflowName} Workflow Update:`,
+        `font-weight: bold; color: ${color};`,
+        action.type,
+      );
 
-    console.log('%c \u2B07 previous state', 'color: Crimson', before);
-    console.log('%c \u2B07 emitted action', 'color: DodgerBlue', action);
-    console.log('%c \u2B95 resulting state', 'color: ForestGreen', after);
+      console.log('%c \u2B07 previous state', 'color: Crimson', before);
+      console.log('%c \u2B07 emitted action', 'color: DodgerBlue', action);
+      console.log('%c \u2B95 resulting state', 'color: ForestGreen', after);
 
-    console.groupEnd();
+      console.groupEnd();
+    },
+    error(err: unknown) {
+      console.log('invocation');
+      console.error(`${workflowName} ERROR`, err);
+    },
   };
 };
 /* eslint-enable no-console */

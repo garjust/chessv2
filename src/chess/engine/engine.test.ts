@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import {
   uciAction,
   isReadyAction,
@@ -10,7 +10,7 @@ import { UCIResponse, UCIResponseType } from './workflow/uci-response';
 import { Engine } from './engine';
 import { FEN_LIBRARY } from '../lib/fen';
 
-test('example interaction with UCI engine', () => {
+test('example interaction with UCI engine', async () => {
   let responses: UCIResponse[] = [];
 
   const engine = new Engine('Iterative', 3);
@@ -40,6 +40,12 @@ test('example interaction with UCI engine', () => {
   engine.emit(uciNewGameAction());
   engine.emit(positionAction(FEN_LIBRARY.STARTING_POSITION_FEN));
   engine.emit(goAction());
+  await vi.waitFor(() => {
+    if (responses.length === 0) {
+      throw Error('no responses appeared');
+    }
+  });
+
   expect(responses).toEqual([{ type: UCIResponseType.BestMove, move: {} }]);
   responses = [];
 });
