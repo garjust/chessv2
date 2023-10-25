@@ -8,7 +8,7 @@ import { SearchExecutor } from '../engine/search-executor';
 export const loadPerft = async (): Promise<
   [worker: Worker, cleanup: () => void]
 > => {
-  const worker = new Worker(new URL('./perft', import.meta.url), {
+  const worker = new Worker(new URL('./webworker/perft', import.meta.url), {
     type: 'module',
   });
   return [worker, () => worker.terminate()];
@@ -30,7 +30,7 @@ export const loadEngine = async (
 
   if (typeof Worker !== 'undefined') {
     logger.debug('loading engine web worker');
-    const worker = new Worker(new URL('./engine', import.meta.url), {
+    const worker = new Worker(new URL('./webworker/engine', import.meta.url), {
       type: 'module',
     });
     worker.addEventListener('error', (event) => {
@@ -41,7 +41,9 @@ export const loadEngine = async (
   } else {
     logger.debug('loading search engine thread');
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./engine', import.meta.url));
+    const worker = new Worker(
+      new URL('./worker-thread/engine', import.meta.url),
+    );
     RemoteClass = wrap<typeof Engine>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
@@ -62,9 +64,12 @@ export const loadSearchExecutor = async (
 
   if (typeof Worker !== 'undefined') {
     logger.debug('loading search-executor web worker');
-    const worker = new Worker(new URL('./search-executor', import.meta.url), {
-      type: 'module',
-    });
+    const worker = new Worker(
+      new URL('./webworker/search-executor', import.meta.url),
+      {
+        type: 'module',
+      },
+    );
     worker.addEventListener('error', (event) => {
       logger.error('search-executor web worker crashed', event.message, event);
     });
@@ -73,7 +78,9 @@ export const loadSearchExecutor = async (
   } else {
     logger.debug('loading search-executor thread');
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./search-executor', import.meta.url));
+    const worker = new Worker(
+      new URL('./worker-thread/search-executor', import.meta.url),
+    );
     RemoteClass = wrap<typeof SearchExecutor>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
@@ -94,7 +101,7 @@ export const loadTimer = async (
 
   if (typeof Worker !== 'undefined') {
     logger.debug('loading timer web worker');
-    const worker = new Worker(new URL('./timer', import.meta.url), {
+    const worker = new Worker(new URL('./webworker/timer', import.meta.url), {
       type: 'module',
     });
     worker.addEventListener('error', (event) => {
@@ -104,7 +111,14 @@ export const loadTimer = async (
     cleanup = () => worker.terminate();
   } else {
     const { Worker } = await import('node:worker_threads');
-    const worker = new Worker(new URL('./timer', import.meta.url));
+    console.log('loaded worker class');
+    const worker = new Worker(
+      new URL('./worker-thread/timer.mjs', import.meta.url),
+    );
+    console.log(
+      'post new worker',
+      new URL('./timer', import.meta.url).toString(),
+    );
     RemoteClass = wrap<typeof Timer>(nodeEndpoint(worker));
     cleanup = () => worker.terminate();
   }
