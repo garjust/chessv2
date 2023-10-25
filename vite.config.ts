@@ -6,4 +6,8 @@ import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   plugins: [base(), svgr(), react()],
+  // Not sure if this is working
+  test: {
+    setupFiles: ['@vitest/web-worker'],
+  },
 });

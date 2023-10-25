@@ -2242,6 +2242,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vitest/web-worker@npm:^0.34.6":
+  version: 0.34.7
+  resolution: "@vitest/web-worker@npm:0.34.7"
+  dependencies:
+    debug: ^4.3.4
+  peerDependencies:
+    vitest: ">=0.34.0"
+  checksum: a31dc8a6027d14114b2e3148642bc0c1de08091834c68a416b873b421b0d0b2bb38a743f23d2a7e1f9177302df1863c71ea55986f2219b3b012de8dc51393d07
+  languageName: node
+  linkType: hard
+
 "@webpack-cli/configtest@npm:^2.1.1":
   version: 2.1.1
   resolution: "@webpack-cli/configtest@npm:2.1.1"
@@ -2879,6 +2890,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^6.9.0
     "@typescript-eslint/parser": ^6.9.0
     "@vitejs/plugin-react": ^4.1.0
+    "@vitest/web-worker": ^0.34.6
     comlink: ^4.4.1
     eslint: ^8.52.0
     eslint-plugin-node: ^11.1.0
