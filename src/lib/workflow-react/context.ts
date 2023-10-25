@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Observable } from 'rxjs';
+import { Observable, distinctUntilChanged, map } from 'rxjs';
 import { Workflow } from '../workflow';
 import { Command } from '../workflow/commands';
 
@@ -23,19 +23,19 @@ export const contextFactory = <S, A>(
   return {
     WorkflowContext: reactContext,
     useWorkflow: <R>(render: (state: S) => R) => {
-      const [state, setState] = useState(initialState);
+      const [rendering, setRendering] = useState<R>(render(initialState));
       const { states, emit } = useContext(reactContext);
 
       useEffect(() => {
-        const subscription = states.subscribe((newState) => {
-          setState(newState);
-        });
+        const subscription = states
+          .pipe(map(render), distinctUntilChanged())
+          .subscribe(setRendering);
         return function cleanup() {
           subscription.unsubscribe();
         };
       }, [states]);
 
-      return { rendering: render(state), emit };
+      return { rendering, emit };
     },
   };
 };
