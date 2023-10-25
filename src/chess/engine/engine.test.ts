@@ -40,10 +40,8 @@ test('example interaction with UCI engine', async () => {
   engine.emit(uciNewGameAction());
   engine.emit(positionAction(FEN_LIBRARY.STARTING_POSITION_FEN));
   engine.emit(goAction());
-  await vi.waitFor(() => {
-    if (responses.length === 0) {
-      throw Error('no responses appeared');
-    }
+  await vi.waitUntil(() => {
+    return responses.length !== 0;
   });
 
   expect(responses).toEqual([{ type: UCIResponseType.BestMove, move: {} }]);

@@ -6,12 +6,14 @@ import {
   mergeMap,
   pairwise,
   share,
-  shareReplay,
   startWith,
   withLatestFrom,
 } from 'rxjs/operators';
 import { Command, commandExecutor, isCommand } from './commands';
 import { isPromiseLike, nonNullable } from './util';
+import Logger from '../logger';
+
+const logger = new Logger('workflow-core');
 
 /**
  * Object returned by the core workflow initialization function. Includes a
@@ -136,7 +138,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   // Split out commands from our root observable.
   const [commands$, actions$] = partition(root$, isCommand);
-  commands$.subscribe(commandExecutor(root$));
+  commands$.pipe(catchError(() => EMPTY)).subscribe(commandExecutor(root$));
 
   /**
    * This observable receives actions and invokes the updater function returning
@@ -144,7 +146,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
    *
    * rx_f: A -> [S, Observable<A | Command>]
    */
-  const actionHandler: Observable<UpdateEvent<S, A>> = actions$.pipe(
+  const actionHandler$: Observable<UpdateEvent<S, A>> = actions$.pipe(
     update(updater, seed),
     map(
       ([state, lazyWork]): UpdateEvent<S, A> => [
@@ -158,7 +160,11 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
   );
 
   // This observable powers our public states observable.
-  const states$: Observable<S> = actionHandler.pipe(
+  const states$: Observable<S> = actionHandler$.pipe(
+    catchError((err: Error) => {
+      logger.debug('error in states observable:', err);
+      throw err;
+    }),
     map(([state, _]) => state),
     // immediately send the initial state into the observable
     // (aids with updates initial value)
@@ -184,12 +190,16 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   // This observable extracts any next actions from the result of calling the
   // updater function
-  actionHandler
+  actionHandler$
     .pipe(
       // swallow errors from upstream and end the observable gracefully;
       // do not continue with more actions
-      catchError(() => EMPTY),
-      // flat map the next actions observable upward for subscription.
+      catchError((err: Error) => {
+        logger.debug('swallow error before forwarding to root:', err.message);
+        return EMPTY;
+      }),
+      // Flat map the next actions observable upward for subscription.
+      // Note the next actions observable could end up being errored.
       mergeMap(([_, actions]) => actions),
       // Remove null next actions.
       filter(nonNullable),

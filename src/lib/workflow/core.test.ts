@@ -40,21 +40,37 @@ test('error flows through', async () => {
   const lastUpdate = lastValueFrom(updates);
 
   emit(null);
+  emit(Command.Done);
 
   await expect(lastState).rejects.toThrowError('test error');
   await expect(lastUpdate).rejects.toThrowError('test error');
 });
 
-test.skip('promise error flows through', async () => {
+test('promise error flows through', async () => {
+  const { emit, states, updates } = workflow(
+    (state) => [state, () => Promise.reject(new Error('promise test error'))],
+    0,
+  );
+
+  const lastState = lastValueFrom(states);
+  const lastUpdate = lastValueFrom(updates);
+
+  emit(null);
+
+  await expect(lastState).rejects.toThrowError('promise test error');
+  await expect(lastUpdate).rejects.toThrowError('promise test error');
+});
+
+test.skip('delayed promise error flows through', async () => {
   const { emit, states, updates } = workflow(
     (state) => [
       state,
-      () => Promise.reject(new Error('promise test error')),
-      // new Promise(() => {
-      //   setTimeout(() => {
-      //     throw new Error('promise test error');
-      //   }, 0);
-      // }),
+      () =>
+        new Promise(() => {
+          setTimeout(() => {
+            throw new Error('delayed promise test error');
+          }, 0);
+        }),
     ],
     0,
   );
@@ -68,7 +84,7 @@ test.skip('promise error flows through', async () => {
   await expect(lastUpdate).rejects.toThrowError('promise test error');
 });
 
-test.skip('observable error flows through', async () => {
+test('observable error flows through', async () => {
   const { emit, states, updates } = workflow(
     (state) => [
       state,
