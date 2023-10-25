@@ -11,6 +11,7 @@ import {
 } from 'rxjs/operators';
 import { Command, commandExecutor, isCommand } from './commands';
 import { isPromiseLike, nonNullable } from './util';
+import { tag } from 'rxjs-spy/operators';
 import Logger from '../logger';
 
 const logger = new Logger('workflow-core');
@@ -121,7 +122,11 @@ const update =
  * @param seed Initial state object for the workflow.
  * @returns A workflow object containing an emit function and observables.
  */
-const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
+const core = <S, A>(
+  updater: Updater<S, A>,
+  seed: S,
+  label: string = 'x',
+): Workflow<S, A> => {
   // Root subject. This subject acts as the "root" observable of
   // the workflow. We define it as a subject so that an emit function can
   // push events into it.
@@ -138,7 +143,12 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
 
   // Split out commands from our root observable.
   const [commands$, actions$] = partition(root$, isCommand);
-  commands$.pipe(catchError(() => EMPTY)).subscribe(commandExecutor(root$));
+  commands$
+    .pipe(
+      tag(`${label}-commands`),
+      catchError(() => EMPTY),
+    )
+    .subscribe(commandExecutor(root$));
 
   /**
    * This observable receives actions and invokes the updater function returning
@@ -147,6 +157,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
    * rx_f: A -> [S, Observable<A | Command>]
    */
   const actionHandler$: Observable<UpdateEvent<S, A>> = actions$.pipe(
+    tag(`${label}-actions`),
     update(updater, seed),
     map(
       ([state, lazyWork]): UpdateEvent<S, A> => [
@@ -169,6 +180,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     // immediately send the initial state into the observable
     // (aids with updates initial value)
     startWith(seed),
+    tag(`${label}-states`),
   );
 
   // This observable powers our public updates/side-effect observable
@@ -177,6 +189,7 @@ const core = <S, A>(updater: Updater<S, A>, seed: S): Workflow<S, A> => {
     pairwise(),
     withLatestFrom(actions$),
     map(([states, action]): [[S, S], A] => [states, action]),
+    tag(`${label}-updates`),
     // swallow errors from upstream and end the observable gracefully
     // TODO: Currently multiplexing errors into publicUpdates and publicStates.
     // Do we actually want this? It needs to be in updates for logging

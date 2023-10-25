@@ -7,9 +7,17 @@ import DisplayGameFEN from './DisplayGameFen';
 import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
 import { Orchestrator } from './orchestrator';
+import { Command } from '../../lib/workflow/commands';
 
 const Game = () => {
-  const [orchestrator, _] = useState<Orchestrator>(new Orchestrator());
+  const [orchestrator, setOrchestrator] = useState<Orchestrator>();
+
+  useEffect(() => {
+    const newOrchestrator = new Orchestrator();
+    setOrchestrator(newOrchestrator);
+
+    return () => newOrchestrator.workflow.emit(Command.Done);
+  }, []);
 
   return (
     <div className="game">
