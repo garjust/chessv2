@@ -1,9 +1,10 @@
+import { createSpy } from './spy';
+
 interface ActionWithType {
   type: string;
 }
 
-import { create } from 'rxjs-spy';
-const spy = create();
+// const spy = createSpy();
 
 const pickColor = (() => {
   const colors = [
@@ -36,9 +37,6 @@ export const updateLogger = <S, A extends ActionWithType>(
       if (ignoreList.includes(action.type)) {
         return;
       }
-
-      spy.flush();
-      spy.show();
 
       console.groupCollapsed(
         `%c${workflowName} Workflow Update:`,
