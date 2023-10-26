@@ -39,7 +39,7 @@ export const updateLogger = <S, A extends ActionWithType>(
       }
 
       console.groupCollapsed(
-        `%c${workflowName} Workflow Update:`,
+        `%c${workflowName} workflow update:`,
         `font-weight: bold; color: ${color};`,
         action.type,
       );
@@ -51,11 +51,11 @@ export const updateLogger = <S, A extends ActionWithType>(
       console.groupEnd();
     },
     error(err: unknown) {
-      console.error(`${workflowName} ERROR`, err);
+      console.error(`${workflowName} workflow ERROR`, err);
     },
     complete() {
       console.log(
-        `%c${workflowName} Completed`,
+        `%c${workflowName} workflow completed`,
         `font-weight: bold; color: ${color};`,
       );
     },
