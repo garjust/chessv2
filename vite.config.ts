@@ -8,6 +8,6 @@ export default defineConfig({
   plugins: [base(), svgr(), react()],
   // Not sure if this is working
   test: {
-    setupFiles: ['@vitest/web-worker'],
+    setupFiles: ['@vitest/web-worker', 'src/test/audio'],
   },
 });

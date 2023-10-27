@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import captureAudio from './audio-files/capture.ogg';
 import moveAudio from './audio-files/move.ogg';
 import notifyAudio from './audio-files/notify.ogg';
-/* eslint-enable @typescript-eslint/no-var-requires */
 
 export enum Sound {
   Capture = 'CAPTURE',
