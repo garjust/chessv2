@@ -222,10 +222,6 @@ function handleEngineResponse(
 
     case UCIResponseType.BestMove:
       validateState(instance, UCIState.WaitingForMove);
-      console.log(
-        instance.engine.diagnosticsResult?.logString,
-        instance.engine.diagnosticsResult,
-      );
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
@@ -308,14 +304,14 @@ function handleOverlaySquares(
 
 function handlePreviousPosition(
   state: State,
-  { core: engine }: Context,
+  { core }: Context,
 ): Update<State, Action> {
-  engine.undoLastMove();
+  core.undoLastMove();
   play(Sound.Move);
 
   return [
     { ...state, selectedSquare: undefined },
-    () => setPositionAction(engine.position),
+    () => setPositionAction(core.position),
   ];
 }
 
@@ -334,7 +330,7 @@ function handleResetOverlay(state: State): Update<State, Action> {
 function handleMovePiece(
   state: State,
   action: MovePieceAction,
-  { core: engine }: Context,
+  { core }: Context,
 ): Update<State, Action> {
   const { move } = action;
   const legalMoves = state.moves;
@@ -367,7 +363,7 @@ function handleMovePiece(
     move.promotion = PieceType.Queen;
   }
 
-  const captured = engine.applyMove(move);
+  const captured = core.applyMove(move);
   if (captured) {
     play(Sound.Capture);
   } else {
@@ -384,20 +380,20 @@ function handleMovePiece(
       },
       lastMove: move,
     },
-    () => setPositionAction(engine.position),
+    () => setPositionAction(core.position),
   ];
 }
 
 function handleSetPosition(
   state: State,
   action: SetPositionAction,
-  { core: engine }: Context,
+  { core }: Context,
 ): Update<State, Action> {
   const { position } = action;
-  const moves = engine.generateMoves();
-  const evaluation = engine.evaluate() / EVALUATION_DIVIDER;
-  const zobrist = engine.zobrist;
-  const checks = engine.checks(position.turn);
+  const moves = core.generateMoves();
+  const evaluation = core.evaluate() / EVALUATION_DIVIDER;
+  const zobrist = core.zobrist;
+  const checks = core.checks(position.turn);
 
   state = {
     ...state,
@@ -452,10 +448,10 @@ function handleSetPosition(
 function handleSetPositionFromFEN(
   state: State,
   action: SetPositionFromFENAction,
-  { core: engine }: Context,
+  { core }: Context,
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
-  engine.position = position;
+  core.position = position;
 
   return [{ ...state, winner: undefined }, () => setPositionAction(position)];
 }
