@@ -6,6 +6,8 @@ import {
   clickSquareAction,
   loadChessComputerAction,
 } from './workflow/action';
+import { Action as EngineAction } from '../engine/workflow';
+import { Type as EngineType, InternalType } from '../engine/workflow/action';
 import { FEN_LIBRARY } from '../lib/fen';
 import { Command } from '../../lib/workflow/commands';
 import { lastValueFrom } from 'rxjs';
@@ -15,10 +17,12 @@ test('example interaction with ui workflow', async () => {
   const ctrl = new Orchestrator();
   const lastValue = lastValueFrom(ctrl.workflow.updates);
 
-  const actions: Action[] = [];
+  const actions: (Action | EngineAction)[] = [];
   ctrl.workflow.updates.subscribe(([_, action]) => {
-    if (action.type === Type.TickPlayersClock) {
-      return;
+    if (action.type === Type.ChessComputerLoaded) {
+      action.instance.engine.workflow.updates.subscribe(([_, action]) => {
+        actions.push(action);
+      });
     }
     actions.push(action);
   });
@@ -27,12 +31,16 @@ test('example interaction with ui workflow', async () => {
   );
   ctrl.workflow.emit(clickSquareAction(12));
   ctrl.workflow.emit(clickSquareAction(28));
-  ctrl.workflow.emit(loadChessComputerAction(Color.Black));
+  ctrl.workflow.emit(loadChessComputerAction(Color.White));
   ctrl.workflow.emit(Command.Done);
 
   await lastValue;
 
-  expect(actions.map(({ type }) => type)).toEqual([
+  expect(
+    actions
+      .map(({ type }) => type)
+      .filter((type) => type !== Type.TickPlayersClock),
+  ).toEqual([
     Type.SetPositionFromFEN, // boot
     Type.SetPosition,
     Type.OverlaySquares,
@@ -44,7 +52,22 @@ test('example interaction with ui workflow', async () => {
     Type.SetPosition,
     Type.OverlaySquares,
     Type.AttemptComputerMove,
-    Type.LoadChessComputer, // click "Load black computer"
+    Type.LoadChessComputer, // click "Load white computer"
     Type.ChessComputerLoaded,
+    EngineType.UCI,
+    InternalType.Respond,
+    Type.EngineResponse,
+    InternalType.Respond,
+    Type.EngineResponse,
+    InternalType.Respond,
+    Type.EngineResponse,
+    InternalType.Respond,
+    Type.EngineResponse,
+    EngineType.Debug,
+    EngineType.IsReady,
+    InternalType.LoadSearchExecutor,
+    InternalType.LoadSearchExecutorDone,
+    InternalType.Respond,
+    Type.EngineResponse,
   ]);
 });

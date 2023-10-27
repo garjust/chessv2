@@ -14,7 +14,7 @@ const isRespondAction = (action: Action): action is RespondAction =>
 // This class does not handle UCI messages directly, instead processing UCI
 // workflow actions.
 export class Engine {
-  private workflow: Workflow<State, Action>;
+  workflow: Workflow<State, Action>;
 
   constructor(version: Version, maxDepth: number) {
     this.workflow = init(
