@@ -14,16 +14,15 @@ import {
   LoadSearchExecutorAction,
   LoadSearchExecutorDoneAction,
   loadSearchExecutorDoneAction,
+  loadSearchExecutorAction,
 } from './action';
 import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
-import { SearchExecutorI } from '../search-executor';
 import { moveFromString } from '../../move-notation';
 import { loadSearchExecutor } from '../../workers';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
-  executor: SearchExecutorI;
   engine: Core;
 };
 
@@ -52,7 +51,10 @@ function handleDebug(state: State, action: DebugAction): Update<State, Action> {
 }
 
 function handleIsReady(state: State): Update<State, Action> {
-  return [state, respondWith({ type: UCIResponseType.ReadyOk })];
+  return [
+    state,
+    () => loadSearchExecutorAction(state.config.version, state.config.maxDepth),
+  ];
 }
 
 function handleSetOption(state: State): Update<State, Action> {
@@ -89,8 +91,15 @@ function handleGo(
   action: GoAction,
   context: Context,
 ): Update<State, Action> {
-  // Call engine to do stuff.
-  const nextMove = context.executor.nextMove(context.engine.position, 500);
+  const { executorInstance } = state;
+  if (executorInstance === null) {
+    throw new Error('search executor instance has not been initialized');
+  }
+
+  const nextMove = executorInstance.executor.nextMove(
+    context.engine.position,
+    500,
+  );
 
   return [
     state,
@@ -144,7 +153,10 @@ function handleLoadSearchExecutorDone(
   state: State,
   action: LoadSearchExecutorDoneAction,
 ): Update<State, Action> {
-  return [{ ...state, executorInstance: action.instance }, null];
+  return [
+    { ...state, executorInstance: action.instance },
+    respondWith({ type: UCIResponseType.ReadyOk }),
+  ];
 }
 
 export const update =
