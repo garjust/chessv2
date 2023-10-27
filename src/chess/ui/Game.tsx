@@ -8,6 +8,8 @@ import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
 import { Orchestrator } from './orchestrator';
 import { Command } from '../../lib/workflow/commands';
+import { setPositionFromFENAction } from './workflow';
+import { FEN_LIBRARY } from '../lib/fen';
 
 const Game = () => {
   const [orchestrator, setOrchestrator] = useState<Orchestrator>();
@@ -15,6 +17,10 @@ const Game = () => {
   useEffect(() => {
     const newOrchestrator = new Orchestrator();
     setOrchestrator(newOrchestrator);
+
+    newOrchestrator.workflow.emit(
+      setPositionFromFENAction(FEN_LIBRARY.STARTING_POSITION_FEN),
+    );
 
     return () => newOrchestrator.workflow.emit(Command.Done);
   }, []);
