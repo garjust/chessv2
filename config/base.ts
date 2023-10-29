@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
+import { basename, extname } from 'path';
 import type { Plugin } from 'vite';
-import path from 'path';
 
 export function base(): Plugin {
   return {
@@ -27,7 +27,7 @@ export function script(options: { entry: string }): Plugin {
           lib: {
             entry: options.entry,
             formats: ['es'],
-            fileName: path.basename(options.entry, path.extname(options.entry)),
+            fileName: basename(options.entry, extname(options.entry)),
           },
           rollupOptions: {
             external: ['fs/promises', 'process', 'readline'],
