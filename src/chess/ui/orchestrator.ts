@@ -12,14 +12,16 @@ import { Type } from './workflow/action';
 export class Orchestrator {
   workflow: Workflow<State, Action>;
 
-  constructor() {
+  constructor(debug = false) {
     this.workflow = init(createState(), {
       core: new Core(),
     });
+    if (debug) {
+      this.workflow.updates.subscribe(
+        updateLogger('Chess', [Type.TickPlayersClock]),
+      );
+    }
 
-    this.workflow.updates.subscribe(
-      updateLogger('Chess', [Type.TickPlayersClock]),
-    );
     const ticker = interval(100).pipe(map(() => tickPlayersClockAction()));
     ticker.subscribe(this.workflow.emit);
   }

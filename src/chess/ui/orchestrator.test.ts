@@ -14,7 +14,7 @@ import { lastValueFrom } from 'rxjs';
 import { Color } from '../types';
 
 test('example interaction with ui workflow', async () => {
-  const ctrl = new Orchestrator();
+  const ctrl = new Orchestrator(true);
   const lastValue = lastValueFrom(ctrl.workflow.updates);
 
   const actions: (Action | EngineAction)[] = [];

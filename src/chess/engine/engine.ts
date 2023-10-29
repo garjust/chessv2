@@ -16,7 +16,7 @@ const isRespondAction = (action: Action): action is RespondAction =>
 export class Engine {
   workflow: Workflow<State, Action>;
 
-  constructor(version: Version, maxDepth: number) {
+  constructor(version: Version, maxDepth: number, debug = false) {
     this.workflow = init(
       createState({
         config: {
@@ -28,7 +28,9 @@ export class Engine {
         engine: new Core(),
       },
     );
-    this.workflow.updates.subscribe(updateLogger('Engine'));
+    if (debug) {
+      this.workflow.updates.subscribe(updateLogger('Engine'));
+    }
   }
 
   emit(action: Action) {

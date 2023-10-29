@@ -251,7 +251,7 @@ function handleLoadChessComputer(
   const player = players[playingAs];
 
   if (player === HumanPlayer) {
-    const engine = new Engine(COMPUTER_VERSION, 10);
+    const engine = new Engine(COMPUTER_VERSION, 10, true);
 
     return [
       state,

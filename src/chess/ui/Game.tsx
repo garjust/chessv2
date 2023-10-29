@@ -15,7 +15,7 @@ const Game = () => {
   const [orchestrator, setOrchestrator] = useState<Orchestrator>();
 
   useEffect(() => {
-    const newOrchestrator = new Orchestrator();
+    const newOrchestrator = new Orchestrator(true);
     setOrchestrator(newOrchestrator);
 
     newOrchestrator.workflow.emit(
