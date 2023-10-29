@@ -87,9 +87,9 @@ test('delayed promise error flows through', async () => {
     (state) => [
       state,
       () =>
-        new Promise(() => {
+        new Promise((_, reject) => {
           setTimeout(() => {
-            throw new Error('delayed promise test error');
+            reject(new Error('delayed promise test error'));
           }, 0);
         }),
     ],
