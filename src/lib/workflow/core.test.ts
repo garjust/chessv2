@@ -61,7 +61,7 @@ test('promise error flows through', async () => {
   await expect(lastUpdate).rejects.toThrowError('promise test error');
 });
 
-test.skip('delayed promise error flows through', async () => {
+test('delayed promise error flows through', async () => {
   const { emit, states, updates } = workflow(
     (state) => [
       state,

@@ -35,6 +35,39 @@ test('counter workflow', () => {
   ]);
 });
 
+test('counter workflow async increment', () => {
+  const { emit, states, updates } = workflow(update({ multiplier: 1 }), {
+    count: 5,
+  });
+
+  const statesResults: (State | string)[] = [];
+  const updatesResults: ([[State, State], Action] | string)[] = [];
+
+  const resulter = <T>(results: (T | string)[]) => ({
+    next(value: T) {
+      results.push(value);
+    },
+    error(err: unknown) {
+      results.push(`error: ${err}`);
+    },
+    complete() {
+      results.push('complete');
+    },
+  });
+  states.subscribe(resulter(statesResults));
+  updates.subscribe(resulter(updatesResults));
+
+  emit({ type: Type.AsyncIncrement, value: 1 });
+  emit(Command.Done);
+
+  expect(statesResults).toEqual([{ count: 6 }, 'complete']);
+  expect(updatesResults).toEqual([
+    [[{ count: 5 }, { count: 5 }], { type: Type.AsyncIncrement, value: 1 }],
+    [[{ count: 5 }, { count: 6 }], { type: Type.Increment, value: 1 }],
+    'complete',
+  ]);
+});
+
 test('counter workflow error', () => {
   const { emit, states, updates } = workflow(update({ multiplier: 2 }), {
     count: 10,
