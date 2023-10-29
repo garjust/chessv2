@@ -14,22 +14,45 @@ export const loadPerft = async (): Promise<
   return [worker, () => worker.terminate()];
 };
 
+const workerHandlers = (
+  label: string,
+  worker: Worker,
+): [cleanup: () => void, error: Promise<void>] => {
+  let cleanup = worker.terminate;
+  const workerError = new Promise<void>((resolve, reject) => {
+    cleanup = () => {
+      resolve();
+      worker.terminate;
+    };
+    worker.addEventListener('error', (event) => {
+      logger.error(`${label} web worker crashed`, event.message, event);
+      reject(event.error);
+    });
+  });
+
+  return [cleanup, workerError];
+};
+
 export const loadSearchExecutor = async (
   ...args: ConstructorParameters<typeof SearchExecutor>
-): Promise<[executor: Remote<SearchExecutor>, cleanup: () => void]> => {
+): Promise<
+  [
+    executor: Remote<SearchExecutor>,
+    cleanup: () => void,
+    workerError: Promise<void>,
+  ]
+> => {
   logger.debug('loading search-executor web worker');
   const worker = new Worker(new URL('./search-executor', import.meta.url), {
     type: 'module',
   });
-  worker.addEventListener('error', (event) => {
-    logger.error('search-executor web worker crashed', event.message, event);
-  });
+  const [cleanup, workerError] = workerHandlers('search-executor', worker);
   const RemoteClass = wrap<typeof SearchExecutor>(worker);
 
   logger.debug('creating remote SearchExecutor instance');
   const instance = await new RemoteClass(...args);
   logger.debug('created remote SearchExecutor instance');
-  return [instance, () => worker.terminate()];
+  return [instance, cleanup, workerError];
 };
 
 export const loadTimer = async (

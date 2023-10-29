@@ -15,6 +15,7 @@ export class Orchestrator {
   constructor(debug = false) {
     this.workflow = init(createState(), {
       core: new Core(),
+      debug,
     });
     if (debug) {
       this.workflow.updates.subscribe(

@@ -14,7 +14,7 @@ import { lastValueFrom } from 'rxjs';
 import { Color } from '../types';
 
 test('example interaction with ui workflow', async () => {
-  const ctrl = new Orchestrator(true);
+  const ctrl = new Orchestrator();
   const lastValue = lastValueFrom(ctrl.workflow.updates);
 
   const actions: (Action | EngineAction)[] = [];
@@ -32,6 +32,13 @@ test('example interaction with ui workflow', async () => {
   ctrl.workflow.emit(clickSquareAction(12));
   ctrl.workflow.emit(clickSquareAction(28));
   ctrl.workflow.emit(loadChessComputerAction(Color.White));
+
+  console.log('THIS', globalThis.addEventListener);
+
+  await new Promise((resolve) => {
+    setTimeout(resolve, 5000);
+  });
+
   ctrl.workflow.emit(Command.Done);
 
   await lastValue;

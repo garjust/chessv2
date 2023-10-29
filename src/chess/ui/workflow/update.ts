@@ -51,6 +51,7 @@ import { delayEmit } from '../../../lib/workflow/util';
 
 export type Context = {
   core: Core;
+  debug: boolean;
 };
 
 const COMPUTER_VERSION: Version = LATEST;
@@ -245,13 +246,14 @@ function createEngineId() {
 function handleLoadChessComputer(
   state: State,
   action: LoadChessComputerAction,
+  context: Context,
 ): Update<State, Action> {
   const { playingAs } = action;
   const { players } = state;
   const player = players[playingAs];
 
   if (player === HumanPlayer) {
-    const engine = new Engine(COMPUTER_VERSION, 10, true);
+    const engine = new Engine(COMPUTER_VERSION, 10, context.debug);
 
     return [
       state,
@@ -521,7 +523,7 @@ export const update =
       case Type.FlipBoard:
         return handleFlipBoard(state);
       case Type.LoadChessComputer:
-        return handleLoadChessComputer(state, action);
+        return handleLoadChessComputer(state, action, context);
       case Type.OverlaySquares:
         return handleOverlaySquares(state, context);
       case Type.PreviousPosition:

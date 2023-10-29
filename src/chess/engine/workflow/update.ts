@@ -138,12 +138,13 @@ function handleLoadSearchExecutor(
     state,
     () =>
       from(
-        loadSearchExecutorWorker(action.version, 10).then(([executor, cleanup]) =>
-          loadSearchExecutorDoneAction({
-            executor,
-            cleanup,
-            __computer: true,
-          }),
+        loadSearchExecutorWorker(action.version, 10).then(
+          ([executor, cleanup]) =>
+            loadSearchExecutorDoneAction({
+              executor,
+              cleanup,
+              __computer: true,
+            }),
         ),
       ),
   ];
