@@ -2,6 +2,7 @@ import { expect, test, vi } from 'vitest';
 import { Orchestrator } from './orchestrator';
 import { Action, setPositionFromFENAction } from './workflow';
 import {
+  EngineResponseAction,
   Type,
   clickSquareAction,
   loadChessComputerAction,
@@ -15,7 +16,7 @@ import { Color } from '../types';
 
 test('example interaction with ui workflow', async () => {
   const ctrl = new Orchestrator();
-  const lastValue = lastValueFrom(ctrl.workflow.updates);
+  const lastUpdate = lastValueFrom(ctrl.workflow.updates);
 
   const actions: (Action | EngineAction)[] = [];
   ctrl.workflow.updates.subscribe(([_, action]) => {
@@ -33,15 +34,13 @@ test('example interaction with ui workflow', async () => {
   ctrl.workflow.emit(clickSquareAction(28));
   ctrl.workflow.emit(loadChessComputerAction(Color.White));
 
-  console.log('THIS', globalThis.addEventListener);
-
   await new Promise((resolve) => {
-    setTimeout(resolve, 5000);
+    setTimeout(resolve, 1000);
   });
 
   ctrl.workflow.emit(Command.Done);
 
-  await lastValue;
+  await lastUpdate;
 
   expect(
     actions
