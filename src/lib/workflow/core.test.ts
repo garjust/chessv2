@@ -15,6 +15,27 @@ test('complete the workflow', async () => {
   await expect(lastUpdate).rejects.toThrowError(EmptyError);
 });
 
+test.skip('await emit', async () => {
+  const { emit, states, updates } = workflow<number, number>(
+    (state, val) => [
+      state + val,
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(100);
+          }, 0);
+        }),
+    ],
+    1,
+  );
+
+  await emit(2);
+  await emit(Command.Done);
+
+  expect(lastValueFrom(states)).resolves.toEqual(103);
+  expect(lastValueFrom(updates)).resolves.toEqual([[3, 103], 100]);
+});
+
 test('receive first state', async () => {
   const { emit, states, updates } = workflow<number, number>(
     (state, val) => [state + val, null],
