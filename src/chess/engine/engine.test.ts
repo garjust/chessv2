@@ -10,6 +10,7 @@ import { UCIResponse, UCIResponseType } from './workflow/uci-response';
 import { Engine } from './engine';
 import { FEN_LIBRARY } from '../lib/fen';
 import { Command } from '../../lib/workflow/commands';
+import { Color, PieceType } from '../types';
 
 test('example interaction with UCI engine', async () => {
   let responses: UCIResponse[] = [];
@@ -43,7 +44,20 @@ test('example interaction with UCI engine', async () => {
   engine.emit(positionAction(FEN_LIBRARY.STARTING_POSITION_FEN));
   engine.emit(goAction());
   await vi.waitUntil(() => responses.length !== 0);
-  expect(responses).toEqual([{ type: UCIResponseType.BestMove, move: {} }]);
+  expect(responses).toEqual([
+    {
+      type: UCIResponseType.BestMove,
+      move: {
+        from: 11,
+        piece: {
+          color: Color.White,
+          type: PieceType.Pawn,
+        },
+        to: 27,
+        weight: 9007199254740991,
+      },
+    },
+  ]);
   responses = [];
 
   engine.workflow.emit(Command.Done);
