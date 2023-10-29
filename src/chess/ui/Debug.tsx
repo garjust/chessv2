@@ -10,7 +10,7 @@ import {
   VIENNA_OPENING,
 } from '../lib/perft';
 import './Debug.css';
-import { loadPerft, loadSearchExecutor } from '../workers';
+import { loadPerftWorker, loadSearchExecutorWorker } from '../workers';
 
 const EXCLUDED_COMPUTERS: Version[] = ['Random'];
 const COMPUTER_DEPTH = 4;
@@ -20,7 +20,7 @@ async function runMoveGenerationTest(
   test: MoveTest,
   toDepth = 5,
 ) {
-  const [worker] = await loadPerft();
+  const [worker] = await loadPerftWorker();
 
   worker.onmessage = (message: MessageEvent<string>) => {
     logger.next(message.data);
@@ -29,7 +29,7 @@ async function runMoveGenerationTest(
 }
 
 async function runSingleComputerNextMoveTest(logger: Observer<string>) {
-  const [searchExecutor, cleanup] = await loadSearchExecutor(
+  const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
     COMPUTER_DEPTH,
   );
@@ -57,7 +57,7 @@ async function runComputerNextMoveTest(
 ) {
   const searchExecutors = await Promise.all(
     Object.keys(Registry).map(async (version) => {
-      const [searchExecutor, cleanup] = await loadSearchExecutor(
+      const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
         version as Version,
         COMPUTER_DEPTH,
       );

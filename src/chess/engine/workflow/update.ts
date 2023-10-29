@@ -19,7 +19,7 @@ import {
 import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
 import { moveFromString } from '../../move-notation';
-import { loadSearchExecutor } from '../../workers';
+import { loadSearchExecutorWorker } from '../../workers';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
@@ -138,7 +138,7 @@ function handleLoadSearchExecutor(
     state,
     () =>
       from(
-        loadSearchExecutor(action.version, 10).then(([executor, cleanup]) =>
+        loadSearchExecutorWorker(action.version, 10).then(([executor, cleanup]) =>
           loadSearchExecutorDoneAction({
             executor,
             cleanup,

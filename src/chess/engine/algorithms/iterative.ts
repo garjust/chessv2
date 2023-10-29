@@ -3,7 +3,7 @@ import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
-import { loadTimer } from '../../workers';
+import { loadTimerWorker } from '../../workers';
 import TimeoutError from '../lib/timeout-error';
 import { SearchResult } from '../lib/types';
 import Logger from '../../../lib/logger';
@@ -66,10 +66,10 @@ export default class Iterative implements SearchExecutorI {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    const [timer, timerCleanup] = await loadTimer(timeout, {
+    const [timer, timerCleanup] = await loadTimerWorker(timeout, {
       label: `${this.label}-search`,
     });
-    const [depthTimer, depthTimerCleanup] = await loadTimer(0, {
+    const [depthTimer, depthTimerCleanup] = await loadTimerWorker(0, {
       autoStart: false,
       label: `${this.label}-search-for-depth`,
     });
