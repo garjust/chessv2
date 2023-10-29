@@ -26,7 +26,7 @@ const workerHandlers = (
     };
     worker.addEventListener('error', (event) => {
       logger.error(`${label} web worker crashed`, event.message, event);
-      reject(event.error);
+      // reject(event.error);
     });
   });
 

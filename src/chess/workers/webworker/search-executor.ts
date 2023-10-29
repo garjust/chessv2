@@ -4,6 +4,7 @@ import { SearchExecutor } from '../../engine/search-executor';
 
 new Logger('worker').debug('running search-executor thread');
 
-console.log('THIS IN WORKER', globalThis.addEventListener);
-
-expose(SearchExecutor);
+// Need to explicitly pass "self" for the comlink endpoint to make vitest web
+// worker shim work.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+expose(SearchExecutor, self as any);
