@@ -21,10 +21,11 @@ import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
 import { moveFromString } from '../../move-notation';
 import { loadSearchExecutorWorker } from '../../workers';
+import { Command } from '../../../lib/workflow/commands';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
-  engine: Core;
+  core: Core;
 };
 
 const respondWith =
@@ -102,13 +103,13 @@ function handlePosition(
   const { fen, moves } = action;
 
   const position = parseFEN(fen);
-  context.engine.position = position;
+  context.core.position = position;
   for (const moveString of moves) {
     const move = moveFromString(moveString);
-    context.engine.applyMove(move);
+    context.core.applyMove(move);
   }
 
-  return [{ ...state, positionForGo: context.engine.position }, null];
+  return [{ ...state, positionForGo: context.core.position }, null];
 }
 
 function handleGo(
@@ -122,8 +123,8 @@ function handleGo(
   }
 
   const nextMove = executorInstance.executor.nextMove(
-    context.engine.position,
-    500,
+    context.core.position,
+    action.command.infinite ? Number.MAX_SAFE_INTEGER : 500,
   );
 
   return [
@@ -138,7 +139,7 @@ function handleGo(
 }
 
 function handleStop(state: State, context: Context): Update<State, Action> {
-  // TODO: call engine to stop the search.
+  // TODO: call engine to stop the search as soon as possible.
   return [state, null];
 }
 
@@ -147,7 +148,8 @@ function handlePonderHit(state: State): Update<State, Action> {
 }
 
 function handleQuit(state: State): Update<State, Action> {
-  throw Error('quit I guess');
+  state.executorInstance?.cleanup();
+  return [state, () => Command.Done];
 }
 
 function handleRespond(state: State, _: RespondAction): Update<State, Action> {
@@ -163,7 +165,7 @@ function handleLoadSearchExecutor(
     state,
     () =>
       from(
-        loadSearchExecutorWorker(action.version, 10).then(
+        loadSearchExecutorWorker(action.version, action.maxDepth).then(
           ([executor, cleanup]) =>
             loadSearchExecutorDoneAction({
               executor,

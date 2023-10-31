@@ -25,7 +25,7 @@ export class Engine {
         },
       }),
       {
-        engine: new Core(),
+        core: new Core(),
       },
     );
     if (debug) {

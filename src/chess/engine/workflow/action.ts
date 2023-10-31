@@ -1,6 +1,6 @@
 import { Version } from '../registry';
 import { ExecutorInstance } from './state';
-import { UCIResponse, EngineOptionName, EngineOption } from './uci-response';
+import { UCIResponse, EngineOption } from './uci-response';
 
 export type GoCommand = Partial<{
   searchmoves: string[];
