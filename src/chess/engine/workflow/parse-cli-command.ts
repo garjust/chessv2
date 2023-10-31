@@ -14,7 +14,7 @@ import {
   uciAction,
   uciNewGameAction,
 } from './action';
-import { EngineOptionName } from './uci-response';
+import { EngineOptionName, OptionHash } from './uci-response';
 
 const parseGoCommand = (parts: string[]): GoCommand => {
   const result: GoCommand = {};
@@ -81,8 +81,20 @@ export const parse = (commandString: string): Action => {
       return isReadyAction();
     case 'setoption': {
       const [, name, , value] = args;
-      // TODO: validation of option name
-      return setOptionAction(name as EngineOptionName, value);
+      switch (name) {
+        case 'Hash':
+          return setOptionAction({
+            name,
+            value: parseInt(value),
+          });
+        case 'OwnBook':
+          return setOptionAction({
+            name,
+            value: value === 'true',
+          });
+        default:
+          throw new Error(`invalid option name ${name}`);
+      }
     }
     case 'register':
       return registerAction();

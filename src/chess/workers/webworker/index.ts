@@ -39,7 +39,7 @@ export const loadSearchExecutor = async (
   [
     executor: Remote<SearchExecutor>,
     cleanup: () => void,
-    workerError: Promise<void>,
+    // workerError: Promise<void>,
   ]
 > => {
   logger.debug('loading search-executor web worker');
@@ -52,7 +52,7 @@ export const loadSearchExecutor = async (
   logger.debug('creating remote SearchExecutor instance');
   const instance = await new RemoteClass(...args);
   logger.debug('created remote SearchExecutor instance');
-  return [instance, cleanup, workerError];
+  return [instance, cleanup];
 };
 
 export const loadTimer = async (

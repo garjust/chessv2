@@ -153,7 +153,11 @@ const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
   return sections.join('/');
 };
 
-export const parseFEN = (fenString: string): Position => {
+export const parseFEN = (fenString: 'startpos' | string): Position => {
+  if (fenString === 'startpos') {
+    return parseFEN(STARTING_POSITION_FEN);
+  }
+
   const [
     piecePlacements,
     activeColor,
@@ -186,15 +190,17 @@ export const parseFEN = (fenString: string): Position => {
 };
 
 export const formatPosition = (fen: Position): string => {
+  const castlingAvailability = [
+    fen.castlingAvailability[Color.White].kingside ? 'K' : '',
+    fen.castlingAvailability[Color.White].queenside ? 'Q' : '',
+    fen.castlingAvailability[Color.Black].kingside ? 'k' : '',
+    fen.castlingAvailability[Color.Black].queenside ? 'q' : '',
+  ].join('');
+
   return [
     piecesToFenPieces(fen.pieces),
     fen.turn === Color.White ? 'w' : 'b',
-    [
-      fen.castlingAvailability[Color.White].kingside ? 'K' : '',
-      fen.castlingAvailability[Color.White].queenside ? 'Q' : '',
-      fen.castlingAvailability[Color.Black].kingside ? 'k' : '',
-      fen.castlingAvailability[Color.Black].queenside ? 'q' : '',
-    ].join(''),
+    castlingAvailability.length === 0 ? '-' : castlingAvailability,
     fen.enPassantSquare ? squareLabel(fen.enPassantSquare) : '-',
     fen.halfMoveCount,
     fen.fullMoveCount,

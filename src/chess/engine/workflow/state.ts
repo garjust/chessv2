@@ -3,6 +3,7 @@ import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import { SearchExecutor } from '../search-executor';
 import { Remote } from 'comlink';
 import { Version } from '../registry';
+import { OptionHash, OptionOwnBook } from './uci-response';
 
 export type ExecutorInstance = {
   executor: Remote<SearchExecutor>;
@@ -21,6 +22,10 @@ export type State = Readonly<{
     version: Version;
     maxDepth: number;
   }>;
+  options: Readonly<{
+    hashSize: number;
+    useBookMoves: boolean;
+  }>;
   executorInstance: Readonly<ExecutorInstance> | null;
 }>;
 
@@ -30,6 +35,10 @@ const INITIAL_STATE: State = {
   config: {
     version: 'Random',
     maxDepth: 1,
+  },
+  options: {
+    hashSize: OptionHash.default,
+    useBookMoves: OptionOwnBook.default,
   },
   executorInstance: null,
 };

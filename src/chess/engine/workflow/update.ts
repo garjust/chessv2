@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Core from '../../core';
-import { parseFEN } from '../../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import {
   Type,
   Action,
@@ -15,6 +15,7 @@ import {
   LoadSearchExecutorDoneAction,
   loadSearchExecutorDoneAction,
   loadSearchExecutorAction,
+  SetOptionAction,
 } from './action';
 import { State } from './index';
 import { UCIResponse, UCIResponseType } from './uci-response';
@@ -51,14 +52,38 @@ function handleDebug(state: State, action: DebugAction): Update<State, Action> {
 }
 
 function handleIsReady(state: State): Update<State, Action> {
+  if (state.executorInstance !== null) {
+    return [state, respondWith({ type: UCIResponseType.ReadyOk })];
+  }
+
   return [
     state,
     () => loadSearchExecutorAction(state.config.version, state.config.maxDepth),
   ];
 }
 
-function handleSetOption(state: State): Update<State, Action> {
-  return [state, null];
+function handleSetOption(
+  state: State,
+  action: SetOptionAction,
+): Update<State, Action> {
+  switch (action.option.name) {
+    case 'Hash':
+      return [
+        {
+          ...state,
+          options: { ...state.options, hashSize: action.option.value },
+        },
+        null,
+      ];
+    case 'OwnBook':
+      return [
+        {
+          ...state,
+          options: { ...state.options, useBookMoves: action.option.value },
+        },
+        null,
+      ];
+  }
 }
 
 function handleRegister(state: State): Update<State, Action> {
@@ -171,7 +196,7 @@ export const update =
       case Type.IsReady:
         return handleIsReady(state);
       case Type.SetOption:
-        return handleSetOption(state);
+        return handleSetOption(state, action);
       case Type.Register:
         return handleRegister(state);
       case Type.UCINewGame:

@@ -25,13 +25,17 @@ type InfoKey =
 
 export type EngineOptionName = 'OwnBook' | 'Hash';
 
-const OptionOwnBook = {
+export type EngineOption =
+  | { name: 'OwnBook'; value: boolean }
+  | { name: 'Hash'; value: number };
+
+export const OptionOwnBook = {
   name: 'OwnBook',
   type: 'check',
   default: true,
 };
 
-const OptionHash = {
+export const OptionHash = {
   name: 'Hash',
   type: 'spin',
   default: 128,

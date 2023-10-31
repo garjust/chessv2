@@ -1,6 +1,6 @@
 import { Version } from '../registry';
 import { ExecutorInstance } from './state';
-import { UCIResponse, EngineOptionName } from './uci-response';
+import { UCIResponse, EngineOptionName, EngineOption } from './uci-response';
 
 export type GoCommand = Partial<{
   searchmoves: string[];
@@ -61,8 +61,7 @@ export interface IsReadyAction {
 // Set an option the engine supports
 export interface SetOptionAction {
   readonly type: Type.SetOption;
-  readonly name: EngineOptionName;
-  readonly value: string;
+  readonly option: EngineOption;
 }
 
 export interface RegisterAction {
@@ -77,7 +76,7 @@ export interface UCINewGameAction {
 // Set the chess position.
 export interface PositionAction {
   readonly type: Type.Position;
-  readonly fen: string;
+  readonly fen: 'startpos' | string;
   readonly moves: string[];
 }
 
@@ -147,13 +146,9 @@ export const isReadyAction = (): IsReadyAction => ({
   type: Type.IsReady,
 });
 
-export const setOptionAction = (
-  name: EngineOptionName,
-  value: string,
-): SetOptionAction => ({
+export const setOptionAction = (option: EngineOption): SetOptionAction => ({
   type: Type.SetOption,
-  name,
-  value,
+  option,
 });
 
 export const registerAction = (): RegisterAction => ({
