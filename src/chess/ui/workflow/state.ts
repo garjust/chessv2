@@ -97,7 +97,8 @@ export type State = Readonly<{
   evaluation: number;
   zobrist?: Readonly<[number, number]>;
   lastMove?: Move;
-  moveStack: Readonly<Move[]>;
+  moveList: Readonly<Move[]>;
+  moveIndex: number;
 }>;
 
 const GAME_LENGTH = 300;
@@ -124,7 +125,8 @@ const INITIAL_STATE: State = {
     [Color.White]: GAME_LENGTH * 1000,
     [Color.Black]: GAME_LENGTH * 1000,
   },
-  moveStack: [],
+  moveList: [],
+  moveIndex: 0,
   moves: [],
 };
 

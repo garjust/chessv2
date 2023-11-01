@@ -1,7 +1,7 @@
 import { Update } from '../../../lib/workflow';
 import { Color, PieceType, Square } from '../../types';
 import { flipColor, isPromotionPositionPawn, movesIncludes } from '../../utils';
-import { parseFEN, formatPosition } from '../../lib/fen';
+import { parseFEN, formatPosition, FEN_LIBRARY } from '../../lib/fen';
 import {
   Type,
   movePieceAction,
@@ -317,7 +317,8 @@ function handleMovePiece(
           state.clocks[state.position.turn] + state.clocks.plusTime * 1000,
       },
       lastMove: move,
-      moveStack: [...state.moveStack, move],
+      moveIndex: state.moveList.length,
+      moveList: [...state.moveList, move],
     },
     () => setPositionAction(core.position),
   ];
@@ -328,21 +329,43 @@ function handleNavigatePosition(
   action: NavigatePositionAction,
   { core }: Context,
 ): Update<State, Action> {
+  let { moveList, moveIndex } = state;
+
   switch (action.to) {
     case Navigate.Back:
-      core.undoLastMove();
-      play(Sound.Move);
-      return [
-        { ...state, selectedSquare: undefined },
-        () => setPositionAction(core.position),
-      ];
+      moveIndex -= 1;
+      break;
     case Navigate.Forward:
-      return [state, null];
+      moveIndex += 1;
+      break;
     case Navigate.Start:
-      return [state, null];
+      moveIndex = 0;
+      break;
     case Navigate.Current:
-      return [state, null];
+      moveIndex = moveList.length;
+      break;
   }
+
+  if (moveIndex < 0 || moveIndex > moveList.length) {
+    return [state, null];
+  }
+
+  core.position = parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN);
+  moveList = moveList.slice(0, moveIndex);
+  for (const move of moveList) {
+    core.applyMove(move);
+  }
+  play(Sound.Move);
+
+  return [
+    {
+      ...state,
+      selectedSquare: undefined,
+      moveIndex,
+      lastMove: moveList[moveList.length - 1],
+    },
+    () => setPositionAction(core.position),
+  ];
 }
 
 function handleOverlaySquares(

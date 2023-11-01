@@ -51,6 +51,7 @@ const Game = () => {
             );
             break;
         }
+        event.preventDefault();
       }}
     >
       {orchestrator ? (
