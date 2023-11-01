@@ -35,6 +35,7 @@ import {
   getEngineInstance,
   engineStateAs,
   isWaitingForEngine,
+  engineInstance,
 } from './state';
 import { from, map, merge } from 'rxjs';
 import Core from '../../core';
@@ -50,11 +51,15 @@ import { UCIResponseType } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
 import { delayEmit } from '../../../lib/workflow/util';
+import Logger from '../../../lib/logger';
+import { moveString } from '../../move-notation';
 
 export type Context = {
   core: Core;
   debug: boolean;
 };
+
+const logger = new Logger('ui-workflow');
 
 const COMPUTER_VERSION: Version = LATEST;
 
@@ -241,10 +246,6 @@ function handleFlipBoard(state: State): Update<State, Action> {
   return [{ ...state, boardOrientation: newOrientation }, null];
 }
 
-function createEngineId() {
-  return `engine-${Math.trunc(Math.random() * 1000000)}`;
-}
-
 function handleLoadChessComputer(
   state: State,
   action: LoadChessComputerAction,
@@ -259,16 +260,7 @@ function handleLoadChessComputer(
 
     return [
       state,
-      () =>
-        chessComputerLoadedAction(
-          {
-            id: createEngineId(),
-            uciState: UCIState.Idle,
-            engine,
-            __computer: true,
-          },
-          playingAs,
-        ),
+      () => chessComputerLoadedAction(engineInstance(engine), playingAs),
     ];
   } else {
     // const instance = getEngineInstance(state, player.engineId);
@@ -290,15 +282,7 @@ function handleMovePiece(
   const legalMoves = state.moves;
 
   if (!movesIncludes(legalMoves, move)) {
-    const piece = pieceInSquare(state, move.from);
-    console.warn(
-      'illegal move!',
-      piece,
-      move.from,
-      '\u2B95',
-      move.to,
-      state.position,
-    );
+    logger.warn('illegal move:', moveString(move));
     return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
   }
 
@@ -333,6 +317,7 @@ function handleMovePiece(
           state.clocks[state.position.turn] + state.clocks.plusTime * 1000,
       },
       lastMove: move,
+      moveStack: [...state.moveStack, move],
     },
     () => setPositionAction(core.position),
   ];

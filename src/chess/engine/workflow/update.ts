@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Core from '../../core';
-import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
+import { parseFEN } from '../../lib/fen';
 import {
   Type,
   Action,
@@ -22,6 +22,7 @@ import { UCIResponse, UCIResponseType } from './uci-response';
 import { moveFromString } from '../../move-notation';
 import { loadSearchExecutorWorker } from '../../workers';
 import { Command } from '../../../lib/workflow/commands';
+import { executorInstance } from './state';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
@@ -167,11 +168,7 @@ function handleLoadSearchExecutor(
       from(
         loadSearchExecutorWorker(action.version, action.maxDepth).then(
           ([executor, cleanup]) =>
-            loadSearchExecutorDoneAction({
-              executor,
-              cleanup,
-              __computer: true,
-            }),
+            loadSearchExecutorDoneAction(executorInstance(executor, cleanup)),
         ),
       ),
   ];

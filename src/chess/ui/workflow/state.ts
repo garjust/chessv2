@@ -43,17 +43,27 @@ export enum UCIState {
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
 
+function createEngineId() {
+  return `engine${Math.trunc(Math.random() * 1000000)}`;
+}
+
 export type EngineInstance = {
   id: string;
-  label?: string;
+  label: string | null;
   uciState: UCIState;
   engine: Engine;
-  // This property is here to indicate to JSON.stringify replacer function
-  // what type of object this is to avoid serializing the comlink remote
-  // object. JSON.stringify does something to the wrapped WebWorker before
-  // it hits the replacer function that explodes.
-  __computer: true;
+  toJSON(): unknown;
 };
+
+export const engineInstance = (engine: Engine): EngineInstance => ({
+  id: createEngineId(),
+  label: null,
+  uciState: UCIState.Idle,
+  engine,
+  toJSON() {
+    return { label: this.label, uciState: this.uciState };
+  },
+});
 
 export type Player =
   | typeof HumanPlayer
@@ -87,6 +97,7 @@ export type State = Readonly<{
   evaluation: number;
   zobrist?: Readonly<[number, number]>;
   lastMove?: Move;
+  moveStack: Readonly<Move[]>;
 }>;
 
 const GAME_LENGTH = 300;
@@ -94,8 +105,18 @@ const PLUS_TIME = 5;
 
 const INITIAL_STATE: State = {
   debugVersion: 0,
+  evaluation: 0,
   boardOrientation: Color.White,
   squareLabels: SquareLabel.None,
+  players: {
+    [Color.White]: HumanPlayer,
+    [Color.Black]: HumanPlayer,
+  },
+  engines: {},
+  checks: [],
+  position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
+  overlayCategory: SquareOverlayCategory.Play,
+  squareOverlay: {},
   clocks: {
     lastTick: Date.now(),
     gameLength: GAME_LENGTH,
@@ -103,17 +124,8 @@ const INITIAL_STATE: State = {
     [Color.White]: GAME_LENGTH * 1000,
     [Color.Black]: GAME_LENGTH * 1000,
   },
-  engines: {},
-  players: {
-    [Color.White]: HumanPlayer,
-    [Color.Black]: HumanPlayer,
-  },
-  evaluation: 0,
+  moveStack: [],
   moves: [],
-  checks: [],
-  overlayCategory: SquareOverlayCategory.Play,
-  squareOverlay: {},
-  position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({

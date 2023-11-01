@@ -8,13 +8,15 @@ import {
 } from './theme';
 import * as PieceSvg from './piece-svg';
 
-export type PieceProps = {
+const Piece = ({
+  type,
+  color,
+  size,
+}: {
   type: PieceType;
   color?: Color;
   size?: number;
-};
-
-const Piece = ({ type, color, size }: PieceProps) => {
+}) => {
   color = color ?? Color.White;
   // size = size ?? 50;
 

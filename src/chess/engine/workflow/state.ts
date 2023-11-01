@@ -8,12 +8,19 @@ import { OptionDefinitions } from './uci-options';
 export type ExecutorInstance = {
   executor: Remote<SearchExecutor>;
   cleanup: () => void;
-  // This property is here to indicate to JSON.stringify replacer function
-  // what type of object this is to avoid serializing the comlink remote
-  // object. JSON.stringify does something to the wrapped WebWorker before
-  // it hits the replacer function that explodes.
-  __computer: true;
+  toJSON(): unknown;
 };
+
+export const executorInstance = (
+  executor: Remote<SearchExecutor>,
+  cleanup: () => void,
+): ExecutorInstance => ({
+  executor,
+  cleanup,
+  toJSON() {
+    return '{ search-executor worker }';
+  },
+});
 
 export type State = Readonly<{
   debug: boolean;

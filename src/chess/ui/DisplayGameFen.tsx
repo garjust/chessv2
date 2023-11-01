@@ -3,15 +3,11 @@ import { State } from './workflow';
 import { formatPosition } from '../lib/fen';
 import { useWorkflow } from './workflow-context';
 
-export type DisplayGameFENProps = {
-  style?: React.CSSProperties;
-};
-
 const render = (state: State) => ({
   position: state.position,
 });
 
-const DisplayGameFEN = ({ style }: DisplayGameFENProps) => {
+const DisplayGameFEN = ({ style }: { style?: React.CSSProperties }) => {
   const { rendering } = useWorkflow(render);
 
   const { position } = rendering;

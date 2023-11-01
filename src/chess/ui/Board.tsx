@@ -3,19 +3,20 @@ import { State } from './workflow';
 import { Color } from '../types';
 import { rankFileToSquare, squareGenerator } from '../utils';
 import './Board.css';
-import Square from './Square';
+import BoardSquare from './BoardSquare';
 import { useWorkflow } from './workflow-context';
-
-export type BoardProps = {
-  squareSize: number;
-  style?: React.CSSProperties;
-};
 
 const render = (state: State) => ({
   boardOrientation: state.boardOrientation,
 });
 
-const Board = ({ squareSize, style }: BoardProps) => {
+const Board = ({
+  squareSize,
+  style,
+}: {
+  squareSize: number;
+  style?: React.CSSProperties;
+}) => {
   const { rendering } = useWorkflow(render);
 
   const { boardOrientation } = rendering;
@@ -23,7 +24,7 @@ const Board = ({ squareSize, style }: BoardProps) => {
   const squares: JSX.Element[] = [];
   for (const square of squareGenerator()) {
     squares.push(
-      <Square
+      <BoardSquare
         key={rankFileToSquare(square)}
         square={rankFileToSquare(square)}
         color={(square.rank + square.file) % 2 == 0 ? Color.Black : Color.White}

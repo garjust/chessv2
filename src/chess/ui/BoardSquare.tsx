@@ -1,6 +1,6 @@
 import React from 'react';
-import './Square.css';
-import { Color, PieceType } from '../types';
+import './BoardSquare.css';
+import { Color, PieceType, Square } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
@@ -27,25 +27,16 @@ import { HEATMAPS, HEATMAP_MULTIPLIER } from '../lib/heatmaps';
 
 const DEFAULT_HEATMAP = HEATMAPS[PieceType.Rook][Color.White];
 
-export type SquareProps = {
-  color: Color;
-  square: number;
-};
+const render = (square: Square) => (state: State) => ({
+  piece: pieceInSquare(state, square),
+  overlay: state.squareOverlay[square],
+  isClickable: isSquareClickable(state, square),
+  squareLabels: state.squareLabels,
+  showHeatmap: showHeatmap(state),
+});
 
-const makeRender =
-  ({ square }: Pick<SquareProps, 'square'>) =>
-  (state: State) => ({
-    piece: pieceInSquare(state, square),
-    overlay: state.squareOverlay[square],
-    isClickable: isSquareClickable(state, square),
-    squareLabels: state.squareLabels,
-    showHeatmap: showHeatmap(state),
-  });
-
-const Square = (props: SquareProps) => {
-  const { rendering, emit } = useWorkflow(makeRender(props));
-
-  const { square, color } = props;
+const BoardSquare = ({ color, square }: { color: Color; square: Square }) => {
+  const { rendering, emit } = useWorkflow(render(square));
   const { piece, overlay, isClickable, squareLabels, showHeatmap } = rendering;
 
   let css: React.CSSProperties = {
@@ -116,4 +107,4 @@ const Square = (props: SquareProps) => {
   );
 };
 
-export default Square;
+export default BoardSquare;

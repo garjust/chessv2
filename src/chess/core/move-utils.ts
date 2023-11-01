@@ -6,7 +6,7 @@ import {
   Square,
   SquareControlObject,
 } from '../types';
-import { directionOfMove, isSlider, isSliderPieceType } from '../utils';
+import { directionOfMove, isSliderPieceType } from '../utils';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;

@@ -3,10 +3,6 @@ import { Color } from '../types';
 import { State } from './workflow';
 import { useWorkflow } from './workflow-context';
 
-export type DisplayClockProps = {
-  style?: React.CSSProperties;
-};
-
 const render = (state: State) => ({
   whiteMs: state.clocks.WHITE,
   blackMs: state.clocks.BLACK,
@@ -33,7 +29,7 @@ const CLOCK_STYLING: React.CSSProperties = {
   fontSize: 32,
 };
 
-const DisplayClock = ({ style }: DisplayClockProps) => {
+const DisplayClock = ({ style }: { style?: React.CSSProperties }) => {
   const { rendering } = useWorkflow(render);
 
   const { whiteMs, blackMs, boardOrientation } = rendering;
