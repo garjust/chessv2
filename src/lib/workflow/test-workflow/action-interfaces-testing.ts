@@ -6,10 +6,10 @@ enum Type {
   Cat = 'CAT',
 }
 
-type FooAction = {
-  type: Type.Foo;
-  val: number;
-};
+// type FooAction = {
+//   type: Type.Foo;
+//   val: number;
+// };
 
 type BarAction = {
   type: Type.Bar;
@@ -21,12 +21,12 @@ type CatAction = {
   val: boolean;
 };
 
-type Action = FooAction | BarAction | CatAction;
-
-const fooAction = (val: number): FooAction => ({
+const fooAction = (val: number): { type: Type.Foo; val: number } => ({
   type: Type.Foo,
   val,
 });
+
+type FooAction = ReturnType<typeof fooAction>;
 
 const barAction = (val: string): BarAction => ({
   type: Type.Bar,
@@ -37,6 +37,8 @@ const catAction = (val: boolean): CatAction => ({
   type: Type.Cat,
   val,
 });
+
+type Action = FooAction | BarAction | CatAction;
 
 // rest of workflow...
 
