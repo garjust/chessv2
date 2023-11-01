@@ -28,80 +28,80 @@ export enum Navigate {
   Current = 'CURRENT',
 }
 
-export interface AttemptComputerMoveAction {
+export type AttemptComputerMoveAction = {
   readonly type: Type.AttemptComputerMove;
-}
+};
 
-export interface ChangeOverlayAction {
+export type ChangeOverlayAction = {
   readonly type: Type.ChangeOverlay;
-}
+};
 
-export interface ChessComputerLoadedAction {
+export type ChessComputerLoadedAction = {
   readonly type: Type.ChessComputerLoaded;
   readonly instance: EngineInstance;
   readonly color: Color;
-}
+};
 
-export interface ClickSquareAction {
+export type ClickSquareAction = {
   readonly type: Type.ClickSquare;
   readonly square: Square;
-}
+};
 
-export interface EngineResponseAction {
+export type EngineResponseAction = {
   readonly type: Type.EngineResponse;
   engineId: string;
   response: UCIResponse;
-}
+};
 
-export interface FlipBoardAction {
+export type FlipBoardAction = {
   readonly type: Type.FlipBoard;
-}
+};
 
-export interface LoadChessComputerAction {
+export type LoadChessComputerAction = {
   readonly type: Type.LoadChessComputer;
   readonly playingAs: Color;
-}
+};
 
-export interface MovePieceAction {
+export type MovePieceAction = {
   readonly type: Type.MovePiece;
   readonly move: Move;
-}
+};
 
-export interface NavigatePositionAction {
+export type NavigatePositionAction = {
   readonly type: Type.NavigatePosition;
   readonly to: Navigate;
-}
+};
 
-export interface OverlaySquaresAction {
+export type OverlaySquaresAction = {
   readonly type: Type.OverlaySquares;
-}
+};
 
-export interface ReceiveComputerMoveAction {
+export type ReceiveComputerMoveAction = {
   readonly type: Type.ReceiveComputerMove;
   readonly move: Move;
-}
+};
 
-export interface ResetOverlayAction {
+export type ResetOverlayAction = {
   readonly type: Type.ResetOverlay;
-}
+};
 
-export interface SetPositionAction {
+export type SetPositionAction = {
   readonly type: Type.SetPosition;
   readonly position: Position;
-}
+};
 
-export interface SetPositionFromFENAction {
+export type SetPositionFromFENAction = {
   readonly type: Type.SetPositionFromFEN;
   readonly fenString: string;
-}
+};
 
-export interface TickPlayersClockAction {
+export type TickPlayersClockAction = {
   readonly type: Type.TickPlayersClock;
-}
+};
 
-export interface ToggleSquareLabelsAction {
+export type ToggleSquareLabelsAction = {
   readonly type: Type.ToggleSquareLabels;
-}
+};
 
 export type Action =
   | AttemptComputerMoveAction
