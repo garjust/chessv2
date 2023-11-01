@@ -346,7 +346,11 @@ function handleNavigatePosition(
       break;
   }
 
-  if (moveIndex < 0 || moveIndex > moveList.length) {
+  if (
+    moveIndex < 0 ||
+    moveIndex > moveList.length ||
+    moveIndex === state.moveIndex
+  ) {
     return [state, null];
   }
 
