@@ -351,6 +351,12 @@ function handleNavigatePosition(
         { ...state, selectedSquare: undefined },
         () => setPositionAction(core.position),
       ];
+    case Navigate.Forward:
+      return [state, null];
+    case Navigate.Start:
+      return [state, null];
+    case Navigate.Current:
+      return [state, null];
   }
 }
 

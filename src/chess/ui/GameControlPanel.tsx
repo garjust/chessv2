@@ -4,11 +4,9 @@ import { FEN_LIBRARY } from '../lib/fen';
 import { Color } from '../types';
 import { State } from './workflow';
 import {
-  Navigate,
   changeOverlayAction,
   flipBoardAction,
   loadChessComputerAction,
-  navigatePositionAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from './workflow/action';
@@ -34,13 +32,6 @@ const GameControlPanel = () => {
       <button onClick={() => emit(flipBoardAction())}>Flip the board</button>
       <button onClick={() => emit(toggleSquareLabelsAction())}>
         Toggle square labels
-      </button>
-      <button
-        onClick={() => {
-          emit(navigatePositionAction(Navigate.Back));
-        }}
-      >
-        Go back
       </button>
       <button onClick={() => emit(changeOverlayAction())}>
         Switch overlay

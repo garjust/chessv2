@@ -8,7 +8,11 @@ import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
 import { Orchestrator } from './orchestrator';
 import { Command } from '../../lib/workflow/commands';
-import { setPositionFromFENAction } from './workflow';
+import {
+  Navigate,
+  navigatePositionAction,
+  setPositionFromFENAction,
+} from './workflow';
 import { FEN_LIBRARY } from '../lib/fen';
 
 const Game = () => {
@@ -26,7 +30,29 @@ const Game = () => {
   }, []);
 
   return (
-    <div className="game">
+    <div
+      className="game"
+      onKeyDownCapture={(event) => {
+        switch (event.key) {
+          case 'ArrowLeft':
+            orchestrator?.workflow.emit(navigatePositionAction(Navigate.Back));
+            break;
+          case 'ArrowRight':
+            orchestrator?.workflow.emit(
+              navigatePositionAction(Navigate.Forward),
+            );
+            break;
+          case 'ArrowUp':
+            orchestrator?.workflow.emit(navigatePositionAction(Navigate.Start));
+            break;
+          case 'ArrowDown':
+            orchestrator?.workflow.emit(
+              navigatePositionAction(Navigate.Current),
+            );
+            break;
+        }
+      }}
+    >
       {orchestrator ? (
         <WorkflowContext.Provider value={orchestrator.workflow}>
           <Board squareSize={64} style={{ gridArea: 'board' }} />
