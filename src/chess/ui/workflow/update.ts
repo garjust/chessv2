@@ -19,6 +19,8 @@ import {
   SetPositionFromFENAction,
   EngineResponseAction,
   engineResponseAction,
+  NavigatePositionAction,
+  Navigate,
 } from './action';
 import { State, Action } from './index';
 import {
@@ -279,56 +281,6 @@ function handleLoadChessComputer(
   }
 }
 
-function handleOverlaySquares(
-  state: State,
-  context: Context,
-): Update<State, Action> {
-  const squareOverlay: Record<Square, SquareOverlayType> = {};
-  const { overlayCategory } = state;
-
-  switch (overlayCategory) {
-    case SquareOverlayCategory.Play:
-      setOverlayForPlay(squareOverlay, state);
-      break;
-    case SquareOverlayCategory.AttacksForWhite:
-      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.White]);
-      break;
-    case SquareOverlayCategory.AttacksForBlack:
-      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.Black]);
-      break;
-    case SquareOverlayCategory.Pins:
-      setOverlayForPins(squareOverlay, context.core.pins);
-      break;
-  }
-
-  return [{ ...state, squareOverlay }, null];
-}
-
-function handlePreviousPosition(
-  state: State,
-  { core }: Context,
-): Update<State, Action> {
-  core.undoLastMove();
-  play(Sound.Move);
-
-  return [
-    { ...state, selectedSquare: undefined },
-    () => setPositionAction(core.position),
-  ];
-}
-
-function handleReceiveComputerMove(
-  state: State,
-  action: ReceiveComputerMoveAction,
-): Update<State, Action> {
-  const { move } = action;
-  return [state, () => movePieceAction(move)];
-}
-
-function handleResetOverlay(state: State): Update<State, Action> {
-  return [{ ...state, squareOverlay: {} }, null];
-}
-
 function handleMovePiece(
   state: State,
   action: MovePieceAction,
@@ -384,6 +336,59 @@ function handleMovePiece(
     },
     () => setPositionAction(core.position),
   ];
+}
+
+function handleNavigatePosition(
+  state: State,
+  action: NavigatePositionAction,
+  { core }: Context,
+): Update<State, Action> {
+  switch (action.to) {
+    case Navigate.Back:
+      core.undoLastMove();
+      play(Sound.Move);
+      return [
+        { ...state, selectedSquare: undefined },
+        () => setPositionAction(core.position),
+      ];
+  }
+}
+
+function handleOverlaySquares(
+  state: State,
+  context: Context,
+): Update<State, Action> {
+  const squareOverlay: Record<Square, SquareOverlayType> = {};
+  const { overlayCategory } = state;
+
+  switch (overlayCategory) {
+    case SquareOverlayCategory.Play:
+      setOverlayForPlay(squareOverlay, state);
+      break;
+    case SquareOverlayCategory.AttacksForWhite:
+      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.White]);
+      break;
+    case SquareOverlayCategory.AttacksForBlack:
+      setOverlayForAttacks(squareOverlay, context.core.attacks[Color.Black]);
+      break;
+    case SquareOverlayCategory.Pins:
+      setOverlayForPins(squareOverlay, context.core.pins);
+      break;
+  }
+
+  return [{ ...state, squareOverlay }, null];
+}
+
+function handleReceiveComputerMove(
+  state: State,
+  action: ReceiveComputerMoveAction,
+): Update<State, Action> {
+  const { move } = action;
+  return [state, () => movePieceAction(move)];
+}
+
+function handleResetOverlay(state: State): Update<State, Action> {
+  return [{ ...state, squareOverlay: {} }, null];
 }
 
 function handleSetPosition(
@@ -524,16 +529,16 @@ export const update =
         return handleFlipBoard(state);
       case Type.LoadChessComputer:
         return handleLoadChessComputer(state, action, context);
+      case Type.MovePiece:
+        return handleMovePiece(state, action, context);
+      case Type.NavigatePosition:
+        return handleNavigatePosition(state, action, context);
       case Type.OverlaySquares:
         return handleOverlaySquares(state, context);
-      case Type.PreviousPosition:
-        return handlePreviousPosition(state, context);
       case Type.ReceiveComputerMove:
         return handleReceiveComputerMove(state, action);
       case Type.ResetOverlay:
         return handleResetOverlay(state);
-      case Type.MovePiece:
-        return handleMovePiece(state, action, context);
       case Type.SetPosition:
         return handleSetPosition(state, action, context);
       case Type.SetPositionFromFEN:

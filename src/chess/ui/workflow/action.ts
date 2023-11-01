@@ -11,14 +11,21 @@ export enum Type {
   FlipBoard = 'FLIP_BOARD',
   LoadChessComputer = 'LOAD_CHESS_COMPUTER',
   MovePiece = 'MOVE_PIECE',
+  NavigatePosition = 'NAVIGATE_POSITION',
   OverlaySquares = 'OVERLAY_SQUARES',
-  PreviousPosition = 'PREVIOUS_POSITION',
   ReceiveComputerMove = 'RECEIVE_COMPUTER_MOVE',
   ResetOverlay = 'RESET_OVERLAY',
   SetPosition = 'SET_POSITION',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
   TickPlayersClock = 'TICK_PLAYERS_CLOCK',
   ToggleSquareLabels = 'TOGGLE_SQUARE_LABELS',
+}
+
+export enum Navigate {
+  Back = 'BACK',
+  Forward = 'FORWARD',
+  Start = 'START',
+  Current = 'CURRENT',
 }
 
 export interface AttemptComputerMoveAction {
@@ -60,12 +67,13 @@ export interface MovePieceAction {
   readonly move: Move;
 }
 
-export interface OverlaySquaresAction {
-  readonly type: Type.OverlaySquares;
+export interface NavigatePositionAction {
+  readonly type: Type.NavigatePosition;
+  readonly to: Navigate;
 }
 
-export interface PreviousPositionAction {
-  readonly type: Type.PreviousPosition;
+export interface OverlaySquaresAction {
+  readonly type: Type.OverlaySquares;
 }
 
 export interface ReceiveComputerMoveAction {
@@ -103,11 +111,11 @@ export type Action =
   | EngineResponseAction
   | FlipBoardAction
   | LoadChessComputerAction
+  | MovePieceAction
+  | NavigatePositionAction
   | OverlaySquaresAction
-  | PreviousPositionAction
   | ReceiveComputerMoveAction
   | ResetOverlayAction
-  | MovePieceAction
   | SetPositionAction
   | SetPositionFromFENAction
   | TickPlayersClockAction
@@ -155,12 +163,20 @@ export const loadChessComputerAction = (
   playingAs,
 });
 
-export const overlaySquaresAction = (): OverlaySquaresAction => ({
-  type: Type.OverlaySquares,
+export const movePieceAction = (move: Move): MovePieceAction => ({
+  type: Type.MovePiece,
+  move,
 });
 
-export const previousPositionAction = (): PreviousPositionAction => ({
-  type: Type.PreviousPosition,
+export const navigatePositionAction = (
+  to: Navigate,
+): NavigatePositionAction => ({
+  type: Type.NavigatePosition,
+  to,
+});
+
+export const overlaySquaresAction = (): OverlaySquaresAction => ({
+  type: Type.OverlaySquares,
 });
 
 export const receiveComputerMoveAction = (
@@ -172,11 +188,6 @@ export const receiveComputerMoveAction = (
 
 export const resetOverlayAction = (): ResetOverlayAction => ({
   type: Type.ResetOverlay,
-});
-
-export const movePieceAction = (move: Move): MovePieceAction => ({
-  type: Type.MovePiece,
-  move,
 });
 
 export const setPositionAction = (position: Position): SetPositionAction => ({

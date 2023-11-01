@@ -4,10 +4,11 @@ import { FEN_LIBRARY } from '../lib/fen';
 import { Color } from '../types';
 import { State } from './workflow';
 import {
+  Navigate,
   changeOverlayAction,
   flipBoardAction,
   loadChessComputerAction,
-  previousPositionAction,
+  navigatePositionAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from './workflow/action';
@@ -23,8 +24,8 @@ const GameControlPanel = () => {
 
   function emitExampleGame(): void {
     emit(setPositionFromFENAction(FEN_LIBRARY.STARTING_POSITION_FEN));
-    moveActions(VIENNA_GAMBIT_ACCEPTED_GAME, 400).subscribe({
-      next: (action) => emit(action),
+    moveActions(VIENNA_GAMBIT_ACCEPTED_GAME, 200).subscribe({
+      next: emit,
     });
   }
 
@@ -36,7 +37,7 @@ const GameControlPanel = () => {
       </button>
       <button
         onClick={() => {
-          emit(previousPositionAction());
+          emit(navigatePositionAction(Navigate.Back));
         }}
       >
         Go back
