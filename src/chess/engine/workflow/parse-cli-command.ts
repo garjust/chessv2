@@ -14,7 +14,6 @@ import {
   uciAction,
   uciNewGameAction,
 } from './action';
-import { EngineOptionName, OptionHash } from './uci-response';
 
 const parseGoCommand = (parts: string[]): GoCommand => {
   const result: GoCommand = {};
@@ -69,18 +68,18 @@ const parseGoCommand = (parts: string[]): GoCommand => {
 
 export const parse = (commandString: string): Action => {
   const [command, ...args] = commandString.split(' ');
+  let name, value, boolValue;
 
   switch (command) {
     case 'uci':
       return uciAction();
     case 'debug':
-      // eslint-disable-next-line no-case-declarations
-      const [boolValue] = args;
+      [boolValue] = args;
       return debugAction(boolValue == 'on');
     case 'isready':
       return isReadyAction();
     case 'setoption': {
-      const [, name, , value] = args;
+      [, name, , value] = args;
       switch (name) {
         case 'Hash':
           return setOptionAction({

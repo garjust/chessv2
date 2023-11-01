@@ -1,5 +1,6 @@
 import { moveString } from '../../move-notation';
 import { Move } from '../../types';
+import { EngineOptionName, OptionDefinitions } from './uci-options';
 
 export enum UCIResponseType {
   Id = 'ID',
@@ -22,26 +23,6 @@ type InfoKey =
   | 'currmovenumber'
   | 'hashfull'
   | 'nps';
-
-export type EngineOptionName = 'OwnBook' | 'Hash';
-
-export type EngineOption =
-  | { name: 'OwnBook'; value: boolean }
-  | { name: 'Hash'; value: number };
-
-export const OptionOwnBook = {
-  name: 'OwnBook',
-  type: 'check',
-  default: true,
-};
-
-export const OptionHash = {
-  name: 'Hash',
-  type: 'spin',
-  default: 128,
-  min: 128,
-  max: 1024,
-};
 
 const optionToResponse = (
   option: Record<string, string | number | boolean>,
@@ -86,10 +67,10 @@ const toUCIString = (response: UCIResponse): string[] => {
       return [`info ${Object.entries(response.data).flat().join(' ')}`];
     case UCIResponseType.Option:
       switch (response.name) {
-        case 'OwnBook':
-          return [optionToResponse(OptionOwnBook)];
         case 'Hash':
-          return [optionToResponse(OptionHash)];
+          return [optionToResponse(OptionDefinitions.Hash)];
+        case 'OwnBook':
+          return [optionToResponse(OptionDefinitions.OwnBook)];
       }
   }
 };
