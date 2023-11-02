@@ -5,6 +5,7 @@ import { rankFileToSquare, squareGenerator } from '../utils';
 import './Board.css';
 import BoardSquare from './BoardSquare';
 import { useWorkflow } from './workflow-context';
+import { BOARD_BORDER } from './theme';
 
 const render = (state: State) => ({
   boardOrientation: state.boardOrientation,
@@ -41,7 +42,7 @@ const Board = ({
         ...style,
         height: squareSize * 8,
         width: squareSize * 8,
-        borderRadius: '8px',
+        backgroundColor: BOARD_BORDER,
       }}
     >
       {squares}
