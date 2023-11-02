@@ -10,6 +10,10 @@ const isMove = (obj: object): obj is Move =>
   Object.prototype.hasOwnProperty.call(obj, 'to');
 
 function replacer(key: string, value: unknown) {
+  if (value === null) {
+    return value;
+  }
+
   if (key === 'evaluation') {
     return (value as number).toFixed(2);
   }

@@ -33,6 +33,9 @@ export enum SquareOverlayCategory {
   Heatmap = 'HEATMAP',
 }
 
+/**
+ * What the UI thinks an engine is currently doing.
+ */
 export enum UCIState {
   Idle = 'IDLE',
   WaitingForUCIOk = 'WAITING_FOR_UCIOK',
@@ -42,6 +45,12 @@ export enum UCIState {
 
 export const HumanPlayer = Symbol('HUMAN');
 export const Draw = Symbol('DRAW');
+
+export type Player =
+  | typeof HumanPlayer
+  | {
+      engineId: string;
+    };
 
 function createEngineId() {
   return `engine${Math.trunc(Math.random() * 1000000)}`;
@@ -65,69 +74,73 @@ export const engineInstance = (engine: Engine): EngineInstance => ({
   },
 });
 
-export type Player =
-  | typeof HumanPlayer
-  | {
-      engineId: string;
-    };
-
 export type State = Readonly<{
   debugVersion?: number;
   boardOrientation: Color;
   squareLabels: SquareLabel;
-  clocks: Readonly<{
-    gameLength: number;
-    plusTime: number;
-    lastTick: number;
-    [Color.White]: number;
-    [Color.Black]: number;
-  }>;
-  engines: Readonly<Record<string, EngineInstance>>;
-  players: Readonly<{
-    [Color.White]: Player;
-    [Color.Black]: Player;
-  }>;
-  winner?: Color | typeof Draw;
-  selectedSquare?: Square;
+  selectedSquare: Square | null;
   overlayCategory: SquareOverlayCategory;
   squareOverlay: Record<Square, SquareOverlayType>;
-  position: Readonly<Position>;
-  moves: Readonly<MoveWithExtraData[]>;
-  checks: Readonly<SquareControlObject[]>;
-  evaluation: number;
-  zobrist?: Readonly<[number, number]>;
-  lastMove?: Move;
-  moveList: Readonly<Move[]>;
-  moveIndex: number;
+  game: Readonly<{
+    winner: Color | typeof Draw | null;
+    evaluation: number;
+    players: Readonly<{
+      [Color.White]: Player;
+      [Color.Black]: Player;
+    }>;
+    clocks: Readonly<{
+      gameLength: number;
+      plusTime: number;
+      lastTick: number;
+      [Color.White]: number;
+      [Color.Black]: number;
+    }>;
+    position: Readonly<Position>;
+    moves: Readonly<MoveWithExtraData[]>;
+    moveList: Readonly<Move[]>;
+    moveIndex: number;
+    checks: Readonly<SquareControlObject[]>;
+    zobrist: Readonly<[number, number]> | null;
+  }>;
+  engines: Readonly<Record<string, EngineInstance>>;
+  displayPosition: Readonly<Position>;
+  lastMove: Move | null;
 }>;
 
-const GAME_LENGTH = 300;
-const PLUS_TIME = 5;
+const GAME_LENGTH_SECONDS = 300;
+const PLUS_TIME_SECONDS = 5;
 
 const INITIAL_STATE: State = {
   debugVersion: 0,
-  evaluation: 0,
   boardOrientation: Color.White,
   squareLabels: SquareLabel.None,
-  players: {
-    [Color.White]: HumanPlayer,
-    [Color.Black]: HumanPlayer,
-  },
-  engines: {},
-  checks: [],
-  position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
+  selectedSquare: null,
   overlayCategory: SquareOverlayCategory.Play,
   squareOverlay: {},
-  clocks: {
-    lastTick: Date.now(),
-    gameLength: GAME_LENGTH,
-    plusTime: PLUS_TIME,
-    [Color.White]: GAME_LENGTH * 1000,
-    [Color.Black]: GAME_LENGTH * 1000,
+  game: {
+    winner: null,
+    evaluation: 0,
+    players: {
+      [Color.White]: HumanPlayer,
+      [Color.Black]: HumanPlayer,
+    },
+    clocks: {
+      lastTick: Date.now(),
+      gameLength: GAME_LENGTH_SECONDS,
+      plusTime: PLUS_TIME_SECONDS,
+      [Color.White]: GAME_LENGTH_SECONDS * 1000,
+      [Color.Black]: GAME_LENGTH_SECONDS * 1000,
+    },
+    position: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
+    moves: [],
+    moveList: [],
+    moveIndex: 0,
+    checks: [],
+    zobrist: null,
   },
-  moveList: [],
-  moveIndex: 0,
-  moves: [],
+  engines: {},
+  displayPosition: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
+  lastMove: null,
 };
 
 export const createState = (overrides: Partial<State> = {}): State => ({
@@ -138,7 +151,7 @@ export const createState = (overrides: Partial<State> = {}): State => ({
 export const pieceInSquare = (
   state: State,
   square: Square,
-): Piece | undefined => state.position.pieces.get(square);
+): Piece | undefined => state.game.position.pieces.get(square);
 
 export const squareIsSelected = (state: State, square: Square) =>
   state.selectedSquare === square;
@@ -148,10 +161,10 @@ export const squareOverlay = (state: State, square: Square) =>
 
 export const isSquareClickable = (state: State, square: Square): boolean => {
   if (
-    (state.position.turn === Color.White &&
-      state.players[Color.White] !== HumanPlayer) ||
-    (state.position.turn === Color.Black &&
-      state.players[Color.Black] !== HumanPlayer)
+    (state.game.position.turn === Color.White &&
+      state.game.players[Color.White] !== HumanPlayer) ||
+    (state.game.position.turn === Color.Black &&
+      state.game.players[Color.Black] !== HumanPlayer)
   ) {
     return false;
   }
@@ -161,7 +174,7 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
   }
 
   const piece = pieceInSquare(state, square);
-  if (piece && piece.color === state.position.turn) {
+  if (piece && piece.color === state.game.position.turn) {
     return true;
   }
 
@@ -169,10 +182,10 @@ export const isSquareClickable = (state: State, square: Square): boolean => {
 };
 
 export const checkedSquare = (state: State): Square | undefined =>
-  state.checks.length > 0 ? state.checks[0].square : undefined;
+  state.game.checks.length > 0 ? state.game.checks[0].square : undefined;
 
 export const availableCaptures = (state: State): Move[] =>
-  state.moves.filter((move) => move.attack);
+  state.game.moves.filter((move) => move.attack);
 
 export const showHeatmap = (state: State) =>
   state.overlayCategory === SquareOverlayCategory.Heatmap;
@@ -201,6 +214,6 @@ export const engineStateAs = (
 });
 
 export const isWaitingForEngine = (state: State, engineId: string): boolean => {
-  const player = state.players[state.position.turn];
+  const player = state.game.players[state.game.position.turn];
   return player !== HumanPlayer && player.engineId === engineId;
 };

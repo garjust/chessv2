@@ -4,8 +4,8 @@ import { State } from './workflow';
 import { useWorkflow } from './workflow-context';
 
 const render = (state: State) => ({
-  whiteMs: state.clocks.WHITE,
-  blackMs: state.clocks.BLACK,
+  whiteMs: state.game.clocks.WHITE,
+  blackMs: state.game.clocks.BLACK,
   boardOrientation: state.boardOrientation,
 });
 

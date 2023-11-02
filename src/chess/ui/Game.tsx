@@ -35,23 +35,26 @@ const Game = () => {
       onKeyDownCapture={(event) => {
         switch (event.key) {
           case 'ArrowLeft':
+            event.preventDefault();
             orchestrator?.workflow.emit(navigatePositionAction(Navigate.Back));
             break;
           case 'ArrowRight':
+            event.preventDefault();
             orchestrator?.workflow.emit(
               navigatePositionAction(Navigate.Forward),
             );
             break;
           case 'ArrowUp':
+            event.preventDefault();
             orchestrator?.workflow.emit(navigatePositionAction(Navigate.Start));
             break;
           case 'ArrowDown':
+            event.preventDefault();
             orchestrator?.workflow.emit(
               navigatePositionAction(Navigate.Current),
             );
             break;
         }
-        event.preventDefault();
       }}
     >
       {orchestrator ? (

@@ -64,8 +64,7 @@ const logger = new Logger('ui-workflow');
 const ENGINE_VERSION: Version = LATEST;
 
 function handleAttemptEngineMove(state: State): Update<State, Action> {
-  const { position, players } = state;
-  const playerForTurn = players[position.turn];
+  const playerForTurn = state.game.players[state.game.position.turn];
 
   if (playerForTurn !== HumanPlayer) {
     const instance = getEngineInstance(state, playerForTurn.engineId);
@@ -77,7 +76,10 @@ function handleAttemptEngineMove(state: State): Update<State, Action> {
         delayEmit(
           instance.engine,
           // TODO: provide moves so far & pass "startpos"
-          EngineWorkflow.positionAction(formatPosition(state.position), []),
+          EngineWorkflow.positionAction(
+            formatPosition(state.game.position),
+            [],
+          ),
           EngineWorkflow.goAction(),
         ),
     ];
@@ -124,9 +126,12 @@ function handleLoadEngineDone(
       engines: Object.assign({}, state.engines, {
         [instance.id]: instance,
       }),
-      players: {
-        ...state.players,
-        [color]: { engineId: instance.id },
+      game: {
+        ...state.game,
+        players: {
+          ...state.game.players,
+          [color]: { engineId: instance.id },
+        },
       },
     },
     () =>
@@ -153,28 +158,30 @@ function handleClickSquare(
   state: State,
   action: ClickSquareAction,
 ): Update<State, Action> {
-  const { square } = action;
-  const { position } = state;
-
-  if (state.selectedSquare !== undefined) {
+  if (state.selectedSquare !== null) {
     const selectedSquare = state.selectedSquare;
 
-    if (selectedSquare === square) {
-      return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
+    if (selectedSquare === action.square) {
+      return [{ ...state, selectedSquare: null }, overlaySquaresAction];
     }
 
     return [
-      { ...state, selectedSquare: undefined },
+      { ...state, selectedSquare: null },
       () =>
         movePieceAction({
           from: selectedSquare,
-          to: square,
+          to: action.square,
         }),
     ];
   } else {
     // Nothing is already selected so attempt to "select" the square.
-    if (pieceInSquare(state, square)?.color === position.turn) {
-      return [{ ...state, selectedSquare: square }, overlaySquaresAction];
+    if (
+      pieceInSquare(state, action.square)?.color === state.game.position.turn
+    ) {
+      return [
+        { ...state, selectedSquare: action.square },
+        overlaySquaresAction,
+      ];
     }
   }
 
@@ -250,8 +257,7 @@ function handleLoadEngine(
   context: Context,
 ): Update<State, Action> {
   const { playingAs } = action;
-  const { players } = state;
-  const player = players[playingAs];
+  const player = state.game.players[playingAs];
 
   if (player === HumanPlayer) {
     const engine = new Engine(ENGINE_VERSION, 10, context.debug);
@@ -265,7 +271,13 @@ function handleLoadEngine(
     // TODO: remove old engine.
     // TODO: check if I need to cleanup the webworkers inside the engine.
     return [
-      { ...state, players: { ...players, [playingAs]: HumanPlayer } },
+      {
+        ...state,
+        game: {
+          ...state.game,
+          players: { ...state.game.players, [playingAs]: HumanPlayer },
+        },
+      },
       null,
     ];
   }
@@ -277,11 +289,11 @@ function handleMovePiece(
   { core }: Context,
 ): Update<State, Action> {
   const { move } = action;
-  const legalMoves = state.moves;
+  const legalMoves = state.game.moves;
 
   if (!movesIncludes(legalMoves, move)) {
     logger.warn('illegal move:', moveString(move));
-    return [{ ...state, selectedSquare: undefined }, overlaySquaresAction];
+    return [{ ...state, selectedSquare: null }, overlaySquaresAction];
   }
 
   const pieceToMove = pieceInSquare(state, move.from);
@@ -309,14 +321,18 @@ function handleMovePiece(
   return [
     {
       ...state,
-      clocks: {
-        ...state.clocks,
-        [state.position.turn]:
-          state.clocks[state.position.turn] + state.clocks.plusTime * 1000,
+      game: {
+        ...state.game,
+        clocks: {
+          ...state.game.clocks,
+          [state.game.position.turn]:
+            state.game.clocks[state.game.position.turn] +
+            state.game.clocks.plusTime * 1000,
+        },
+        moveIndex: state.game.moveList.length,
+        moveList: [...state.game.moveList, move],
       },
       lastMove: move,
-      moveIndex: state.moveList.length,
-      moveList: [...state.moveList, move],
     },
     () => setPositionAction(core.position),
   ];
@@ -327,7 +343,7 @@ function handleNavigatePosition(
   action: NavigatePositionAction,
   { core }: Context,
 ): Update<State, Action> {
-  let { moveList, moveIndex } = state;
+  let { moveList, moveIndex } = state.game;
 
   switch (action.to) {
     case Navigate.Back:
@@ -347,7 +363,7 @@ function handleNavigatePosition(
   if (
     moveIndex < 0 ||
     moveIndex > moveList.length ||
-    moveIndex === state.moveIndex
+    moveIndex === state.game.moveIndex
   ) {
     return [state, null];
   }
@@ -362,8 +378,8 @@ function handleNavigatePosition(
   return [
     {
       ...state,
-      selectedSquare: undefined,
-      moveIndex,
+      selectedSquare: null,
+      game: { ...state.game, moveIndex },
       lastMove: moveList[moveList.length - 1],
     },
     () => setPositionAction(core.position),
@@ -420,11 +436,7 @@ function handleSetPosition(
 
   state = {
     ...state,
-    position,
-    moves,
-    evaluation,
-    checks,
-    zobrist,
+    game: { ...state.game, position, moves, evaluation, checks, zobrist },
   };
 
   if (position.halfMoveCount === 100) {
@@ -432,7 +444,7 @@ function handleSetPosition(
     return [
       {
         ...state,
-        winner: Draw,
+        game: { ...state.game, winner: Draw },
       },
       null,
     ];
@@ -452,7 +464,7 @@ function handleSetPosition(
     return [
       {
         ...state,
-        winner,
+        game: { ...state.game, winner },
       },
       overlaySquaresAction,
     ];
@@ -476,29 +488,38 @@ function handleSetPositionFromFEN(
   const position = parseFEN(action.fenString);
   core.position = position;
 
-  return [{ ...state, winner: undefined }, () => setPositionAction(position)];
+  return [
+    { ...state, game: { ...state.game, winner: null } },
+    () => setPositionAction(position),
+  ];
 }
 
 function handleTickPlayersClock(state: State): Update<State, Action> {
-  const { position, clocks } = state;
+  const { position, clocks } = state.game;
   const tick = Date.now();
 
   const turnClock = clocks[position.turn];
 
   state = {
     ...state,
-    clocks: {
-      ...clocks,
-      lastTick: tick,
-      [position.turn]:
-        turnClock > 0
-          ? Math.max(turnClock - (tick - clocks.lastTick), 0)
-          : state.clocks[position.turn],
+    game: {
+      ...state.game,
+      clocks: {
+        ...clocks,
+        lastTick: tick,
+        [position.turn]:
+          turnClock > 0
+            ? Math.max(turnClock - (tick - clocks.lastTick), 0)
+            : state.game.clocks[position.turn],
+      },
     },
   };
 
-  if (state.clocks[position.turn] <= 0) {
-    state = { ...state, winner: flipColor(position.turn) };
+  if (state.game.clocks[position.turn] <= 0) {
+    state = {
+      ...state,
+      game: { ...state.game, winner: flipColor(position.turn) },
+    };
   }
 
   return [state, null];

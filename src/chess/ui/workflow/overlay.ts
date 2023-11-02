@@ -11,7 +11,8 @@ export const setOverlayForPlay = (
   map: Record<Square, SquareOverlayType>,
   state: State,
 ): void => {
-  const { position, selectedSquare, lastMove, moves } = state;
+  const { position, moves } = state.game;
+  const { selectedSquare, lastMove } = state;
 
   if (lastMove) {
     map[lastMove.from] = SquareOverlayType.LastMove;
@@ -23,7 +24,7 @@ export const setOverlayForPlay = (
     map[check] = SquareOverlayType.Check;
   }
 
-  if (selectedSquare !== undefined) {
+  if (selectedSquare !== null) {
     map[selectedSquare] = SquareOverlayType.SelectedPiece;
 
     const piece = pieceInSquare(state, selectedSquare);

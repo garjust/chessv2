@@ -4,7 +4,7 @@ import { formatPosition } from '../lib/fen';
 import { useWorkflow } from './workflow-context';
 
 const render = (state: State) => ({
-  position: state.position,
+  position: state.game.position,
 });
 
 const DisplayGameFEN = ({ style }: { style?: React.CSSProperties }) => {
