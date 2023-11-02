@@ -12,5 +12,7 @@ export * from './action';
 export { update } from './update';
 
 const init = (seed: State, context: Context) =>
-  workflow<State, Action>(update(context), seed, 'engine');
+  workflow<State, Action>(update(context), seed, 'engine', (state) => {
+    state.executorInstance?.cleanup();
+  });
 export default init;

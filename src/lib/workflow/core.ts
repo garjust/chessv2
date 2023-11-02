@@ -1,4 +1,12 @@
-import { EMPTY, Observable, Subject, from, of, partition } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  Subject,
+  from,
+  lastValueFrom,
+  of,
+  partition,
+} from 'rxjs';
 import {
   catchError,
   filter,
@@ -126,6 +134,7 @@ const core = <S, A>(
   updater: Updater<S, A>,
   seed: S,
   label: string,
+  cleanup: (state: S) => void = () => {},
 ): Workflow<S, A> => {
   // Root subject. This subject acts as the "root" observable of
   // the workflow. We define it as a subject so that an emit function can
@@ -197,9 +206,12 @@ const core = <S, A>(
   );
 
   // Subscribe to our internal observables to push values into our public
-  // subjects
+  // subjects.
+  //
+  // Note: these calls create the first hot observable subscriptions.
   updates$.subscribe(publicUpdates$);
   states$.subscribe(publicStates$);
+  lastValueFrom(states$).then(cleanup);
 
   // This observable extracts any next actions from the result of calling the
   // updater function
