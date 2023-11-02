@@ -41,9 +41,7 @@ const Board = ({
         ...style,
         height: squareSize * 8,
         width: squareSize * 8,
-        borderColor: 'black',
-        borderWidth: '2px',
-        borderStyle: 'solid',
+        borderRadius: '8px',
       }}
     >
       {squares}
