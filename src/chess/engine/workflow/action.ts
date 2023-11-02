@@ -2,6 +2,7 @@ import { Version } from '../registry';
 import { ExecutorInstance } from './state';
 import { UCIResponse } from './uci-response';
 import { EngineOption } from './uci-options';
+import { Move } from '../../types';
 
 export type GoCommand = Partial<{
   searchmoves: string[];
@@ -78,7 +79,7 @@ export interface UCINewGameAction {
 export interface PositionAction {
   readonly type: Type.Position;
   readonly fen: 'startpos' | string;
-  readonly moves: string[];
+  readonly moves: readonly Move[];
 }
 
 // Run a search in the current position!
@@ -162,7 +163,7 @@ export const uciNewGameAction = (): UCINewGameAction => ({
 
 export const positionAction = (
   fen: string,
-  moves: string[] = [],
+  moves: readonly Move[] = [],
 ): PositionAction => ({
   type: Type.Position,
   fen,

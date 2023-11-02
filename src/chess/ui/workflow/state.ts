@@ -74,8 +74,18 @@ export const engineInstance = (engine: Engine): EngineInstance => ({
   },
 });
 
+export const validateEngineInstanceState = (
+  engine: EngineInstance,
+  state: UCIState,
+): void => {
+  if (engine.uciState !== state) {
+    throw Error(`engine ${engine.label} not in state ${state}`);
+  }
+};
+
 export type State = Readonly<{
   debugVersion?: number;
+  engines: Readonly<Record<string, EngineInstance>>;
   boardOrientation: Color;
   squareLabels: SquareLabel;
   selectedSquare: Square | null;
@@ -84,6 +94,7 @@ export type State = Readonly<{
   game: Readonly<{
     winner: Color | typeof Draw | null;
     evaluation: number;
+    turn: Color;
     players: Readonly<{
       [Color.White]: Player;
       [Color.Black]: Player;
@@ -101,8 +112,6 @@ export type State = Readonly<{
     moveIndex: number;
     checks: Readonly<SquareControlObject[]>;
   }>;
-  engines: Readonly<Record<string, EngineInstance>>;
-  displayPosition: Readonly<Position>;
   lastMove: Move | null;
 }>;
 
@@ -111,6 +120,7 @@ const PLUS_TIME_SECONDS = 5;
 
 const INITIAL_STATE: State = {
   debugVersion: 0,
+  engines: {},
   boardOrientation: Color.White,
   squareLabels: SquareLabel.None,
   selectedSquare: null,
@@ -119,6 +129,7 @@ const INITIAL_STATE: State = {
   game: {
     winner: null,
     evaluation: 0,
+    turn: Color.White,
     players: {
       [Color.White]: HumanPlayer,
       [Color.Black]: HumanPlayer,
@@ -136,8 +147,6 @@ const INITIAL_STATE: State = {
     moveIndex: 0,
     checks: [],
   },
-  engines: {},
-  displayPosition: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
   lastMove: null,
 };
 
@@ -212,6 +221,9 @@ export const engineStateAs = (
 });
 
 export const isWaitingForEngine = (state: State, engineId: string): boolean => {
-  const player = state.game.players[state.game.position.turn];
+  const player = state.game.players[state.game.turn];
   return player !== HumanPlayer && player.engineId === engineId;
 };
+
+export const isDisplayingCurrentPosition = (state: State): boolean =>
+  state.game.moveIndex === state.game.moveList.length;

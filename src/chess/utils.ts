@@ -1,3 +1,4 @@
+import { formatPosition } from './lib/fen';
 import {
   Color,
   DirectionUnit,
@@ -209,4 +210,11 @@ export const copyPosition = (position: Position): Position => {
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,
   };
+};
+
+export const isPositionEqual = (a: Position, b: Position): boolean => {
+  const fenA = formatPosition(a);
+  const fenB = formatPosition(b);
+
+  return fenA === fenB;
 };

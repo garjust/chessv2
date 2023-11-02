@@ -1,6 +1,11 @@
 import { Update } from '../../../lib/workflow';
 import { Color, PieceType, Square } from '../../types';
-import { flipColor, isPromotionPositionPawn, movesIncludes } from '../../utils';
+import {
+  flipColor,
+  isPositionEqual,
+  isPromotionPositionPawn,
+  movesIncludes,
+} from '../../utils';
 import { parseFEN, formatPosition, FEN_LIBRARY } from '../../lib/fen';
 import {
   Type,
@@ -21,6 +26,7 @@ import {
   engineResponseAction,
   NavigatePositionAction,
   Navigate,
+  navigatePositionAction,
 } from './action';
 import { State, Action } from './index';
 import {
@@ -36,8 +42,10 @@ import {
   engineStateAs,
   isWaitingForEngine,
   engineInstance,
+  isDisplayingCurrentPosition,
+  validateEngineInstanceState,
 } from './state';
-import { from, map, merge } from 'rxjs';
+import { from, map, merge, of } from 'rxjs';
 import Core from '../../core';
 import { play, Sound } from '../audio';
 import {
@@ -64,22 +72,18 @@ const logger = new Logger('ui-workflow');
 const ENGINE_VERSION: Version = LATEST;
 
 function handleAttemptEngineMove(state: State): Update<State, Action> {
-  const playerForTurn = state.game.players[state.game.position.turn];
+  const playerForTurn = state.game.players[state.game.turn];
 
   if (playerForTurn !== HumanPlayer) {
     const instance = getEngineInstance(state, playerForTurn.engineId);
-    validateState(instance, UCIState.Idle);
+    validateEngineInstanceState(instance, UCIState.Idle);
 
     return [
       engineStateAs(state, instance.id, UCIState.WaitingForMove),
       () =>
         delayEmit(
           instance.engine,
-          // TODO: provide moves so far & pass "startpos"
-          EngineWorkflow.positionAction(
-            formatPosition(state.game.position),
-            [],
-          ),
+          EngineWorkflow.positionAction('startpos', state.game.moveList),
           EngineWorkflow.goAction(),
         ),
     ];
@@ -188,12 +192,6 @@ function handleClickSquare(
   return [state, overlaySquaresAction];
 }
 
-const validateState = (engine: EngineInstance, state: UCIState): void => {
-  if (engine.uciState !== state) {
-    throw Error(`engine ${engine.label} not in state ${state}`);
-  }
-};
-
 function handleEngineResponse(
   state: State,
   action: EngineResponseAction,
@@ -219,14 +217,14 @@ function handleEngineResponse(
     case UCIResponseType.Option:
       return [state, null];
     case UCIResponseType.UCIOk:
-      validateState(instance, UCIState.WaitingForUCIOk);
+      validateEngineInstanceState(instance, UCIState.WaitingForUCIOk);
 
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
         () => delayEmit(instance.engine, EngineWorkflow.isReadyAction()),
       ];
     case UCIResponseType.ReadyOk:
-      validateState(instance, UCIState.WaitingForReadyOk);
+      validateEngineInstanceState(instance, UCIState.WaitingForReadyOk);
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
@@ -234,7 +232,7 @@ function handleEngineResponse(
       ];
 
     case UCIResponseType.BestMove:
-      validateState(instance, UCIState.WaitingForMove);
+      validateEngineInstanceState(instance, UCIState.WaitingForMove);
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
@@ -246,9 +244,10 @@ function handleEngineResponse(
 }
 
 function handleFlipBoard(state: State): Update<State, Action> {
-  const newOrientation = flipColor(state.boardOrientation);
-
-  return [{ ...state, boardOrientation: newOrientation }, null];
+  return [
+    { ...state, boardOrientation: flipColor(state.boardOrientation) },
+    null,
+  ];
 }
 
 function handleLoadEngine(
@@ -323,18 +322,19 @@ function handleMovePiece(
       ...state,
       game: {
         ...state.game,
+        turn: flipColor(state.game.turn),
         clocks: {
           ...state.game.clocks,
-          [state.game.position.turn]:
-            state.game.clocks[state.game.position.turn] +
+          [state.game.turn]:
+            state.game.clocks[state.game.turn] +
             state.game.clocks.plusTime * 1000,
         },
-        moveIndex: state.game.moveList.length,
+        moveIndex: state.game.moveList.length + 1,
         moveList: [...state.game.moveList, move],
       },
       lastMove: move,
     },
-    () => setPositionAction(core.position),
+    () => of(setPositionAction(core.position), attemptEngineMoveAction()),
   ];
 }
 
@@ -416,7 +416,15 @@ function handleReceiveEngineMove(
   action: ReceiveEngineMoveAction,
 ): Update<State, Action> {
   const { move } = action;
-  return [state, () => movePieceAction(move)];
+
+  if (!isDisplayingCurrentPosition(state)) {
+    return [
+      state,
+      () => of(navigatePositionAction(Navigate.Current), movePieceAction(move)),
+    ];
+  } else {
+    return [state, () => movePieceAction(move)];
+  }
 }
 
 function handleResetOverlay(state: State): Update<State, Action> {
@@ -429,14 +437,18 @@ function handleSetPosition(
   { core }: Context,
 ): Update<State, Action> {
   const { position } = action;
+
+  if (!isPositionEqual(position, core.position)) {
+    logger.error('position desync', core.position, position);
+  }
+
   const moves = core.generateMoves();
   const evaluation = core.evaluate() / EVALUATION_DIVIDER;
-  const zobrist = core.zobrist;
   const checks = core.checks(position.turn);
 
   state = {
     ...state,
-    game: { ...state.game, position, moves, evaluation, checks, zobrist },
+    game: { ...state.game, position, moves, evaluation, checks },
   };
 
   if (position.halfMoveCount === 100) {
@@ -474,10 +486,7 @@ function handleSetPosition(
     play(Sound.Check);
   }
 
-  return [
-    state,
-    () => from([overlaySquaresAction(), attemptEngineMoveAction()]),
-  ];
+  return [state, overlaySquaresAction];
 }
 
 function handleSetPositionFromFEN(
@@ -489,7 +498,7 @@ function handleSetPositionFromFEN(
   core.position = position;
 
   return [
-    { ...state, game: { ...state.game, winner: null } },
+    { ...state, game: { ...state.game, winner: null, turn: position.turn } },
     () => setPositionAction(position),
   ];
 }

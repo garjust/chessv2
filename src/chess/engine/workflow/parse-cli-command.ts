@@ -1,5 +1,6 @@
 import { Action } from '.';
 import { FEN_LIBRARY } from '../../lib/fen';
+import { moveFromString } from '../../move-notation';
 import {
   GoCommand,
   debugAction,
@@ -100,7 +101,9 @@ export const parse = (commandString: string): Action => {
     case 'ucinewgame':
       return uciNewGameAction();
     case 'position': {
-      const [fen, ...moves] = args;
+      const [fen, ...moveStrings] = args;
+      const moves = moveStrings.map(moveFromString);
+
       return positionAction(
         fen === 'startpos' ? FEN_LIBRARY.STARTING_POSITION_FEN : fen,
         moves,

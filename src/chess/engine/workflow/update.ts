@@ -105,8 +105,7 @@ function handlePosition(
 
   const position = parseFEN(fen);
   context.core.position = position;
-  for (const moveString of moves) {
-    const move = moveFromString(moveString);
+  for (const move of moves) {
     context.core.applyMove(move);
   }
 
