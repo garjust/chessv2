@@ -83,7 +83,7 @@ function handleAttemptEngineMove(state: State): Update<State, Action> {
       engineStateAs(state, instance.id, UCIState.WaitingForMove),
       () =>
         delayEmit(
-          instance.engine,
+          instance.engine.workflow,
           EngineWorkflow.positionAction('startpos', state.game.moveList),
           EngineWorkflow.goAction(),
         ),
@@ -150,7 +150,7 @@ function handleLoadEngineDone(
         ),
         from(
           delayEmit(
-            instance.engine,
+            instance.engine.workflow,
             EngineWorkflow.uciAction(),
             EngineWorkflow.debugAction(true),
           ),
@@ -222,7 +222,8 @@ function handleEngineResponse(
 
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
-        () => delayEmit(instance.engine, EngineWorkflow.isReadyAction()),
+        () =>
+          delayEmit(instance.engine.workflow, EngineWorkflow.isReadyAction()),
       ];
     case UCIResponseType.ReadyOk:
       validateEngineInstanceState(instance, UCIState.WaitingForReadyOk);

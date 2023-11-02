@@ -22,10 +22,10 @@ searchEngine.responses.subscribe((response: UCIResponse) => {
 });
 
 if (DEBUG) {
-  searchEngine.emit(debugAction(true));
+  searchEngine.workflow.emit(debugAction(true));
 }
 
 rl.on('line', (line) => {
   const action = parse(line);
-  searchEngine.emit(action);
+  searchEngine.workflow.emit(action);
 });

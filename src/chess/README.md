@@ -35,7 +35,6 @@ A chess engine can be loaded in two ways:
   - Requires move generation at leaf nodes
 - *TTable memory is crashing chrome.*
 - *Support UCI*
-  - Move notation
   - Handle all extra commands to "go"
   - Handle setting hash size
   - Handle stopping search asap

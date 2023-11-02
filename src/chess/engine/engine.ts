@@ -33,10 +33,6 @@ export class Engine {
     }
   }
 
-  emit(action: Action) {
-    this.workflow.emit(action);
-  }
-
   // Return an observable of UCIResponse objects.
   //
   // Extra note:

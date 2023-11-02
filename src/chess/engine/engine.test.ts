@@ -20,7 +20,7 @@ test('example interaction with UCI engine', async () => {
     responses = [...responses, r];
   });
 
-  engine.emit(uciAction());
+  engine.workflow.emit(uciAction());
   expect(responses).toEqual([
     {
       type: UCIResponseType.Id,
@@ -35,14 +35,14 @@ test('example interaction with UCI engine', async () => {
 
   // engine.emit(setOptionAction('Hash', '512'));
   // engine.emit(setOptionAction('OwnBook', 'false'));
-  engine.emit(isReadyAction());
+  engine.workflow.emit(isReadyAction());
   await vi.waitUntil(() => responses.length !== 0);
   expect(responses).toEqual([{ type: UCIResponseType.ReadyOk }]);
   responses = [];
 
-  engine.emit(uciNewGameAction());
-  engine.emit(positionAction(FEN_LIBRARY.STARTING_POSITION_FEN));
-  engine.emit(goAction());
+  engine.workflow.emit(uciNewGameAction());
+  engine.workflow.emit(positionAction(FEN_LIBRARY.STARTING_POSITION_FEN));
+  engine.workflow.emit(goAction());
   await vi.waitUntil(() => responses.length !== 0);
   expect(responses).toEqual([
     {
