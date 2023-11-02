@@ -61,6 +61,7 @@ import { Engine } from '../../engine/engine';
 import { delayEmit } from '../../../lib/workflow/util';
 import Logger from '../../../lib/logger';
 import { moveString } from '../../move-notation';
+import { Command } from '../../../lib/workflow/commands';
 
 export type Context = {
   core: Core;
@@ -266,12 +267,16 @@ function handleLoadEngine(
       () => loadEngineDoneAction(engineInstance(engine), playingAs),
     ];
   } else {
-    // const instance = getEngineInstance(state, player.engineId);
-    // TODO: remove old engine.
-    // TODO: check if I need to cleanup the webworkers inside the engine.
+    const instance = getEngineInstance(state, player.engineId);
+    instance.engine.workflow.emit(Command.Done);
+
+    const engines: Record<string, EngineInstance> = { ...state.engines };
+    delete engines[player.engineId];
+
     return [
       {
         ...state,
+        engines,
         game: {
           ...state.game,
           players: { ...state.game.players, [playingAs]: HumanPlayer },

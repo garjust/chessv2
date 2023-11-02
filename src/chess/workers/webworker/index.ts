@@ -18,11 +18,11 @@ const workerHandlers = (
   label: string,
   worker: Worker,
 ): [cleanup: () => void, error: Promise<void>] => {
-  let cleanup = worker.terminate;
+  let cleanup = () => worker.terminate();
   const workerError = new Promise<void>((resolve, reject) => {
     cleanup = () => {
       resolve();
-      worker.terminate;
+      worker.terminate();
     };
     worker.addEventListener('error', (event) => {
       logger.error(`${label} web worker crashed`, event.message, event);

@@ -4,7 +4,11 @@ import { Command } from './commands';
 import { EmptyError, Observable, firstValueFrom, lastValueFrom } from 'rxjs';
 
 test('complete the workflow', async () => {
-  const { emit, states$: states, updates$: updates } = workflow((state) => [state, null], {});
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow((state) => [state, null], {}, 'test');
 
   const lastState = lastValueFrom(states);
   const lastUpdate = lastValueFrom(updates);
@@ -16,7 +20,11 @@ test('complete the workflow', async () => {
 });
 
 test.skip('await emit', async () => {
-  const { emit, states$: states, updates$: updates } = workflow<number, number>(
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow<number, number>(
     (state, val) => [
       state + val,
       () =>
@@ -27,6 +35,7 @@ test.skip('await emit', async () => {
         }),
     ],
     1,
+    'test',
   );
 
   await emit(2);
@@ -37,10 +46,11 @@ test.skip('await emit', async () => {
 });
 
 test('receive first state', async () => {
-  const { emit, states$: states, updates$: updates } = workflow<number, number>(
-    (state, val) => [state + val, null],
-    1,
-  );
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow<number, number>((state, val) => [state + val, null], 1, 'test');
 
   const firstState = firstValueFrom(states);
   const firstUpdate = firstValueFrom(updates);
@@ -53,9 +63,17 @@ test('receive first state', async () => {
 });
 
 test('error flows through', async () => {
-  const { emit, states$: states, updates$: updates } = workflow(() => {
-    throw Error('test error');
-  }, 0);
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow(
+    () => {
+      throw Error('test error');
+    },
+    0,
+    'test',
+  );
 
   const lastState = lastValueFrom(states);
   const lastUpdate = lastValueFrom(updates);
@@ -68,9 +86,14 @@ test('error flows through', async () => {
 });
 
 test('promise error flows through', async () => {
-  const { emit, states$: states, updates$: updates } = workflow(
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow(
     (state) => [state, () => Promise.reject(new Error('promise test error'))],
     0,
+    'test',
   );
 
   const lastState = lastValueFrom(states);
@@ -83,7 +106,11 @@ test('promise error flows through', async () => {
 });
 
 test('delayed promise error flows through', async () => {
-  const { emit, states$: states, updates$: updates } = workflow(
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow(
     (state) => [
       state,
       () =>
@@ -94,6 +121,7 @@ test('delayed promise error flows through', async () => {
         }),
     ],
     0,
+    'test',
   );
 
   const lastState = lastValueFrom(states);
@@ -106,7 +134,11 @@ test('delayed promise error flows through', async () => {
 });
 
 test('observable error flows through', async () => {
-  const { emit, states$: states, updates$: updates } = workflow(
+  const {
+    emit,
+    states$: states,
+    updates$: updates,
+  } = workflow(
     (state) => [
       state,
       () =>
@@ -115,6 +147,7 @@ test('observable error flows through', async () => {
         }),
     ],
     0,
+    'test',
   );
 
   const lastState = lastValueFrom(states);

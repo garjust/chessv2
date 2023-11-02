@@ -125,7 +125,7 @@ const update =
 const core = <S, A>(
   updater: Updater<S, A>,
   seed: S,
-  label: string = 'x',
+  label: string,
 ): Workflow<S, A> => {
   // Root subject. This subject acts as the "root" observable of
   // the workflow. We define it as a subject so that an emit function can
