@@ -6,7 +6,7 @@ import { State } from './workflow';
 import {
   changeOverlayAction,
   flipBoardAction,
-  loadChessComputerAction,
+  loadEngineAction,
   setPositionFromFENAction,
   toggleSquareLabelsAction,
 } from './workflow/action';
@@ -36,11 +36,11 @@ const GameControlPanel = () => {
       <button onClick={() => emit(changeOverlayAction())}>
         Switch overlay
       </button>
-      <button onClick={() => emit(loadChessComputerAction(Color.Black))}>
-        Load black computer
+      <button onClick={() => emit(loadEngineAction(Color.Black))}>
+        Load black engine
       </button>
-      <button onClick={() => emit(loadChessComputerAction(Color.White))}>
-        Load white computer
+      <button onClick={() => emit(loadEngineAction(Color.White))}>
+        Load white engine
       </button>
       <button onClick={emitExampleGame}>Example game</button>
     </div>

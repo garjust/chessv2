@@ -8,24 +8,23 @@ export type MoveTest = {
   counts: number[];
 };
 
-export const PERFT_POSITION_5: MoveTest = {
-  fen: FEN_LIBRARY.PERFT_5_FEN,
-  counts: [44, 1486, 62379, 2103487, 89941194],
-};
-
-export const STARTING_POSITION: MoveTest = {
-  fen: FEN_LIBRARY.STARTING_POSITION_FEN,
-  counts: [20, 400, 8902, 197281, 4865609, 119060324],
-};
-
-export const VIENNA_OPENING: MoveTest = {
-  fen: FEN_LIBRARY.VIENNA_OPENING_FEN,
-  counts: [27, 966, 27249, 951936, 28181171, 982980787],
-};
-
-export const BLACK_CHECKMATE: MoveTest = {
-  fen: FEN_LIBRARY.BLACK_CHECKMATE_FEN,
-  counts: [30, 847, 24516, 666062, 18526901, 493165553],
+export const TestFens: Record<string, MoveTest> = {
+  PERFT_POSITION_5: {
+    fen: FEN_LIBRARY.PERFT_5_FEN,
+    counts: [44, 1486, 62379, 2103487, 89941194],
+  },
+  STARTING_POSITION: {
+    fen: FEN_LIBRARY.STARTING_POSITION_FEN,
+    counts: [20, 400, 8902, 197281, 4865609, 119060324],
+  },
+  VIENNA_OPENING: {
+    fen: FEN_LIBRARY.VIENNA_OPENING_FEN,
+    counts: [27, 966, 27249, 951936, 28181171, 982980787],
+  },
+  BLACK_CHECKMATE: {
+    fen: FEN_LIBRARY.BLACK_CHECKMATE_FEN,
+    counts: [30, 847, 24516, 666062, 18526901, 493165553],
+  },
 };
 
 const isCountCorrectForDepthFromStart = (

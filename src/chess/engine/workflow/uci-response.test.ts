@@ -7,10 +7,10 @@ test('responses', () => {
   expect(
     toUCI({
       type: UCIResponseType.Id,
-      name: 'justin uci computer v1',
+      name: 'justin uci engine v1',
       author: 'garjust',
     }),
-  ).toEqual(['id name justin uci computer v1', 'id author garjust']);
+  ).toEqual(['id name justin uci engine v1', 'id author garjust']);
   expect(toUCI({ type: UCIResponseType.Option, name: 'Hash' })).toEqual([
     'option name Hash type spin default 128 min 128 max 1024',
   ]);

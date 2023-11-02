@@ -13,18 +13,18 @@ export const contextFactory = <S, A>(
   };
 } => {
   const reactContext = React.createContext<Workflow<S, A>>({
-    states: new Observable<S>(),
     emit: (_: A | Command) => {
       /* do nothing, this is just an empty default */
     },
-    updates: new Observable<[[S, S], A]>(),
+    states$: new Observable<S>(),
+    updates$: new Observable<[[S, S], A]>(),
   });
 
   return {
     WorkflowContext: reactContext,
     useWorkflow: <R>(render: (state: S) => R) => {
       const [rendering, setRendering] = useState<R>(render(initialState));
-      const { states, emit } = useContext(reactContext);
+      const { states$: states, emit } = useContext(reactContext);
 
       useEffect(() => {
         const subscription = states

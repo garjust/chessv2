@@ -1,12 +1,7 @@
 import { expect, test } from 'vitest';
 import Core from '../src/chess/core';
 import { parseFEN, FEN_LIBRARY } from '../src/chess/lib/fen';
-import {
-  PERFT_POSITION_5,
-  searchRoot,
-  STARTING_POSITION,
-  VIENNA_OPENING,
-} from '../src/chess/lib/perft';
+import { TestFens, searchRoot } from '../src/chess/lib/perft';
 
 test('perft_5', () => {
   const engine = new Core(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
@@ -15,7 +10,7 @@ test('perft_5', () => {
   const { counter } = searchRoot(engine, 5);
   const timing = Date.now() - start;
 
-  expect(counter).toEqual(PERFT_POSITION_5.counts[4]);
+  expect(counter).toEqual(TestFens.PERFT_POSITION_5.counts[4]);
   console.log(
     `perft_5 position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`,
   );
@@ -28,7 +23,7 @@ test('starting position', () => {
   const { counter } = searchRoot(engine, 5);
   const timing = Date.now() - start;
 
-  expect(counter).toEqual(STARTING_POSITION.counts[4]);
+  expect(counter).toEqual(TestFens.STARTING_POSITION.counts[4]);
   console.log(
     `starting position: ${((timing / counter) * 1000).toPrecision(5)}μs/node`,
   );
@@ -41,7 +36,7 @@ test('vienna opening', () => {
   const { counter } = searchRoot(engine, 5);
   const timing = Date.now() - start;
 
-  expect(counter).toEqual(VIENNA_OPENING.counts[4]);
+  expect(counter).toEqual(TestFens.VIENNA_OPENING.counts[4]);
   console.log(
     `vienna opening position: ${((timing / counter) * 1000).toPrecision(
       5,

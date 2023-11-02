@@ -38,7 +38,7 @@ function handleUCI(state: State): Update<State, Action> {
   const responses: UCIResponse[] = [
     {
       type: UCIResponseType.Id,
-      name: 'justin uci computer v1',
+      name: 'justin uci engine v1',
       author: 'garjust',
     },
     { type: UCIResponseType.Option, name: 'Hash' },

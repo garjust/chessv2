@@ -24,7 +24,7 @@ test('example interaction with UCI engine', async () => {
   expect(responses).toEqual([
     {
       type: UCIResponseType.Id,
-      name: 'justin uci computer v1',
+      name: 'justin uci engine v1',
       author: 'garjust',
     },
     { type: UCIResponseType.Option, name: 'Hash' },

@@ -3,17 +3,17 @@ import { Color, Move, Position, Square } from '../../types';
 import { EngineInstance } from './state';
 
 export enum Type {
-  AttemptComputerMove = 'ATTEMPT_COMPUTER_MOVE',
+  AttemptEngineMove = 'ATTEMPT_ENGINE_MOVE',
   ChangeOverlay = 'CHANGE_OVERLAY',
-  ChessComputerLoaded = 'CHESS_COMPUTER_LOADED',
   ClickSquare = 'CLICK_SQUARE',
   EngineResponse = 'ENGINE_RESPONSE',
   FlipBoard = 'FLIP_BOARD',
-  LoadChessComputer = 'LOAD_CHESS_COMPUTER',
+  LoadEngine = 'LOAD_ENGINE',
+  LoadEngineDone = 'LOAD_ENGINE_DONE',
   MovePiece = 'MOVE_PIECE',
   NavigatePosition = 'NAVIGATE_POSITION',
   OverlaySquares = 'OVERLAY_SQUARES',
-  ReceiveComputerMove = 'RECEIVE_COMPUTER_MOVE',
+  ReceiveEngineMove = 'RECEIVE_ENGINE_MOVE',
   ResetOverlay = 'RESET_OVERLAY',
   SetPosition = 'SET_POSITION',
   SetPositionFromFEN = 'SET_POSITION_FROM_FEN',
@@ -28,18 +28,12 @@ export enum Navigate {
   Current = 'CURRENT',
 }
 
-export type AttemptComputerMoveAction = {
-  readonly type: Type.AttemptComputerMove;
+export type AttemptEngineMoveAction = {
+  readonly type: Type.AttemptEngineMove;
 };
 
 export type ChangeOverlayAction = {
   readonly type: Type.ChangeOverlay;
-};
-
-export type ChessComputerLoadedAction = {
-  readonly type: Type.ChessComputerLoaded;
-  readonly instance: EngineInstance;
-  readonly color: Color;
 };
 
 export type ClickSquareAction = {
@@ -57,9 +51,15 @@ export type FlipBoardAction = {
   readonly type: Type.FlipBoard;
 };
 
-export type LoadChessComputerAction = {
-  readonly type: Type.LoadChessComputer;
+export type LoadEngineAction = {
+  readonly type: Type.LoadEngine;
   readonly playingAs: Color;
+};
+
+export type LoadEngineDoneAction = {
+  readonly type: Type.LoadEngineDone;
+  readonly instance: EngineInstance;
+  readonly color: Color;
 };
 
 export type MovePieceAction = {
@@ -76,8 +76,8 @@ export type OverlaySquaresAction = {
   readonly type: Type.OverlaySquares;
 };
 
-export type ReceiveComputerMoveAction = {
-  readonly type: Type.ReceiveComputerMove;
+export type ReceiveEngineMoveAction = {
+  readonly type: Type.ReceiveEngineMove;
   readonly move: Move;
 };
 
@@ -104,38 +104,29 @@ export type ToggleSquareLabelsAction = {
 };
 
 export type Action =
-  | AttemptComputerMoveAction
+  | AttemptEngineMoveAction
   | ChangeOverlayAction
-  | ChessComputerLoadedAction
   | ClickSquareAction
   | EngineResponseAction
   | FlipBoardAction
-  | LoadChessComputerAction
+  | LoadEngineAction
+  | LoadEngineDoneAction
   | MovePieceAction
   | NavigatePositionAction
   | OverlaySquaresAction
-  | ReceiveComputerMoveAction
+  | ReceiveEngineMoveAction
   | ResetOverlayAction
   | SetPositionAction
   | SetPositionFromFENAction
   | TickPlayersClockAction
   | ToggleSquareLabelsAction;
 
-export const attemptComputerMoveAction = (): AttemptComputerMoveAction => ({
-  type: Type.AttemptComputerMove,
+export const attemptEngineMoveAction = (): AttemptEngineMoveAction => ({
+  type: Type.AttemptEngineMove,
 });
 
 export const changeOverlayAction = (): ChangeOverlayAction => ({
   type: Type.ChangeOverlay,
-});
-
-export const chessComputerLoadedAction = (
-  instance: EngineInstance,
-  color: Color,
-): ChessComputerLoadedAction => ({
-  type: Type.ChessComputerLoaded,
-  instance,
-  color,
 });
 
 export const clickSquareAction = (square: Square): ClickSquareAction => ({
@@ -156,11 +147,18 @@ export const flipBoardAction = (): FlipBoardAction => ({
   type: Type.FlipBoard,
 });
 
-export const loadChessComputerAction = (
-  playingAs: Color,
-): LoadChessComputerAction => ({
-  type: Type.LoadChessComputer,
+export const loadEngineAction = (playingAs: Color): LoadEngineAction => ({
+  type: Type.LoadEngine,
   playingAs,
+});
+
+export const loadEngineDoneAction = (
+  instance: EngineInstance,
+  color: Color,
+): LoadEngineDoneAction => ({
+  type: Type.LoadEngineDone,
+  instance,
+  color,
 });
 
 export const movePieceAction = (move: Move): MovePieceAction => ({
@@ -179,10 +177,10 @@ export const overlaySquaresAction = (): OverlaySquaresAction => ({
   type: Type.OverlaySquares,
 });
 
-export const receiveComputerMoveAction = (
+export const receiveEngineMoveAction = (
   move: Move,
-): ReceiveComputerMoveAction => ({
-  type: Type.ReceiveComputerMove,
+): ReceiveEngineMoveAction => ({
+  type: Type.ReceiveEngineMove,
   move,
 });
 

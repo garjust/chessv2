@@ -2,18 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
 import { Registry, LATEST, Version } from '../engine/registry';
 import { parseFEN } from '../lib/fen';
-import {
-  BLACK_CHECKMATE,
-  MoveTest,
-  PERFT_POSITION_5,
-  STARTING_POSITION,
-  VIENNA_OPENING,
-} from '../lib/perft';
+import { TestFens, MoveTest } from '../lib/perft';
 import './Debug.css';
 import { loadPerftWorker, loadSearchExecutorWorker } from '../workers';
 
-const EXCLUDED_COMPUTERS: Version[] = ['Random'];
-const COMPUTER_DEPTH = 4;
+const EXCLUDED_ENGINES: Version[] = ['Random'];
+const ENGINE_DEPTH = 4;
 
 async function runMoveGenerationTest(
   logger: Subject<string>,
@@ -28,13 +22,17 @@ async function runMoveGenerationTest(
   worker.postMessage({ test, toDepth });
 }
 
-async function runSingleComputerNextMoveTest(logger: Observer<string>) {
+async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
-    COMPUTER_DEPTH,
+    ENGINE_DEPTH,
   );
 
-  const tests = [STARTING_POSITION, VIENNA_OPENING, PERFT_POSITION_5];
+  const tests = [
+    TestFens.STARTING_POSITION,
+    TestFens.VIENNA_OPENING,
+    TestFens.PERFT_POSITION_5,
+  ];
 
   for (const test of tests) {
     await searchExecutor.nextMove(parseFEN(test.fen));
@@ -51,15 +49,12 @@ async function runSingleComputerNextMoveTest(logger: Observer<string>) {
   logger.next('--');
 }
 
-async function runComputerNextMoveTest(
-  logger: Observer<string>,
-  test: MoveTest,
-) {
+async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
   const searchExecutors = await Promise.all(
     Object.keys(Registry).map(async (version) => {
       const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
         version as Version,
-        COMPUTER_DEPTH,
+        ENGINE_DEPTH,
       );
       return {
         version: version as Version,
@@ -70,7 +65,7 @@ async function runComputerNextMoveTest(
   );
 
   for (const { version, searchExecutor, cleanup } of searchExecutors) {
-    if (EXCLUDED_COMPUTERS.includes(version)) {
+    if (EXCLUDED_ENGINES.includes(version)) {
       continue;
     }
 
@@ -122,46 +117,66 @@ const Debug = () => {
         }}
       >
         <button
-          onClick={() => runMoveGenerationTest(logger, STARTING_POSITION)}
+          onClick={() =>
+            runMoveGenerationTest(logger, TestFens.STARTING_POSITION)
+          }
         >
           Move generation perft
         </button>
 
-        <button onClick={() => runMoveGenerationTest(logger, PERFT_POSITION_5)}>
+        <button
+          onClick={() =>
+            runMoveGenerationTest(logger, TestFens.PERFT_POSITION_5)
+          }
+        >
           Move generation perft PERFT_5
         </button>
 
-        <button onClick={() => runMoveGenerationTest(logger, VIENNA_OPENING)}>
+        <button
+          onClick={() => runMoveGenerationTest(logger, TestFens.VIENNA_OPENING)}
+        >
           Move generation perft VIENNA
         </button>
 
-        <button onClick={() => runMoveGenerationTest(logger, BLACK_CHECKMATE)}>
+        <button
+          onClick={() =>
+            runMoveGenerationTest(logger, TestFens.BLACK_CHECKMATE)
+          }
+        >
           Move generation perft BLACK MATE
         </button>
 
         <button
-          onClick={() => runComputerNextMoveTest(logger, STARTING_POSITION)}
+          onClick={() =>
+            runEngineNextMoveTest(logger, TestFens.STARTING_POSITION)
+          }
         >
           Move AI perft
         </button>
 
         <button
-          onClick={() => runComputerNextMoveTest(logger, PERFT_POSITION_5)}
+          onClick={() =>
+            runEngineNextMoveTest(logger, TestFens.PERFT_POSITION_5)
+          }
         >
           Move AI perft PERFT_5
         </button>
 
-        <button onClick={() => runComputerNextMoveTest(logger, VIENNA_OPENING)}>
+        <button
+          onClick={() => runEngineNextMoveTest(logger, TestFens.VIENNA_OPENING)}
+        >
           Move AI perft VIENNA
         </button>
 
         <button
-          onClick={() => runComputerNextMoveTest(logger, BLACK_CHECKMATE)}
+          onClick={() =>
+            runEngineNextMoveTest(logger, TestFens.BLACK_CHECKMATE)
+          }
         >
           Move AI perft BLACK MATE
         </button>
 
-        <button onClick={() => runSingleComputerNextMoveTest(logger)}>
+        <button onClick={() => runSingleEngineNextMoveTest(logger)}>
           Single Move AI perft
         </button>
       </div>

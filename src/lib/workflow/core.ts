@@ -30,12 +30,12 @@ export interface Workflow<S, A> {
    * Observable of states from the workflow. Subscribe to receive
    * the latest states.
    */
-  states: Observable<S>;
+  states$: Observable<S>;
   /**
    * Observable of actions that have been emitted to the workflow.
    * Includes before and after states with the action that caused the state change.
    */
-  updates: Observable<[[S, S], A]>;
+  updates$: Observable<[[S, S], A]>;
 }
 
 /**
@@ -221,8 +221,8 @@ const core = <S, A>(
 
   return {
     emit: publicEmit,
-    states: publicStates$.asObservable().pipe(share()),
-    updates: publicUpdates$.asObservable().pipe(share()),
+    states$: publicStates$.asObservable().pipe(share()),
+    updates$: publicUpdates$.asObservable().pipe(share()),
   };
 };
 

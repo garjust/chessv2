@@ -1,12 +1,7 @@
-import { expect, test, vi } from 'vitest';
+import { expect, test } from 'vitest';
 import { Orchestrator } from './orchestrator';
 import { Action, setPositionFromFENAction } from './workflow';
-import {
-  EngineResponseAction,
-  Type,
-  clickSquareAction,
-  loadChessComputerAction,
-} from './workflow/action';
+import { Type, clickSquareAction, loadEngineAction } from './workflow/action';
 import { Action as EngineAction } from '../engine/workflow';
 import { Type as EngineType, InternalType } from '../engine/workflow/action';
 import { FEN_LIBRARY } from '../lib/fen';
@@ -16,12 +11,12 @@ import { Color } from '../types';
 
 test('example interaction with ui workflow', async () => {
   const ctrl = new Orchestrator();
-  const lastUpdate = lastValueFrom(ctrl.workflow.updates);
+  const lastUpdate = lastValueFrom(ctrl.workflow.updates$);
 
   const actions: (Action | EngineAction)[] = [];
-  ctrl.workflow.updates.subscribe(([_, action]) => {
-    if (action.type === Type.ChessComputerLoaded) {
-      action.instance.engine.workflow.updates.subscribe(([_, action]) => {
+  ctrl.workflow.updates$.subscribe(([_, action]) => {
+    if (action.type === Type.LoadEngineDone) {
+      action.instance.engine.workflow.updates$.subscribe(([_, action]) => {
         actions.push(action);
       });
     }
@@ -32,7 +27,7 @@ test('example interaction with ui workflow', async () => {
   );
   ctrl.workflow.emit(clickSquareAction(12));
   ctrl.workflow.emit(clickSquareAction(28));
-  ctrl.workflow.emit(loadChessComputerAction(Color.White));
+  ctrl.workflow.emit(loadEngineAction(Color.White));
 
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
@@ -50,16 +45,16 @@ test('example interaction with ui workflow', async () => {
     Type.SetPositionFromFEN, // boot
     Type.SetPosition,
     Type.OverlaySquares,
-    Type.AttemptComputerMove,
+    Type.AttemptEngineMove,
     Type.ClickSquare, // click E2
     Type.OverlaySquares,
     Type.ClickSquare, // click E4
     Type.MovePiece,
     Type.SetPosition,
     Type.OverlaySquares,
-    Type.AttemptComputerMove,
-    Type.LoadChessComputer, // click "Load white computer"
-    Type.ChessComputerLoaded,
+    Type.AttemptEngineMove,
+    Type.LoadEngine, // click "Load white engine"
+    Type.LoadEngineDone,
     EngineType.UCI,
     InternalType.Respond,
     Type.EngineResponse,

@@ -4,7 +4,7 @@ import { Action, State, Type, update } from './counter';
 import { Command } from '../commands';
 
 test('counter workflow', () => {
-  const { emit, states, updates } = workflow(update({ multiplier: 2 }), {
+  const { emit, states$: states, updates$: updates } = workflow(update({ multiplier: 2 }), {
     count: 10,
   });
 
@@ -36,7 +36,7 @@ test('counter workflow', () => {
 });
 
 test('counter workflow async increment', () => {
-  const { emit, states, updates } = workflow(update({ multiplier: 1 }), {
+  const { emit, states$: states, updates$: updates } = workflow(update({ multiplier: 1 }), {
     count: 5,
   });
 
@@ -69,7 +69,7 @@ test('counter workflow async increment', () => {
 });
 
 test('counter workflow error', () => {
-  const { emit, states, updates } = workflow(update({ multiplier: 2 }), {
+  const { emit, states$: states, updates$: updates } = workflow(update({ multiplier: 2 }), {
     count: 10,
   });
 

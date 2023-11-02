@@ -7,13 +7,13 @@ import {
   movePieceAction,
   overlaySquaresAction,
   setPositionAction,
-  attemptComputerMoveAction,
-  receiveComputerMoveAction,
-  chessComputerLoadedAction,
-  ChessComputerLoadedAction,
+  attemptEngineMoveAction,
+  receiveEngineMoveAction,
+  loadEngineDoneAction,
+  LoadEngineDoneAction,
   ClickSquareAction,
-  LoadChessComputerAction,
-  ReceiveComputerMoveAction,
+  LoadEngineAction,
+  ReceiveEngineMoveAction,
   MovePieceAction,
   SetPositionAction,
   SetPositionFromFENAction,
@@ -61,9 +61,9 @@ export type Context = {
 
 const logger = new Logger('ui-workflow');
 
-const COMPUTER_VERSION: Version = LATEST;
+const ENGINE_VERSION: Version = LATEST;
 
-function handleAttemptComputerMove(state: State): Update<State, Action> {
+function handleAttemptEngineMove(state: State): Update<State, Action> {
   const { position, players } = state;
   const playerForTurn = players[position.turn];
 
@@ -110,9 +110,9 @@ function handleChangeOverlay(state: State): Update<State, Action> {
   return [{ ...state, overlayCategory: nextCategory }, overlaySquaresAction];
 }
 
-function handleChessComputerLoaded(
+function handleLoadEngineDone(
   state: State,
-  action: ChessComputerLoadedAction,
+  action: LoadEngineDoneAction,
 ): Update<State, Action> {
   const { instance, color } = action;
 
@@ -223,9 +223,7 @@ function handleEngineResponse(
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
-        isWaitingForEngine(state, instance.id)
-          ? attemptComputerMoveAction
-          : null,
+        isWaitingForEngine(state, instance.id) ? attemptEngineMoveAction : null,
       ];
 
     case UCIResponseType.BestMove:
@@ -233,7 +231,7 @@ function handleEngineResponse(
 
       return [
         engineStateAs(state, instance.id, UCIState.Idle),
-        () => receiveComputerMoveAction(response.move),
+        () => receiveEngineMoveAction(response.move),
       ];
     default:
       throw Error(`dont know how to handle UCIResponse ${response.type}`);
@@ -246,9 +244,9 @@ function handleFlipBoard(state: State): Update<State, Action> {
   return [{ ...state, boardOrientation: newOrientation }, null];
 }
 
-function handleLoadChessComputer(
+function handleLoadEngine(
   state: State,
-  action: LoadChessComputerAction,
+  action: LoadEngineAction,
   context: Context,
 ): Update<State, Action> {
   const { playingAs } = action;
@@ -256,11 +254,11 @@ function handleLoadChessComputer(
   const player = players[playingAs];
 
   if (player === HumanPlayer) {
-    const engine = new Engine(COMPUTER_VERSION, 10, context.debug);
+    const engine = new Engine(ENGINE_VERSION, 10, context.debug);
 
     return [
       state,
-      () => chessComputerLoadedAction(engineInstance(engine), playingAs),
+      () => loadEngineDoneAction(engineInstance(engine), playingAs),
     ];
   } else {
     // const instance = getEngineInstance(state, player.engineId);
@@ -397,9 +395,9 @@ function handleOverlaySquares(
   return [{ ...state, squareOverlay }, null];
 }
 
-function handleReceiveComputerMove(
+function handleReceiveEngineMove(
   state: State,
-  action: ReceiveComputerMoveAction,
+  action: ReceiveEngineMoveAction,
 ): Update<State, Action> {
   const { move } = action;
   return [state, () => movePieceAction(move)];
@@ -466,7 +464,7 @@ function handleSetPosition(
 
   return [
     state,
-    () => from([overlaySquaresAction(), attemptComputerMoveAction()]),
+    () => from([overlaySquaresAction(), attemptEngineMoveAction()]),
   ];
 }
 
@@ -533,28 +531,28 @@ export const update =
     }
 
     switch (action.type) {
-      case Type.AttemptComputerMove:
-        return handleAttemptComputerMove(state);
+      case Type.AttemptEngineMove:
+        return handleAttemptEngineMove(state);
       case Type.ChangeOverlay:
         return handleChangeOverlay(state);
-      case Type.ChessComputerLoaded:
-        return handleChessComputerLoaded(state, action);
+      case Type.LoadEngineDone:
+        return handleLoadEngineDone(state, action);
       case Type.ClickSquare:
         return handleClickSquare(state, action);
       case Type.EngineResponse:
         return handleEngineResponse(state, action);
       case Type.FlipBoard:
         return handleFlipBoard(state);
-      case Type.LoadChessComputer:
-        return handleLoadChessComputer(state, action, context);
+      case Type.LoadEngine:
+        return handleLoadEngine(state, action, context);
       case Type.MovePiece:
         return handleMovePiece(state, action, context);
       case Type.NavigatePosition:
         return handleNavigatePosition(state, action, context);
       case Type.OverlaySquares:
         return handleOverlaySquares(state, context);
-      case Type.ReceiveComputerMove:
-        return handleReceiveComputerMove(state, action);
+      case Type.ReceiveEngineMove:
+        return handleReceiveEngineMove(state, action);
       case Type.ResetOverlay:
         return handleResetOverlay(state);
       case Type.SetPosition:

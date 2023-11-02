@@ -29,7 +29,7 @@ export class Engine {
       },
     );
     if (debug) {
-      this.workflow.updates.subscribe(updateLogger('Engine'));
+      this.workflow.updates$.subscribe(updateLogger('Engine'));
     }
   }
 
@@ -55,7 +55,7 @@ export class Engine {
   //   });
   // this.responses = responses.asObservable();
   get responses(): Observable<UCIResponse> {
-    return this.workflow.updates.pipe(
+    return this.workflow.updates$.pipe(
       map(([_, action]) => action),
       filter(isRespondAction),
       map((action) => action.response),

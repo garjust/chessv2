@@ -18,7 +18,7 @@ export class Orchestrator {
       debug,
     });
     if (debug) {
-      this.workflow.updates.subscribe(
+      this.workflow.updates$.subscribe(
         updateLogger('Chess', [Type.TickPlayersClock]),
       );
     }
