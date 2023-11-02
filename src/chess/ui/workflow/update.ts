@@ -54,7 +54,8 @@ import {
   setOverlayForPlay,
 } from './overlay';
 import { EVALUATION_DIVIDER } from '../../core/evaluation';
-import { Version, LATEST } from '../../engine/registry';
+import { LATEST } from '../../engine/search-executor';
+import { Version } from '../../engine/search-executor';
 import { UCIResponseType } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';

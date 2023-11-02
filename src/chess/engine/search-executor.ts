@@ -1,6 +1,23 @@
 import { Move, Position } from '../types';
-import { Version, Registry } from './registry';
+import AlphaBeta from './algorithms/alpha-beta';
+import Iterative from './algorithms/iterative';
+import Negamax from './algorithms/negamax';
+import OrderMoves from './algorithms/order-moves';
+import Quiescence from './algorithms/quiescence';
+import Random from './algorithms/random';
 import { DiagnosticsResult } from './lib/diagnostics';
+
+export const Registry = Object.freeze({
+  Iterative,
+  Quiescence,
+  OrderMoves,
+  AlphaBeta,
+  Negamax,
+  Random,
+});
+
+export type Version = keyof typeof Registry;
+export const LATEST: Version = 'Iterative';
 
 export interface SearchExecutorI {
   nextMove(position: Position, timeout?: number): Promise<Move>;

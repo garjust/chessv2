@@ -2,7 +2,7 @@ import { Position } from '../../types';
 import { FEN_LIBRARY, parseFEN } from '../../lib/fen';
 import { SearchExecutor } from '../search-executor';
 import { Remote } from 'comlink';
-import { Version } from '../registry';
+import { Version } from '../search-executor';
 import { OptionDefinitions } from './uci-options';
 
 export type ExecutorInstance = {

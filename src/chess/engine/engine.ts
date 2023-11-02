@@ -1,4 +1,4 @@
-import { Version } from './registry';
+import { Version } from './search-executor';
 import Core from '../core';
 import init, { Action, State, createState } from './workflow';
 import { InternalType, RespondAction } from './workflow/action';

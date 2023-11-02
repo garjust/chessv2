@@ -1,4 +1,4 @@
-import { Version } from '../registry';
+import { Version } from '../search-executor';
 import { ExecutorInstance } from './state';
 import { UCIResponse } from './uci-response';
 import { EngineOption } from './uci-options';

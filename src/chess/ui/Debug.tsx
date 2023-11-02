@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
-import { Registry, LATEST, Version } from '../engine/registry';
+import { LATEST } from '../engine/search-executor';
+import { Version } from '../engine/search-executor';
+import { Registry } from '../engine/search-executor';
 import { parseFEN } from '../lib/fen';
 import { TestFens, MoveTest } from '../lib/perft';
 import './Debug.css';

@@ -1,5 +1,6 @@
 import readline from 'readline';
-import { LATEST, Version } from '../chess/engine/registry';
+import { LATEST } from '../chess/engine/search-executor';
+import { Version } from '../chess/engine/search-executor';
 import { Engine } from '../chess/engine/engine';
 import { parse } from '../chess/engine/workflow/parse-cli-command';
 import { UCIResponse, toUCI } from '../chess/engine/workflow/uci-response';
