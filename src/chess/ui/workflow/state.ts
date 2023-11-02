@@ -100,7 +100,6 @@ export type State = Readonly<{
     moveList: Readonly<Move[]>;
     moveIndex: number;
     checks: Readonly<SquareControlObject[]>;
-    zobrist: Readonly<[number, number]> | null;
   }>;
   engines: Readonly<Record<string, EngineInstance>>;
   displayPosition: Readonly<Position>;
@@ -136,7 +135,6 @@ const INITIAL_STATE: State = {
     moveList: [],
     moveIndex: 0,
     checks: [],
-    zobrist: null,
   },
   engines: {},
   displayPosition: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
