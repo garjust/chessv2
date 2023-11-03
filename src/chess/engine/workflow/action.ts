@@ -1,8 +1,9 @@
 import { Version } from '../search-executor';
 import { ExecutorInstance } from './state';
-import { UCIResponse } from './uci-response';
+import { InfoKey, UCIResponse } from './uci-response';
 import { EngineOption } from './uci-options';
 import { Move } from '../../types';
+import { Observable } from 'rxjs';
 
 export type GoCommand = Partial<{
   searchmoves: string[];
@@ -117,6 +118,7 @@ export interface LoadSearchExecutorAction {
 export interface LoadSearchExecutorDoneAction {
   readonly type: InternalType.LoadSearchExecutorDone;
   readonly instance: ExecutorInstance;
+  readonly infoFromExecutor$: Observable<Record<InfoKey, string>>;
 }
 
 export type Action =
@@ -203,7 +205,9 @@ export const loadSearchExecutorAction = (
 
 export const loadSearchExecutorDoneAction = (
   instance: ExecutorInstance,
+  infoFromExecutor$: Observable<Record<InfoKey, string>>,
 ): LoadSearchExecutorDoneAction => ({
   type: InternalType.LoadSearchExecutorDone,
   instance,
+  infoFromExecutor$,
 });

@@ -28,6 +28,10 @@ async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
     ENGINE_DEPTH,
+    (info) => {
+      logger.next(`${info}`);
+      console.log(info);
+    },
   );
 
   const tests = [
@@ -38,12 +42,11 @@ async function runSingleEngineNextMoveTest(logger: Observer<string>) {
 
   for (const test of tests) {
     await searchExecutor.nextMove(parseFEN(test.fen));
-
-    const diagnosticsResult = await searchExecutor.diagnosticsResult;
-    if (diagnosticsResult) {
-      logger.next(diagnosticsResult.logString);
-      console.log(diagnosticsResult.label, diagnosticsResult);
-    }
+    // const diagnosticsResult = await searchExecutor.diagnosticsResult;
+    // if (diagnosticsResult) {
+    //   logger.next(diagnosticsResult.logString);
+    //   console.log(diagnosticsResult.label, diagnosticsResult);
+    // }
   }
 
   cleanup();
@@ -57,6 +60,7 @@ async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
       const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
         version as Version,
         ENGINE_DEPTH,
+        () => {},
       );
       return {
         version: version as Version,
@@ -73,20 +77,20 @@ async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
 
     await searchExecutor.nextMove(parseFEN(test.fen));
 
-    const diagnosticsResult = await searchExecutor.diagnosticsResult;
-    if (diagnosticsResult) {
-      logger.next(diagnosticsResult.logString);
-      console.log(diagnosticsResult.label, diagnosticsResult);
+    // const diagnosticsResult = await searchExecutor.diagnosticsResult;
+    // if (diagnosticsResult) {
+    //   logger.next(diagnosticsResult.logString);
+    //   console.log(diagnosticsResult.label, diagnosticsResult);
 
-      // const cutPercentage =
-      //   1 -
-      //   diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
+    // const cutPercentage =
+    //   1 -
+    //   diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
 
-      // console.log(
-      //   diagnosticsResult.label,
-      //   `cut=${(cutPercentage * 100).toPrecision(5)}%`
-      // );
-    }
+    // console.log(
+    //   diagnosticsResult.label,
+    //   `cut=${(cutPercentage * 100).toPrecision(5)}%`
+    // );
+    // }
 
     cleanup();
   }

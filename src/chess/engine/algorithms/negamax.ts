@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
@@ -8,7 +8,7 @@ const MAX_DEPTH = 4;
 
 // The most basic tree search algorithm (minimax) but optimized to a single
 // recursive function.
-export default class Negamax implements SearchExecutorI {
+export default class Negamax implements SearchInterface {
   maxDepth: number;
   engine: Core;
   context: Context;

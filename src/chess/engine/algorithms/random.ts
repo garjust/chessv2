@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Move, Piece, PieceType, Position, Square } from '../../types';
 import { pluck } from '../../../lib/array';
 import Core from '../../core';
@@ -6,7 +6,7 @@ import Diagnotics from '../lib/diagnostics';
 
 // Just randomly pick a move, with a tiny bit of intelligence to make
 // non-sliding piece moves more often.
-export default class Random implements SearchExecutorI {
+export default class Random implements SearchInterface {
   engine: Core;
   diagnostics: Diagnotics;
 

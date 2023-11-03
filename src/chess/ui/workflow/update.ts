@@ -6,7 +6,7 @@ import {
   isPromotionPositionPawn,
   movesIncludes,
 } from '../../utils';
-import { parseFEN, formatPosition, FEN_LIBRARY } from '../../lib/fen';
+import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
 import {
   Type,
   movePieceAction,
@@ -216,6 +216,9 @@ function handleEngineResponse(
         },
         null,
       ];
+    case UCIResponseType.Info:
+      logger.debug(`info from ${action.engineId}`, response.info);
+      return [state, null];
     case UCIResponseType.Option:
       return [state, null];
     case UCIResponseType.UCIOk:

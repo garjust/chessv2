@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
@@ -12,7 +12,7 @@ const MAX_DEPTH = 4;
 // This fixes the so called "horizon effect" where the position at a leaf
 // node has an important capture available on the next move. The quiescence
 // search fixes this by only searching capturing moves (to unlimited depth).
-export default class Quiescence implements SearchExecutorI {
+export default class Quiescence implements SearchInterface {
   maxDepth: number;
   engine: Core;
   context: Context;

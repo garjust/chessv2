@@ -1,4 +1,4 @@
-import { from } from 'rxjs';
+import { Observable, Subject, concat, from, map, of } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Core from '../../core';
 import { parseFEN } from '../../lib/fen';
@@ -18,27 +18,25 @@ import {
   SetOptionAction,
 } from './action';
 import { State } from './index';
-import { UCIResponse, UCIResponseType } from './uci-response';
-import { moveFromString } from '../../move-notation';
+import { InfoKey, UCIResponse, UCIResponseType } from './uci-response';
 import { loadSearchExecutorWorker } from '../../workers';
 import { Command } from '../../../lib/workflow/commands';
 import { executorInstance } from './state';
+import { proxy } from 'comlink';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Context = {
   core: Core;
 };
 
-const respondWith =
-  (...responses: UCIResponse[]) =>
-  () =>
-    from(responses.map(respondAction));
+const respondWith = (...responses: UCIResponse[]) =>
+  from(responses.map(respondAction));
 
 function handleUCI(state: State): Update<State, Action> {
   const responses: UCIResponse[] = [
     {
       type: UCIResponseType.Id,
-      name: 'justin uci engine v1',
+      name: `garb uci engine ${state.config.version}`,
       author: 'garjust',
     },
     { type: UCIResponseType.Option, name: 'Hash' },
@@ -46,7 +44,7 @@ function handleUCI(state: State): Update<State, Action> {
     { type: UCIResponseType.UCIOk },
   ];
 
-  return [state, respondWith(...responses)];
+  return [state, () => respondWith(...responses)];
 }
 
 function handleDebug(state: State, action: DebugAction): Update<State, Action> {
@@ -55,7 +53,7 @@ function handleDebug(state: State, action: DebugAction): Update<State, Action> {
 
 function handleIsReady(state: State): Update<State, Action> {
   if (state.executorInstance !== null) {
-    return [state, respondWith({ type: UCIResponseType.ReadyOk })];
+    return [state, () => respondWith({ type: UCIResponseType.ReadyOk })];
   }
 
   return [
@@ -161,13 +159,24 @@ function handleLoadSearchExecutor(
   state: State,
   action: LoadSearchExecutorAction,
 ): Update<State, Action> {
+  const infoFromExecutor$ = new Subject<Record<InfoKey, string>>();
+
   return [
     state,
     () =>
-      from(
-        loadSearchExecutorWorker(action.version, action.maxDepth).then(
-          ([executor, cleanup]) =>
-            loadSearchExecutorDoneAction(executorInstance(executor, cleanup)),
+      loadSearchExecutorWorker(
+        action.version,
+        action.maxDepth,
+        proxy((info: Record<InfoKey, string>) => {
+          infoFromExecutor$.next(info);
+        }),
+      ).then(([executor, cleanup]) =>
+        loadSearchExecutorDoneAction(
+          executorInstance(executor, () => {
+            cleanup();
+            infoFromExecutor$.complete();
+          }),
+          infoFromExecutor$.asObservable(),
         ),
       ),
   ];
@@ -179,7 +188,20 @@ function handleLoadSearchExecutorDone(
 ): Update<State, Action> {
   return [
     { ...state, executorInstance: action.instance },
-    respondWith({ type: UCIResponseType.ReadyOk }),
+    () =>
+      concat(
+        respondWith({ type: UCIResponseType.ReadyOk }),
+        action.infoFromExecutor$.pipe(
+          map(
+            (info) =>
+              ({
+                type: UCIResponseType.Info,
+                info,
+              }) as UCIResponse,
+          ),
+          map(respondAction),
+        ),
+      ),
   ];
 }
 

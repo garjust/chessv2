@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
@@ -11,7 +11,7 @@ const MAX_DEPTH = 4;
 //
 // Alpha-beta adds tree-pruning to the tree search in a way that is completely
 // safe. Alpha-beta will always return the same move as negamax.
-export default class AlphaBeta implements SearchExecutorI {
+export default class AlphaBeta implements SearchInterface {
   maxDepth: number;
   engine: Core;
   context: Context;

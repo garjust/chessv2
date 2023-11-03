@@ -5,7 +5,7 @@ import Negamax from './algorithms/negamax';
 import OrderMoves from './algorithms/order-moves';
 import Quiescence from './algorithms/quiescence';
 import Random from './algorithms/random';
-import { DiagnosticsResult } from './lib/diagnostics';
+import { InfoKey } from './workflow/uci-response';
 
 export const Registry = Object.freeze({
   Iterative,
@@ -19,28 +19,27 @@ export const Registry = Object.freeze({
 export type Version = keyof typeof Registry;
 export const LATEST: Version = 'Iterative';
 
-export interface SearchExecutorI {
+export interface SearchInterface {
   nextMove(position: Position, timeout?: number): Promise<Move>;
-  get diagnosticsResult(): DiagnosticsResult | null;
-  get label(): string;
 }
 
-export class SearchExecutor implements SearchExecutorI {
+export class SearchExecutor {
   searchExecutor: InstanceType<(typeof Registry)[Version]>;
+  uciInfo: (info: Record<InfoKey, string>) => void;
 
-  constructor(version: Version, maxDepth: number) {
+  constructor(
+    version: Version,
+    maxDepth: number,
+    uciInfo: (info: Record<InfoKey, string>) => void,
+  ) {
     this.searchExecutor = new Registry[version](maxDepth);
+    this.uciInfo = uciInfo;
   }
 
   nextMove(position: Position, timeout?: number | undefined): Promise<Move> {
+    this.uciInfo({
+      hashfull: 'yes def',
+    });
     return this.searchExecutor.nextMove(position, timeout);
-  }
-
-  get diagnosticsResult(): DiagnosticsResult | null {
-    return this.searchExecutor.diagnosticsResult;
-  }
-
-  get label(): string {
-    return this.searchExecutor.label;
   }
 }

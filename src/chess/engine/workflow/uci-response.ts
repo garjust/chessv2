@@ -13,7 +13,7 @@ export enum UCIResponseType {
   Option = 'OPTION',
 }
 
-type InfoKey =
+export type InfoKey =
   | 'depth'
   | 'time'
   | 'nodes'
@@ -41,7 +41,7 @@ export type UCIResponse =
   | { type: UCIResponseType.BestMove; move: Move; ponder?: Move }
   | { type: UCIResponseType.CopyProtection }
   | { type: UCIResponseType.Registration }
-  | { type: UCIResponseType.Info; data: Record<InfoKey, string> }
+  | { type: UCIResponseType.Info; info: Record<InfoKey, string> }
   | { type: UCIResponseType.Option; name: EngineOptionName };
 
 const toUCIString = (response: UCIResponse): string[] => {
@@ -64,7 +64,7 @@ const toUCIString = (response: UCIResponse): string[] => {
     case UCIResponseType.Registration:
       throw Error('engine does not need registration');
     case UCIResponseType.Info:
-      return [`info ${Object.entries(response.data).flat().join(' ')}`];
+      return [`info ${Object.entries(response.info).flat().join(' ')}`];
     case UCIResponseType.Option:
       switch (response.name) {
         case 'Hash':

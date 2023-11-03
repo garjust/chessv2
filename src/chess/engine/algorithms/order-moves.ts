@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
@@ -12,7 +12,7 @@ const MAX_DEPTH = 6;
 //
 // This is the first expansion in "work" done by the search algorithm
 // separate from core engine work (move generation and execution).
-export default class OrderMoves implements SearchExecutorI {
+export default class OrderMoves implements SearchInterface {
   maxDepth: number;
   engine: Core;
   context: Context;

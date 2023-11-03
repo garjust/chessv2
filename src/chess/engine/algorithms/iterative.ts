@@ -1,4 +1,4 @@
-import { SearchExecutorI } from '../search-executor';
+import { SearchInterface } from '../search-executor';
 import { Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
@@ -27,7 +27,7 @@ const TIMEOUT = 10_000;
 //   than an immediate search at depth N. This is because we create state
 //   during each iteration which can make future iterations faster than they
 //   would otherwise be (better move ordering, more TTable hits, etc).
-export default class Iterative implements SearchExecutorI {
+export default class Iterative implements SearchInterface {
   maxDepth: number;
   core: Core;
   diagnostics?: Diagnotics;
