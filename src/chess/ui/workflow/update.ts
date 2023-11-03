@@ -118,48 +118,6 @@ function handleChangeOverlay(state: State): Update<State, Action> {
   return [{ ...state, overlayCategory: nextCategory }, overlaySquaresAction];
 }
 
-function handleLoadEngineDone(
-  state: State,
-  action: LoadEngineDoneAction,
-): Update<State, Action> {
-  const { instance, color } = action;
-
-  instance.uciState = UCIState.WaitingForUCIOk;
-
-  return [
-    {
-      ...state,
-      engines: Object.assign({}, state.engines, {
-        [instance.id]: instance,
-      }),
-      game: {
-        ...state.game,
-        players: {
-          ...state.game.players,
-          [color]: { engineId: instance.id },
-        },
-      },
-    },
-    () =>
-      merge(
-        // Here is where we link the workflows together by returning an
-        // observable here parent actions mapped from child actions.
-        instance.engine.responses.pipe(
-          map((response) => {
-            return engineResponseAction(instance.id, response);
-          }),
-        ),
-        from(
-          delayEmit(
-            instance.engine.workflow,
-            EngineWorkflow.uciAction(),
-            EngineWorkflow.debugAction(true),
-          ),
-        ),
-      ),
-  ];
-}
-
 function handleClickSquare(
   state: State,
   action: ClickSquareAction,
@@ -236,7 +194,6 @@ function handleEngineResponse(
         engineStateAs(state, instance.id, UCIState.Idle),
         isWaitingForEngine(state, instance.id) ? attemptEngineMoveAction : null,
       ];
-
     case UCIResponseType.BestMove:
       validateEngineInstanceState(instance, UCIState.WaitingForMove);
 
@@ -290,6 +247,48 @@ function handleLoadEngine(
       null,
     ];
   }
+}
+
+function handleLoadEngineDone(
+  state: State,
+  action: LoadEngineDoneAction,
+): Update<State, Action> {
+  const { instance, color } = action;
+
+  instance.uciState = UCIState.WaitingForUCIOk;
+
+  return [
+    {
+      ...state,
+      engines: Object.assign({}, state.engines, {
+        [instance.id]: instance,
+      }),
+      game: {
+        ...state.game,
+        players: {
+          ...state.game.players,
+          [color]: { engineId: instance.id },
+        },
+      },
+    },
+    () =>
+      merge(
+        // Here is where we link the workflows together by returning an
+        // observable here parent actions mapped from child actions.
+        instance.engine.responses.pipe(
+          map((response) => {
+            return engineResponseAction(instance.id, response);
+          }),
+        ),
+        from(
+          delayEmit(
+            instance.engine.workflow,
+            EngineWorkflow.uciAction(),
+            EngineWorkflow.debugAction(true),
+          ),
+        ),
+      ),
+  ];
 }
 
 function handleMovePiece(
