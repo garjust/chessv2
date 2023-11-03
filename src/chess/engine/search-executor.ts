@@ -25,12 +25,12 @@ export interface SearchInterface {
 
 export class SearchExecutor {
   searchExecutor: InstanceType<(typeof Registry)[Version]>;
-  uciInfo: (info: Record<InfoKey, string>) => void;
+  uciInfo: (info: Partial<Record<InfoKey, string>>) => void;
 
   constructor(
     version: Version,
     maxDepth: number,
-    uciInfo: (info: Record<InfoKey, string>) => void,
+    uciInfo: (info: Partial<Record<InfoKey, string>>) => void,
   ) {
     this.searchExecutor = new Registry[version](maxDepth);
     this.uciInfo = uciInfo;

@@ -159,7 +159,7 @@ function handleLoadSearchExecutor(
   state: State,
   action: LoadSearchExecutorAction,
 ): Update<State, Action> {
-  const infoFromExecutor$ = new Subject<Record<InfoKey, string>>();
+  const infoFromExecutor$ = new Subject<Partial<Record<InfoKey, string>>>();
 
   return [
     state,
@@ -167,7 +167,7 @@ function handleLoadSearchExecutor(
       loadSearchExecutorWorker(
         action.version,
         action.maxDepth,
-        proxy((info: Record<InfoKey, string>) => {
+        proxy((info: Partial<Record<InfoKey, string>>) => {
           infoFromExecutor$.next(info);
         }),
       ).then(([executor, cleanup]) =>

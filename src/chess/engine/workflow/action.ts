@@ -118,7 +118,7 @@ export interface LoadSearchExecutorAction {
 export interface LoadSearchExecutorDoneAction {
   readonly type: InternalType.LoadSearchExecutorDone;
   readonly instance: ExecutorInstance;
-  readonly infoFromExecutor$: Observable<Record<InfoKey, string>>;
+  readonly infoFromExecutor$: Observable<Partial<Record<InfoKey, string>>>;
 }
 
 export type Action =
@@ -205,7 +205,7 @@ export const loadSearchExecutorAction = (
 
 export const loadSearchExecutorDoneAction = (
   instance: ExecutorInstance,
-  infoFromExecutor$: Observable<Record<InfoKey, string>>,
+  infoFromExecutor$: Observable<Partial<Record<InfoKey, string>>>,
 ): LoadSearchExecutorDoneAction => ({
   type: InternalType.LoadSearchExecutorDone,
   instance,
