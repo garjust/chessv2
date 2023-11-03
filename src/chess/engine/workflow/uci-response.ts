@@ -14,14 +14,22 @@ export enum UCIResponseType {
 }
 
 export type InfoKey =
+  // search depth in plies
   | 'depth'
+  // the time searched in ms, this should be sent together with the pv.
   | 'time'
+  // x nodes searched, the engine should send this info regularly
   | 'nodes'
+  // the best line found
   | 'pv'
   | 'score'
+  // currently searching this move
   | 'currmove'
+  // currently searching move number x, for the first move x should be 1 not 0.
   | 'currmovenumber'
+  // the hash is x permill full, the engine should send this info regularly
   | 'hashfull'
+  // x nodes per second searched, the engine should send this info regularly
   | 'nps';
 
 const optionToResponse = (
