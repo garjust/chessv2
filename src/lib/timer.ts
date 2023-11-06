@@ -1,4 +1,3 @@
-import { formatNumber } from './formatter';
 import Logger from './logger';
 
 const logger = new Logger('timer');
@@ -6,25 +5,18 @@ const logger = new Logger('timer');
 export default class Timer {
   readonly label;
   readonly tickRate;
-  readonly #debug;
 
-  value;
-  #lastTick = 0;
+  #value: number;
   #tickerId?: NodeJS.Timeout;
+  #current?: Promise<void>;
 
   constructor(
     timeout: number,
-    {
-      tickRate = 50,
-      label = 'anonymous',
-      debug = false,
-      autoStart = true,
-    } = {},
+    { tickRate = 50, label = 'anonymous', autoStart = true } = {},
   ) {
-    this.value = timeout;
+    this.#value = timeout;
     this.label = label;
     this.tickRate = tickRate;
-    this.#debug = debug;
 
     logger.debug(`created ${label}`, { timeout, tickRate, autoStart });
 
@@ -33,44 +25,55 @@ export default class Timer {
     }
   }
 
-  brrring(): boolean {
-    return this.value === 0;
+  public get value() {
+    return this.#value;
   }
 
-  start(timeout?: number) {
+  public get promise() {
+    return this.#current;
+  }
+
+  brrring(): boolean {
+    return this.#value === 0;
+  }
+
+  start(timeout?: number): Promise<void> {
     if (this.#tickerId !== undefined) {
       throw new Error(`timer ${this.label} already started`);
     }
     if (timeout) {
-      this.value = timeout;
+      this.#value = timeout;
     }
 
     logger.debug(`started ${this.label}`, { timeout: this.value });
 
-    this.#lastTick = Date.now();
-    this.#tickerId = setInterval(() => {
-      const tick = Date.now();
-      this.value -= tick - this.#lastTick;
-      this.#lastTick = tick;
-      if (this.#debug) {
-        logger.debug(`${this.label} tick`, this.value);
-      }
+    this.#current = new Promise((resolve) => {
+      let lastTick = Date.now();
+      this.#tickerId = setInterval(() => {
+        const tick = Date.now();
+        this.#value -= tick - lastTick;
+        lastTick = tick;
 
-      if (this.value <= 0) {
-        logger.debug(`${this.label} reached 0`);
-        this.value = 0;
-        this.stop();
-      }
-    }, this.tickRate);
+        if (this.value <= 0) {
+          this.#value = 0;
+          resolve();
+          this.stop();
+        }
+      }, this.tickRate);
+    });
+    return this.#current;
   }
 
   stop() {
-    if (this.#debug) {
-      logger.debug(`${this.label} stopped`);
-    }
     if (this.#tickerId) {
       clearInterval(this.#tickerId);
       this.#tickerId = undefined;
+      // TODO: should not be reseting the promise here. As is the timer can
+      // "restart" and should restart on the same promise.
+      this.#current = undefined;
+      logger.debug(`${this.label} stopped`);
+    } else {
+      logger.debug(`${this.label} stopped but was not running`);
     }
   }
 }
