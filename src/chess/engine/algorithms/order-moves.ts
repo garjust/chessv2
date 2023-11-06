@@ -6,9 +6,9 @@ import {
   SearchInterface,
   SearchConstructor,
   InfoReporter,
+  SearchLimit,
 } from '../search-interface';
-
-const MAX_DEPTH = 6;
+import { MAX_DEPTH } from '../lib/state';
 
 // Add move ordering to the alpha-beta tree search. Searching better moves
 // earlier at a particular node allows alpha-beta to prune more branches of
@@ -17,15 +17,11 @@ const MAX_DEPTH = 6;
 // This is the first expansion in "work" done by the search algorithm
 // separate from core engine work (move generation and execution).
 export default class OrderMoves implements SearchInterface {
-  maxDepth: number;
-  core: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor(infoReporter: InfoReporter) {
-    this.maxDepth = MAX_DEPTH;
-    this.core = new Core();
-    this.context = new Context(this.label, MAX_DEPTH, this.core, {
+  constructor(reporter: InfoReporter) {
+    this.context = new Context(this.label, reporter, {
       pruneNodes: true,
       moveOrdering: true,
     });
@@ -39,12 +35,17 @@ export default class OrderMoves implements SearchInterface {
     return 'alphabeta-v2-move-ordered';
   }
 
-  async nextMove(position: Position) {
+  async nextMove(
+    position: Position,
+    _1: Move[],
+    _2: number,
+    limits: SearchLimit,
+  ) {
     this.diagnostics = undefined;
-    this.core.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
-      this.maxDepth,
+      position,
+      limits.depth ?? MAX_DEPTH,
     );
 
     this.diagnostics = diagnostics;

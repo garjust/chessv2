@@ -1,27 +1,22 @@
 import { Move, Position } from '../../types';
-import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
 import {
   SearchInterface,
   SearchConstructor,
   InfoReporter,
+  SearchLimit,
 } from '../search-interface';
-
-const MAX_DEPTH = 4;
+import { MAX_DEPTH } from '../lib/state';
 
 // The most basic tree search algorithm (minimax) but optimized to a single
 // recursive function.
 export default class Negamax implements SearchInterface {
-  maxDepth: number;
-  core: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor(infoReporter: InfoReporter) {
-    this.maxDepth = MAX_DEPTH;
-    this.core = new Core();
-    this.context = new Context(this.label, MAX_DEPTH, this.core);
+  constructor(reporter: InfoReporter) {
+    this.context = new Context(this.label, reporter);
   }
 
   get diagnosticsResult() {
@@ -32,12 +27,17 @@ export default class Negamax implements SearchInterface {
     return 'negamax';
   }
 
-  async nextMove(position: Position) {
+  async nextMove(
+    position: Position,
+    _1: Move[],
+    _2: number,
+    limits: SearchLimit,
+  ) {
     this.diagnostics = undefined;
-    this.core.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
-      this.maxDepth,
+      position,
+      limits.depth ?? MAX_DEPTH,
     );
 
     this.diagnostics = diagnostics;

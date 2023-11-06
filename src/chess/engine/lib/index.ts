@@ -22,7 +22,7 @@ export default class Search {
     const beta = Infinity;
 
     const moves = this.context.orderMoves(
-      this.context.engine.generateMoves(),
+      this.context.core.generateMoves(),
       depth,
     );
 
@@ -39,12 +39,12 @@ export default class Search {
     }
 
     for (const move of moves) {
-      this.context.engine.applyMove(move);
+      this.context.core.applyMove(move);
       const result = {
         move,
         score: -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1)),
       };
-      this.context.engine.undoLastMove();
+      this.context.core.undoLastMove();
 
       scores.push(result);
 
@@ -56,7 +56,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set(this.context.engine.zobrist, {
+    this.context.state.tTable.set(this.context.core.zobrist, {
       nodeType: NodeType.PV,
       depth,
       score: alpha,
@@ -86,7 +86,7 @@ export default class Search {
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
 
-    const cacheHit = this.context.state.tTable.get(this.context.engine.zobrist);
+    const cacheHit = this.context.state.tTable.get(this.context.core.zobrist);
 
     // If we found this position in the TTable and it was a CUT node then we can
     // test against beta before move generation.
@@ -105,19 +105,19 @@ export default class Search {
       if (this.context.configuration.quiescenceSearch) {
         return this.quiescenceSearch(alpha, beta);
       } else {
-        return this.context.engine.evaluateNormalized();
+        return this.context.core.evaluateNormalized();
       }
     }
 
     const moves = this.context.orderMoves(
-      this.context.engine.generateMoves(),
+      this.context.core.generateMoves(),
       depth,
     );
 
     // If there are no moves at this node then the game has ended.
     if (moves.length === 0) {
       if (
-        this.context.engine.checks(this.context.engine.position.turn).length > 0
+        this.context.core.checks(this.context.core.position.turn).length > 0
       ) {
         return -1 * (MATE_SCORE + depth);
       } else {
@@ -126,9 +126,9 @@ export default class Search {
     }
 
     for (const move of moves) {
-      this.context.engine.applyMove(move);
+      this.context.core.applyMove(move);
       const x = -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1));
-      this.context.engine.undoLastMove();
+      this.context.core.undoLastMove();
 
       if (x > alpha) {
         nodeType = NodeType.PV;
@@ -152,7 +152,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set(this.context.engine.zobrist, {
+    this.context.state.tTable.set(this.context.core.zobrist, {
       nodeType,
       depth,
       score: alpha,
@@ -172,7 +172,7 @@ export default class Search {
   quiescenceSearch(alpha: number, beta: number): number {
     this.context.diagnostics?.quiescenceNodeVisit();
 
-    const noMove = this.context.engine.evaluateNormalized();
+    const noMove = this.context.core.evaluateNormalized();
 
     if (noMove > alpha) {
       alpha = noMove;
@@ -183,13 +183,13 @@ export default class Search {
     }
 
     const moves = this.context.quiescenceOrderMoves(
-      this.context.engine.generateAttackingMoves(),
+      this.context.core.generateAttackingMoves(),
     );
 
     for (const move of moves) {
-      this.context.engine.applyMove(move);
+      this.context.core.applyMove(move);
       const x = -1 * this.quiescenceSearch(beta * -1, alpha * -1);
-      this.context.engine.undoLastMove();
+      this.context.core.undoLastMove();
 
       if (x > alpha) {
         alpha = x;

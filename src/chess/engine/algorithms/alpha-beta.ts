@@ -1,14 +1,13 @@
 import { Move, Position } from '../../types';
-import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
 import {
   InfoReporter,
   SearchConstructor,
   SearchInterface,
+  SearchLimit,
 } from '../search-interface';
-
-const MAX_DEPTH = 4;
+import { MAX_DEPTH } from '../lib/state';
 
 // A step up from the negamax algorithm, this is the classic tree search
 // algorithm used for games like chess.
@@ -16,15 +15,11 @@ const MAX_DEPTH = 4;
 // Alpha-beta adds tree-pruning to the tree search in a way that is completely
 // safe. Alpha-beta will always return the same move as negamax.
 export default class AlphaBeta implements SearchInterface {
-  maxDepth: number;
-  engine: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor(infoReporter: InfoReporter) {
-    this.maxDepth = MAX_DEPTH;
-    this.engine = new Core();
-    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
+  constructor(reporter: InfoReporter) {
+    this.context = new Context(this.label, reporter, {
       pruneNodes: true,
     });
   }
@@ -37,12 +32,17 @@ export default class AlphaBeta implements SearchInterface {
     return 'alphabeta';
   }
 
-  async nextMove(position: Position) {
+  async nextMove(
+    position: Position,
+    _1: Move[],
+    _2: number,
+    limits: SearchLimit,
+  ) {
     this.diagnostics = undefined;
-    this.engine.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
-      this.maxDepth,
+      position,
+      limits.depth ?? MAX_DEPTH,
     );
 
     this.diagnostics = diagnostics;

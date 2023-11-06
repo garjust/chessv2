@@ -12,10 +12,9 @@ import {
   SearchInterface,
   SearchLimit,
 } from '../search-interface';
+import { MAX_DEPTH } from '../lib/state';
 
-const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
-const TIMEOUT = 10_000;
 
 // An iterative approach to the alpha-beta tree search. This algorithm is a
 // series of progressively deeper alpha-beta tree searches starting at
@@ -33,16 +32,12 @@ const TIMEOUT = 10_000;
 //   during each iteration which can make future iterations faster than they
 //   would otherwise be (better move ordering, more TTable hits, etc).
 export default class Iterative implements SearchInterface {
-  maxDepth: number;
-  core: Core;
   diagnostics?: Diagnotics;
   context: Context;
   logger: Logger;
 
-  constructor(infoReporter: InfoReporter) {
-    this.maxDepth = MAX_DEPTH;
-    this.core = new Core();
-    this.context = new Context(this.label, MAX_DEPTH, this.core, {
+  constructor(reporter: InfoReporter) {
+    this.context = new Context(this.label, reporter, {
       pruneNodes: true,
       quiescenceSearch: true,
       moveOrdering: true,
@@ -72,7 +67,6 @@ export default class Iterative implements SearchInterface {
     limits?: SearchLimit,
   ) {
     this.diagnostics = undefined;
-    this.core.position = position;
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
@@ -85,11 +79,14 @@ export default class Iterative implements SearchInterface {
     });
     this.context.state.timer = depthTimer;
 
-    for (let i = INITIAL_DEPTH; i <= this.maxDepth; i++) {
+    for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       await depthTimer.start(await timer.value);
 
       try {
-        [currentResult, diagnostics] = await this.context.withDiagnostics(i);
+        [currentResult, diagnostics] = await this.context.withDiagnostics(
+          position,
+          i,
+        );
       } catch (error) {
         if (error instanceof TimeoutError) {
           break;

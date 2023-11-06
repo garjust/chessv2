@@ -17,6 +17,10 @@ const TIMER_SAMPLE_RATE = 200;
 // tree.
 const MICROSECONDS_PER_NODE = 50;
 
+// Reasonable max depth. Since a search can now be infinite time we need a
+// reasonable value for initializing our data structures.
+export const MAX_DEPTH = 25;
+
 // Caculate a threshold using the assumption for μs/node and the sample rate.
 // We also assume the timer is read exactly once per node.
 const TIMER_SAMPLE_THRESHOLD =
@@ -33,7 +37,7 @@ export default class State {
 
   _timerSampleCounter = 0;
 
-  constructor(maxDepth: number) {
+  constructor(maxDepth: number = MAX_DEPTH) {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
     this.tTable = new TranspositionTable();

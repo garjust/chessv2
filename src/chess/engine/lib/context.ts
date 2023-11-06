@@ -1,6 +1,7 @@
 import Search from '.';
 import Core from '../../core';
-import { MoveWithExtraData } from '../../types';
+import { MoveWithExtraData, Position } from '../../types';
+import { InfoReporter } from '../search-interface';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
@@ -35,29 +36,31 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
  */
 export default class Context {
   readonly label: string;
-  readonly engine: Core;
+  readonly reporter: InfoReporter;
+  readonly core: Core;
   readonly configuration: SearchConfiguration;
   readonly state: State;
   diagnostics?: Diagnostics;
 
   constructor(
     label: string,
-    maxDepth: number,
-    engine: Core,
+    reporter: InfoReporter,
     config: Partial<SearchConfiguration> = {},
   ) {
     this.label = label;
-    this.engine = engine;
-    this.state = new State(maxDepth);
+    this.reporter = reporter;
+    this.core = new Core();
+    this.state = new State();
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
   }
 
   // Run a search with diagnostics.
   async withDiagnostics(
+    position: Position,
     maxDepth: number,
   ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
-    const result = await this.run(maxDepth);
+    const result = await this.run(position, maxDepth);
     this.diagnostics.recordResult(result, this.state);
 
     return [result, this.diagnostics];
@@ -65,7 +68,9 @@ export default class Context {
 
   useTTForPV = true;
 
-  async run(maxDepth: number) {
+  async run(position: Position, maxDepth: number) {
+    this.core.position = position;
+
     // Before executing a search update state.
     this.state.pvTable = new PVTable(maxDepth);
 
@@ -74,7 +79,7 @@ export default class Context {
     // If we want to use the TT to extract the PV we overwrite the result's
     // PV.
     if (this.useTTForPV) {
-      result.pv = extractPV(this.state.tTable, this.engine);
+      result.pv = extractPV(this.state.tTable, this.core);
     }
     // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();
@@ -94,7 +99,7 @@ export default class Context {
       return orderMoves(
         moves,
         this.configuration.moveOrderingHeuristics.hashMove
-          ? this.state.tTable.get(this.engine.zobrist)?.move
+          ? this.state.tTable.get(this.core.zobrist)?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
           ? this.state.pvMove(currentDepth)
