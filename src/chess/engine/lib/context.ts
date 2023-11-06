@@ -1,12 +1,10 @@
 import Search from '.';
 import Core from '../../core';
-import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
-import { Move, MoveWithExtraData } from '../../types';
-import { moveString } from '../../move-notation';
+import { MoveWithExtraData } from '../../types';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
-import { extractPV, humanEvaluation } from './score-utils';
+import { extractPV } from './score-utils';
 import State from './state';
 import { SearchConfiguration, SearchResult } from './types';
 
@@ -25,14 +23,16 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
   pruneFromTTable: false,
 };
 
-// The context object contains any information, state, or other objects
-// used by the search algorithm. This includes configuration for how the
-// search should operate, a pointer to the underlying chess engine, various
-// state tables, etc.
-//
-// The context object also provides an entry point to running the search
-// algorithm which will perform some extra work updating state, extracting the
-// PV from the state, etc.
+/**
+ * The context object contains any information, state, or other objects
+ * used by the search algorithm. This includes configuration for how the
+ * search should operate, a pointer to the chess core used, various
+ * state tables, etc.
+ *
+ * The context object also provides an entry point to running the search
+ * algorithm which will perform some extra work updating state, extracting the
+ * PV from the state, etc.
+ */
 export default class Context {
   readonly label: string;
   readonly engine: Core;

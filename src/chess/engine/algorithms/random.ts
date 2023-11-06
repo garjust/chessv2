@@ -1,17 +1,21 @@
-import { SearchInterface } from '../search-executor';
 import { Move, Piece, PieceType, Position, Square } from '../../types';
 import { pluck } from '../../../lib/array';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
+import {
+  InfoReporter,
+  SearchConstructor,
+  SearchInterface,
+} from '../search-interface';
 
 // Just randomly pick a move, with a tiny bit of intelligence to make
 // non-sliding piece moves more often.
 export default class Random implements SearchInterface {
-  engine: Core;
+  core: Core;
   diagnostics: Diagnotics;
 
-  constructor() {
-    this.engine = new Core();
+  constructor(_: InfoReporter) {
+    this.core = new Core();
     this.diagnostics = new Diagnotics(this.label, 0);
   }
 
@@ -24,11 +28,11 @@ export default class Random implements SearchInterface {
   }
 
   async nextMove(position: Position) {
-    this.engine.position = position;
+    this.core.position = position;
     this.diagnostics = new Diagnotics(this.label, 0);
 
     let move: Move | undefined;
-    const moves = this.engine.generateMoves();
+    const moves = this.core.generateMoves();
 
     const captures = moves.filter((move) => move.attack);
     if (captures.length > 0) {
@@ -70,4 +74,9 @@ export default class Random implements SearchInterface {
     });
     return move;
   }
+
+  ponderMove(_1: Position, _2: Move) {
+    throw new Error(`search ${this.label} cannot ponder`);
+  }
 }
+const _: SearchConstructor = Random;

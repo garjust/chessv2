@@ -86,7 +86,7 @@ function handleAttemptEngineMove(state: State): Update<State, Action> {
         delayEmit(
           instance.engine.workflow,
           EngineWorkflow.positionAction('startpos', state.game.moveList),
-          EngineWorkflow.goAction(),
+          EngineWorkflow.goAction({ depth: 10, nodes: 20000000 }),
         ),
     ];
   }
@@ -222,7 +222,7 @@ function handleLoadEngine(
   const player = state.game.players[playingAs];
 
   if (player === HumanPlayer) {
-    const engine = new Engine(ENGINE_VERSION, 10, context.debug);
+    const engine = new Engine(ENGINE_VERSION, context.debug);
 
     return [
       state,

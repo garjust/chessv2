@@ -1,12 +1,12 @@
 import { Version } from '../search-executor';
 import { ExecutorInstance } from './state';
-import { InfoKey, UCIResponse } from './uci-response';
+import { Info, UCIResponse } from './uci-response';
 import { EngineOption } from './uci-options';
 import { Move } from '../../types';
 import { Observable } from 'rxjs';
 
 export type GoCommand = Partial<{
-  searchmoves: string[];
+  searchmoves: Move[];
   ponder: boolean;
   wtime: number;
   btime: number;
@@ -112,13 +112,12 @@ export interface RespondAction {
 export interface LoadSearchExecutorAction {
   readonly type: InternalType.LoadSearchExecutor;
   readonly version: Version;
-  readonly maxDepth: number;
 }
 
 export interface LoadSearchExecutorDoneAction {
   readonly type: InternalType.LoadSearchExecutorDone;
   readonly instance: ExecutorInstance;
-  readonly infoFromExecutor$: Observable<Partial<Record<InfoKey, string>>>;
+  readonly infoFromExecutor$: Observable<Info>;
 }
 
 export type Action =
@@ -196,16 +195,14 @@ export const respondAction = (response: UCIResponse): RespondAction => ({
 
 export const loadSearchExecutorAction = (
   version: Version,
-  maxDepth: number,
 ): LoadSearchExecutorAction => ({
   type: InternalType.LoadSearchExecutor,
   version,
-  maxDepth,
 });
 
 export const loadSearchExecutorDoneAction = (
   instance: ExecutorInstance,
-  infoFromExecutor$: Observable<Partial<Record<InfoKey, string>>>,
+  infoFromExecutor$: Observable<Info>,
 ): LoadSearchExecutorDoneAction => ({
   type: InternalType.LoadSearchExecutorDone,
   instance,

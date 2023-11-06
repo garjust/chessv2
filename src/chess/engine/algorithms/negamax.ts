@@ -1,8 +1,12 @@
-import { SearchInterface } from '../search-executor';
-import { Position } from '../../types';
+import { Move, Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
+import {
+  SearchInterface,
+  SearchConstructor,
+  InfoReporter,
+} from '../search-interface';
 
 const MAX_DEPTH = 4;
 
@@ -10,14 +14,14 @@ const MAX_DEPTH = 4;
 // recursive function.
 export default class Negamax implements SearchInterface {
   maxDepth: number;
-  engine: Core;
+  core: Core;
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor(maxDepth = MAX_DEPTH) {
-    this.maxDepth = maxDepth;
-    this.engine = new Core();
-    this.context = new Context(this.label, maxDepth, this.engine);
+  constructor(infoReporter: InfoReporter) {
+    this.maxDepth = MAX_DEPTH;
+    this.core = new Core();
+    this.context = new Context(this.label, MAX_DEPTH, this.core);
   }
 
   get diagnosticsResult() {
@@ -30,7 +34,7 @@ export default class Negamax implements SearchInterface {
 
   async nextMove(position: Position) {
     this.diagnostics = undefined;
-    this.engine.position = position;
+    this.core.position = position;
 
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
       this.maxDepth,
@@ -39,4 +43,9 @@ export default class Negamax implements SearchInterface {
     this.diagnostics = diagnostics;
     return move;
   }
+
+  ponderMove(_1: Position, _2: Move) {
+    throw new Error(`search ${this.label} cannot ponder`);
+  }
 }
+const _: SearchConstructor = Negamax;

@@ -27,7 +27,6 @@ export type State = Readonly<{
   positionForGo: Readonly<Position>;
   config: Readonly<{
     version: Version;
-    maxDepth: number;
   }>;
   options: Readonly<{
     hashSize: typeof OptionDefinitions.Hash.default;
@@ -40,8 +39,7 @@ const INITIAL_STATE: State = {
   debug: false,
   positionForGo: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
   config: {
-    version: 'Random',
-    maxDepth: 1,
+    version: 'random',
   },
   options: {
     hashSize: OptionDefinitions.Hash.default,

@@ -1,8 +1,12 @@
-import { SearchInterface } from '../search-executor';
-import { Position } from '../../types';
+import { Move, Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
+import {
+  InfoReporter,
+  SearchConstructor,
+  SearchInterface,
+} from '../search-interface';
 
 const MAX_DEPTH = 4;
 
@@ -17,10 +21,10 @@ export default class AlphaBeta implements SearchInterface {
   context: Context;
   diagnostics?: Diagnotics;
 
-  constructor(maxDepth = MAX_DEPTH) {
-    this.maxDepth = maxDepth;
+  constructor(infoReporter: InfoReporter) {
+    this.maxDepth = MAX_DEPTH;
     this.engine = new Core();
-    this.context = new Context(this.label, maxDepth, this.engine, {
+    this.context = new Context(this.label, MAX_DEPTH, this.engine, {
       pruneNodes: true,
     });
   }
@@ -44,4 +48,9 @@ export default class AlphaBeta implements SearchInterface {
     this.diagnostics = diagnostics;
     return move;
   }
+
+  ponderMove(_1: Position, _2: Move) {
+    throw new Error(`search ${this.label} cannot ponder`);
+  }
 }
+const _: SearchConstructor = AlphaBeta;

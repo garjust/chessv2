@@ -8,7 +8,7 @@ import { TestFens, MoveTest } from '../lib/perft';
 import './Debug.css';
 import { loadPerftWorker, loadSearchExecutorWorker } from '../workers';
 
-const EXCLUDED_ENGINES: Version[] = ['Random'];
+const EXCLUDED_VERSIONS: Version[] = ['random'];
 const ENGINE_DEPTH = 4;
 
 async function runMoveGenerationTest(
@@ -27,7 +27,6 @@ async function runMoveGenerationTest(
 async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
-    ENGINE_DEPTH,
     (info) => {
       logger.next(`${info}`);
       console.log(info);
@@ -41,7 +40,12 @@ async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   ];
 
   for (const test of tests) {
-    await searchExecutor.nextMove(parseFEN(test.fen));
+    await searchExecutor.nextMove(
+      parseFEN(test.fen),
+      [],
+      Number.MAX_SAFE_INTEGER,
+      { depth: ENGINE_DEPTH },
+    );
     // const diagnosticsResult = await searchExecutor.diagnosticsResult;
     // if (diagnosticsResult) {
     //   logger.next(diagnosticsResult.logString);
@@ -59,7 +63,6 @@ async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
     Object.keys(Registry).map(async (version) => {
       const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
         version as Version,
-        ENGINE_DEPTH,
         () => {},
       );
       return {
@@ -71,11 +74,16 @@ async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
   );
 
   for (const { version, searchExecutor, cleanup } of searchExecutors) {
-    if (EXCLUDED_ENGINES.includes(version)) {
+    if (EXCLUDED_VERSIONS.includes(version)) {
       continue;
     }
 
-    await searchExecutor.nextMove(parseFEN(test.fen));
+    await searchExecutor.nextMove(
+      parseFEN(test.fen),
+      [],
+      Number.MAX_SAFE_INTEGER,
+      { depth: ENGINE_DEPTH },
+    );
 
     // const diagnosticsResult = await searchExecutor.diagnosticsResult;
     // if (diagnosticsResult) {

@@ -1,4 +1,4 @@
-import { Observable, Subject, concat, from, map, of } from 'rxjs';
+import { Subject, concat, from, map, of } from 'rxjs';
 import { Update } from '../../../lib/workflow';
 import Core from '../../core';
 import { parseFEN } from '../../lib/fen';
@@ -18,7 +18,7 @@ import {
   SetOptionAction,
 } from './action';
 import { State } from './index';
-import { InfoKey, UCIResponse, UCIResponseType } from './uci-response';
+import { Info, UCIResponse, UCIResponseType } from './uci-response';
 import { loadSearchExecutorWorker } from '../../workers';
 import { Command } from '../../../lib/workflow/commands';
 import { executorInstance } from './state';
@@ -56,10 +56,7 @@ function handleIsReady(state: State): Update<State, Action> {
     return [state, () => respondWith({ type: UCIResponseType.ReadyOk })];
   }
 
-  return [
-    state,
-    () => loadSearchExecutorAction(state.config.version, state.config.maxDepth),
-  ];
+  return [state, () => loadSearchExecutorAction(state.config.version)];
 }
 
 function handleSetOption(
@@ -116,13 +113,19 @@ function handleGo(
   context: Context,
 ): Update<State, Action> {
   const { executorInstance } = state;
+  const go = action.command;
   if (executorInstance === null) {
     throw new Error('search executor instance has not been initialized');
   }
 
+  // TODO: determine timeout based on go command time control info
+  const timeout = 5000;
+
   const nextMove = executorInstance.executor.nextMove(
     context.core.position,
-    action.command.infinite ? Number.MAX_SAFE_INTEGER : 500,
+    go.searchmoves ?? [],
+    go.infinite ? Number.MAX_SAFE_INTEGER : timeout,
+    { depth: go.depth, nodes: go.nodes, time: go.movetime },
   );
 
   return [
@@ -159,15 +162,14 @@ function handleLoadSearchExecutor(
   state: State,
   action: LoadSearchExecutorAction,
 ): Update<State, Action> {
-  const infoFromExecutor$ = new Subject<Partial<Record<InfoKey, string>>>();
+  const infoFromExecutor$ = new Subject<Info>();
 
   return [
     state,
     () =>
       loadSearchExecutorWorker(
         action.version,
-        action.maxDepth,
-        proxy((info: Partial<Record<InfoKey, string>>) => {
+        proxy((info: Info) => {
           infoFromExecutor$.next(info);
         }),
       ).then(([executor, cleanup]) =>

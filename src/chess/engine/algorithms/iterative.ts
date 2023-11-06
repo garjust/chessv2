@@ -1,5 +1,4 @@
-import { SearchInterface } from '../search-executor';
-import { Position } from '../../types';
+import { Move, Position } from '../../types';
 import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
@@ -7,6 +6,12 @@ import { loadTimerWorker } from '../../workers';
 import TimeoutError from '../lib/timeout-error';
 import { SearchResult } from '../lib/types';
 import Logger from '../../../lib/logger';
+import {
+  InfoReporter,
+  SearchConstructor,
+  SearchInterface,
+  SearchLimit,
+} from '../search-interface';
 
 const MAX_DEPTH = 6;
 const INITIAL_DEPTH = 1;
@@ -34,10 +39,10 @@ export default class Iterative implements SearchInterface {
   context: Context;
   logger: Logger;
 
-  constructor(maxDepth = MAX_DEPTH) {
-    this.maxDepth = maxDepth;
+  constructor(infoReporter: InfoReporter) {
+    this.maxDepth = MAX_DEPTH;
     this.core = new Core();
-    this.context = new Context(this.label, maxDepth, this.core, {
+    this.context = new Context(this.label, MAX_DEPTH, this.core, {
       pruneNodes: true,
       quiescenceSearch: true,
       moveOrdering: true,
@@ -60,7 +65,12 @@ export default class Iterative implements SearchInterface {
     return 'alphabeta-iterative';
   }
 
-  async nextMove(position: Position, timeout = TIMEOUT) {
+  async nextMove(
+    position: Position,
+    movesToSearch: Move[],
+    timeout: number,
+    limits?: SearchLimit,
+  ) {
     this.diagnostics = undefined;
     this.core.position = position;
     let currentResult: SearchResult | null = null;
@@ -107,4 +117,9 @@ export default class Iterative implements SearchInterface {
     }
     return currentResult.move;
   }
+
+  ponderMove(_1: Position, _2: Move) {
+    throw new Error(`search ${this.label} cannot ponder`);
+  }
 }
+const _: SearchConstructor = Iterative;

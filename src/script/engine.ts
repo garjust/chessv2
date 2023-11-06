@@ -8,7 +8,7 @@ import { debugAction } from '../chess/engine/workflow';
 
 const DEBUG = true;
 
-const SEARCH_VERSION: Version = LATEST;
+const ENGINE_VERSION: Version = LATEST;
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -16,17 +16,17 @@ const rl = readline.createInterface({
   terminal: false,
 });
 
-const searchEngine = new Engine(SEARCH_VERSION, 10);
+const engine = new Engine(ENGINE_VERSION);
 
-searchEngine.responses.subscribe((response: UCIResponse) => {
+engine.responses.subscribe((response: UCIResponse) => {
   toUCI(response).map((str: string) => rl.write(`${str}\n`));
 });
 
 if (DEBUG) {
-  searchEngine.workflow.emit(debugAction(true));
+  engine.workflow.emit(debugAction(true));
 }
 
 rl.on('line', (line) => {
   const action = parse(line);
-  searchEngine.workflow.emit(action);
+  engine.workflow.emit(action);
 });

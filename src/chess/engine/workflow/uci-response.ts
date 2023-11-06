@@ -32,6 +32,8 @@ export type InfoKey =
   // x nodes per second searched, the engine should send this info regularly
   | 'nps';
 
+export type Info = Partial<Record<InfoKey, string>>;
+
 const optionToResponse = (
   option: Record<string, string | number | boolean>,
 ): string => {

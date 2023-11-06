@@ -22,7 +22,7 @@ const parseGoCommand = (parts: string[]): GoCommand => {
   for (let cursor = parts.shift(); parts.length === 0; cursor = parts.shift()) {
     switch (cursor as keyof GoCommand) {
       case 'searchmoves':
-        result.searchmoves = [...parts];
+        result.searchmoves = [...parts.map(moveFromString)];
         parts.length = 0;
         break;
       case 'ponder':

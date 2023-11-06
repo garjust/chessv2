@@ -16,12 +16,11 @@ const isRespondAction = (action: Action): action is RespondAction =>
 export class Engine {
   workflow: Workflow<State, Action>;
 
-  constructor(version: Version, maxDepth: number, debug = false) {
+  constructor(version: Version, debug = false) {
     this.workflow = init(
       createState({
         config: {
           version,
-          maxDepth,
         },
       }),
       {

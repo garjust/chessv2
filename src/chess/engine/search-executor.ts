@@ -1,45 +1,57 @@
 import { Move, Position } from '../types';
-import AlphaBeta from './algorithms/alpha-beta';
-import Iterative from './algorithms/iterative';
-import Negamax from './algorithms/negamax';
-import OrderMoves from './algorithms/order-moves';
-import Quiescence from './algorithms/quiescence';
-import Random from './algorithms/random';
-import { InfoKey } from './workflow/uci-response';
-
-export const Registry = Object.freeze({
-  Iterative,
-  Quiescence,
-  OrderMoves,
+import {
   AlphaBeta,
+  Iterative,
   Negamax,
+  OrderMoves,
+  Quiescence,
   Random,
+  SearchExecutorVersion,
+} from './algorithms';
+import {
+  InfoReporter,
+  SearchConstructor,
+  SearchInterface,
+  SearchLimit,
+} from './search-interface';
+
+export const Registry: Readonly<
+  Record<SearchExecutorVersion, SearchConstructor>
+> = Object.freeze({
+  iterative: Iterative,
+  quiescence: Quiescence,
+  orderMoves: OrderMoves,
+  alphaBeta: AlphaBeta,
+  negamax: Negamax,
+  random: Random,
 });
 
 export type Version = keyof typeof Registry;
-export const LATEST: Version = 'Iterative';
+export const LATEST: Version = 'iterative';
 
-export interface SearchInterface {
-  nextMove(position: Position, timeout?: number): Promise<Move>;
-}
-
+/**
+ * Wraps an actual search executor version, effectively proxying function
+ * calls to the version. The wrapper exists to better handle instantiating
+ * a search executor on a Worker using comlnk.
+ */
 export class SearchExecutor {
-  searchExecutor: InstanceType<(typeof Registry)[Version]>;
-  uciInfo: (info: Partial<Record<InfoKey, string>>) => void;
+  search: SearchInterface;
 
-  constructor(
-    version: Version,
-    maxDepth: number,
-    uciInfo: (info: Partial<Record<InfoKey, string>>) => void,
-  ) {
-    this.searchExecutor = new Registry[version](maxDepth);
-    this.uciInfo = uciInfo;
+  constructor(version: Version, infoReporter: InfoReporter) {
+    infoReporter({ currmovenumber: 'ok' });
+    this.search = new Registry[version](infoReporter);
   }
 
-  nextMove(position: Position, timeout?: number | undefined): Promise<Move> {
-    this.uciInfo({
-      hashfull: 'yes def',
-    });
-    return this.searchExecutor.nextMove(position, timeout);
+  nextMove(
+    position: Position,
+    movesToSearch: Move[],
+    timeout: number,
+    limits: SearchLimit,
+  ): Promise<Move> {
+    return this.search.nextMove(position, movesToSearch, timeout, limits);
+  }
+
+  ponderMove(position: Position, move: Move) {
+    this.search.ponderMove(position, move);
   }
 }
