@@ -27,6 +27,7 @@ import {
   NavigatePositionAction,
   Navigate,
   navigatePositionAction,
+  loadEngineAction,
 } from './action';
 import { State, Action } from './index';
 import {
@@ -45,7 +46,7 @@ import {
   isDisplayingCurrentPosition,
   validateEngineInstanceState,
 } from './state';
-import { from, map, merge, of } from 'rxjs';
+import { catchError, from, map, merge, of } from 'rxjs';
 import Core from '../../core';
 import { play, Sound } from '../audio';
 import {
@@ -279,6 +280,8 @@ function handleLoadEngineDone(
           map((response) => {
             return engineResponseAction(instance.id, response);
           }),
+          // TODO: add an "unload" action and pass a reason
+          catchError(() => of(loadEngineAction(color))),
         ),
         from(
           delayEmit(

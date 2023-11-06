@@ -182,7 +182,7 @@ const core = <S, A>(
   // This observable powers our public states observable.
   const states$: Observable<S> = actionHandler$.pipe(
     catchError((err: Error) => {
-      logger.debug('error in states observable:', err);
+      logger.debug(`{${label}}`, 'error in states observable:', err);
       throw err;
     }),
     map(([state, _]) => state),
@@ -220,7 +220,11 @@ const core = <S, A>(
       // swallow errors from upstream and end the observable gracefully;
       // do not continue with more actions
       catchError((err: Error) => {
-        logger.debug('swallow error before forwarding to root:', err.message);
+        logger.debug(
+          `{${label}}`,
+          'swallow error before forwarding to root:',
+          err.message,
+        );
         return EMPTY;
       }),
       // Flat map the next actions observable upward for subscription.
