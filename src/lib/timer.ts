@@ -1,13 +1,16 @@
 import { formatNumber } from './formatter';
+import Logger from './logger';
+
+const logger = new Logger('timer');
 
 export default class Timer {
   readonly label;
   readonly tickRate;
-  readonly _debug;
+  readonly #debug;
 
   value;
-  _lastTick = 0;
-  _tickerId?: NodeJS.Timeout;
+  #lastTick = 0;
+  #tickerId?: NodeJS.Timeout;
 
   constructor(
     timeout: number,
@@ -21,16 +24,9 @@ export default class Timer {
     this.value = timeout;
     this.label = label;
     this.tickRate = tickRate;
-    this._debug = debug;
+    this.#debug = debug;
 
-    if (this._debug) {
-      console.log(
-        '[TIMER]',
-        `created timer ${label}: ${formatNumber(
-          timeout,
-        )}ms; tickRate=${tickRate}ms`,
-      );
-    }
+    logger.debug(`created ${label}`, { timeout, tickRate, autoStart });
 
     if (autoStart) {
       this.start();
@@ -42,29 +38,27 @@ export default class Timer {
   }
 
   start(timeout?: number) {
+    if (this.#tickerId !== undefined) {
+      throw new Error(`timer ${this.label} already started`);
+    }
     if (timeout) {
       this.value = timeout;
     }
 
-    if (this._debug) {
-      console.log(
-        '[TIMER]',
-        `started ${this.label}: ${formatNumber(this.value)}ms`,
-      );
-    }
+    logger.debug(`started ${this.label}`, { timeout: this.value });
 
-    this._lastTick = Date.now();
-    this._tickerId = setInterval(() => {
+    this.#lastTick = Date.now();
+    this.#tickerId = setInterval(() => {
       const tick = Date.now();
-      this.value -= tick - this._lastTick;
-      this._lastTick = tick;
-      if (this._debug) {
-        console.log('[TIMER]', `${this.label} tick ${this.value}`);
+      this.value -= tick - this.#lastTick;
+      this.#lastTick = tick;
+      if (this.#debug) {
+        logger.debug(`${this.label} tick`, this.value);
       }
 
       if (this.value <= 0) {
-        if (this._debug) {
-          console.log('[TIMER]', `${this.label} reached 0`);
+        if (this.#debug) {
+          logger.debug(`${this.label} reached 0`);
         }
         this.value = 0;
         this.stop();
@@ -73,11 +67,12 @@ export default class Timer {
   }
 
   stop() {
-    if (this._debug) {
-      console.log('[TIMER]', `${this.label} stopped`);
+    if (this.#debug) {
+      logger.debug(`${this.label} stopped`);
     }
-    if (this._tickerId) {
-      clearInterval(this._tickerId);
+    if (this.#tickerId) {
+      clearInterval(this.#tickerId);
+      this.#tickerId = undefined;
     }
   }
 }
