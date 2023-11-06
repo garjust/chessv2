@@ -25,11 +25,11 @@ export default class Timer {
     }
   }
 
-  public get value() {
+  get value() {
     return this.#value;
   }
 
-  public get promise() {
+  get promise() {
     return this.#current;
   }
 
@@ -48,9 +48,9 @@ export default class Timer {
     logger.debug(`started ${this.label}`, { timeout: this.value });
 
     this.#current = new Promise((resolve) => {
-      let lastTick = Date.now();
+      let lastTick = performance.now();
       this.#tickerId = setInterval(() => {
-        const tick = Date.now();
+        const tick = performance.now();
         this.#value -= tick - lastTick;
         lastTick = tick;
 
