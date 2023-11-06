@@ -1,5 +1,4 @@
 import { Move, Position } from '../../types';
-import Core from '../../core';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
 import {
