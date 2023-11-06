@@ -72,15 +72,9 @@ export default class Iterative implements SearchInterface {
     const [timer, timerCleanup] = await loadTimerWorker(timeout, {
       label: `${this.label}-search`,
     });
-    const [depthTimer, depthTimerCleanup] = await loadTimerWorker(0, {
-      autoStart: false,
-      label: `${this.label}-search-for-depth`,
-    });
-    this.context.state.timer = depthTimer;
+    this.context.state.timer = timer;
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
-      await depthTimer.start(await timer.value);
-
       try {
         [currentResult, diagnostics] = await this.context.withDiagnostics(
           position,
@@ -94,8 +88,6 @@ export default class Iterative implements SearchInterface {
         }
       }
 
-      await depthTimer.stop();
-
       this.diagnostics = diagnostics;
       this.logger.debug(
         'intermediate result:',
@@ -103,10 +95,10 @@ export default class Iterative implements SearchInterface {
         this.diagnostics.result?.evaluation,
         this.diagnostics?.result?.principleVariation,
       );
+      this.logger.debug('remaining time', await timer.value);
     }
 
     timerCleanup();
-    depthTimerCleanup();
 
     if (currentResult === null) {
       throw Error('no search result');

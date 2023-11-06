@@ -57,9 +57,7 @@ export default class Timer {
       }
 
       if (this.value <= 0) {
-        if (this.#debug) {
-          logger.debug(`${this.label} reached 0`);
-        }
+        logger.debug(`${this.label} reached 0`);
         this.value = 0;
         this.stop();
       }
