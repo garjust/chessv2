@@ -5,7 +5,7 @@ import { Type, clickSquareAction, loadEngineAction } from './workflow/action';
 import { Action as EngineAction } from '../engine/workflow';
 import { Type as EngineType, InternalType } from '../engine/workflow/action';
 import { FEN_LIBRARY } from '../lib/fen';
-import { Command } from '../../lib/workflow/commands';
+import { Command } from '../../rx-workflow/commands';
 import { lastValueFrom } from 'rxjs';
 import { Color } from '../types';
 

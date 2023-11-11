@@ -1,4 +1,4 @@
-import { Update } from '../../../lib/workflow';
+import { Update } from '../../../rx-workflow';
 import { Color, PieceType, Square } from '../../types';
 import {
   flipColor,
@@ -60,10 +60,10 @@ import { Version } from '../../engine/search-executor';
 import { UCIResponseType } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
-import { delayEmit } from '../../../lib/workflow/util';
+import { delayEmit } from '../../../rx-workflow/util';
 import Logger from '../../../lib/logger';
 import { moveString } from '../../move-notation';
-import { Command } from '../../../lib/workflow/commands';
+import { Command } from '../../../rx-workflow/commands';
 
 export type Context = {
   core: Core;

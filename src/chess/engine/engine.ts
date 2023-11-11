@@ -3,7 +3,7 @@ import Core from '../core';
 import init, { Action, State, createState } from './workflow';
 import { InternalType, RespondAction } from './workflow/action';
 import { UCIResponse } from './workflow/uci-response';
-import { Workflow, updateLogger } from '../../lib/workflow';
+import { Workflow, updateLogger } from '../../rx-workflow';
 import { Observable, filter, map } from 'rxjs';
 
 const isRespondAction = (action: Action): action is RespondAction =>

@@ -1,5 +1,5 @@
 import { interval, map } from 'rxjs';
-import { Workflow, updateLogger } from '../../lib/workflow';
+import { Workflow, updateLogger } from '../../rx-workflow';
 import Core from '../core';
 import init, {
   Action,

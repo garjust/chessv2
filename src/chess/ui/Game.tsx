@@ -7,7 +7,7 @@ import DisplayGameFEN from './DisplayGameFen';
 import DisplayClock from './DisplayClock';
 import GameControlPanel from './GameControlPanel';
 import { Orchestrator } from './orchestrator';
-import { Command } from '../../lib/workflow/commands';
+import { Command } from '../../rx-workflow/commands';
 import {
   Navigate,
   navigatePositionAction,

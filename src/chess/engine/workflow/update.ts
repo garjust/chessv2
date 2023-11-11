@@ -1,5 +1,5 @@
 import { Subject, concat, from, map, of } from 'rxjs';
-import { Update } from '../../../lib/workflow';
+import { Update } from '../../../rx-workflow';
 import Core from '../../core';
 import { parseFEN } from '../../lib/fen';
 import {
@@ -20,7 +20,7 @@ import {
 import { State } from './index';
 import { Info, UCIResponse, UCIResponseType } from './uci-response';
 import { loadSearchExecutorWorker } from '../../workers';
-import { Command } from '../../../lib/workflow/commands';
+import { Command } from '../../../rx-workflow/commands';
 import { executorInstance } from './state';
 import { proxy } from 'comlink';
 

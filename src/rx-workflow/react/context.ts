@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Observable, distinctUntilChanged, map } from 'rxjs';
-import { Workflow } from '../workflow';
-import { Command } from '../workflow/commands';
+import { Workflow } from '..';
+import { Command } from '../commands';
 
 export const contextFactory = <S, A>(
   initialState: S,

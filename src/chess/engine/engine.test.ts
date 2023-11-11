@@ -9,7 +9,7 @@ import {
 import { UCIResponse, UCIResponseType } from './workflow/uci-response';
 import { Engine } from './engine';
 import { FEN_LIBRARY } from '../lib/fen';
-import { Command } from '../../lib/workflow/commands';
+import { Command } from '../../rx-workflow/commands';
 import { Color, PieceType } from '../types';
 
 test('example interaction with UCI engine', async () => {

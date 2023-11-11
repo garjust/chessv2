@@ -20,7 +20,7 @@ import {
 import { Command, commandExecutor, isCommand } from './commands';
 import { isPromiseLike, nonNullable } from './util';
 import { tag } from 'rxjs-spy/operators';
-import Logger from '../logger';
+import Logger from '../lib/logger';
 
 const logger = new Logger('workflow-core');
 
