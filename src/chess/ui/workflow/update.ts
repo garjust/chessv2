@@ -15,16 +15,7 @@ import {
   attemptEngineMoveAction,
   receiveEngineMoveAction,
   loadEngineDoneAction,
-  LoadEngineDoneAction,
-  ClickSquareAction,
-  LoadEngineAction,
-  ReceiveEngineMoveAction,
-  MovePieceAction,
-  SetPositionAction,
-  SetPositionFromFENAction,
-  EngineResponseAction,
   engineResponseAction,
-  NavigatePositionAction,
   Navigate,
   navigatePositionAction,
   loadEngineAction,
@@ -121,7 +112,7 @@ function handleChangeOverlay(state: State): Update<State, Action> {
 
 function handleClickSquare(
   state: State,
-  action: ClickSquareAction,
+  action: Action & { type: Type.ClickSquare },
 ): Update<State, Action> {
   if (state.selectedSquare !== null) {
     const selectedSquare = state.selectedSquare;
@@ -155,7 +146,7 @@ function handleClickSquare(
 
 function handleEngineResponse(
   state: State,
-  action: EngineResponseAction,
+  action: Action & { type: Type.EngineResponse },
 ): Update<State, Action> {
   const instance = getEngineInstance(state, action.engineId);
 
@@ -216,7 +207,7 @@ function handleFlipBoard(state: State): Update<State, Action> {
 
 function handleLoadEngine(
   state: State,
-  action: LoadEngineAction,
+  action: Action & { type: Type.LoadEngine },
   context: Context,
 ): Update<State, Action> {
   const { playingAs } = action;
@@ -252,7 +243,7 @@ function handleLoadEngine(
 
 function handleLoadEngineDone(
   state: State,
-  action: LoadEngineDoneAction,
+  action: Action & { type: Type.LoadEngineDone },
 ): Update<State, Action> {
   const { instance, color } = action;
 
@@ -296,7 +287,7 @@ function handleLoadEngineDone(
 
 function handleMovePiece(
   state: State,
-  action: MovePieceAction,
+  action: Action & { type: Type.MovePiece },
   { core }: Context,
 ): Update<State, Action> {
   const { move } = action;
@@ -352,7 +343,7 @@ function handleMovePiece(
 
 function handleNavigatePosition(
   state: State,
-  action: NavigatePositionAction,
+  action: Action & { type: Type.NavigatePosition },
   { core }: Context,
 ): Update<State, Action> {
   let { moveList, moveIndex } = state.game;
@@ -425,7 +416,7 @@ function handleOverlaySquares(
 
 function handleReceiveEngineMove(
   state: State,
-  action: ReceiveEngineMoveAction,
+  action: Action & { type: Type.ReceiveEngineMove },
 ): Update<State, Action> {
   const { move } = action;
 
@@ -445,7 +436,7 @@ function handleResetOverlay(state: State): Update<State, Action> {
 
 function handleSetPosition(
   state: State,
-  action: SetPositionAction,
+  action: Action & { type: Type.SetPosition },
   { core }: Context,
 ): Update<State, Action> {
   const { position } = action;
@@ -503,7 +494,7 @@ function handleSetPosition(
 
 function handleSetPositionFromFEN(
   state: State,
-  action: SetPositionFromFENAction,
+  action: Action & { type: Type.SetPositionFromFEN },
   { core }: Context,
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
