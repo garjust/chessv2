@@ -4,6 +4,7 @@ enum Type {
   Foo = 'FOO',
   Bar = 'BAR',
   Cat = 'CAT',
+  ThisIsPrivate = 'THIS_IS_PRIVATE',
 }
 
 const fooAction = (val: number) =>
@@ -24,10 +25,20 @@ const catAction = (val: boolean) =>
     val,
   }) as const;
 
+const thisIsPrivateAction = () =>
+  ({
+    type: Type.ThisIsPrivate,
+  }) as const;
+
 type Action =
   | ReturnType<typeof fooAction>
   | ReturnType<typeof barAction>
-  | ReturnType<typeof catAction>;
+  | ReturnType<typeof catAction>
+  | ReturnType<typeof thisIsPrivateAction>;
+
+type Private =
+  | (Action & { type: Type.ThisIsPrivate })
+  | (Action & { type: Type.Cat });
 
 // rest of workflow...
 
@@ -53,6 +64,14 @@ function handleCat(
   action: Action & { type: Type.Cat },
 ): Update<State, Action> {
   console.log('is a cat?', action.val);
+  return [state, thisIsPrivateAction];
+}
+
+function handleThisIsPrivate(
+  state: State,
+  _: Action & { type: Type.ThisIsPrivate },
+): Update<State, Action> {
+  console.log('thisisprivate');
   return [state, null];
 }
 
@@ -64,12 +83,19 @@ const update = (state: State, action: Action): Update<State, Action> => {
       return handleBar(state, action);
     case Type.Cat:
       return handleCat(state, action);
+    case Type.ThisIsPrivate:
+      return handleThisIsPrivate(state, action);
   }
 };
 
-const workflow = core<State, Action>(update, { counter: 0 }, 'test');
+const workflow = core<State, Action, Exclude<Action, Private>>(
+  update,
+  { counter: 0 },
+  'test',
+);
 
 workflow.emit(fooAction(50));
 workflow.emit(fooAction(60));
-workflow.emit(catAction(true));
+// workflow.emit(catAction(true));
 workflow.emit(barAction('tahdah'));
+// workflow.emit(thisIsPrivateAction()); // this should be a type error

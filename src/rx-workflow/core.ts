@@ -29,11 +29,11 @@ const logger = new Logger('workflow-core');
  * function to emit actions to the workflow and observables output by the
  * workflow.
  */
-export interface Workflow<S, A> {
+export interface Workflow<S, A, Ap extends A = A> {
   /**
    * Emit actions to the workflow.
    */
-  emit: (action: A | Command) => void;
+  emit: (action: Ap | Command) => void;
   /**
    * Observable of states from the workflow. Subscribe to receive
    * the latest states.
@@ -130,19 +130,19 @@ const update =
  * @param seed Initial state object for the workflow.
  * @returns A workflow object containing an emit function and observables.
  */
-const core = <S, A>(
+const core = <S, A, Ap extends A = A>(
   updater: Updater<S, A>,
   seed: S,
   label: string,
   cleanup: (state: S) => void = () => {},
-): Workflow<S, A> => {
+): Workflow<S, A, Ap> => {
   // Root subject. This subject acts as the "root" observable of
   // the workflow. We define it as a subject so that an emit function can
   // push events into it.
   const root$ = new Subject<RootEvent<A>>();
 
   // Define the emit function that will be exposed.
-  const publicEmit = (action: A | Command) => root$.next(action);
+  const publicEmit = (action: Ap | Command) => root$.next(action);
   // Public states subject. This will be exposed as a hot
   // observable for workflow state.
   const publicStates$ = new Subject<S>();
