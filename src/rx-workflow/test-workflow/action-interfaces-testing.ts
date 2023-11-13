@@ -11,32 +11,36 @@ enum Type {
 //   val: number;
 // };
 
-type BarAction = {
-  type: Type.Bar;
-  val: string;
-};
+// type BarAction = {
+//   type: Type.Bar;
+//   val: string;
+// };
 
-type CatAction = {
-  type: Type.Cat;
-  val: boolean;
-};
+// type CatAction = {
+//   type: Type.Cat;
+//   val: boolean;
+// };
 
-const fooAction = (val: number): { type: Type.Foo; val: number } => ({
-  type: Type.Foo,
-  val,
-});
-
+const fooAction = (val: number) =>
+  ({
+    type: Type.Foo,
+    val,
+  }) as const;
 type FooAction = ReturnType<typeof fooAction>;
 
-const barAction = (val: string): BarAction => ({
-  type: Type.Bar,
-  val,
-});
+const barAction = (val: string) =>
+  ({
+    type: Type.Bar,
+    val,
+  }) as const;
+type BarAction = ReturnType<typeof barAction>;
 
-const catAction = (val: boolean): CatAction => ({
-  type: Type.Cat,
-  val,
-});
+const catAction = (val: boolean) =>
+  ({
+    type: Type.Cat,
+    val,
+  }) as const;
+type CatAction = ReturnType<typeof catAction>;
 
 type Action = FooAction | BarAction | CatAction;
 
@@ -44,16 +48,28 @@ type Action = FooAction | BarAction | CatAction;
 
 type State = { counter: number };
 
+function handleFoo(state: State, action: FooAction): Update<State, Action> {
+  return [{ ...state, counter: state.counter + action.val }, null];
+}
+
+function handleBar(state: State, action: BarAction): Update<State, Action> {
+  console.log('bar!', action.val, state.counter);
+  return [state, null];
+}
+
+function handleCat(state: State, action: CatAction): Update<State, Action> {
+  console.log('is a cat?', action.val);
+  return [state, null];
+}
+
 const update = (state: State, action: Action): Update<State, Action> => {
   switch (action.type) {
     case Type.Foo:
-      return [{ ...state, counter: state.counter + action.val }, null];
+      return handleFoo(state, action);
     case Type.Bar:
-      console.log('bar!', action.val, state.counter);
-      return [state, null];
+      return handleBar(state, action);
     case Type.Cat:
-      console.log('is a cat?', action.val);
-      return [state, null];
+      return handleCat(state, action);
   }
 };
 
