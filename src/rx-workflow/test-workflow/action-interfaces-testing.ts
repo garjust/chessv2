@@ -6,43 +6,24 @@ enum Type {
   Cat = 'CAT',
 }
 
-// type FooAction = {
-//   type: Type.Foo;
-//   val: number;
-// };
-
-// type BarAction = {
-//   type: Type.Bar;
-//   val: string;
-// };
-
-// type CatAction = {
-//   type: Type.Cat;
-//   val: boolean;
-// };
-
 const fooAction = (val: number) =>
   ({
     type: Type.Foo,
     val,
   }) as const;
-// type FooAction = ReturnType<typeof fooAction>;
 
 const barAction = (val: string) =>
   ({
     type: Type.Bar,
     val,
   }) as const;
-// type BarAction = ReturnType<typeof barAction>;
 
 const catAction = (val: boolean) =>
   ({
     type: Type.Cat,
     val,
   }) as const;
-// type CatAction = ReturnType<typeof catAction>;
 
-// type Action = FooAction | BarAction | CatAction;
 type Action =
   | ReturnType<typeof fooAction>
   | ReturnType<typeof barAction>
