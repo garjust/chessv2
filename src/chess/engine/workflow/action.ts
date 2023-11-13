@@ -32,9 +32,6 @@ export enum Type {
   Stop = 'STOP',
   PonderHit = 'PONDER_HIT',
   Quit = 'QUIT',
-}
-
-export enum InternalType {
   Respond = 'RESPOND',
   LoadSearchExecutor = 'LOAD_SEARCH_EXECUTOR',
   LoadSearchExecutorDone = 'LOAD_SEARCH_EXECUTOR_DONE',
@@ -44,167 +41,112 @@ export enum InternalType {
 // Initialization command. engine should expect this command after start
 // to set UCI mode. More useful when an engine program can operate in other
 // modes.
-export interface UCIAction {
-  readonly type: Type.UCI;
-}
+export const uciAction = () =>
+  ({
+    type: Type.UCI,
+  }) as const;
 
-export interface DebugAction {
-  readonly type: Type.Debug;
-  readonly value: boolean;
-}
+export const debugAction = (value: boolean) =>
+  ({
+    type: Type.Debug,
+    value,
+  }) as const;
 
 // Used to synchronize with the engine.
 // - Should always be sent after initialization before a first search
 // - Can be sent when engine is calculating (and respond immediately without
 // interupting search)
-export interface IsReadyAction {
-  readonly type: Type.IsReady;
-}
+export const isReadyAction = () =>
+  ({
+    type: Type.IsReady,
+  }) as const;
 
-// Set an option the engine supports
-export interface SetOptionAction {
-  readonly type: Type.SetOption;
-  readonly option: EngineOption;
-}
+export const setOptionAction = (option: EngineOption) =>
+  ({
+    type: Type.SetOption,
+    option,
+  }) as const;
 
-export interface RegisterAction {
-  readonly type: Type.Register;
-}
+export const registerAction = () =>
+  ({
+    type: Type.Register,
+  }) as const;
 
-// Instruct the engine the next position and search will be a new game
-export interface UCINewGameAction {
-  readonly type: Type.UCINewGame;
-}
+export const uciNewGameAction = () =>
+  ({
+    type: Type.UCINewGame,
+  }) as const;
 
-// Set the chess position.
-export interface PositionAction {
-  readonly type: Type.Position;
-  readonly fen: 'startpos' | string;
-  readonly moves: readonly Move[];
-}
+export const positionAction = (fen: string, moves: readonly Move[] = []) =>
+  ({
+    type: Type.Position,
+    fen,
+    moves,
+  }) as const;
 
-// Run a search in the current position!
-export interface GoAction {
-  readonly type: Type.Go;
-  readonly command: GoCommand;
-}
+export const goAction = (command?: GoCommand) =>
+  ({
+    type: Type.Go,
+    command: command ? command : {},
+  }) as const;
 
 // Stop caluclating as soon as possible.
-export interface StopAction {
-  readonly type: Type.Stop;
-}
+export const stopAction = () =>
+  ({
+    type: Type.Stop,
+  }) as const;
 
-//
-export interface PonderHitAction {
-  readonly type: Type.PonderHit;
-}
+export const ponderHitAction = () =>
+  ({
+    type: Type.PonderHit,
+  }) as const;
 
-// Quit the engine program.
-export interface QuitAction {
-  readonly type: Type.Quit;
-}
+export const quitAction = () =>
+  ({
+    type: Type.Quit,
+  }) as const;
 
-export interface RespondAction {
-  readonly type: InternalType.Respond;
-  readonly response: UCIResponse;
-}
+export const respondAction = (response: UCIResponse) =>
+  ({
+    type: Type.Respond,
+    response,
+  }) as const;
 
-export interface LoadSearchExecutorAction {
-  readonly type: InternalType.LoadSearchExecutor;
-  readonly version: Version;
-}
-
-export interface LoadSearchExecutorDoneAction {
-  readonly type: InternalType.LoadSearchExecutorDone;
-  readonly instance: ExecutorInstance;
-  readonly infoFromExecutor$: Observable<Info>;
-}
-
-export type Action =
-  | UCIAction
-  | DebugAction
-  | IsReadyAction
-  | SetOptionAction
-  | RegisterAction
-  | UCINewGameAction
-  | PositionAction
-  | GoAction
-  | StopAction
-  | PonderHitAction
-  | QuitAction
-  | RespondAction
-  | LoadSearchExecutorAction
-  | LoadSearchExecutorDoneAction;
-
-export const uciAction = (): UCIAction => ({
-  type: Type.UCI,
-});
-
-export const debugAction = (value: boolean): DebugAction => ({
-  type: Type.Debug,
-  value,
-});
-
-export const isReadyAction = (): IsReadyAction => ({
-  type: Type.IsReady,
-});
-
-export const setOptionAction = (option: EngineOption): SetOptionAction => ({
-  type: Type.SetOption,
-  option,
-});
-
-export const registerAction = (): RegisterAction => ({
-  type: Type.Register,
-});
-
-export const uciNewGameAction = (): UCINewGameAction => ({
-  type: Type.UCINewGame,
-});
-
-export const positionAction = (
-  fen: string,
-  moves: readonly Move[] = [],
-): PositionAction => ({
-  type: Type.Position,
-  fen,
-  moves,
-});
-
-export const goAction = (command?: GoCommand): GoAction => ({
-  type: Type.Go,
-  command: command ? command : {},
-});
-
-export const stopAction = (): StopAction => ({
-  type: Type.Stop,
-});
-
-export const ponderHitAction = (): PonderHitAction => ({
-  type: Type.PonderHit,
-});
-
-export const quitAction = (): QuitAction => ({
-  type: Type.Quit,
-});
-
-export const respondAction = (response: UCIResponse): RespondAction => ({
-  type: InternalType.Respond,
-  response,
-});
-
-export const loadSearchExecutorAction = (
-  version: Version,
-): LoadSearchExecutorAction => ({
-  type: InternalType.LoadSearchExecutor,
-  version,
-});
+export const loadSearchExecutorAction = (version: Version) =>
+  ({
+    type: Type.LoadSearchExecutor,
+    version,
+  }) as const;
 
 export const loadSearchExecutorDoneAction = (
   instance: ExecutorInstance,
   infoFromExecutor$: Observable<Info>,
-): LoadSearchExecutorDoneAction => ({
-  type: InternalType.LoadSearchExecutorDone,
-  instance,
-  infoFromExecutor$,
-});
+) =>
+  ({
+    type: Type.LoadSearchExecutorDone,
+    instance,
+    infoFromExecutor$,
+  }) as const;
+
+export type Action =
+  | ReturnType<typeof debugAction>
+  | ReturnType<typeof goAction>
+  | ReturnType<typeof isReadyAction>
+  | ReturnType<typeof loadSearchExecutorAction>
+  | ReturnType<typeof loadSearchExecutorDoneAction>
+  | ReturnType<typeof ponderHitAction>
+  | ReturnType<typeof positionAction>
+  | ReturnType<typeof quitAction>
+  | ReturnType<typeof registerAction>
+  | ReturnType<typeof respondAction>
+  | ReturnType<typeof setOptionAction>
+  | ReturnType<typeof stopAction>
+  | ReturnType<typeof uciAction>
+  | ReturnType<typeof uciNewGameAction>;
+
+export type Public = Exclude<
+  Action,
+  | (Action & { type: Type.LoadSearchExecutor })
+  | (Action & { type: Type.LoadSearchExecutorDone })
+  | (Action & { type: Type.Respond })
+>;

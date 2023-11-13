@@ -1,20 +1,21 @@
 import { Version } from './search-executor';
 import Core from '../core';
 import init, { Action, State, createState } from './workflow';
-import { InternalType, RespondAction } from './workflow/action';
+import { Public, Type } from './workflow/action';
 import { UCIResponse } from './workflow/uci-response';
 import { Workflow, updateLogger } from '../../rx-workflow';
 import { Observable, filter, map } from 'rxjs';
 
-const isRespondAction = (action: Action): action is RespondAction =>
-  action.type === InternalType.Respond;
+const isRespondAction = (
+  action: Action,
+): action is Action & { type: Type.Respond } => action.type === Type.Respond;
 
 // Class representing a chess engine which communicates via the UCI protocol.
 //
 // This class does not handle UCI messages directly, instead processing UCI
 // workflow actions.
 export class Engine {
-  workflow: Workflow<State, Action>;
+  workflow: Workflow<State, Action, Public>;
 
   constructor(version: Version, debug = false) {
     this.workflow = init(

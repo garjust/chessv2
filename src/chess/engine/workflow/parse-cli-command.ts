@@ -3,6 +3,7 @@ import { FEN_LIBRARY } from '../../lib/fen';
 import { moveFromString } from '../../move-notation';
 import {
   GoCommand,
+  Public,
   debugAction,
   goAction,
   isReadyAction,
@@ -67,7 +68,7 @@ const parseGoCommand = (parts: string[]): GoCommand => {
   return result;
 };
 
-export const parse = (commandString: string): Action => {
+export const parse = (commandString: string): Public => {
   const [command, ...args] = commandString.split(' ');
   let name, value, boolValue;
 

@@ -5,17 +5,9 @@ import { parseFEN } from '../../lib/fen';
 import {
   Type,
   Action,
-  DebugAction,
-  GoAction,
-  InternalType,
-  PositionAction,
-  RespondAction,
   respondAction,
-  LoadSearchExecutorAction,
-  LoadSearchExecutorDoneAction,
   loadSearchExecutorDoneAction,
   loadSearchExecutorAction,
-  SetOptionAction,
 } from './action';
 import { State } from './index';
 import { Info, UCIResponse, UCIResponseType } from './uci-response';
@@ -47,7 +39,10 @@ function handleUCI(state: State): Update<State, Action> {
   return [state, () => respondWith(...responses)];
 }
 
-function handleDebug(state: State, action: DebugAction): Update<State, Action> {
+function handleDebug(
+  state: State,
+  action: Action & { type: Type.Debug },
+): Update<State, Action> {
   return [{ ...state, debug: action.value }, null];
 }
 
@@ -61,7 +56,7 @@ function handleIsReady(state: State): Update<State, Action> {
 
 function handleSetOption(
   state: State,
-  action: SetOptionAction,
+  action: Action & { type: Type.SetOption },
 ): Update<State, Action> {
   switch (action.option.name) {
     case 'Hash':
@@ -93,7 +88,7 @@ function handleUCINewGame(state: State): Update<State, Action> {
 
 function handlePosition(
   state: State,
-  action: PositionAction,
+  action: Action & { type: Type.Position },
   context: Context,
 ): Update<State, Action> {
   const { fen, moves } = action;
@@ -109,7 +104,7 @@ function handlePosition(
 
 function handleGo(
   state: State,
-  action: GoAction,
+  action: Action & { type: Type.Go },
   context: Context,
 ): Update<State, Action> {
   const { executorInstance } = state;
@@ -153,14 +148,17 @@ function handleQuit(state: State): Update<State, Action> {
   return [state, () => Command.Done];
 }
 
-function handleRespond(state: State, _: RespondAction): Update<State, Action> {
+function handleRespond(
+  state: State,
+  _: Action & { type: Type.Respond },
+): Update<State, Action> {
   // No-op action used for communicating externally.
   return [state, null];
 }
 
 function handleLoadSearchExecutor(
   state: State,
-  action: LoadSearchExecutorAction,
+  action: Action & { type: Type.LoadSearchExecutor },
 ): Update<State, Action> {
   const infoFromExecutor$ = new Subject<Info>();
 
@@ -186,7 +184,7 @@ function handleLoadSearchExecutor(
 
 function handleLoadSearchExecutorDone(
   state: State,
-  action: LoadSearchExecutorDoneAction,
+  action: Action & { type: Type.LoadSearchExecutorDone },
 ): Update<State, Action> {
   return [
     { ...state, executorInstance: action.instance },
@@ -233,11 +231,11 @@ export const update =
         return handlePonderHit(state);
       case Type.Quit:
         return handleQuit(state);
-      case InternalType.Respond:
+      case Type.Respond:
         return handleRespond(state, action);
-      case InternalType.LoadSearchExecutor:
+      case Type.LoadSearchExecutor:
         return handleLoadSearchExecutor(state, action);
-      case InternalType.LoadSearchExecutorDone:
+      case Type.LoadSearchExecutorDone:
         return handleLoadSearchExecutorDone(state, action);
     }
   };

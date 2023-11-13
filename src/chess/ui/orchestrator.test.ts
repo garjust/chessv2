@@ -3,7 +3,7 @@ import { Orchestrator } from './orchestrator';
 import { Action, setPositionFromFENAction } from './workflow';
 import { Type, clickSquareAction, loadEngineAction } from './workflow/action';
 import { Action as EngineAction } from '../engine/workflow';
-import { Type as EngineType, InternalType } from '../engine/workflow/action';
+import { Type as EngineType } from '../engine/workflow/action';
 import { FEN_LIBRARY } from '../lib/fen';
 import { Command } from '../../rx-workflow/commands';
 import { lastValueFrom } from 'rxjs';
@@ -56,19 +56,19 @@ test('example interaction with ui workflow', async () => {
     Type.LoadEngine, // click "Load white engine"
     Type.LoadEngineDone,
     EngineType.UCI,
-    InternalType.Respond,
+    EngineType.Respond,
     Type.EngineResponse,
-    InternalType.Respond,
+    EngineType.Respond,
     Type.EngineResponse,
-    InternalType.Respond,
+    EngineType.Respond,
     Type.EngineResponse,
-    InternalType.Respond,
+    EngineType.Respond,
     Type.EngineResponse,
     EngineType.Debug,
     EngineType.IsReady,
-    InternalType.LoadSearchExecutor,
-    InternalType.LoadSearchExecutorDone,
-    InternalType.Respond,
+    EngineType.LoadSearchExecutor,
+    EngineType.LoadSearchExecutorDone,
+    EngineType.Respond,
     Type.EngineResponse,
   ]);
 });
