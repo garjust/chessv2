@@ -1,7 +1,7 @@
 # chess engine
 
 - `chess/` The chess game
-  - `core/` The core chess logic. Supports functionality needed for humans to play a game of chess (move validation, move execution, board state)
+  - `core/` The core chess logic. Supports functionality needed for humans to play a game of chess (move generation, move execution, board state)
   - `engine/` Search engine implementation
     - `algorithms/` Each individual algorithm and configuration
     - `lib/` Supporting code for the search engine
@@ -10,9 +10,9 @@
   - `ui/` React UI for the chess game
     - `workflow/` The workflow which controls the game ui
   - `workers/` Scripts and loading logic for concurrency
-- `lib/`
-  - `workflow/` Workflow core library
-  - `workflow-react/` Integration of the core workflow library with react
+- `lib/` Generic library code
+- `rx-workflow/` Workflow core library
+  - `react/` Integration of the core workflow library with react
 
 ## App control
 
