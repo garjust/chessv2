@@ -44,7 +44,13 @@ const DisplayClock = ({ style }: { style?: React.CSSProperties }) => {
         justifyContent: 'center',
       }}
     >
-      <span style={{ ...CLOCK_STYLING, borderBottom: '1px solid black' }}>
+      <span
+        style={{
+          ...CLOCK_STYLING,
+          borderBottom: '1px solid',
+          borderBottomColor: '--var(color-white)',
+        }}
+      >
         {boardOrientation === Color.White ? format(blackMs) : format(whiteMs)}
       </span>
       <span style={{ ...CLOCK_STYLING }}>

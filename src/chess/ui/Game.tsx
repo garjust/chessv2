@@ -61,7 +61,7 @@ const Game = () => {
         <WorkflowContext.Provider value={orchestrator.workflow}>
           <Board squareSize={64} style={{ gridArea: 'board' }} />
 
-          <GameControlPanel />
+          <GameControlPanel style={{ gridArea: 'buttons' }} />
 
           <DisplayClock style={{ gridArea: 'clock' }} />
 

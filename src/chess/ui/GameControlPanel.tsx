@@ -17,7 +17,7 @@ const render = (state: State) => ({
   state,
 });
 
-const GameControlPanel = () => {
+const GameControlPanel = ({ style }: { style?: React.CSSProperties }) => {
   const { emit } = useWorkflow(render);
 
   function emitExampleGame(): void {
@@ -28,7 +28,7 @@ const GameControlPanel = () => {
   }
 
   return (
-    <div className="game-control-panel">
+    <div className="game-control-panel" style={style}>
       <button onClick={() => emit(flipBoardAction())}>Flip the board</button>
       <button onClick={() => emit(toggleSquareLabelsAction())}>
         Toggle square labels

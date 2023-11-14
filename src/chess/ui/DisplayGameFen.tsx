@@ -13,11 +13,11 @@ const DisplayGameFEN = ({ style }: { style?: React.CSSProperties }) => {
   const { position } = rendering;
 
   return (
-    <pre style={{ ...style, margin: 0, fontSize: 12 }}>
+    <pre style={{ ...style, margin: 0, fontSize: 12, justifySelf: 'center' }}>
       <code
         style={{
-          backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-black)',
+          // backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-white)',
           padding: 4,
         }}
       >

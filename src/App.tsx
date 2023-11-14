@@ -22,7 +22,7 @@ const App = () => {
         onClick={() => {
           setScreen(screen === Screen.Game ? Screen.Debug : Screen.Game);
         }}
-        style={{ marginBottom: 16, padding: 4 }}
+        style={{ marginBottom: 16 }}
       >
         Switch Screen
       </button>
