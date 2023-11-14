@@ -48,7 +48,11 @@ const Piece = ({
     marginBottom: -3,
   };
 
-  return <Svg width={size} height={size} style={css} />;
+  return (
+    <div>
+      <Svg width={size} height={size} style={css} />
+    </div>
+  );
 };
 
 export default Piece;
