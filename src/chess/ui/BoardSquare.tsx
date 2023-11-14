@@ -1,4 +1,4 @@
-import React, { DragEvent, useEffect, useState } from 'react';
+import React, { DragEvent } from 'react';
 import './BoardSquare.css';
 import { Color, PieceType, Square } from '../types';
 import { squareLabel } from '../utils';
@@ -24,7 +24,6 @@ import { useWorkflow } from './workflow-context';
 import { clickSquareAction } from './workflow/action';
 import Piece from './Piece';
 import { HEATMAPS, HEATMAP_MULTIPLIER } from '../lib/heatmaps';
-import { Subject } from 'rxjs';
 
 const DEFAULT_HEATMAP = HEATMAPS[PieceType.Rook][Color.White];
 
@@ -36,7 +35,19 @@ const render = (square: Square) => (state: State) => ({
   showHeatmap: showHeatmap(state),
 });
 
-const BoardSquare = ({ color, square }: { color: Color; square: Square }) => {
+const BoardSquare = ({
+  color,
+  square,
+  onDragStart,
+  onDragOver,
+  onDrop,
+}: {
+  color: Color;
+  square: Square;
+  onDragStart: (val: [Square, DragEvent]) => void;
+  onDragOver: (val: DragEvent) => void;
+  onDrop: (val: [Square, DragEvent]) => void;
+}) => {
   const { rendering, emit } = useWorkflow(render(square));
   const { piece, overlay, isClickable, squareLabels, showHeatmap } = rendering;
 
@@ -86,27 +97,6 @@ const BoardSquare = ({ color, square }: { color: Color; square: Square }) => {
     label = squareLabel(square);
   }
 
-  const pieceElement = piece ? (
-    <Piece type={piece.type} color={piece.color} />
-  ) : null;
-
-  const [obs] = useState(new Subject<DragEvent>());
-
-  useEffect(() => {
-    obs.subscribe((event) => {
-      switch (event.type) {
-        case 'dragStart':
-          break;
-        case 'dragOver':
-          break;
-        case 'drop':
-          break;
-      }
-    });
-
-    return () => obs.complete();
-  }, [obs]);
-
   return (
     <div
       draggable={piece !== undefined}
@@ -114,31 +104,10 @@ const BoardSquare = ({ color, square }: { color: Color; square: Square }) => {
       style={css}
       onClick={isClickable ? () => emit(clickSquareAction(square)) : undefined}
       onDragStart={
-        isClickable && pieceElement !== null
-          ? (event: DragEvent) => {
-              const svg = event.currentTarget.getElementsByTagName('svg')[0];
-              console.log(svg);
-              event.dataTransfer.setData('test/plain', `${square}`);
-              event.dataTransfer.dropEffect = 'move';
-              event.dataTransfer.setDragImage(
-                svg,
-                svg.width.baseVal.value / 2,
-                svg.height.baseVal.value / 2,
-              );
-              emit(clickSquareAction(square));
-            }
-          : undefined
+        isClickable ? (event) => onDragStart([square, event]) : undefined
       }
-      onDragOver={(event: DragEvent) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-        console.log('over');
-      }}
-      onDrop={(event: DragEvent) => {
-        event.preventDefault();
-        console.log('drop');
-        emit(clickSquareAction(square));
-      }}
+      onDragOver={onDragOver}
+      onDrop={(event) => onDrop([square, event])}
       tabIndex={0}
     >
       {piece ? <Piece type={piece.type} color={piece.color} /> : null}
