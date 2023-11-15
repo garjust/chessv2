@@ -166,27 +166,10 @@ export const squareIsSelected = (state: State, square: Square) =>
 export const squareOverlay = (state: State, square: Square) =>
   state.squareOverlay[square];
 
-export const isSquareClickable = (state: State, square: Square): boolean => {
-  if (
-    (state.game.position.turn === Color.White &&
-      state.game.players[Color.White] !== HumanPlayer) ||
-    (state.game.position.turn === Color.Black &&
-      state.game.players[Color.Black] !== HumanPlayer)
-  ) {
-    return false;
-  }
-
-  if (state.selectedSquare !== undefined) {
-    return true;
-  }
-
-  const piece = pieceInSquare(state, square);
-  if (piece && piece.color === state.game.position.turn) {
-    return true;
-  }
-
-  return false;
-};
+export const squareContainsMovablePiece = (
+  state: State,
+  square: Square,
+): boolean => pieceInSquare(state, square)?.color === state.game.position.turn;
 
 export const checkedSquare = (state: State): Square | undefined =>
   state.game.checks.length > 0 ? state.game.checks[0].square : undefined;

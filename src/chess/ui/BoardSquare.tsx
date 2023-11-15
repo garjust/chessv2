@@ -4,7 +4,7 @@ import { Color, PieceType, Square } from '../types';
 import { squareLabel } from '../utils';
 import {
   State,
-  isSquareClickable,
+  squareContainsMovablePiece,
   pieceInSquare,
   SquareLabel,
   SquareOverlayType,
@@ -26,11 +26,12 @@ import Piece from './Piece';
 import { HEATMAPS, HEATMAP_MULTIPLIER } from '../lib/heatmaps';
 
 const DEFAULT_HEATMAP = HEATMAPS[PieceType.Rook][Color.White];
+const RIGHT_MOUSE_BUTTON = 2;
 
 const render = (square: Square) => (state: State) => ({
   piece: pieceInSquare(state, square),
   overlay: state.squareOverlay[square],
-  isClickable: isSquareClickable(state, square),
+  hasMoveablePiece: squareContainsMovablePiece(state, square),
   squareLabels: state.squareLabels,
   showHeatmap: showHeatmap(state),
 });
@@ -51,13 +52,14 @@ const BoardSquare = ({
   onDrop: (val: [Square, DragEvent]) => void;
 }) => {
   const { rendering, emit } = useWorkflow(render(square));
-  const { piece, overlay, isClickable, squareLabels, showHeatmap } = rendering;
+  const { piece, overlay, hasMoveablePiece, squareLabels, showHeatmap } =
+    rendering;
 
   const [svgImage, setSVGImage] = useState<HTMLImageElement>();
 
   let css: React.CSSProperties = {
     position: 'relative',
-    cursor: isClickable ? 'pointer' : 'inherit',
+    cursor: 'pointer',
     gridArea: squareLabel(square),
     backgroundColor:
       color === Color.White ? BOARD_SQUARE_WHITE : BOARD_SQUARE_BLACK,
@@ -121,11 +123,17 @@ const BoardSquare = ({
       draggable={piece !== undefined}
       className="square"
       style={css}
-      onClick={isClickable ? () => emit(clickSquareAction(square)) : undefined}
-      onDragStart={
-        isClickable
-          ? (event) => onDragStart([square, event, svgImage])
+      onContextMenu={(event) => event.preventDefault()}
+      onMouseDown={(event) =>
+        event.button === RIGHT_MOUSE_BUTTON
+          ? emit(clickSquareAction(square, true))
           : undefined
+      }
+      onClick={() =>
+        hasMoveablePiece ? emit(clickSquareAction(square)) : undefined
+      }
+      onDragStart={(event) =>
+        hasMoveablePiece ? onDragStart([square, event, svgImage]) : undefined
       }
       onDragOver={onDragOver}
       onDrop={(event) => onDrop([square, event])}

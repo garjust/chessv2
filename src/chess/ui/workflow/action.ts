@@ -38,10 +38,11 @@ export const changeOverlayAction = () =>
     type: Type.ChangeOverlay,
   }) as const;
 
-export const clickSquareAction = (square: Square) =>
+export const clickSquareAction = (square: Square, alternate = false) =>
   ({
     type: Type.ClickSquare,
     square,
+    alternate,
   }) as const;
 
 export const engineResponseAction = (engineId: string, response: UCIResponse) =>
