@@ -44,12 +44,14 @@ function replacer(key: string, value: unknown) {
   return value;
 }
 
+const render = (state: State) => JSON.stringify(state, replacer, 2);
+
 const DisplayGameState = ({ style }: { style?: React.CSSProperties }) => {
-  const { rendering } = useWorkflow((state: State) => state);
+  const { rendering } = useWorkflow(render);
 
   return (
     <pre style={{ ...style, fontSize: 14, margin: 0 }}>
-      <code>{JSON.stringify(rendering, replacer, 2)}</code>
+      <code>{rendering}</code>
     </pre>
   );
 };

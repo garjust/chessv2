@@ -1,4 +1,4 @@
-import React, { DragEvent } from 'react';
+import React, { DragEvent, Ref, useCallback, useState } from 'react';
 import './BoardSquare.css';
 import { Color, PieceType, Square } from '../types';
 import { squareLabel } from '../utils';
@@ -38,18 +38,22 @@ const render = (square: Square) => (state: State) => ({
 const BoardSquare = ({
   color,
   square,
+  size,
   onDragStart,
   onDragOver,
   onDrop,
 }: {
   color: Color;
   square: Square;
-  onDragStart: (val: [Square, DragEvent]) => void;
+  size: number;
+  onDragStart: (val: [Square, DragEvent, HTMLImageElement?]) => void;
   onDragOver: (val: DragEvent) => void;
   onDrop: (val: [Square, DragEvent]) => void;
 }) => {
   const { rendering, emit } = useWorkflow(render(square));
   const { piece, overlay, isClickable, squareLabels, showHeatmap } = rendering;
+
+  const [svgImage, setSVGImage] = useState<HTMLImageElement>();
 
   let css: React.CSSProperties = {
     position: 'relative',
@@ -97,6 +101,21 @@ const BoardSquare = ({
     label = squareLabel(square);
   }
 
+  // Store an HTMLImageElement representing the piece in this square for use
+  // during drag+drop interaction. This is done to be able to render the image
+  // of the piece without any background.
+  const storeImage = useCallback(async (svg: SVGSVGElement) => {
+    if (svg !== null) {
+      const img = await new Promise<HTMLImageElement>((resolve) => {
+        const xml = new XMLSerializer().serializeToString(svg);
+        const img = new Image();
+        img.addEventListener('load', () => resolve(img));
+        img.src = 'data:image/svg+xml;base64,' + btoa(xml);
+      });
+      setSVGImage(img);
+    }
+  }, []);
+
   return (
     <div
       draggable={piece !== undefined}
@@ -104,13 +123,22 @@ const BoardSquare = ({
       style={css}
       onClick={isClickable ? () => emit(clickSquareAction(square)) : undefined}
       onDragStart={
-        isClickable ? (event) => onDragStart([square, event]) : undefined
+        isClickable
+          ? (event) => onDragStart([square, event, svgImage])
+          : undefined
       }
       onDragOver={onDragOver}
       onDrop={(event) => onDrop([square, event])}
       tabIndex={0}
     >
-      {piece ? <Piece type={piece.type} color={piece.color} /> : null}
+      {piece ? (
+        <Piece
+          ref={storeImage}
+          size={size}
+          type={piece.type}
+          color={piece.color}
+        />
+      ) : null}
       {label ? (
         <span
           style={{

@@ -22,22 +22,16 @@ const Board = ({
   squareSize: number;
   style?: React.CSSProperties;
 }) => {
-  const { rendering, emit } = useWorkflow(
-    render,
-    (a, b) => a.boardOrientation === b.boardOrientation,
-  );
+  const { rendering, emit } = useWorkflow(render);
   const { boardOrientation } = rendering;
 
-  const onDragStart = useObservable<[Square, DragEvent]>();
-  useSubscription(onDragStart.obs$, ([square, event]) => {
-    const svg = event.currentTarget.getElementsByTagName('svg')[0];
+  const onDragStart = useObservable<[Square, DragEvent, HTMLImageElement?]>();
+  useSubscription(onDragStart.obs$, async ([square, event, img]) => {
     event.dataTransfer.setData('test/plain', `${square}`);
     event.dataTransfer.dropEffect = 'move';
-    event.dataTransfer.setDragImage(
-      svg,
-      svg.width.baseVal.value / 2,
-      svg.height.baseVal.value / 2,
-    );
+    if (img !== undefined) {
+      event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
+    }
     emit(clickSquareAction(square));
   });
 
@@ -60,6 +54,7 @@ const Board = ({
         key={rankFileToSquare(square)}
         square={rankFileToSquare(square)}
         color={(square.rank + square.file) % 2 == 0 ? Color.Black : Color.White}
+        size={squareSize}
         onDragStart={onDragStart.next}
         onDragOver={onDragOver.next}
         onDrop={onDrop.next}

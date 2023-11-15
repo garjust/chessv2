@@ -13,9 +13,7 @@ import {
 import { moveActions } from './workflow/moves-to-actions';
 import { useWorkflow } from './workflow-context';
 
-const render = (state: State) => ({
-  state,
-});
+const render = () => null;
 
 const GameControlPanel = ({ style }: { style?: React.CSSProperties }) => {
   const { emit } = useWorkflow(render);

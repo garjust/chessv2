@@ -1614,6 +1614,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash.isequal@npm:^4.5.8":
+  version: 4.5.8
+  resolution: "@types/lodash.isequal@npm:4.5.8"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: f3180c2d2925514fff1908a1303c11468c9f39b47fd7b053416aad3f1447f8e4a9894dd0460187ac9ac19387e25aec8dd8214d13a50a0967e0dc9cca8e4c5353
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.14.201
+  resolution: "@types/lodash@npm:4.14.201"
+  checksum: 484be655298e9b2dc2d218ea934071b2ea31e4a531c561dd220dbda65237e8d08c20dc2d457ac24f29be7fe167415bf7bb9360ea0d80bdb8b0f0ec8d8db92fae
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^20.8.7":
   version: 20.9.0
   resolution: "@types/node@npm:20.9.0"
@@ -2508,6 +2524,7 @@ __metadata:
   dependencies:
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.5.1
+    "@types/lodash.isequal": ^4.5.8
     "@types/node": ^20.8.7
     "@types/react": ^18.2.31
     "@types/react-dom": ^18.2.14
@@ -2522,6 +2539,7 @@ __metadata:
     eslint-plugin-react: ^7.33.2
     fast-sort: ^3.4.0
     jest: ^29.7.0
+    lodash.isequal: ^4.5.0
     prettier: ^3.0.3
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -5217,6 +5235,13 @@ __metadata:
   dependencies:
     p-locate: ^5.0.0
   checksum: 72eb661788a0368c099a184c59d2fee760b3831c9c1c33955e8a19ae4a21b4116e53fa736dc086cdeb9fce9f7cc508f2f92d2d3aae516f133e16a2bb59a39f5a
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: da27515dc5230eb1140ba65ff8de3613649620e8656b19a6270afe4866b7bd461d9ba2ac8a48dcc57f7adac4ee80e1de9f965d89d4d81a0ad52bb3eec2609644
   languageName: node
   linkType: hard
 

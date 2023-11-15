@@ -5,7 +5,15 @@ import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
-  plugins: [base(), svgr(), react()],
+  plugins: [
+    base(),
+    svgr({
+      svgrOptions: {
+        ref: true,
+      },
+    }),
+    react(),
+  ],
   // Not sure if this is working
   test: {
     setupFiles: ['@vitest/web-worker', 'src/test/audio'],
