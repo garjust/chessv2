@@ -13,6 +13,7 @@ import {
 
 const render = (state: State) => ({
   boardOrientation: state.boardOrientation,
+  selectedSquare: state.selectedSquare,
 });
 
 const Board = ({
@@ -23,7 +24,7 @@ const Board = ({
   style?: React.CSSProperties;
 }) => {
   const { rendering, emit } = useWorkflow(render);
-  const { boardOrientation } = rendering;
+  const { boardOrientation, selectedSquare } = rendering;
 
   const onDragStart = useObservable<[Square, DragEvent, HTMLImageElement?]>();
   useSubscription(onDragStart.obs$, async ([square, event, img]) => {
@@ -32,7 +33,12 @@ const Board = ({
     if (img !== undefined) {
       event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
     }
-    emit(clickSquareAction(square));
+
+    // If the square is already selected, don't fire a click event. This way
+    // we can just "swap" into drag mode with the same piece.
+    if (selectedSquare !== square) {
+      emit(clickSquareAction(square));
+    }
   });
 
   const onDragOver = useObservable<DragEvent>();
