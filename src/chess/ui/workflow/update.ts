@@ -114,34 +114,38 @@ function handleClickSquare(
   state: State,
   action: Action & { type: Type.ClickSquare },
 ): Update<State, Action> {
-  if (state.selectedSquare !== null) {
-    const selectedSquare = state.selectedSquare;
-
-    if (selectedSquare === action.square) {
-      return [{ ...state, selectedSquare: null }, overlaySquaresAction];
-    }
-
-    return [
-      { ...state, selectedSquare: null },
-      () =>
-        movePieceAction({
-          from: selectedSquare,
-          to: action.square,
-        }),
-    ];
+  if (action.alternate) {
+    return [{ ...state, selectedSquare: null }, overlaySquaresAction];
   } else {
-    // Nothing is already selected so attempt to "select" the square.
-    if (
-      pieceInSquare(state, action.square)?.color === state.game.position.turn
-    ) {
+    if (state.selectedSquare !== null) {
+      const selectedSquare = state.selectedSquare;
+
+      if (selectedSquare === action.square) {
+        return [{ ...state, selectedSquare: null }, overlaySquaresAction];
+      }
+
       return [
-        { ...state, selectedSquare: action.square },
-        overlaySquaresAction,
+        { ...state, selectedSquare: null },
+        () =>
+          movePieceAction({
+            from: selectedSquare,
+            to: action.square,
+          }),
       ];
+    } else {
+      // Nothing is already selected so attempt to "select" the square.
+      if (
+        pieceInSquare(state, action.square)?.color === state.game.position.turn
+      ) {
+        return [
+          { ...state, selectedSquare: action.square },
+          overlaySquaresAction,
+        ];
+      } else {
+        return [state, null];
+      }
     }
   }
-
-  return [state, overlaySquaresAction];
 }
 
 function handleEngineResponse(
