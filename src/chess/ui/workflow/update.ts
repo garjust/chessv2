@@ -115,7 +115,14 @@ function handleClickSquare(
   action: Action & { type: Type.ClickSquare },
 ): Update<State, Action> {
   if (action.alternate) {
-    return [{ ...state, selectedSquare: null }, overlaySquaresAction];
+    let squareOverlay = state.squareOverlay;
+    if (state.selectedSquare !== null) {
+      squareOverlay = {};
+    }
+
+    squareOverlay[action.square] = SquareOverlayType.Attacked;
+
+    return [{ ...state, selectedSquare: null, squareOverlay }, null];
   } else {
     if (state.selectedSquare !== null) {
       const selectedSquare = state.selectedSquare;
@@ -142,7 +149,7 @@ function handleClickSquare(
           overlaySquaresAction,
         ];
       } else {
-        return [state, null];
+        return [state, overlaySquaresAction];
       }
     }
   }

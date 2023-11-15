@@ -129,9 +129,7 @@ const BoardSquare = ({
           ? emit(clickSquareAction(square, true))
           : undefined
       }
-      onClick={() =>
-        hasMoveablePiece ? emit(clickSquareAction(square)) : undefined
-      }
+      onClick={() => emit(clickSquareAction(square))}
       onDragStart={(event) =>
         hasMoveablePiece ? onDragStart([square, event, svgImage]) : undefined
       }
