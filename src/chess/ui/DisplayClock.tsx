@@ -3,36 +3,41 @@ import { Color } from '../types';
 import { State } from './workflow';
 import { useWorkflow } from './workflow-context';
 
+const SCRAMBLE_CUTOFF_MS = 10000;
+
+// Round the clock numbers if they are larger than the scarmble cutoff since
+// the precision would not be rendered.
 const render = (state: State) => ({
-  whiteMs: state.game.clocks.WHITE,
-  blackMs: state.game.clocks.BLACK,
+  whiteSeconds:
+    state.game.clocks.WHITE >= SCRAMBLE_CUTOFF_MS
+      ? Math.round(state.game.clocks.WHITE / 1000)
+      : state.game.clocks.WHITE / 1000,
+  blackSeconds:
+    state.game.clocks.BLACK >= SCRAMBLE_CUTOFF_MS
+      ? Math.round(state.game.clocks.BLACK / 1000)
+      : state.game.clocks.BLACK / 1000,
   boardOrientation: state.boardOrientation,
 });
 
-const format = (ms: number): string => {
-  const seconds = ms / 1000;
-  const remainder = Math.round(seconds % 60);
-  let remainderString: string;
-  if (remainder === 0) {
-    remainderString = '00';
-  } else if (remainder <= 9) {
-    remainderString = `0${remainder}`;
+const format = (seconds: number): string => {
+  const remainder = seconds % 60;
+  if (seconds >= SCRAMBLE_CUTOFF_MS / 1000) {
+    return `${Math.floor(seconds / 60).toFixed(0)}:${remainder
+      .toFixed(0)
+      .padStart(2, '0')}`;
   } else {
-    remainderString = remainder.toString();
+    return `${remainder.toFixed(1).padStart(4, '0')}`;
   }
-
-  return `${Math.floor(seconds / 60).toFixed(0)}:${remainderString}`;
 };
 
 const CLOCK_STYLING: React.CSSProperties = {
-  padding: 32,
+  padding: 24,
   fontSize: 32,
 };
 
 const DisplayClock = ({ style }: { style?: React.CSSProperties }) => {
   const { rendering } = useWorkflow(render);
-
-  const { whiteMs, blackMs, boardOrientation } = rendering;
+  const { whiteSeconds, blackSeconds, boardOrientation } = rendering;
 
   return (
     <div
@@ -40,8 +45,8 @@ const DisplayClock = ({ style }: { style?: React.CSSProperties }) => {
         ...style,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'start',
         justifyContent: 'center',
+        width: 120,
       }}
     >
       <span
@@ -51,10 +56,14 @@ const DisplayClock = ({ style }: { style?: React.CSSProperties }) => {
           borderBottomColor: '--var(color-white)',
         }}
       >
-        {boardOrientation === Color.White ? format(blackMs) : format(whiteMs)}
+        {boardOrientation === Color.White
+          ? format(blackSeconds)
+          : format(whiteSeconds)}
       </span>
       <span style={{ ...CLOCK_STYLING }}>
-        {boardOrientation === Color.White ? format(whiteMs) : format(blackMs)}
+        {boardOrientation === Color.White
+          ? format(whiteSeconds)
+          : format(blackSeconds)}
       </span>
     </div>
   );
