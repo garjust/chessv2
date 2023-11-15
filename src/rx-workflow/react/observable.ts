@@ -19,7 +19,6 @@ export const useSubscription = <T>(
   subscriber: Subscriber<T> | ((value: T) => void),
 ) => {
   useEffect(() => {
-    console.debug('subscribe...');
     const sub = obs$.subscribe(subscriber);
     return () => sub.unsubscribe();
   }, [obs$, subscriber]);

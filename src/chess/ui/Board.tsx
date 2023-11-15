@@ -22,7 +22,10 @@ const Board = ({
   squareSize: number;
   style?: React.CSSProperties;
 }) => {
-  const { rendering, emit } = useWorkflow(render);
+  const { rendering, emit } = useWorkflow(
+    render,
+    (a, b) => a.boardOrientation === b.boardOrientation,
+  );
   const { boardOrientation } = rendering;
 
   const onDragStart = useObservable<[Square, DragEvent]>();

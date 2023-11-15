@@ -7,7 +7,10 @@ export const contextFactory = <S, A>(
   initialState: S,
 ): {
   WorkflowContext: React.Context<Workflow<S, A>>;
-  useWorkflow: <R>(render: (state: S) => R) => {
+  useWorkflow: <R>(
+    render: (state: S) => R,
+    distinct?: (previous: R, next: R) => boolean,
+  ) => {
     rendering: R;
     emit: (action: A) => void;
   };
@@ -22,13 +25,16 @@ export const contextFactory = <S, A>(
 
   return {
     WorkflowContext: reactContext,
-    useWorkflow: <R>(render: (state: S) => R) => {
+    useWorkflow: <R>(
+      render: (state: S) => R,
+      distinct: (previous: R, next: R) => boolean = () => false,
+    ) => {
       const [rendering, setRendering] = useState<R>(render(initialState));
       const { states$: states, emit } = useContext(reactContext);
 
       useEffect(() => {
         const subscription = states
-          .pipe(map(render), distinctUntilChanged())
+          .pipe(map(render), distinctUntilChanged(distinct))
           .subscribe(setRendering);
         return function cleanup() {
           subscription.unsubscribe();

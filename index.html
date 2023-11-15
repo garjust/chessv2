@@ -29,6 +29,15 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!--
+      This needs to be defined for some node modules to function in browser.
+      - Should vite handle this?
+    -->
+    <script>
+      if (global === undefined) {
+        var global = window;
+      }
+    </script>
     <script type="module" src="/src/index.tsx"></script>
     <!--
       This HTML file is a template.
