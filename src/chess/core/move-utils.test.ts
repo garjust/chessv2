@@ -3,7 +3,29 @@ import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControlObject } from '../types';
 import { labelToSquare } from '../utils';
 import { RAY_BY_DIRECTION } from './move-lookup';
-import { rayControlScanner, squareControlXraysMove } from './move-utils';
+import {
+  down,
+  downLeft,
+  downRight,
+  left,
+  rayControlScanner,
+  right,
+  squareControlXraysMove,
+  up,
+  upLeft,
+  upRight,
+} from './move-utils';
+
+test('movement functions', () => {
+  expect(up(4)).toEqual(12);
+  expect(down(11)).toEqual(3);
+  expect(left(20)).toEqual(19);
+  expect(right(20)).toEqual(21);
+  expect(upLeft(36)).toEqual(43);
+  expect(upRight(36)).toEqual(45);
+  expect(downLeft(36)).toEqual(27);
+  expect(downRight(36)).toEqual(29);
+});
 
 test('squareControlXraysMove', () => {
   let squareControl: SquareControlObject = {

@@ -2,9 +2,9 @@ import { Color, Piece, Position, Square, SquareLabel } from '../types';
 import {
   squareLabel,
   labelToSquare,
-  rankFileToSquare,
   PIECE_TYPE_TO_FEN_PIECE,
   FEN_PIECE_TO_PIECE_TYPE,
+  squareGenerator,
 } from '../utils';
 
 // Basic positions
@@ -79,8 +79,8 @@ const fenPieceToColor = (pieceCharacter: string): Color =>
 const pieceMapFromFenPieces = (fenPieces: string): Map<Square, Piece> => {
   const pieces = new Map<Square, Piece>();
 
-  let rank = 7;
-  let file = 0;
+  // Start in the top left of the board from white's perspective
+  let square = 56;
 
   for (const char of fenPieces) {
     switch (char) {
@@ -93,12 +93,11 @@ const pieceMapFromFenPieces = (fenPieces: string): Map<Square, Piece> => {
       case '7':
       case '8':
         // Advance the file.
-        file += Number(char);
+        square += Number(char);
         break;
       case '/':
         // Advance the rank.
-        rank -= 1;
-        file = 0;
+        square -= 16;
         break;
       case 'b':
       case 'B':
@@ -112,12 +111,12 @@ const pieceMapFromFenPieces = (fenPieces: string): Map<Square, Piece> => {
       case 'Q':
       case 'r':
       case 'R':
-        pieces.set(rankFileToSquare({ rank, file }), {
+        pieces.set(square, {
           color: fenPieceToColor(char),
           type: FEN_PIECE_TO_PIECE_TYPE[char],
         });
         // Advance the file after placing a piece.
-        file += 1;
+        square += 1;
     }
   }
 
@@ -129,28 +128,34 @@ const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
 
   let emptyCounter;
 
-  for (let rank = 7; rank >= 0; rank--) {
-    let rankString = '';
-    emptyCounter = 0;
-    for (let file = 0; file < 8; file++) {
-      const piece = pieces.get(rankFileToSquare({ rank, file }));
-      if (piece) {
-        if (emptyCounter > 0) {
-          rankString += String(emptyCounter);
-        }
-        rankString += pieceToFenPiece(piece);
-        emptyCounter = 0;
-      } else {
-        emptyCounter++;
+  emptyCounter = 0;
+  let rankString = '';
+  for (const square of squareGenerator()) {
+    if (square % 8 === 0) {
+      emptyCounter = 0;
+      rankString = '';
+    }
+
+    const piece = pieces.get(square);
+    if (piece) {
+      if (emptyCounter > 0) {
+        rankString += String(emptyCounter);
       }
+      rankString += pieceToFenPiece(piece);
+      emptyCounter = 0;
+    } else {
+      emptyCounter++;
     }
-    if (emptyCounter > 0) {
-      rankString += String(emptyCounter);
+
+    if (square % 8 === 7) {
+      if (emptyCounter > 0) {
+        rankString += String(emptyCounter);
+      }
+      sections.push(rankString);
     }
-    sections.push(rankString);
   }
 
-  return sections.join('/');
+  return sections.reverse().join('/');
 };
 
 export const parseFEN = (fenString: 'startpos' | string): Position => {

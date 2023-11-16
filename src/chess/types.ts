@@ -1,18 +1,17 @@
 export enum Color {
-  White = 'WHITE',
-  Black = 'BLACK',
+  White = 1,
+  Black = 2,
 }
 
 export enum PieceType {
-  Bishop = 'BISHOP',
-  King = 'KING',
-  Knight = 'KNIGHT',
-  Pawn = 'PAWN',
-  Queen = 'QUEEN',
-  Rook = 'ROOK',
+  Pawn = 1,
+  Knight = 2,
+  Bishop = 3,
+  Rook = 4,
+  Queen = 5,
+  King = 6,
 }
 
-// export type Piece = bigint;
 export type Piece = {
   type: PieceType;
   color: Color;
@@ -24,11 +23,6 @@ export type SlidingPiece =
   | { color: Color; type: PieceType.Queen };
 
 export type Square = number;
-
-export type RankFile = {
-  rank: number;
-  file: number;
-};
 
 export enum DirectionUnit {
   Up = 8,

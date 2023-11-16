@@ -1,90 +1,76 @@
-import { fromSquares } from '../lib/bitboard';
-import { DirectionUnit, PieceType, RankFile, Square } from '../types';
-import { rankFileToSquare, squareGenerator } from '../utils';
+import { DirectionUnit, PieceType, Square } from '../types';
+import { squareGenerator } from '../utils';
+
 import {
-  up,
-  left,
-  right,
+  isLegalSquare,
   down,
-  upLeft,
-  upRight,
   downLeft,
   downRight,
-  isLegalSquare,
+  left,
   ray,
+  right,
+  rankFileSquare,
+  up,
+  upLeft,
+  upRight,
+  rankFileToSquare,
 } from './rank-file-square';
 
-type ScanFn = (square: RankFile, n?: number) => RankFile;
-
-const SCAN_FN_FOR_DIRECTION = {
-  [DirectionUnit.UpLeft]: upLeft,
-  [DirectionUnit.UpRight]: upRight,
-  [DirectionUnit.DownLeft]: downLeft,
-  [DirectionUnit.DownRight]: downRight,
-  [DirectionUnit.Up]: up,
-  [DirectionUnit.Right]: right,
-  [DirectionUnit.Left]: left,
-  [DirectionUnit.Down]: down,
-};
-
-const kingMoves = (from: RankFile): Square[] =>
+const kingMoves = (from: Square): Square[] =>
   [
-    up(from),
-    left(from),
-    right(from),
-    down(from),
-    upLeft(from),
-    upRight(from),
-    downLeft(from),
-    downRight(from),
+    up(rankFileSquare(from)),
+    left(rankFileSquare(from)),
+    right(rankFileSquare(from)),
+    down(rankFileSquare(from)),
+    upLeft(rankFileSquare(from)),
+    upRight(rankFileSquare(from)),
+    downLeft(rankFileSquare(from)),
+    downRight(rankFileSquare(from)),
   ]
     .filter((square) => isLegalSquare(square))
-    .map((square) => rankFileToSquare(square));
+    .map(rankFileToSquare);
 
-const knightMoves = (from: RankFile): Square[] =>
+const knightMoves = (from: Square): Square[] =>
   [
-    up(left(from), 2),
-    up(right(from), 2),
-    left(up(from), 2),
-    left(down(from), 2),
-    down(left(from), 2),
-    down(right(from), 2),
-    right(up(from), 2),
-    right(down(from), 2),
+    up(left(rankFileSquare(from)), 2),
+    up(right(rankFileSquare(from)), 2),
+    left(up(rankFileSquare(from)), 2),
+    left(down(rankFileSquare(from)), 2),
+    down(left(rankFileSquare(from)), 2),
+    down(right(rankFileSquare(from)), 2),
+    right(up(rankFileSquare(from)), 2),
+    right(down(rankFileSquare(from)), 2),
   ]
     .filter((square) => isLegalSquare(square))
-    .map((square) => rankFileToSquare(square));
+    .map(rankFileToSquare);
 
-const scan = (square: RankFile, scanFn: ScanFn) =>
-  ray(square, scanFn).map((square) => rankFileToSquare(square));
+// const bishopMoves = (from: Square): Square[][] =>
+//   [upLeft, upRight, downLeft, downRight].map(scan(from));
 
-const bishopMoves = (from: RankFile): Square[][] =>
-  [upLeft, upRight, downLeft, downRight].map((scanFn) => scan(from, scanFn));
+// const rookMoves = (from: Square): Square[][] =>
+//   [up, right, left, down].map(scan(from));
 
-const rookMoves = (from: RankFile): Square[][] =>
-  [up, right, left, down].map((scanFn) => scan(from, scanFn));
-
-const bishopMovesByDirection = (from: RankFile): RaysByDirection =>
+const bishopMovesByDirection = (from: Square): RaysByDirection =>
   [
     DirectionUnit.UpLeft,
     DirectionUnit.UpRight,
     DirectionUnit.DownLeft,
     DirectionUnit.DownRight,
-  ].reduce((obj, direction) => {
-    obj[direction] = scan(from, SCAN_FN_FOR_DIRECTION[direction]);
+  ].reduce<RaysByDirection>((obj, direction) => {
+    obj[direction] = ray(from, direction);
     return obj;
-  }, {} as RaysByDirection);
+  }, {});
 
-const rookMovesByDirection = (from: RankFile): RaysByDirection =>
+const rookMovesByDirection = (from: Square): RaysByDirection =>
   [
     DirectionUnit.Up,
     DirectionUnit.Right,
     DirectionUnit.Left,
     DirectionUnit.Down,
-  ].reduce((obj, direction) => {
-    obj[direction] = scan(from, SCAN_FN_FOR_DIRECTION[direction]);
+  ].reduce<RaysByDirection>((obj, direction) => {
+    obj[direction] = ray(from, direction);
     return obj;
-  }, {} as RaysByDirection);
+  }, {});
 
 const BISHOP_LOOKUP: Square[][][] = [];
 const KNIGHT_LOOKUP: Square[][] = [];
@@ -92,7 +78,7 @@ const KING_LOOKUP: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
 
-type RaysByDirection = Record<DirectionUnit, Square[]>;
+type RaysByDirection = Partial<Record<DirectionUnit, Square[]>>;
 
 const BISHOP_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
 const ROOK_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
@@ -101,23 +87,19 @@ const QUEEN_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
 const KING_RAYS: { type: PieceType; ray: Square[] }[][] = [];
 const SUPER_PIECE_LOOKUP: Square[][] = [];
 
-for (const { rank, file } of squareGenerator()) {
-  const square = rankFileToSquare({ rank, file });
-  BISHOP_LOOKUP[square] = bishopMoves({ rank, file });
-  KING_LOOKUP[square] = kingMoves({ rank, file });
-  KNIGHT_LOOKUP[square] = knightMoves({ rank, file });
-  ROOK_LOOKUP[square] = rookMoves({ rank, file });
-  QUEEN_LOOKUP[square] = [
-    ...bishopMoves({ rank, file }),
-    ...rookMoves({ rank, file }),
-  ];
-
-  BISHOP_LOOKUP_BY_DIRECTION[square] = bishopMovesByDirection({ rank, file });
-  ROOK_LOOKUP_BY_DIRECTION[square] = rookMovesByDirection({ rank, file });
+for (const square of squareGenerator()) {
+  BISHOP_LOOKUP_BY_DIRECTION[square] = bishopMovesByDirection(square);
+  ROOK_LOOKUP_BY_DIRECTION[square] = rookMovesByDirection(square);
   QUEEN_LOOKUP_BY_DIRECTION[square] = {
-    ...bishopMovesByDirection({ rank, file }),
-    ...rookMovesByDirection({ rank, file }),
+    ...bishopMovesByDirection(square),
+    ...rookMovesByDirection(square),
   };
+
+  BISHOP_LOOKUP[square] = Object.values(BISHOP_LOOKUP_BY_DIRECTION[square]);
+  KING_LOOKUP[square] = kingMoves(square);
+  KNIGHT_LOOKUP[square] = knightMoves(square);
+  ROOK_LOOKUP[square] = Object.values(ROOK_LOOKUP_BY_DIRECTION[square]);
+  QUEEN_LOOKUP[square] = Object.values(QUEEN_LOOKUP_BY_DIRECTION[square]);
 
   KING_RAYS[square] = [
     ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
@@ -148,19 +130,19 @@ const QUEEN_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
 // if a square intersects any of the rays.
 export const BISHOP_RAY_BITARRAYS: boolean[][] = BISHOP_RAYS_FLAT.map(
   (squares) => {
-    const array = Array(64);
+    const array = Array<boolean>(64);
     squares.forEach((x) => (array[x] = true));
     return array;
   },
 );
 export const ROOK_RAY_BITARRAYS: boolean[][] = ROOK_RAYS_FLAT.map((squares) => {
-  const array = Array(64);
+  const array = Array<boolean>(64);
   squares.forEach((x) => (array[x] = true));
   return array;
 });
 export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
   (squares) => {
-    const array = Array(64);
+    const array = Array<boolean>(64);
     squares.forEach((x) => (array[x] = true));
     return array;
   },
@@ -168,7 +150,7 @@ export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
 
 export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
   (squares) => {
-    const array = Array(64);
+    const array = Array<boolean>(64);
     squares.forEach((x) => (array[x] = true));
     return array;
   },

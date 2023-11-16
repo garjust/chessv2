@@ -6,7 +6,6 @@ import {
   Piece,
   PieceType,
   Position,
-  RankFile,
   SlidingPiece,
   Square,
   SquareLabel,
@@ -76,10 +75,10 @@ const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
 
 type Nullable<T> = T | undefined | null;
 
-export const rankFileToSquare = ({ rank, file }: RankFile): Square =>
-  rank * 8 + file;
+export const rankForSquare = (square: Square) => square % 8; // ????????????????????????
 
-export const rankForSquare = (square: Square) => square % 8;
+export const rankIndexForSquare = (square: Square) => Math.floor(square / 8);
+export const fileIndexForSquare = (square: Square) => square % 8;
 
 export const squareLabel = (square: Square): SquareLabel =>
   SQUARE_LABEL_LOOKUP[square];
@@ -87,11 +86,9 @@ export const squareLabel = (square: Square): SquareLabel =>
 export const labelToSquare = (label: SquareLabel): Square =>
   SQUARE_LABEL_LOOKUP.indexOf(label);
 
-export const squareGenerator = function* () {
-  for (let rank = 0; rank < 8; rank++) {
-    for (let file = 0; file < 8; file++) {
-      yield { rank, file };
-    }
+export const squareGenerator: () => Generator<Square> = function* () {
+  for (let square: Square = 0; square < 64; square++) {
+    yield square;
   }
 };
 

@@ -53,7 +53,7 @@ const pseudoMovesForPosition = (
   const { enPassantSquare, castlingAvailability, attackedSquares } = options;
 
   for (const [square, piece] of pieces) {
-    if (color && piece.color !== color) {
+    if (piece.color !== color) {
       continue;
     }
 
