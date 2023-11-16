@@ -102,8 +102,10 @@ export const isSliderPieceType = (
 export const isSlider = (piece: Piece): piece is SlidingPiece =>
   isSliderPieceType(piece.type);
 
-export const squaresInclude = (squares: Square[], square: Square): boolean =>
-  squares.includes(square);
+export const squaresInclude = (
+  squares: Readonly<Square[]>,
+  square: Square,
+): boolean => squares.includes(square);
 
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
   Boolean(a && b && a.from === b.from && a.to === b.to);

@@ -57,24 +57,24 @@ export type Pin = {
   legalMoveSquares: Square[];
 };
 
-export type AttackObject = {
+export type AttackObject = Readonly<{
   // The square being attacked for this object
-  attacked: { square: Square; type: PieceType };
+  attacked: Readonly<{ square: Square; type: PieceType }>;
   // The attacking piece
-  attacker: { square: Square; type: PieceType };
+  attacker: Readonly<{ square: Square; type: PieceType }>;
   // If the attacker is a sliding piece this is the set of squares they move through
   // for the attack. A move to one of these squares blocks the attack.
-  slideSquares: Square[];
-};
+  slideSquares: Readonly<Square[]>;
+}>;
 
-export type SquareControlObject = {
+export type SquareControlObject = Readonly<{
   square: Square;
   // The attacking piece
-  attacker: { square: Square; type: PieceType };
+  attacker: Readonly<{ square: Square; type: PieceType }>;
   // If the attacker is a sliding piece this is the set of squares they move through
   // for the attack. A move to one of these squares blocks the attack.
-  slideSquares: Square[];
-};
+  slideSquares: Readonly<Square[]>;
+}>;
 
 export type MoveWithExtraData = Move & {
   piece: Piece;
