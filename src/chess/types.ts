@@ -12,10 +12,10 @@ export enum PieceType {
   King = 6,
 }
 
-export type Piece = {
+export type Piece = Readonly<{
   type: PieceType;
   color: Color;
-};
+}>;
 
 export type SlidingPiece =
   | { color: Color; type: PieceType.Bishop }
@@ -47,7 +47,7 @@ export type Move = {
   promotion?: PromotionOption;
 };
 
-export type Pin = {
+export type Pin = Readonly<{
   // The square with the pinned or skewered piece.
   pinned: Square;
   // The square of the attacker creating the pin.
@@ -55,7 +55,7 @@ export type Pin = {
   // Legal squares the pinned piece can move to. This includes it's
   // resident square.
   legalMoveSquares: Square[];
-};
+}>;
 
 export type AttackObject = Readonly<{
   // The square being attacked for this object
