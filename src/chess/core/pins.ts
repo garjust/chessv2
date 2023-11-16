@@ -1,10 +1,9 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
-import { directionOfMove } from '../utils';
 import {
-  KING_RAYS,
-  QUEEN_RAY_BITARRAYS,
-  RAY_BY_DIRECTION,
-} from './lookup-moves/move-lookup';
+  BISHOP_RAYS,
+  ROOK_RAYS,
+  QUEEN_MOVE_BITARRAYS,
+} from './lookup-moves';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (
@@ -26,7 +25,7 @@ export const updatePinsOnKings = (
       } else if (
         // If the move from square interacts with any king ray we may need
         // to remove or add a pin.
-        QUEEN_RAY_BITARRAYS[king][move.from]
+        QUEEN_MOVE_BITARRAYS[king][move.from]
       ) {
         // const unit = directionOfMove(king, move.from);
         // const ray = RAY_BY_DIRECTION[PieceType.Queen][king][unit];
@@ -35,7 +34,7 @@ export const updatePinsOnKings = (
       } else if (
         // If the move to square interacts with any king ray we may need
         // to remove or add a pin.
-        QUEEN_RAY_BITARRAYS[king][move.to]
+        QUEEN_MOVE_BITARRAYS[king][move.to]
       ) {
         pinsByColor[color].reset(pieces, king, color);
       }
@@ -116,24 +115,13 @@ export default class Pins {
     this._map.delete(square);
   }
 
-  reset(
+  private walkRays(
     pieces: Map<Square, Piece>,
-    kingSquare: Square,
+    pieceType: PieceType,
     color: Color,
-    cache = true,
+    rays: number[][],
   ) {
-    if (cache) {
-      this._updatesStack[this._updatesStack.length - 1].push({
-        type: UpdateType.Reset,
-        map: this._map,
-      });
-    }
-
-    this._map = new Map<Square, Pin>();
-
-    const rays = KING_RAYS[kingSquare];
-
-    for (const { type, ray } of rays) {
+    for (const ray of rays) {
       // looking for a friendly piece then an opponent's slider.
       const friendlyPieces: Square[] = [];
       const openSquares: Square[] = [];
@@ -155,7 +143,7 @@ export default class Pins {
 
       if (
         opponentPiece &&
-        (opponentPiece.piece.type === type ||
+        (opponentPiece.piece.type === pieceType ||
           opponentPiece.piece.type === PieceType.Queen)
       ) {
         // We found a pin or sliding attack on the king!
@@ -170,6 +158,25 @@ export default class Pins {
         }
       }
     }
+  }
+
+  reset(
+    pieces: Map<Square, Piece>,
+    kingSquare: Square,
+    color: Color,
+    cache = true,
+  ) {
+    if (cache) {
+      this._updatesStack[this._updatesStack.length - 1].push({
+        type: UpdateType.Reset,
+        map: this._map,
+      });
+    }
+
+    this._map = new Map<Square, Pin>();
+
+    this.walkRays(pieces, PieceType.Bishop, color, BISHOP_RAYS[kingSquare]);
+    this.walkRays(pieces, PieceType.Rook, color, ROOK_RAYS[kingSquare]);
   }
 
   pinByPinnedPiece(square: Square): Pin | undefined {

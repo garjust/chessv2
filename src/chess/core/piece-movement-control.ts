@@ -1,11 +1,12 @@
 import { Color, Piece, PieceType, Square, SquareControlObject } from '../types';
 import { isLegalSquare } from '../utils';
 import {
-  BISHOP_LOOKUP,
-  KING_LOOKUP,
-  KNIGHT_LOOKUP,
-  ROOK_LOOKUP,
-} from './lookup-moves/move-lookup';
+  BISHOP_RAYS,
+  KING_MOVES,
+  KNIGHT_MOVES,
+  QUEEN_RAYS,
+  ROOK_RAYS,
+} from './lookup-moves';
 import { down, left, right, up, rayControlScanner } from './move-utils';
 
 export const pawnMoves = (
@@ -38,14 +39,14 @@ export const pawnMoves = (
 };
 
 export const knightMoves = (from: Square): SquareControlObject[] =>
-  KNIGHT_LOOKUP[from].map((to) => ({
+  KNIGHT_MOVES[from].map((to) => ({
     attacker: { square: from, type: PieceType.Knight },
     square: to,
     slideSquares: [],
   }));
 
 export const kingMoves = (from: Square): SquareControlObject[] => {
-  return KING_LOOKUP[from].map((to) => ({
+  return KING_MOVES[from].map((to) => ({
     attacker: { square: from, type: PieceType.King },
     square: to,
     slideSquares: [],
@@ -57,7 +58,7 @@ export const bishopMoves = (
   color: Color,
   from: Square,
 ): SquareControlObject[] =>
-  BISHOP_LOOKUP[from].flatMap((ray) =>
+  BISHOP_RAYS[from].flatMap((ray) =>
     rayControlScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
@@ -70,7 +71,7 @@ export const rookMoves = (
   color: Color,
   from: Square,
 ): SquareControlObject[] =>
-  ROOK_LOOKUP[from].flatMap((ray) =>
+  ROOK_RAYS[from].flatMap((ray) =>
     rayControlScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Rook } },
@@ -82,10 +83,14 @@ export const queenMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
   from: Square,
-): SquareControlObject[] => [
-  ...bishopMoves(pieces, color, from),
-  ...rookMoves(pieces, color, from),
-];
+): SquareControlObject[] =>
+  QUEEN_RAYS[from].flatMap((ray) =>
+    rayControlScanner(
+      pieces,
+      { square: from, piece: { color, type: PieceType.Queen } },
+      ray,
+    ),
+  );
 
 export const forPiece = (
   piece: Piece,

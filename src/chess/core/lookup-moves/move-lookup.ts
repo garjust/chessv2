@@ -1,20 +1,19 @@
-import { DirectionUnit, PieceType, Square } from '../../types';
+import { DirectionUnit, Square } from '../../types';
 import { squareGenerator } from '../../utils';
-
 import {
   isLegalSquare,
   down,
   downLeft,
   downRight,
   left,
-  ray,
   right,
   rankFileSquare,
   up,
   upLeft,
   upRight,
   rankFileToSquare,
-} from './rank-file-square';
+} from './movement';
+import { ray } from './rays';
 
 const kingMoves = (from: Square): Square[] =>
   [
@@ -50,124 +49,105 @@ const knightMoves = (from: Square): Square[] =>
 // const rookMoves = (from: Square): Square[][] =>
 //   [up, right, left, down].map(scan(from));
 
-const bishopMovesByDirection = (from: Square): RaysByDirection =>
-  [
-    DirectionUnit.UpLeft,
-    DirectionUnit.UpRight,
-    DirectionUnit.DownLeft,
-    DirectionUnit.DownRight,
-  ].reduce<RaysByDirection>((obj, direction) => {
-    obj[direction] = ray(from, direction);
-    return obj;
-  }, {});
+type BishopRays = {
+  [DirectionUnit.UpLeft]: Square[];
+  [DirectionUnit.UpRight]: Square[];
+  [DirectionUnit.DownLeft]: Square[];
+  [DirectionUnit.DownRight]: Square[];
+};
 
-const rookMovesByDirection = (from: Square): RaysByDirection =>
-  [
-    DirectionUnit.Up,
-    DirectionUnit.Right,
-    DirectionUnit.Left,
-    DirectionUnit.Down,
-  ].reduce<RaysByDirection>((obj, direction) => {
-    obj[direction] = ray(from, direction);
-    return obj;
-  }, {});
+type RookRays = {
+  [DirectionUnit.Up]: Square[];
+  [DirectionUnit.Down]: Square[];
+  [DirectionUnit.Left]: Square[];
+  [DirectionUnit.Right]: Square[];
+};
+
+const bishopMovesByDirection = (from: Square): BishopRays =>
+  (
+    [
+      DirectionUnit.UpLeft,
+      DirectionUnit.UpRight,
+      DirectionUnit.DownLeft,
+      DirectionUnit.DownRight,
+    ] as const
+  ).reduce<BishopRays>(
+    (obj, direction) => {
+      obj[direction] = ray(from, direction);
+      return obj;
+    },
+    {
+      [DirectionUnit.UpLeft]: [],
+      [DirectionUnit.UpRight]: [],
+      [DirectionUnit.DownLeft]: [],
+      [DirectionUnit.DownRight]: [],
+    },
+  );
+
+const rookMovesByDirection = (from: Square): RookRays =>
+  (
+    [
+      DirectionUnit.Up,
+      DirectionUnit.Right,
+      DirectionUnit.Left,
+      DirectionUnit.Down,
+    ] as const
+  ).reduce<RookRays>(
+    (obj, direction) => {
+      obj[direction] = ray(from, direction);
+      return obj;
+    },
+    {
+      [DirectionUnit.Up]: [],
+      [DirectionUnit.Down]: [],
+      [DirectionUnit.Left]: [],
+      [DirectionUnit.Right]: [],
+    },
+  );
 
 const BISHOP_LOOKUP: Square[][][] = [];
-const KNIGHT_LOOKUP: Square[][] = [];
-const KING_LOOKUP: Square[][] = [];
+const KNIGHT_MOVES: Square[][] = [];
+const KING_MOVES: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
 
-type RaysByDirection = Partial<Record<DirectionUnit, Square[]>>;
+const BISHOP_LOOKUP_BY_DIRECTION: Array<BishopRays> = [];
+const ROOK_LOOKUP_BY_DIRECTION: Array<RookRays> = [];
+const RAYS_BY_DIRECTION: Array<BishopRays & RookRays> = [];
 
-const BISHOP_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
-const ROOK_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
-const QUEEN_LOOKUP_BY_DIRECTION: Array<RaysByDirection> = [];
-
-const KING_RAYS: { type: PieceType; ray: Square[] }[][] = [];
 const SUPER_PIECE_LOOKUP: Square[][] = [];
 
 for (const square of squareGenerator()) {
   BISHOP_LOOKUP_BY_DIRECTION[square] = bishopMovesByDirection(square);
   ROOK_LOOKUP_BY_DIRECTION[square] = rookMovesByDirection(square);
-  QUEEN_LOOKUP_BY_DIRECTION[square] = {
+  RAYS_BY_DIRECTION[square] = {
     ...bishopMovesByDirection(square),
     ...rookMovesByDirection(square),
   };
 
   BISHOP_LOOKUP[square] = Object.values(BISHOP_LOOKUP_BY_DIRECTION[square]);
-  KING_LOOKUP[square] = kingMoves(square);
-  KNIGHT_LOOKUP[square] = knightMoves(square);
+  KING_MOVES[square] = kingMoves(square);
+  KNIGHT_MOVES[square] = knightMoves(square);
   ROOK_LOOKUP[square] = Object.values(ROOK_LOOKUP_BY_DIRECTION[square]);
-  QUEEN_LOOKUP[square] = Object.values(QUEEN_LOOKUP_BY_DIRECTION[square]);
-
-  KING_RAYS[square] = [
-    ...BISHOP_LOOKUP[square].map((ray) => ({ type: PieceType.Bishop, ray })),
-    ...ROOK_LOOKUP[square].map((ray) => ({ type: PieceType.Rook, ray })),
-  ];
+  QUEEN_LOOKUP[square] = Object.values(RAYS_BY_DIRECTION[square]);
 
   SUPER_PIECE_LOOKUP[square] = [
     ...BISHOP_LOOKUP[square].flat(),
     ...ROOK_LOOKUP[square].flat(),
-    ...KNIGHT_LOOKUP[square],
-    ...KING_LOOKUP[square],
+    ...KNIGHT_MOVES[square],
+    ...KING_MOVES[square],
   ];
 }
 
-// Flat ray lists
-//
-// For each square, all squares for rays which intersect it.
-const BISHOP_RAYS_FLAT: Square[][] = BISHOP_LOOKUP.map((raySet) =>
-  raySet.flat(),
-);
-const ROOK_RAYS_FLAT: Square[][] = ROOK_LOOKUP.map((raySet) => raySet.flat());
-const QUEEN_RAYS_FLAT: Square[][] = QUEEN_LOOKUP.map((raySet) => raySet.flat());
-
-// Flat Bitarrays
-//
-// For each square, all squares for rays which intersect it in a sparse
-// array format. This allows array index lookup (square as index) to determine
-// if a square intersects any of the rays.
-export const BISHOP_RAY_BITARRAYS: boolean[][] = BISHOP_RAYS_FLAT.map(
-  (squares) => {
-    const array = Array<boolean>(64);
-    squares.forEach((x) => (array[x] = true));
-    return array;
-  },
-);
-export const ROOK_RAY_BITARRAYS: boolean[][] = ROOK_RAYS_FLAT.map((squares) => {
-  const array = Array<boolean>(64);
-  squares.forEach((x) => (array[x] = true));
-  return array;
-});
-export const QUEEN_RAY_BITARRAYS: boolean[][] = QUEEN_RAYS_FLAT.map(
-  (squares) => {
-    const array = Array<boolean>(64);
-    squares.forEach((x) => (array[x] = true));
-    return array;
-  },
-);
-
-export const SUPER_PIECE_BITARRAYS: boolean[][] = SUPER_PIECE_LOOKUP.map(
-  (squares) => {
-    const array = Array<boolean>(64);
-    squares.forEach((x) => (array[x] = true));
-    return array;
-  },
-);
-
-export const RAY_BY_DIRECTION = {
-  [PieceType.Bishop]: BISHOP_LOOKUP_BY_DIRECTION,
-  [PieceType.Rook]: ROOK_LOOKUP_BY_DIRECTION,
-  [PieceType.Queen]: QUEEN_LOOKUP_BY_DIRECTION,
-};
+// Move lookup bitarrays
+// -----------------------------------------------------------------------------
 
 export {
   BISHOP_LOOKUP,
-  KING_LOOKUP,
-  KNIGHT_LOOKUP,
+  KING_MOVES,
   QUEEN_LOOKUP,
+  SUPER_PIECE_LOOKUP,
+  KNIGHT_MOVES,
   ROOK_LOOKUP,
-  QUEEN_RAYS_FLAT,
-  KING_RAYS,
+  RAYS_BY_DIRECTION,
 };

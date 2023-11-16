@@ -1,4 +1,4 @@
-import { DirectionUnit, Square } from '../../types';
+import { Square } from '../../types';
 import { fileIndexForSquare, rankIndexForSquare } from '../../utils';
 
 /**
@@ -52,33 +52,3 @@ export const downLeft = (square: RankFileSquare, n = 1): RankFileSquare =>
   down(left(square, n), n);
 export const downRight = (square: RankFileSquare, n = 1): RankFileSquare =>
   down(right(square, n), n);
-
-const SCAN_FN_FOR_DIRECTION = {
-  [DirectionUnit.UpLeft]: upLeft,
-  [DirectionUnit.UpRight]: upRight,
-  [DirectionUnit.DownLeft]: downLeft,
-  [DirectionUnit.DownRight]: downRight,
-  [DirectionUnit.Up]: up,
-  [DirectionUnit.Right]: right,
-  [DirectionUnit.Left]: left,
-  [DirectionUnit.Down]: down,
-};
-
-const rayGenerator = function* (
-  square: RankFileSquare,
-  direction: DirectionUnit,
-) {
-  square = SCAN_FN_FOR_DIRECTION[direction](square);
-  while (isLegalSquare(square)) {
-    yield square;
-    square = SCAN_FN_FOR_DIRECTION[direction](square);
-  }
-};
-
-export const ray = (from: Square, direction: DirectionUnit) => {
-  const squares: Square[] = [];
-  for (const square of rayGenerator(rankFileSquare(from), direction)) {
-    squares.push(rankFileToSquare(square));
-  }
-  return squares;
-};

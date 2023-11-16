@@ -16,11 +16,11 @@ import {
 } from '../utils';
 import AttackMap from './attack-map';
 import {
-  BISHOP_LOOKUP,
-  KING_LOOKUP,
-  KNIGHT_LOOKUP,
-  ROOK_LOOKUP,
-} from './lookup-moves/move-lookup';
+  BISHOP_RAYS,
+  KING_MOVES,
+  KNIGHT_MOVES,
+  ROOK_RAYS,
+} from './lookup-moves';
 import { down, left, right, up, rayScanner } from './move-utils';
 
 export const expandPromotions = (move: MoveWithExtraData) =>
@@ -138,7 +138,7 @@ export const knightMoves = (
   color: Color,
   from: Square,
 ): MoveWithExtraData[] =>
-  KNIGHT_LOOKUP[from]
+  KNIGHT_MOVES[from]
     .filter((to) => pieces.get(to)?.color !== color)
     .map((to) => {
       let attack: AttackObject | undefined;
@@ -175,7 +175,7 @@ export const kingMoves = (
 ): MoveWithExtraData[] => {
   const squares = castlingOnly
     ? []
-    : KING_LOOKUP[from].filter((to) => pieces.get(to)?.color !== color);
+    : KING_MOVES[from].filter((to) => pieces.get(to)?.color !== color);
 
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
@@ -231,7 +231,7 @@ export const bishopMoves = (
   from: Square,
   { skip = [] }: { skip: Square[] },
 ): MoveWithExtraData[] =>
-  BISHOP_LOOKUP[from].flatMap((ray) =>
+  BISHOP_RAYS[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Bishop } },
@@ -246,7 +246,7 @@ export const rookMoves = (
   from: Square,
   { skip = [] }: { skip: Square[] },
 ): MoveWithExtraData[] =>
-  ROOK_LOOKUP[from].flatMap((ray) =>
+  ROOK_RAYS[from].flatMap((ray) =>
     rayScanner(
       pieces,
       { square: from, piece: { color, type: PieceType.Rook } },

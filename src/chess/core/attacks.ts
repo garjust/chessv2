@@ -9,11 +9,11 @@ import {
 } from '../types';
 import { flipColor, directionOfMove, isSlider } from '../utils';
 import {
-  BISHOP_RAY_BITARRAYS,
-  QUEEN_RAY_BITARRAYS,
-  ROOK_RAY_BITARRAYS,
-  RAY_BY_DIRECTION,
-} from './lookup-moves/move-lookup';
+  BISHOP_MOVE_BITARRAYS,
+  ROOK_MOVE_BITARRAYS,
+  QUEEN_MOVE_BITARRAYS,
+  RAYS_BY_DIRECTION,
+} from './lookup-moves';
 import { rayControlScanner } from './move-utils';
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';
@@ -23,11 +23,11 @@ import { PIECES } from '../piece-consants';
 const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
   switch (piece.type) {
     case PieceType.Bishop:
-      return BISHOP_RAY_BITARRAYS[pieceSquare][square];
+      return BISHOP_MOVE_BITARRAYS[pieceSquare][square];
     case PieceType.Rook:
-      return ROOK_RAY_BITARRAYS[pieceSquare][square];
+      return ROOK_MOVE_BITARRAYS[pieceSquare][square];
     case PieceType.Queen:
-      return QUEEN_RAY_BITARRAYS[pieceSquare][square];
+      return QUEEN_MOVE_BITARRAYS[pieceSquare][square];
     default:
       return false;
   }
@@ -65,7 +65,7 @@ const updatePiecesAttacks = (
     directionOfMove(square, move.to) === directionOfMove(square, move.from)
   ) {
     const unit = directionOfMove(square, move.from);
-    const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+    const ray = RAYS_BY_DIRECTION[square][unit];
 
     const moveUnit = directionOfMove(move.from, move.to);
 
@@ -102,7 +102,7 @@ const updatePiecesAttacks = (
     //   obstructed is no longer obstructed, therefore we want to add attacks.
     if (isIncidentFrom) {
       const unit = directionOfMove(square, move.from);
-      const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+      const ray = RAYS_BY_DIRECTION[square][unit];
       const newSquaresControlled = rayControlScanner(
         pieces,
         { square, piece },
@@ -120,7 +120,7 @@ const updatePiecesAttacks = (
     //   obstructed, therefore we want to remove attacks.
     if (!isCapture && isIncidentTo) {
       const unit = directionOfMove(square, move.to);
-      const ray = RAY_BY_DIRECTION[piece.type][square][unit];
+      const ray = RAYS_BY_DIRECTION[square][unit];
       const squaresNoLongerControlled = rayControlScanner(
         pieces,
         { square, piece },
