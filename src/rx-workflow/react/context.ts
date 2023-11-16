@@ -45,7 +45,7 @@ export const contextFactory = <S, A>(
         const subscription = states
           .pipe(
             map(render),
-            distinctUntilChanged(
+            distinctUntilChanged<R>(
               renderDistinctOnly ? renderingEquals : undefined,
             ),
           )

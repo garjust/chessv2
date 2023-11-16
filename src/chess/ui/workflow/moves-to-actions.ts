@@ -12,6 +12,6 @@ export const moveActions = (
     map(moveFromString),
     map((move) => [move.from, move.to]),
     mergeMap(([squareA, squareB]) => from([squareA, squareB])),
-    map(clickSquareAction),
+    map((square) => clickSquareAction(square)),
     delayOperator(actionDelay),
   );
