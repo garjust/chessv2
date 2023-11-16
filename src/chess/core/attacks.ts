@@ -13,7 +13,7 @@ import {
   QUEEN_RAY_BITARRAYS,
   ROOK_RAY_BITARRAYS,
   RAY_BY_DIRECTION,
-} from './move-lookup';
+} from './lookup-moves/move-lookup';
 import { rayControlScanner } from './move-utils';
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';

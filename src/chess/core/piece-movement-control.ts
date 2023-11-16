@@ -5,7 +5,7 @@ import {
   KING_LOOKUP,
   KNIGHT_LOOKUP,
   ROOK_LOOKUP,
-} from './move-lookup';
+} from './lookup-moves/move-lookup';
 import { down, left, right, up, rayControlScanner } from './move-utils';
 
 export const pawnMoves = (

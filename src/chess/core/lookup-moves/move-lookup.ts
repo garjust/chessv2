@@ -1,5 +1,5 @@
-import { DirectionUnit, PieceType, Square } from '../types';
-import { squareGenerator } from '../utils';
+import { DirectionUnit, PieceType, Square } from '../../types';
+import { squareGenerator } from '../../utils';
 
 import {
   isLegalSquare,

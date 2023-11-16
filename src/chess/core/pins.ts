@@ -4,7 +4,7 @@ import {
   KING_RAYS,
   QUEEN_RAY_BITARRAYS,
   RAY_BY_DIRECTION,
-} from './move-lookup';
+} from './lookup-moves/move-lookup';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (

@@ -1,5 +1,5 @@
-import { DirectionUnit, Square } from '../types';
-import { fileIndexForSquare, rankIndexForSquare } from '../utils';
+import { DirectionUnit, Square } from '../../types';
+import { fileIndexForSquare, rankIndexForSquare } from '../../utils';
 
 /**
  * Define a less error prone square representation for pre-computing lookup
