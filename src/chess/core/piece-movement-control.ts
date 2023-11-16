@@ -1,5 +1,4 @@
 import { Color, Piece, PieceType, Square, SquareControlObject } from '../types';
-import { isLegalSquare } from '../utils';
 import {
   BISHOP_RAYS,
   KING_MOVES,
@@ -20,14 +19,14 @@ export const pawnMoves = (
   const rightCaptureSquare = advanceFn(right(from));
 
   // Pawn captures diagonally.
-  if (isLegalSquare(leftCaptureSquare) && leftCaptureSquare % 8 !== 7) {
+  if (leftCaptureSquare % 8 !== 7) {
     squares.push({
       attacker: { square: from, type: PieceType.Pawn },
       square: leftCaptureSquare,
       slideSquares: [],
     });
   }
-  if (isLegalSquare(rightCaptureSquare) && rightCaptureSquare % 8 !== 0) {
+  if (rightCaptureSquare % 8 !== 0) {
     squares.push({
       attacker: { square: from, type: PieceType.Pawn },
       square: rightCaptureSquare,
