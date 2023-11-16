@@ -9,13 +9,13 @@ const SCRAMBLE_CUTOFF_MS = 10000;
 // the precision would not be rendered.
 const render = (state: State) => ({
   whiteSeconds:
-    state.game.clocks.WHITE >= SCRAMBLE_CUTOFF_MS
-      ? Math.round(state.game.clocks.WHITE / 1000)
-      : state.game.clocks.WHITE / 1000,
+    state.game.clocks[Color.White] >= SCRAMBLE_CUTOFF_MS
+      ? Math.round(state.game.clocks[Color.White] / 1000)
+      : state.game.clocks[Color.White] / 1000,
   blackSeconds:
-    state.game.clocks.BLACK >= SCRAMBLE_CUTOFF_MS
-      ? Math.round(state.game.clocks.BLACK / 1000)
-      : state.game.clocks.BLACK / 1000,
+    state.game.clocks[Color.Black] >= SCRAMBLE_CUTOFF_MS
+      ? Math.round(state.game.clocks[Color.Black] / 1000)
+      : state.game.clocks[Color.Black] / 1000,
   boardOrientation: state.boardOrientation,
 });
 

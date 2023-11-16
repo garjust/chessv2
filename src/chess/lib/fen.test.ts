@@ -40,11 +40,11 @@ test('parse/encode starting position', () => {
     ]),
     turn: Color.White,
     castlingAvailability: {
-      BLACK: {
+      [Color.Black]: {
         kingside: true,
         queenside: true,
       },
-      WHITE: {
+      [Color.White]: {
         kingside: true,
         queenside: true,
       },
@@ -67,11 +67,11 @@ test('parse/encode blank fen', () => {
     pieces: new Map(),
     turn: Color.White,
     castlingAvailability: {
-      BLACK: {
+      [Color.Black]: {
         kingside: false,
         queenside: false,
       },
-      WHITE: {
+      [Color.White]: {
         kingside: false,
         queenside: false,
       },

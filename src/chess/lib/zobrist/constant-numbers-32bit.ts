@@ -1,10 +1,10 @@
-import { PieceType } from '../../types';
+import { Color, PieceType } from '../../types';
 import { ZobristNumbers } from './types';
 
 export const A: ZobristNumbers<number> = {
   TURN: 270825591.170619,
   PIECE_SQUARE: {
-    WHITE: {
+    [Color.White]: {
       '0': {
         [PieceType.Bishop]: 1926361364.9690251,
         [PieceType.King]: 702920854.1250172,
@@ -518,7 +518,7 @@ export const A: ZobristNumbers<number> = {
         [PieceType.Rook]: 767746409.4711008,
       },
     },
-    BLACK: {
+    [Color.Black]: {
       '0': {
         [PieceType.Bishop]: 1057152346.508728,
         [PieceType.King]: 1775495926.155263,
@@ -1034,15 +1034,21 @@ export const A: ZobristNumbers<number> = {
     },
   },
   CASTLING_AVAILABILITY: {
-    WHITE: { kingside: 1753117804.9440327, queenside: 1249753307.6009521 },
-    BLACK: { kingside: 1997117866.0802016, queenside: 1372538.756307125 },
+    [Color.White]: {
+      kingside: 1753117804.9440327,
+      queenside: 1249753307.6009521,
+    },
+    [Color.Black]: {
+      kingside: 1997117866.0802016,
+      queenside: 1372538.756307125,
+    },
   },
 };
 
 export const B: ZobristNumbers<number> = {
   TURN: 74356811.50603724,
   PIECE_SQUARE: {
-    WHITE: {
+    [Color.White]: {
       '0': {
         [PieceType.Bishop]: 861341035.6156178,
         [PieceType.King]: 440943450.8888521,
@@ -1556,7 +1562,7 @@ export const B: ZobristNumbers<number> = {
         [PieceType.Rook]: 171979230.63984537,
       },
     },
-    BLACK: {
+    [Color.Black]: {
       '0': {
         [PieceType.Bishop]: 636761022.5744262,
         [PieceType.King]: 2016526255.0442538,
@@ -2072,7 +2078,13 @@ export const B: ZobristNumbers<number> = {
     },
   },
   CASTLING_AVAILABILITY: {
-    WHITE: { kingside: 1445686586.225099, queenside: 1917310400.511158 },
-    BLACK: { kingside: 1228437978.6626902, queenside: 1607134665.416885 },
+    [Color.White]: {
+      kingside: 1445686586.225099,
+      queenside: 1917310400.511158,
+    },
+    [Color.Black]: {
+      kingside: 1228437978.6626902,
+      queenside: 1607134665.416885,
+    },
   },
 };
