@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControlObject } from '../types';
 import { labelToSquare } from '../utils';
-import { RAYS_BY_DIRECTION } from './lookup-moves/move-lookup';
+import { RAYS_BY_DIRECTION } from './lookup/move-lookup';
 import {
   down,
   downLeft,

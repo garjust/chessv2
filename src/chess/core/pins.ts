@@ -3,7 +3,7 @@ import {
   BISHOP_RAYS,
   ROOK_RAYS,
   QUEEN_MOVE_BITARRAYS,
-} from './lookup-moves';
+} from './lookup';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (

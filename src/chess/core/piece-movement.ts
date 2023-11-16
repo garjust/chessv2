@@ -15,12 +15,7 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import {
-  BISHOP_RAYS,
-  KING_MOVES,
-  KNIGHT_MOVES,
-  ROOK_RAYS,
-} from './lookup-moves';
+import { BISHOP_RAYS, KING_MOVES, KNIGHT_MOVES, ROOK_RAYS } from './lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
 
 export const expandPromotions = (move: MoveWithExtraData) =>
