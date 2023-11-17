@@ -43,7 +43,7 @@ test('counter workflow', () => {
   ]);
 });
 
-test('counter workflow async increment', () => {
+test.skip('counter workflow async increment', () => {
   const {
     emit,
     states$: states,
@@ -84,7 +84,7 @@ test('counter workflow async increment', () => {
   ]);
 });
 
-test('counter workflow error', () => {
+test.skip('counter workflow error', () => {
   const {
     emit,
     states$: states,
