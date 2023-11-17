@@ -9,16 +9,21 @@ export const PIECE_SHIFT = 1;
 export const FROM_SHIFT = 4;
 export const TO_SHIFT = 10;
 
+type intMove = Brand<number, 'intMove'>;
+
 export const moveInt = (
   color: Color,
   pieceType: PieceType,
   from: Square,
   to: Square,
-): number =>
-  color | (pieceType << PIECE_SHIFT) | (from << FROM_SHIFT) | (to << TO_SHIFT);
+): intMove =>
+  (color |
+    (pieceType << PIECE_SHIFT) |
+    (from << FROM_SHIFT) |
+    (to << TO_SHIFT)) as intMove;
 
 export const unpackMove = (
-  move: number,
+  move: intMove,
 ): { color: Color; pieceType: PieceType; from: Square; to: Square } => ({
   color: move & COLOR_MASK,
   pieceType: (move & PIECE_MASK) >>> PIECE_SHIFT,
