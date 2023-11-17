@@ -8,6 +8,7 @@ export {
 
 // moves
 export { KING_MOVES, KNIGHT_MOVES } from './move-lookup';
+export { CASTLING_ROOK_MOVES } from './constants';
 
 // bitarrays
 export {

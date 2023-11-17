@@ -9,7 +9,7 @@ import { fileIndexForSquare, rankIndexForSquare } from '../../utils';
 type RankFileSquare = { rank: number; file: number };
 
 export const rankFileToSquare = ({ rank, file }: RankFileSquare): Square =>
-  rank * 8 + file;
+  (rank * 8 + file) as Square;
 
 export const rankFileSquare = (square: Square): RankFileSquare => ({
   rank: rankIndexForSquare(square),
