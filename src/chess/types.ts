@@ -1,8 +1,14 @@
+/**
+ * Color of a square or piece
+ */
 export enum Color {
-  White = 1,
-  Black = 2,
+  White = 0,
+  Black = 1,
 }
 
+/**
+ * Type of piece.
+ */
 export enum PieceType {
   Pawn = 1,
   Knight = 2,
