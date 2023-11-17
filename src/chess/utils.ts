@@ -87,7 +87,7 @@ export const labelToSquare = (label: SquareLabel): Square =>
   SQUARE_LABEL_LOOKUP.indexOf(label);
 
 export const squareGenerator: () => Generator<Square> = function* () {
-  for (let square: Square = 0; square < 64; square++) {
+  for (let square = 0 as Square; square < 64; square++) {
     yield square;
   }
 };

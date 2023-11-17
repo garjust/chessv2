@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControlObject } from '../types';
-import { labelToSquare } from '../utils';
+import { buildMove, labelToSquare } from '../utils';
 import { RAYS_BY_DIRECTION } from './lookup/move-lookup';
 import {
   down,
@@ -34,25 +34,21 @@ test('squareControlXraysMove', () => {
     slideSquares: [27, 20],
   };
 
-  expect(squareControlXraysMove(squareControl, { from: 0, to: 8 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(0, 8))).toEqual(false);
+  expect(squareControlXraysMove(squareControl, buildMove(41, 48))).toEqual(
     false,
   );
-  expect(squareControlXraysMove(squareControl, { from: 41, to: 48 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(27, 36))).toEqual(
     false,
   );
-  expect(squareControlXraysMove(squareControl, { from: 27, to: 36 })).toEqual(
-    false,
-  );
-  expect(squareControlXraysMove(squareControl, { from: 14, to: 7 })).toEqual(
-    true,
-  );
+  expect(squareControlXraysMove(squareControl, buildMove(14, 7))).toEqual(true);
 
   squareControl = {
     attacker: { square: 44, type: PieceType.Queen },
     square: 52,
     slideSquares: [],
   };
-  expect(squareControlXraysMove(squareControl, { from: 52, to: 60 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(52, 60))).toEqual(
     true,
   );
 });
