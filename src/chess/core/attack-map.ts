@@ -4,6 +4,7 @@ import {
   SquareControlObject,
   Position as ExternalPosition,
 } from '../types';
+import { squareGenerator } from '../utils';
 import { forPiece } from './piece-movement-control';
 
 enum UpdateType {
@@ -32,11 +33,11 @@ export default class AttackMap {
   _updatesStack: Update[][] = [];
 
   constructor(position: ExternalPosition, color: Color) {
-    for (let i = 0; i < 64; i++) {
-      this._squareControlByPiece.set(i, []);
+    for (const square of squareGenerator()) {
+      this._squareControlByPiece.set(square, []);
     }
-    for (let i = 0; i < 64; i++) {
-      this._squareControlByAttackedSquare.set(i, new Map());
+    for (const square of squareGenerator()) {
+      this._squareControlByAttackedSquare.set(square, new Map());
     }
 
     for (const [square, piece] of position.pieces) {
@@ -53,7 +54,7 @@ export default class AttackMap {
     return (this._squareControlByAttackedSquare.get(square)?.size ?? 0) > 0;
   }
 
-  controlForPiece(square: number): SquareControlObject[] {
+  controlForPiece(square: Square): SquareControlObject[] {
     return this._squareControlByPiece.get(square) ?? [];
   }
 
