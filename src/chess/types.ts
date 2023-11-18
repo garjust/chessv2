@@ -28,7 +28,7 @@ export type SlidingPiece =
   | { color: Color; type: PieceType.Rook }
   | { color: Color; type: PieceType.Queen };
 
-export type Square = number;
+export type Square = Readonly<number>;
 
 export enum DirectionUnit {
   Up = 8,
