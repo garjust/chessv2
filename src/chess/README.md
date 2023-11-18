@@ -24,7 +24,6 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
-- Remove dead move code it is confusing me (piece-movement?)
 - Pre-compute SquareControlObjects for all rays/moves so that objects are not
   created when assembling sets of SquareControlObjects
 - Refactor "Move" types to be subsets of each other for duck typing
