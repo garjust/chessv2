@@ -91,7 +91,7 @@ export type SquareControlObject = Readonly<{
    * If the attacker is a sliding piece this is the set of squares they move through
    * for the attack. A move to one of these squares blocks the attack.
    */
-  slideSquares: Readonly<Square[]>;
+  slideSquares: Readonly<Square[]>; // This data is used for handlnig when a king is checked by a single sliding piece
 }>;
 
 /**
@@ -106,7 +106,7 @@ export type AttackObject = Readonly<{
    * If the attacker is a sliding piece this is the set of squares they move through
    * for the attack. A move to one of these squares blocks the attack.
    */
-  slideSquares: Readonly<Square[]>;
+  slideSquares: Readonly<Square[]>; // NOTE: This data is unused
 }>;
 
 export type MoveWithExtraData = Move & {
