@@ -1,5 +1,12 @@
 /**
- * Color of a square or piece
+ * A square on the chess board.
+ *
+ * Npte: fits in 6 bits.
+ */
+export type Square = Readonly<number>;
+
+/**
+ * Color of a square or piece.
  */
 export enum Color {
   White = 0,
@@ -8,6 +15,8 @@ export enum Color {
 
 /**
  * Type of piece.
+ *
+ * Indexed at 1 for convenience. Either way a piece type will fit in 3 bits.
  */
 export enum PieceType {
   Pawn = 1,
@@ -28,8 +37,10 @@ export type SlidingPiece =
   | { color: Color; type: PieceType.Rook }
   | { color: Color; type: PieceType.Queen };
 
-export type Square = Readonly<number>;
-
+/**
+ * Each value corresponds to moving from one square to an adjacent square in
+ * the defined direction.
+ */
 export enum DirectionUnit {
   Up = 8,
   Right = 1,
@@ -53,32 +64,48 @@ export type Move = {
   promotion?: PromotionOption;
 };
 
+/**
+ * Describes a pin in a position.
+ */
 export type Pin = Readonly<{
-  // The square with the pinned or skewered piece.
-  pinned: Square;
-  // The square of the attacker creating the pin.
+  /** The square of the attacker creating the pin. */
   attacker: Square;
-  // Legal squares the pinned piece can move to. This includes it's
-  // resident square.
-  legalMoveSquares: Square[];
+  /** The square with the pinned or skewered piece. */
+  pinned: Square;
+  /**
+   * Legal squares the pinned piece can move to while maintaining the pin.
+   * This includes it's resident square.
+   */
+  legalMoveSquares: Readonly<Square[]>;
 }>;
 
-export type AttackObject = Readonly<{
-  // The square being attacked for this object
-  attacked: Readonly<{ square: Square; type: PieceType }>;
-  // The attacking piece
+/**
+ * Describes control a piece has on a square.
+ */
+export type SquareControlObject = Readonly<{
+  /** The controlling piece. */
   attacker: Readonly<{ square: Square; type: PieceType }>;
-  // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attack.
+  /** The square under control */
+  square: Square;
+  /**
+   * If the attacker is a sliding piece this is the set of squares they move through
+   * for the attack. A move to one of these squares blocks the attack.
+   */
   slideSquares: Readonly<Square[]>;
 }>;
 
-export type SquareControlObject = Readonly<{
-  square: Square;
-  // The attacking piece
+/**
+ * Describes an attack a piece is making on another piece.
+ */
+export type AttackObject = Readonly<{
+  /** The attacking piece. */
   attacker: Readonly<{ square: Square; type: PieceType }>;
-  // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attack.
+  /** The square being attacked for this object. */
+  attacked: Readonly<{ square: Square; type: PieceType }>;
+  /**
+   * If the attacker is a sliding piece this is the set of squares they move through
+   * for the attack. A move to one of these squares blocks the attack.
+   */
   slideSquares: Readonly<Square[]>;
 }>;
 
@@ -90,7 +117,7 @@ export type MoveWithExtraData = Move & {
 
 export type CastlingSide = 'kingside' | 'queenside';
 
-export type CastlingAvailability = {
+export type CastlingAvailability = Readonly<{
   [Color.White]: {
     kingside: boolean;
     queenside: boolean;
@@ -99,22 +126,32 @@ export type CastlingAvailability = {
     kingside: boolean;
     queenside: boolean;
   };
-};
+}>;
 
+/**
+ * Fully represent a unique chess position.
+ */
 export type Position = {
+  /** Map of board squares to pieces tracking where pieces are located. */
   pieces: Map<Square, Piece>;
-  // Which player's turn it is.
+  /** Which player's turn it is. */
   turn: Color;
-  // Castling availability.
+  /** Castling availability map. */
   castlingAvailability: CastlingAvailability;
-  // If a pawn has just made a two-square move, this is the
-  // position "behind" the pawn.
+  /**
+   * If a pawn has just made a two-square move, this is the
+   * square "behind" the pawn.
+   */
   enPassantSquare: Square | null;
-  // The number of halfmoves since the last capture or pawn advance, used for
-  // the fifty-move rule.
+  /**
+   * The number of halfmoves since the last capture or pawn advance, used for
+   * the fifty-move rule.
+   */
   halfMoveCount: number;
-  // The number of the full move. It starts at 1, and is incremented
-  // after Black's move.
+  /**
+   * The number of the full move. It starts at 1, and is incremented
+   * after Black's move.
+   */
   fullMoveCount: number;
 };
 
