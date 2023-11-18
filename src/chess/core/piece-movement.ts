@@ -6,25 +6,23 @@ import {
   Square,
   AttackObject,
   CastlingAvailability,
-  PromotionOption,
 } from '../types';
 import {
   isLegalSquare,
   flipColor,
   isStartPositionPawn,
   isPromotionPositionPawn,
+  PROMOTION_OPTION_PIECE_TYPES,
 } from '../utils';
 import AttackMap from './attack-map';
 import { BISHOP_RAYS, KING_MOVES, KNIGHT_MOVES, ROOK_RAYS } from './lookup';
 import { down, left, right, up, rayScanner } from './move-utils';
 
 export const expandPromotions = (move: MoveWithExtraData) =>
-  [PieceType.Bishop, PieceType.Knight, PieceType.Queen, PieceType.Rook].map(
-    (pieceType) => ({
-      ...move,
-      promotion: pieceType as PromotionOption,
-    }),
-  );
+  PROMOTION_OPTION_PIECE_TYPES.map((pieceType) => ({
+    ...move,
+    promotion: pieceType,
+  }));
 
 export const expandAllPromotions = (moves: MoveWithExtraData[]) =>
   moves.flatMap((move) => expandPromotions(move));

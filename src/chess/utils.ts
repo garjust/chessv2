@@ -36,6 +36,13 @@ export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
   },
 });
 
+export const PROMOTION_OPTION_PIECE_TYPES = [
+  PieceType.Bishop,
+  PieceType.Knight,
+  PieceType.Queen,
+  PieceType.Rook,
+] as const;
+
 export const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
   b: PieceType.Bishop,
   B: PieceType.Bishop,

@@ -1,9 +1,5 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
-import {
-  BISHOP_RAYS,
-  ROOK_RAYS,
-  QUEEN_MOVE_BITARRAYS,
-} from './lookup';
+import { BISHOP_RAYS, ROOK_RAYS, QUEEN_MOVE_BITARRAYS } from './lookup';
 import { KingSquares, PinsByColor } from './types';
 
 export const updatePinsOnKings = (
