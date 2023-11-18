@@ -9,7 +9,7 @@ test('moveInt', () => {
     20 as Square,
     35 as Square,
   );
-  expect(move).toEqual(0b01000110101000100);
+  expect(move).toEqual(0b0001000110101000100); // 19 bits
 
   const unpacked = unpackMove(move);
   expect(unpacked.color).toEqual(Color.White);
