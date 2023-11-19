@@ -84,7 +84,9 @@ export type Pin = Readonly<{
  */
 export type SquareControlObject = Readonly<{
   /** The controlling piece. */
-  attacker: Readonly<{ square: Square; type: PieceType }>;
+  piece: Piece;
+  /** The square of the controlling piece */
+  from: Square;
   /** The square under control */
   to: Square;
   /**

@@ -101,7 +101,7 @@ export default class AttackMap {
     for (const squareControl of squares) {
       this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.set(squareControl.attacker.square, squareControl);
+        ?.set(squareControl.from, squareControl);
     }
     this._squareControlByPiece.set(square, squares);
   }
@@ -122,7 +122,7 @@ export default class AttackMap {
     for (const squareControl of squares) {
       this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.set(squareControl.attacker.square, squareControl);
+        ?.set(squareControl.from, squareControl);
     }
     const existing = this._squareControlByPiece.get(square);
     if (!existing) {
@@ -144,14 +144,14 @@ export default class AttackMap {
     for (const squareControl of squares) {
       const squareControlExists = this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.has(squareControl.attacker.square);
+        ?.has(squareControl.from);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
       this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.delete(squareControl.attacker.square);
+        ?.delete(squareControl.from);
     }
     this._squareControlByPiece.set(square, []);
   }
@@ -174,21 +174,19 @@ export default class AttackMap {
       });
     }
 
-    const squaresToRemove = squares.map(
-      (squareControl) => squareControl.to,
-    );
+    const squaresToRemove = squares.map((squareControl) => squareControl.to);
 
     for (const squareControl of squares) {
       const squareControlExists = this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.has(squareControl.attacker.square);
+        ?.has(squareControl.from);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
       this._squareControlByAttackedSquare
         .get(squareControl.to)
-        ?.delete(squareControl.attacker.square);
+        ?.delete(squareControl.from);
     }
 
     for (let i = existing.length - 1; i >= 0; i--) {

@@ -34,8 +34,8 @@ export const squareControlXraysMove = (
   squareControl: SquareControlObject,
   move: Move,
 ): boolean =>
-  isSliderPieceType(squareControl.attacker.type) &&
-  directionOfMove(squareControl.attacker.square, squareControl.to) ===
+  isSliderPieceType(squareControl.piece.type) &&
+  directionOfMove(squareControl.from, squareControl.to) ===
     directionOfMove(move.from, move.to);
 
 export const rayControlScanner = (
@@ -68,7 +68,8 @@ export const rayControlScanner = (
     }
 
     moves.push({
-      attacker: { square: from, type: scanningPiece.piece.type },
+      piece: scanningPiece.piece,
+      from,
       to: to,
       slideSquares: [...slideSquares],
     });

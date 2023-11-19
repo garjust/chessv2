@@ -31,6 +31,7 @@ A chess engine can be loaded in two ways:
   - Probably remove AttackObject altogether
   - Remove buildMove function in move-generation
   - Remove a lot of object creation in move-generation
+  - _iff_ color is removed from SquareControlObject the objects can be pre-computed with half as much space
   - Decide how to handle move weight if doing this since MoveWithExtraData objects will be reused at different tree nodes
     - 0 out the weight somewhere?
     - Store elsewhere?

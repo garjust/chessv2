@@ -24,7 +24,7 @@ const buildMove = (
   piece: Piece,
   attackedPiece?: Piece,
 ): MoveWithExtraData => ({
-  from: squareControl.attacker.square,
+  from: squareControl.from,
   to: squareControl.to,
   piece,
   attack: attackedPiece
@@ -33,7 +33,10 @@ const buildMove = (
           square: squareControl.to,
           type: attackedPiece.type,
         },
-        attacker: squareControl.attacker,
+        attacker: {
+          square: squareControl.from,
+          type: squareControl.piece.type,
+        },
         slideSquares: squareControl.slideSquares,
       }
     : undefined,
@@ -125,8 +128,7 @@ const moveResolvesCheck = (
     // In the case that the king is checked by a single piece we can capture
     // the piece or block the attack.
     return (
-      squaresInclude(check.slideSquares, move.to) ||
-      check.attacker.square === move.to
+      squaresInclude(check.slideSquares, move.to) || check.from === move.to
     );
   } else if (checks.length === 2) {
     // In the case that the king is checked by multiple pieces (can only be 2)

@@ -10,11 +10,11 @@ import {
 import { down, left, right, up, rayControlScanner } from './move-utils';
 
 export const pawnMoves = (
-  color: Color,
+  piece: Piece,
   from: Square,
 ): SquareControlObject[] => {
   const squares: SquareControlObject[] = [];
-  const advanceFn = color === Color.White ? up : down;
+  const advanceFn = piece.color === Color.White ? up : down;
 
   const leftCaptureSquare = advanceFn(left(from));
   const rightCaptureSquare = advanceFn(right(from));
@@ -22,14 +22,16 @@ export const pawnMoves = (
   // Pawn captures diagonally.
   if (isLegalSquare(leftCaptureSquare) && leftCaptureSquare % 8 !== 7) {
     squares.push({
-      attacker: { square: from, type: PieceType.Pawn },
+      piece,
+      from,
       to: leftCaptureSquare,
       slideSquares: [],
     });
   }
   if (isLegalSquare(rightCaptureSquare) && rightCaptureSquare % 8 !== 0) {
     squares.push({
-      attacker: { square: from, type: PieceType.Pawn },
+      piece,
+      from,
       to: rightCaptureSquare,
       slideSquares: [],
     });
@@ -38,16 +40,24 @@ export const pawnMoves = (
   return squares;
 };
 
-export const knightMoves = (from: Square): SquareControlObject[] =>
+export const knightMoves = (
+  from: Square,
+  piece: Piece,
+): SquareControlObject[] =>
   KNIGHT_MOVES[from].map((to) => ({
-    attacker: { square: from, type: PieceType.Knight },
+    piece,
+    from,
     to,
     slideSquares: [],
   }));
 
-export const kingMoves = (from: Square): SquareControlObject[] => {
+export const kingMoves = (
+  from: Square,
+  piece: Piece,
+): SquareControlObject[] => {
   return KING_MOVES[from].map((to) => ({
-    attacker: { square: from, type: PieceType.King },
+    piece,
+    from,
     to,
     slideSquares: [],
   }));
@@ -55,41 +65,29 @@ export const kingMoves = (from: Square): SquareControlObject[] => {
 
 export const bishopMoves = (
   pieces: Map<Square, Piece>,
-  color: Color,
+  piece: Piece,
   from: Square,
 ): SquareControlObject[] =>
   BISHOP_RAYS[from].flatMap((ray) =>
-    rayControlScanner(
-      pieces,
-      { square: from, piece: { color, type: PieceType.Bishop } },
-      ray,
-    ),
+    rayControlScanner(pieces, { square: from, piece }, ray),
   );
 
 export const rookMoves = (
   pieces: Map<Square, Piece>,
-  color: Color,
+  piece: Piece,
   from: Square,
 ): SquareControlObject[] =>
   ROOK_RAYS[from].flatMap((ray) =>
-    rayControlScanner(
-      pieces,
-      { square: from, piece: { color, type: PieceType.Rook } },
-      ray,
-    ),
+    rayControlScanner(pieces, { square: from, piece }, ray),
   );
 
 export const queenMoves = (
   pieces: Map<Square, Piece>,
-  color: Color,
+  piece: Piece,
   from: Square,
 ): SquareControlObject[] =>
   QUEEN_RAYS[from].flatMap((ray) =>
-    rayControlScanner(
-      pieces,
-      { square: from, piece: { color, type: PieceType.Queen } },
-      ray,
-    ),
+    rayControlScanner(pieces, { square: from, piece }, ray),
   );
 
 export const forPiece = (
@@ -99,16 +97,16 @@ export const forPiece = (
 ): SquareControlObject[] => {
   switch (piece.type) {
     case PieceType.Bishop:
-      return bishopMoves(pieces, piece.color, square);
+      return bishopMoves(pieces, piece, square);
     case PieceType.King:
-      return kingMoves(square);
+      return kingMoves(square, piece);
     case PieceType.Knight:
-      return knightMoves(square);
+      return knightMoves(square, piece);
     case PieceType.Pawn:
-      return pawnMoves(piece.color, square);
+      return pawnMoves(piece, square);
     case PieceType.Queen:
-      return queenMoves(pieces, piece.color, square);
+      return queenMoves(pieces, piece, square);
     case PieceType.Rook:
-      return rookMoves(pieces, piece.color, square);
+      return rookMoves(pieces, piece, square);
   }
 };
