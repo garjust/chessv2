@@ -1,4 +1,4 @@
-import { sort } from 'fast-sort';
+import { inPlaceSort } from 'fast-sort';
 import { PieceValue } from '../../core/evaluation';
 import { squareValueDiff } from '../../lib/heatmaps';
 import { Move, MoveWithExtraData, Piece, Square } from '../../types';
@@ -48,6 +48,8 @@ const moveWeight = (
   return n;
 };
 
+const getMoveWeight = (move: MoveWithExtraData) => move.weight;
+
 export const orderMoves = (
   pieces: Map<Square, Piece>,
   moves: MoveWithExtraData[],
@@ -56,20 +58,16 @@ export const orderMoves = (
   killerMove?: Move,
   historyTable?: HistoryTable,
 ): MoveWithExtraData[] => {
-  const sortBy = (move: MoveWithExtraData) => {
-    if (!move.weight) {
-      move.weight = moveWeight(
-        pieces,
-        move,
-        tableMove,
-        pvMove,
-        killerMove,
-        historyTable,
-      );
-    }
+  for (const move of moves) {
+    move.weight = moveWeight(
+      pieces,
+      move,
+      tableMove,
+      pvMove,
+      killerMove,
+      historyTable,
+    );
+  }
 
-    return move.weight;
-  };
-
-  return sort(moves).desc(sortBy);
+  return inPlaceSort(moves).desc(getMoveWeight);
 };
