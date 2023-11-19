@@ -5,7 +5,7 @@ import {
   PieceType,
   Square,
   CastlingAvailability,
-  SquareControlObject,
+  SquareControl,
 } from '../types';
 import {
   flipColor,
@@ -89,7 +89,7 @@ const pseudoMovesForPosition = (
 
 // When in check we need to prune moves that do not resolve the check.
 const moveResolvesCheck = (
-  checks: SquareControlObject[],
+  checks: SquareControl[],
   move: MoveWithExtraData,
 ): boolean => {
   // If the moving piece is a king all it's moves should be retained. Moves
@@ -132,7 +132,7 @@ const moveLeavesKingInCheck = (
   }: {
     kingSquare: Square;
     pins: Pins;
-    checks: SquareControlObject[];
+    checks: SquareControl[];
     opponentAttackMap: AttackMap;
   },
 ): boolean => {
@@ -184,7 +184,7 @@ export const generateMoves = (
     attackedSquares: AttackedSquares;
     pins: Pins;
     kings: KingSquares;
-    checks: SquareControlObject[];
+    checks: SquareControl[];
     enPassantSquare: Square | null;
     castlingAvailability: CastlingAvailability;
   },

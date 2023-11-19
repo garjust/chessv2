@@ -3,7 +3,7 @@ import {
   MoveWithExtraData,
   Piece,
   Square,
-  SquareControlObject,
+  SquareControl,
 } from '../types';
 import {
   PROMOTION_OPTION_PIECE_TYPES,
@@ -30,7 +30,7 @@ export const isMoveInFile = (move: Move): boolean =>
   (move.from - move.to) % 8 === 0;
 
 export const squareControlXraysMove = (
-  squareControl: SquareControlObject,
+  squareControl: SquareControl,
   move: Move,
 ): boolean =>
   isSliderPieceType(squareControl.piece.type) &&
@@ -43,8 +43,8 @@ export const rayControlScanner = (
   ray: Square[],
   skipPast?: Square,
   stopAt?: Square,
-): SquareControlObject[] => {
-  const moves: SquareControlObject[] = [];
+): SquareControl[] => {
+  const moves: SquareControl[] = [];
   const slideSquares: Square[] = [];
   const from = scanningPiece.square;
   let skip = skipPast !== undefined ? true : false;

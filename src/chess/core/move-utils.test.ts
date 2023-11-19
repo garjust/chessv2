@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
-import { Color, DirectionUnit, PieceType, SquareControlObject } from '../types';
+import { Color, DirectionUnit, PieceType, SquareControl } from '../types';
 import { buildMove, labelToSquare } from '../utils';
 import { RAYS_BY_DIRECTION } from './lookup/move-lookup';
 import {
@@ -28,7 +28,7 @@ test('movement functions', () => {
 });
 
 test('squareControlXraysMove', () => {
-  let squareControl: SquareControlObject = {
+  let squareControl: SquareControl = {
     piece: { type: PieceType.Queen, color: Color.White },
     from: 34,
     to: 13,

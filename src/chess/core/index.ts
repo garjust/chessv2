@@ -8,7 +8,7 @@ import {
   Piece,
   Pin,
   Position,
-  SquareControlObject,
+  SquareControl,
 } from '../types';
 import { flipColor } from '../utils';
 import AttackMap from './attack-map';
@@ -130,9 +130,9 @@ export default class Core {
     return this.currentZobrist.key;
   }
 
-  checks(color: Color): SquareControlObject[] {
+  checks(color: Color): SquareControl[] {
     const king = this.internalPosition.kings[color];
-    const checks: SquareControlObject[] = [];
+    const checks: SquareControl[] = [];
     if (king) {
       for (const [, squareControl] of this.internalPosition.attackedSquares[
         flipColor(color)

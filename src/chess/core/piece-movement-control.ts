@@ -1,4 +1,4 @@
-import { Color, Piece, PieceType, Square, SquareControlObject } from '../types';
+import { Color, Piece, PieceType, Square, SquareControl } from '../types';
 import { isLegalSquare } from '../utils';
 import {
   BISHOP_RAYS,
@@ -9,11 +9,8 @@ import {
 } from './lookup';
 import { down, left, right, up, rayControlScanner } from './move-utils';
 
-export const pawnMoves = (
-  piece: Piece,
-  from: Square,
-): SquareControlObject[] => {
-  const squares: SquareControlObject[] = [];
+export const pawnMoves = (piece: Piece, from: Square): SquareControl[] => {
+  const squares: SquareControl[] = [];
   const advanceFn = piece.color === Color.White ? up : down;
 
   const leftCaptureSquare = advanceFn(left(from));
@@ -40,10 +37,7 @@ export const pawnMoves = (
   return squares;
 };
 
-export const knightMoves = (
-  from: Square,
-  piece: Piece,
-): SquareControlObject[] =>
+export const knightMoves = (from: Square, piece: Piece): SquareControl[] =>
   KNIGHT_MOVES[from].map((to) => ({
     piece,
     from,
@@ -51,10 +45,7 @@ export const knightMoves = (
     slideSquares: [],
   }));
 
-export const kingMoves = (
-  from: Square,
-  piece: Piece,
-): SquareControlObject[] => {
+export const kingMoves = (from: Square, piece: Piece): SquareControl[] => {
   return KING_MOVES[from].map((to) => ({
     piece,
     from,
@@ -67,7 +58,7 @@ export const bishopMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-): SquareControlObject[] =>
+): SquareControl[] =>
   BISHOP_RAYS[from].flatMap((ray) =>
     rayControlScanner(pieces, { square: from, piece }, ray),
   );
@@ -76,7 +67,7 @@ export const rookMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-): SquareControlObject[] =>
+): SquareControl[] =>
   ROOK_RAYS[from].flatMap((ray) =>
     rayControlScanner(pieces, { square: from, piece }, ray),
   );
@@ -85,7 +76,7 @@ export const queenMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-): SquareControlObject[] =>
+): SquareControl[] =>
   QUEEN_RAYS[from].flatMap((ray) =>
     rayControlScanner(pieces, { square: from, piece }, ray),
   );
@@ -94,7 +85,7 @@ export const forPiece = (
   piece: Piece,
   pieces: Map<Square, Piece>,
   square: Square,
-): SquareControlObject[] => {
+): SquareControl[] => {
   switch (piece.type) {
     case PieceType.Bishop:
       return bishopMoves(pieces, piece, square);

@@ -80,9 +80,10 @@ export type Pin = Readonly<{
 }>;
 
 /**
- * Describes control a piece has on a square.
+ * Describes control a piece has on a square. Fully represents a move that can
+ * be executed or evaluated, although the move may not be legal.
  */
-export type SquareControlObject = {
+export type SquareControl = {
   /** The controlling piece. */
   readonly piece: Piece;
   /** The square of the controlling piece. */

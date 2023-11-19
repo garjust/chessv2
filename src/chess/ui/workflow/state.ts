@@ -6,7 +6,7 @@ import {
   Square,
   Move,
   MoveWithExtraData,
-  SquareControlObject,
+  SquareControl,
 } from '../../types';
 import { Engine } from '../../engine/engine';
 
@@ -110,7 +110,7 @@ export type State = Readonly<{
     moves: Readonly<MoveWithExtraData[]>;
     moveList: Readonly<Move[]>;
     moveIndex: number;
-    checks: Readonly<SquareControlObject[]>;
+    checks: Readonly<SquareControl[]>;
   }>;
   lastMove: Move | null;
 }>;

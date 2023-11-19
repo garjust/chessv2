@@ -1,7 +1,7 @@
 import {
   Color,
   Square,
-  SquareControlObject,
+  SquareControl,
   Position as ExternalPosition,
 } from '../types';
 import { squareGenerator } from '../utils';
@@ -16,18 +16,18 @@ enum UpdateType {
 type Update = {
   type: UpdateType;
   square: Square;
-  squares: SquareControlObject[];
+  squares: SquareControl[];
 };
 
 export default class AttackMap {
   // Store all squares controlled by the piece residing in
   // the key square.
-  _squareControlByPiece = new Map<Square, SquareControlObject[]>();
+  _squareControlByPiece = new Map<Square, SquareControl[]>();
   // Store all squares which attack each square. Use a Square-keyed map so we
   // can quickly add/remove/enumerate the attacks on a square.
   _squareControlByAttackedSquare = new Map<
     Square,
-    Map<Square, SquareControlObject>
+    Map<Square, SquareControl>
   >();
 
   _updatesStack: Update[][] = [];
@@ -54,7 +54,7 @@ export default class AttackMap {
     return (this._squareControlByAttackedSquare.get(square)?.size ?? 0) > 0;
   }
 
-  controlForPiece(square: Square): SquareControlObject[] {
+  controlForPiece(square: Square): SquareControl[] {
     return this._squareControlByPiece.get(square) ?? [];
   }
 
@@ -97,7 +97,7 @@ export default class AttackMap {
     }
   }
 
-  addAttacksForPiece(square: Square, squares: SquareControlObject[]): void {
+  addAttacksForPiece(square: Square, squares: SquareControl[]): void {
     for (const squareControl of squares) {
       this._squareControlByAttackedSquare
         .get(squareControl.to)
@@ -106,11 +106,7 @@ export default class AttackMap {
     this._squareControlByPiece.set(square, squares);
   }
 
-  addAttacks(
-    square: Square,
-    squares: SquareControlObject[],
-    cache = true,
-  ): void {
+  addAttacks(square: Square, squares: SquareControl[], cache = true): void {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.PartialAdd,
@@ -156,11 +152,7 @@ export default class AttackMap {
     this._squareControlByPiece.set(square, []);
   }
 
-  removeAttacks(
-    square: Square,
-    squares: SquareControlObject[],
-    cache = true,
-  ): void {
+  removeAttacks(square: Square, squares: SquareControl[], cache = true): void {
     const existing = this._squareControlByPiece.get(square);
     if (!existing) {
       throw Error('there should be square control from this square');

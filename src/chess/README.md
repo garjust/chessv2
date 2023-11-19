@@ -24,12 +24,10 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
-- Pre-compute SquareControlObjects for all rays/moves so that objects are not
-  created when assembling sets of SquareControlObjects
+- Pre-compute SquareControl for all rays/moves so that objects are not
+  created when assembling sets of SquareControls
 - Refactor "Move" types to be subsets of each other for duck typing
-  - SquareControlObject > MoveWithExtraData > Move
-  - Remove a lot of object creation in move-generation
-  - _iff_ color is removed from SquareControlObject the objects can be pre-computed with half as much space
+  - _iff_ color is removed from SquareControl the objects can be pre-computed with half as much space
   - Decide how to handle move weight if doing this since MoveWithExtraData objects will be reused at different tree nodes
     - 0 out the weight somewhere?
     - Store elsewhere?
