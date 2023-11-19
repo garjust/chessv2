@@ -4,12 +4,11 @@
 const { execSync } = require('child_process');
 
 const FENS = [
-  ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 5], // startpos
+  ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 6], // startpos
   ['rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8', 5], // perft 5
-  ['2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w - - 1 11', 5], // vienna gambit
-  ['rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/2N5/PPPP1PPP/R1BQK1NR/ b KQkQ - 3 3', 5], // vienna open
+  ['2kr1bnr/ppp2ppp/2n5/1B2P3/5Bb1/2N2N2/PPP3PP/R2K3R/ w - - 1 11', 6], // vienna gambit
   ['r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R w KQ - 2 8', 5], // fried liver busted
-  ['4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24', 5], // black checkmate
+  ['4k3/5p1p/6rp/2N1p3/2RnP1r1/1P5P/P4R2/7K b - - 0 24', 6], // black checkmate
 ];
 
 let count = 0;
@@ -23,4 +22,4 @@ for (const [fen, depth] of FENS) {
   console.log('----', count, `${timing}µs`);
 }
 
-console.log('=', `${(timing / count).toFixed(6)} µs/move`);
+console.log('=', `${((timing * 1000) / count).toFixed(6)} ns/move`);
