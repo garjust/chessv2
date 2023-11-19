@@ -191,10 +191,7 @@ export const findKing = (
 };
 
 export const copyPosition = (position: Position): Position => {
-  const pieces = new Map<Square, Piece>();
-  for (const [key, value] of position.pieces) {
-    pieces.set(key, value);
-  }
+  const pieces = new Map(position.pieces);
 
   const castlingAvailability = {
     [Color.White]: {

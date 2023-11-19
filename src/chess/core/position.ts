@@ -1,10 +1,12 @@
-import { Color, Position as ExternalPosition } from '../types';
+import { Color, Position } from '../types';
 import { copyPosition, findKing } from '../utils';
 import AttackMap from './attack-map';
 import Pins from './pins';
-import { KingSquares, Position } from './types';
+import { KingSquares, PositionWithComputedData } from './types';
 
-const convertToInternal = (position: ExternalPosition): Position => {
+const computeExtraPositionData = (
+  position: Position,
+): PositionWithComputedData => {
   const whiteKing = findKing(position, Color.White);
   const blackKing = findKing(position, Color.Black);
 
@@ -31,27 +33,15 @@ const convertToInternal = (position: ExternalPosition): Position => {
   };
 };
 
-const convertToExternal = (position: Position): ExternalPosition => {
-  const {
-    pieces,
-    turn,
-    castlingAvailability,
-    enPassantSquare,
-    halfMoveCount,
-    fullMoveCount,
-  } = position;
-  return {
-    pieces,
-    turn,
-    castlingAvailability,
-    enPassantSquare,
-    halfMoveCount,
-    fullMoveCount,
-  };
-};
+/**
+ * WARNING: This function is very slow and should not be used during game
+ * tree traversal.
+ *
+ * This function initializes all the state used to make the core run as fast
+ * as possible.
+ */
+export const copyToInternal = (position: Position): PositionWithComputedData =>
+  computeExtraPositionData(copyPosition(position));
 
-export const copyToInternal = (position: ExternalPosition): Position =>
-  convertToInternal(copyPosition(position));
-
-export const copyToExternal = (position: Position): ExternalPosition =>
-  copyPosition(convertToExternal(position));
+export const copyToExternal = (position: Position): Position =>
+  copyPosition(position);
