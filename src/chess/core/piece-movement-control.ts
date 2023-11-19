@@ -23,14 +23,14 @@ export const pawnMoves = (
   if (isLegalSquare(leftCaptureSquare) && leftCaptureSquare % 8 !== 7) {
     squares.push({
       attacker: { square: from, type: PieceType.Pawn },
-      square: leftCaptureSquare,
+      to: leftCaptureSquare,
       slideSquares: [],
     });
   }
   if (isLegalSquare(rightCaptureSquare) && rightCaptureSquare % 8 !== 0) {
     squares.push({
       attacker: { square: from, type: PieceType.Pawn },
-      square: rightCaptureSquare,
+      to: rightCaptureSquare,
       slideSquares: [],
     });
   }
@@ -41,14 +41,14 @@ export const pawnMoves = (
 export const knightMoves = (from: Square): SquareControlObject[] =>
   KNIGHT_MOVES[from].map((to) => ({
     attacker: { square: from, type: PieceType.Knight },
-    square: to,
+    to,
     slideSquares: [],
   }));
 
 export const kingMoves = (from: Square): SquareControlObject[] => {
   return KING_MOVES[from].map((to) => ({
     attacker: { square: from, type: PieceType.King },
-    square: to,
+    to,
     slideSquares: [],
   }));
 };

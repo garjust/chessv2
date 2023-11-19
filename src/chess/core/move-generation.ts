@@ -25,12 +25,12 @@ const buildMove = (
   attackedPiece?: Piece,
 ): MoveWithExtraData => ({
   from: squareControl.attacker.square,
-  to: squareControl.square,
+  to: squareControl.to,
   piece,
   attack: attackedPiece
     ? {
         attacked: {
-          square: squareControl.square,
+          square: squareControl.to,
           type: attackedPiece.type,
         },
         attacker: squareControl.attacker,
@@ -60,7 +60,7 @@ const pseudoMovesForPosition = (
     const attacks = attackedSquares[piece.color].controlForPiece(square);
 
     for (const squareControl of attacks) {
-      const attackedPiece = pieces.get(squareControl.square);
+      const attackedPiece = pieces.get(squareControl.to);
 
       // Get rid of attacks on own-pieces.
       if (attackedPiece?.color === color) {
@@ -70,7 +70,7 @@ const pseudoMovesForPosition = (
       if (piece.type === PieceType.Pawn) {
         // The only pawn moves here are capturing moves, so make sure they
         // are actually captures.
-        if (!attackedPiece && squareControl.square !== enPassantSquare) {
+        if (!attackedPiece && squareControl.to !== enPassantSquare) {
           continue;
         }
       }

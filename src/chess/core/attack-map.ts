@@ -100,7 +100,7 @@ export default class AttackMap {
   addAttacksForPiece(square: Square, squares: SquareControlObject[]): void {
     for (const squareControl of squares) {
       this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.set(squareControl.attacker.square, squareControl);
     }
     this._squareControlByPiece.set(square, squares);
@@ -121,7 +121,7 @@ export default class AttackMap {
 
     for (const squareControl of squares) {
       this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.set(squareControl.attacker.square, squareControl);
     }
     const existing = this._squareControlByPiece.get(square);
@@ -143,14 +143,14 @@ export default class AttackMap {
 
     for (const squareControl of squares) {
       const squareControlExists = this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.has(squareControl.attacker.square);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
       this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.delete(squareControl.attacker.square);
     }
     this._squareControlByPiece.set(square, []);
@@ -175,25 +175,25 @@ export default class AttackMap {
     }
 
     const squaresToRemove = squares.map(
-      (squareControl) => squareControl.square,
+      (squareControl) => squareControl.to,
     );
 
     for (const squareControl of squares) {
       const squareControlExists = this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.has(squareControl.attacker.square);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
       this._squareControlByAttackedSquare
-        .get(squareControl.square)
+        .get(squareControl.to)
         ?.delete(squareControl.attacker.square);
     }
 
     for (let i = existing.length - 1; i >= 0; i--) {
       const control = existing[i];
-      if (squaresToRemove.includes(control.square)) {
+      if (squaresToRemove.includes(control.to)) {
         existing.splice(i, 1);
       }
     }

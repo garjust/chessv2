@@ -30,7 +30,7 @@ test('movement functions', () => {
 test('squareControlXraysMove', () => {
   let squareControl: SquareControlObject = {
     attacker: { square: 34, type: PieceType.Queen },
-    square: 13,
+    to: 13,
     slideSquares: [27, 20],
   };
 
@@ -45,7 +45,7 @@ test('squareControlXraysMove', () => {
 
   squareControl = {
     attacker: { square: 44, type: PieceType.Queen },
-    square: 52,
+    to: 52,
     slideSquares: [],
   };
   expect(squareControlXraysMove(squareControl, buildMove(52, 60))).toEqual(

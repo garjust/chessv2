@@ -86,7 +86,7 @@ export type SquareControlObject = Readonly<{
   /** The controlling piece. */
   attacker: Readonly<{ square: Square; type: PieceType }>;
   /** The square under control */
-  square: Square;
+  to: Square;
   /**
    * If the attacker is a sliding piece this is the set of squares they move through
    * for the attack. A move to one of these squares blocks the attack.

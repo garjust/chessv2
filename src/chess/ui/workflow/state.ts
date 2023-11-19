@@ -172,7 +172,7 @@ export const squareContainsMovablePiece = (
 ): boolean => pieceInSquare(state, square)?.color === state.game.position.turn;
 
 export const checkedSquare = (state: State): Square | undefined =>
-  state.game.checks.length > 0 ? state.game.checks[0].square : undefined;
+  state.game.checks.length > 0 ? state.game.checks[0].to : undefined;
 
 export const availableCaptures = (state: State): Move[] =>
   state.game.moves.filter((move) => move.attack);
