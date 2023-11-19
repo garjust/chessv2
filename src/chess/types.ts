@@ -82,23 +82,26 @@ export type Pin = Readonly<{
 /**
  * Describes control a piece has on a square.
  */
-export type SquareControlObject = Readonly<{
+export type SquareControlObject = {
   /** The controlling piece. */
-  piece: Piece;
+  readonly piece: Piece;
   /** The square of the controlling piece. */
-  from: Square;
+  readonly from: Square;
   /** The square under control. */
-  to: Square;
+  readonly to: Square;
   /**
    * If the attacker is a sliding piece this is the set of squares they move through
    * for the attack. A move to one of these squares blocks the attack.
    */
-  slideSquares: Readonly<Square[]>; // This data is used for handling when a king is checked by a single sliding piece.
-}>;
+  readonly slideSquares: Readonly<Square[]>; // This data is used for handling when a king is checked by a single sliding piece.
+
+  attack?: boolean;
+  weight?: number;
+};
 
 export type MoveWithExtraData = Move & {
   piece: Piece;
-  attack: boolean;
+  attack?: boolean;
   weight?: number;
 };
 

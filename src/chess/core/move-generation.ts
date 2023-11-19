@@ -19,17 +19,6 @@ import { castlingKingMoves, advancePawnMoves } from './piece-movement';
 import Pins from './pins';
 import { KingSquares, AttackedSquares } from './types';
 
-const buildMove = (
-  squareControl: SquareControlObject,
-  piece: Piece,
-  attackedPiece?: Piece,
-): MoveWithExtraData => ({
-  from: squareControl.from,
-  to: squareControl.to,
-  piece,
-  attack: attackedPiece !== undefined,
-});
-
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
@@ -66,7 +55,8 @@ const pseudoMovesForPosition = (
         }
       }
 
-      const move = buildMove(squareControl, piece, attackedPiece);
+      const move = squareControl;
+      move.attack = attackedPiece !== undefined;
 
       if (
         piece.type === PieceType.Pawn &&
