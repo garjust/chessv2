@@ -19,27 +19,30 @@ const expandAllPromotions = (moves: MoveWithExtraData[]) =>
 
 export const advancePawnMoves = (
   pieces: Map<Square, Piece>,
-  color: Color,
+  piece: Piece,
   from: Square,
 ): MoveWithExtraData[] => {
   let squares: MoveWithExtraData[] = [];
-  const advanceFn = color === Color.White ? up : down;
+  const advanceFn = piece.color === Color.White ? up : down;
 
   // Space forward of the pawn.
   if (isLegalSquare(advanceFn(from)) && !pieces.get(advanceFn(from))) {
     squares.push({
       from,
       to: advanceFn(from),
-      piece: { type: PieceType.Pawn, color },
+      piece,
       attack: false,
     });
 
     // Space two squares forward of the pawn when it is in it's starting rank.
-    if (!pieces.get(advanceFn(from, 2)) && isStartPositionPawn(color, from)) {
+    if (
+      !pieces.get(advanceFn(from, 2)) &&
+      isStartPositionPawn(piece.color, from)
+    ) {
       squares.push({
         from,
         to: advanceFn(from, 2),
-        piece: { type: PieceType.Pawn, color },
+        piece,
         attack: false,
       });
     }
@@ -47,7 +50,7 @@ export const advancePawnMoves = (
 
   // If the pawn will promote on next advancement take the possible pawn moves
   // and add possible promotions.
-  if (isPromotionPositionPawn(color, from)) {
+  if (isPromotionPositionPawn(piece.color, from)) {
     squares = expandAllPromotions(squares);
   }
 
@@ -56,7 +59,7 @@ export const advancePawnMoves = (
 
 export const castlingKingMoves = (
   pieces: Map<Square, Piece>,
-  color: Color,
+  piece: Piece,
   from: Square,
   {
     opponentAttackMap,
@@ -71,7 +74,7 @@ export const castlingKingMoves = (
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
   if (
-    castlingAvailability[color].kingside &&
+    castlingAvailability[piece.color].kingside &&
     // Check squares being castled through are empty
     !pieces.get(right(from)) &&
     !pieces.get(right(from, 2)) &&
@@ -83,7 +86,7 @@ export const castlingKingMoves = (
     squares.push(right(from, 2));
   }
   if (
-    castlingAvailability[color].queenside &&
+    castlingAvailability[piece.color].queenside &&
     // Check squares being castled through are empty
     !pieces.get(left(from)) &&
     !pieces.get(left(from, 2)) &&
@@ -99,7 +102,7 @@ export const castlingKingMoves = (
   return squares.map((to) => ({
     from,
     to,
-    piece: { type: PieceType.King, color },
+    piece,
     attack: false,
   }));
 };

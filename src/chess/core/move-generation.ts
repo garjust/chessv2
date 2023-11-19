@@ -41,47 +41,46 @@ const pseudoMovesForPosition = (
 
     for (const squareControl of attacks) {
       const attackedPiece = pieces.get(squareControl.to);
+      squareControl.attack = attackedPiece !== undefined;
 
       // Get rid of attacks on own-pieces.
-      if (attackedPiece?.color === color) {
+      // Logic to discard moves:
+      // 1. Discard the move if it attacks a piece of the same control.
+      // 2. Discard pawn moves that don't capture a piece (only the diagonal
+      //    captures are included in square control).
+      if (
+        attackedPiece?.color === color ||
+        (piece.type === PieceType.Pawn &&
+          !squareControl.attack &&
+          squareControl.to !== enPassantSquare)
+      ) {
         continue;
       }
-
-      if (piece.type === PieceType.Pawn) {
-        // The only pawn moves here are capturing moves, so make sure they
-        // are actually captures.
-        if (!attackedPiece && squareControl.to !== enPassantSquare) {
-          continue;
-        }
-      }
-
-      const move = squareControl;
-      move.attack = attackedPiece !== undefined;
 
       if (
         piece.type === PieceType.Pawn &&
         isPromotionPositionPawn(piece.color, square)
       ) {
-        moves.push(...expandPromotions(move));
+        moves.push(...expandPromotions(squareControl));
       } else {
-        moves.push(move);
+        moves.push(squareControl);
       }
     }
 
-    // Below handle moves that don't really exert "control" so are not covered
-    // by SqsuareControlObject state. These moves are castling and pawn
-    // advancement.
+    // Add moves that are not included in square control:
+    // 1. Castling moves
+    // 2. Pawn advancement
     if (piece.type === PieceType.King) {
       // Add castling moves
       moves.push(
-        ...castlingKingMoves(pieces, piece.color, square, {
+        ...castlingKingMoves(pieces, piece, square, {
           castlingAvailability,
           opponentAttackMap: attackedSquares[flipColor(color)],
         }),
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
-      moves.push(...advancePawnMoves(pieces, piece.color, square));
+      moves.push(...advancePawnMoves(pieces, piece, square));
     }
   }
 
