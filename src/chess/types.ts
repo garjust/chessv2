@@ -1,35 +1,46 @@
+/**
+ * A square on the chess board.
+ *
+ * Npte: fits in 6 bits.
+ */
+export type Square = Readonly<number>;
+
+/**
+ * Color of a square or piece.
+ */
 export enum Color {
-  White = 'WHITE',
-  Black = 'BLACK',
+  White = 0,
+  Black = 1,
 }
 
+/**
+ * Type of piece.
+ *
+ * Indexed at 1 for convenience. Either way a piece type will fit in 3 bits.
+ */
 export enum PieceType {
-  Bishop = 'BISHOP',
-  King = 'KING',
-  Knight = 'KNIGHT',
-  Pawn = 'PAWN',
-  Queen = 'QUEEN',
-  Rook = 'ROOK',
+  Pawn = 1,
+  Knight = 2,
+  Bishop = 3,
+  Rook = 4,
+  Queen = 5,
+  King = 6,
 }
 
-// export type Piece = bigint;
-export type Piece = {
+export type Piece = Readonly<{
   type: PieceType;
   color: Color;
-};
+}>;
 
 export type SlidingPiece =
   | { color: Color; type: PieceType.Bishop }
   | { color: Color; type: PieceType.Rook }
   | { color: Color; type: PieceType.Queen };
 
-export type Square = number;
-
-export type RankFile = {
-  rank: number;
-  file: number;
-};
-
+/**
+ * Each value corresponds to moving from one square to an adjacent square in
+ * the defined direction.
+ */
 export enum DirectionUnit {
   Up = 8,
   Right = 1,
@@ -53,34 +64,50 @@ export type Move = {
   promotion?: PromotionOption;
 };
 
-export type Pin = {
-  // The square with the pinned or skewered piece.
-  pinned: Square;
-  // The square of the attacker creating the pin.
+/**
+ * Describes a pin in a position.
+ */
+export type Pin = Readonly<{
+  /** The square of the attacker creating the pin. */
   attacker: Square;
-  // Legal squares the pinned piece can move to. This includes it's
-  // resident square.
-  legalMoveSquares: Square[];
-};
+  /** The square with the pinned or skewered piece. */
+  pinned: Square;
+  /**
+   * Legal squares the pinned piece can move to while maintaining the pin.
+   * This includes it's resident square.
+   */
+  legalMoveSquares: Readonly<Square[]>;
+}>;
 
-export type AttackObject = {
-  // The square being attacked for this object
-  attacked: { square: Square; type: PieceType };
-  // The attacking piece
-  attacker: { square: Square; type: PieceType };
-  // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attack.
-  slideSquares: Square[];
-};
-
-export type SquareControlObject = {
+/**
+ * Describes control a piece has on a square.
+ */
+export type SquareControlObject = Readonly<{
+  /** The controlling piece. */
+  attacker: Readonly<{ square: Square; type: PieceType }>;
+  /** The square under control */
   square: Square;
-  // The attacking piece
-  attacker: { square: Square; type: PieceType };
-  // If the attacker is a sliding piece this is the set of squares they move through
-  // for the attack. A move to one of these squares blocks the attack.
-  slideSquares: Square[];
-};
+  /**
+   * If the attacker is a sliding piece this is the set of squares they move through
+   * for the attack. A move to one of these squares blocks the attack.
+   */
+  slideSquares: Readonly<Square[]>; // This data is used for handlnig when a king is checked by a single sliding piece
+}>;
+
+/**
+ * Describes an attack a piece is making on another piece.
+ */
+export type AttackObject = Readonly<{
+  /** The attacking piece. */
+  attacker: Readonly<{ square: Square; type: PieceType }>;
+  /** The square being attacked for this object. */
+  attacked: Readonly<{ square: Square; type: PieceType }>;
+  /**
+   * If the attacker is a sliding piece this is the set of squares they move through
+   * for the attack. A move to one of these squares blocks the attack.
+   */
+  slideSquares: Readonly<Square[]>; // NOTE: This data is unused
+}>;
 
 export type MoveWithExtraData = Move & {
   piece: Piece;
@@ -90,7 +117,7 @@ export type MoveWithExtraData = Move & {
 
 export type CastlingSide = 'kingside' | 'queenside';
 
-export type CastlingAvailability = {
+export type CastlingAvailability = Readonly<{
   [Color.White]: {
     kingside: boolean;
     queenside: boolean;
@@ -99,22 +126,32 @@ export type CastlingAvailability = {
     kingside: boolean;
     queenside: boolean;
   };
-};
+}>;
 
+/**
+ * Fully represent a unique chess position.
+ */
 export type Position = {
+  /** Map of board squares to pieces tracking where pieces are located. */
   pieces: Map<Square, Piece>;
-  // Which player's turn it is.
+  /** Which player's turn it is. */
   turn: Color;
-  // Castling availability.
+  /** Castling availability map. */
   castlingAvailability: CastlingAvailability;
-  // If a pawn has just made a two-square move, this is the
-  // position "behind" the pawn.
+  /**
+   * If a pawn has just made a two-square move, this is the
+   * square "behind" the pawn.
+   */
   enPassantSquare: Square | null;
-  // The number of halfmoves since the last capture or pawn advance, used for
-  // the fifty-move rule.
+  /**
+   * The number of halfmoves since the last capture or pawn advance, used for
+   * the fifty-move rule.
+   */
   halfMoveCount: number;
-  // The number of the full move. It starts at 1, and is incremented
-  // after Black's move.
+  /**
+   * The number of the full move. It starts at 1, and is incremented
+   * after Black's move.
+   */
   fullMoveCount: number;
 };
 

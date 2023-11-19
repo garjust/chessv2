@@ -45,7 +45,6 @@ test('example interaction with ui workflow', async () => {
     Type.SetPositionFromFEN, // boot
     Type.SetPosition,
     Type.OverlaySquares,
-    Type.AttemptEngineMove,
     Type.ClickSquare, // click E2
     Type.OverlaySquares,
     Type.ClickSquare, // click E4

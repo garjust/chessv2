@@ -24,6 +24,19 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
+- Pre-compute SquareControlObjects for all rays/moves so that objects are not
+  created when assembling sets of SquareControlObjects
+- Refactor "Move" types to be subsets of each other for duck typing
+  - AttackObject > SquareControlObject > MoveWithExtraData > Move
+  - Probably remove AttackObject altogether
+  - Remove buildMove function in move-generation
+  - Remove a lot of object creation in move-generation
+  - Decide how to handle move weight if doing this since MoveWithExtraData objects will be reused at different tree nodes
+    - 0 out the weight somewhere?
+    - Store elsewhere?
+    - If weight is stored elsewhere that removes a blocker to packing everything
+      into 32bits (other blocker is slideSquares)
+
 - Decrease weight of moves to squares attacked by pawns
 - *Opening book* (Kevin will fried liver me)
 - Evaluation like pawn cover for king

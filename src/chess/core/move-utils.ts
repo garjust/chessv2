@@ -6,7 +6,11 @@ import {
   Square,
   SquareControlObject,
 } from '../types';
-import { directionOfMove, isSliderPieceType } from '../utils';
+import {
+  PROMOTION_OPTION_PIECE_TYPES,
+  directionOfMove,
+  isSliderPieceType,
+} from '../utils';
 
 export const up = (square: Square, n = 1): Square => square + 8 * n;
 export const down = (square: Square, n = 1): Square => square - 8 * n;
@@ -33,52 +37,6 @@ export const squareControlXraysMove = (
   isSliderPieceType(squareControl.attacker.type) &&
   directionOfMove(squareControl.attacker.square, squareControl.square) ===
     directionOfMove(move.from, move.to);
-
-export const rayScanner = (
-  pieces: Map<Square, Piece>,
-  scanningPiece: { square: Square; piece: Piece },
-  ray: Square[],
-  { skip = [] }: { skip: Square[] },
-): MoveWithExtraData[] => {
-  const moves: MoveWithExtraData[] = [];
-  const from = scanningPiece.square;
-
-  let attack: AttackObject | undefined;
-
-  for (const to of ray) {
-    if (skip.includes(to)) {
-      moves.push({ from, to, piece: scanningPiece.piece });
-      continue;
-    }
-
-    const piece = pieces.get(to);
-
-    if (piece) {
-      if (piece.color === scanningPiece.piece.color) {
-        // friend!
-        break;
-      } else {
-        // foe!
-        attack = {
-          attacked: { square: to, type: piece.type },
-          attacker: {
-            square: from,
-            type: scanningPiece.piece.type,
-          },
-          slideSquares: moves.map(({ to }) => to),
-        };
-
-        moves.push({ from, to, piece: scanningPiece.piece, attack });
-        break;
-      }
-    } else {
-      // empty square!
-      moves.push({ from, to, piece: scanningPiece.piece });
-    }
-  }
-
-  return moves;
-};
 
 export const rayControlScanner = (
   pieces: Map<Square, Piece>,
@@ -129,3 +87,9 @@ export const rayControlScanner = (
 
   return moves;
 };
+
+export const expandPromotions = (move: MoveWithExtraData) =>
+  PROMOTION_OPTION_PIECE_TYPES.map((pieceType) => ({
+    ...move,
+    promotion: pieceType,
+  }));

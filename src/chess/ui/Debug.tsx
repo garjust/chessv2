@@ -12,15 +12,10 @@ const EXCLUDED_VERSIONS: Version[] = ['random'];
 const ENGINE_DEPTH = 4;
 
 async function runMoveGenerationTest(
-  logger: Subject<string>,
+  worker: Worker,
   test: MoveTest,
   toDepth = 5,
 ) {
-  const [worker] = await loadPerftWorker();
-
-  worker.onmessage = (message: MessageEvent<string>) => {
-    logger.next(message.data);
-  };
   worker.postMessage({ test, toDepth });
 }
 
@@ -109,6 +104,20 @@ async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
 const Debug = () => {
   const [logger] = useState(new Subject<string>());
   const [log, setLog] = useState([] as string[]);
+  const [worker, setWorker] = useState<Worker | null>(null);
+
+  useEffect(() => {
+    const promise = loadPerftWorker();
+    promise.then(([newWorker]) => {
+      newWorker.onmessage = (message: MessageEvent<string>) => {
+        logger.next(message.data);
+      };
+      setWorker(newWorker);
+    });
+    return () => {
+      promise.then(([newWorker]) => newWorker.terminate());
+    };
+  }, []);
 
   useEffect(() => {
     const subscription = logger.subscribe((str) => {
@@ -132,7 +141,9 @@ const Debug = () => {
       >
         <button
           onClick={() =>
-            runMoveGenerationTest(logger, TestFens.STARTING_POSITION)
+            worker
+              ? runMoveGenerationTest(worker, TestFens.STARTING_POSITION)
+              : null
           }
         >
           Move generation perft
@@ -140,21 +151,29 @@ const Debug = () => {
 
         <button
           onClick={() =>
-            runMoveGenerationTest(logger, TestFens.PERFT_POSITION_5)
+            worker
+              ? runMoveGenerationTest(worker, TestFens.PERFT_POSITION_5)
+              : null
           }
         >
           Move generation perft PERFT_5
         </button>
 
         <button
-          onClick={() => runMoveGenerationTest(logger, TestFens.VIENNA_OPENING)}
+          onClick={() =>
+            worker
+              ? runMoveGenerationTest(worker, TestFens.VIENNA_OPENING)
+              : null
+          }
         >
           Move generation perft VIENNA
         </button>
 
         <button
           onClick={() =>
-            runMoveGenerationTest(logger, TestFens.BLACK_CHECKMATE)
+            worker
+              ? runMoveGenerationTest(worker, TestFens.BLACK_CHECKMATE)
+              : null
           }
         >
           Move generation perft BLACK MATE

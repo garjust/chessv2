@@ -1,7 +1,11 @@
-import React, { DragEvent, useState } from 'react';
+import React, { DragEvent } from 'react';
 import { State, clickSquareAction } from './workflow';
 import { Color, Square } from '../types';
-import { rankFileToSquare, squareGenerator } from '../utils';
+import {
+  fileIndexForSquare,
+  rankIndexForSquare,
+  squareGenerator,
+} from '../utils';
 import './Board.css';
 import BoardSquare from './BoardSquare';
 import { useWorkflow } from './workflow-context';
@@ -57,9 +61,13 @@ const Board = ({
   for (const square of squareGenerator()) {
     squares.push(
       <BoardSquare
-        key={rankFileToSquare(square)}
-        square={rankFileToSquare(square)}
-        color={(square.rank + square.file) % 2 == 0 ? Color.Black : Color.White}
+        key={square}
+        square={square}
+        color={
+          (rankIndexForSquare(square) + fileIndexForSquare(square)) % 2 == 0
+            ? Color.Black
+            : Color.White
+        }
         size={squareSize}
         onDragStart={onDragStart.next}
         onDragOver={onDragOver.next}

@@ -6,7 +6,6 @@ import {
   Piece,
   PieceType,
   Position,
-  RankFile,
   SlidingPiece,
   Square,
   SquareLabel,
@@ -15,16 +14,16 @@ import {
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
 
-export const ROOK_STARTING_SQUARES = Object.freeze({
+export const ROOK_STARTING_SQUARES = {
   [Color.White]: {
-    queenside: 0,
-    kingside: 7,
+    queenside: 0 as Square,
+    kingside: 7 as Square,
   },
   [Color.Black]: {
-    queenside: 56,
-    kingside: 63,
+    queenside: 56 as Square,
+    kingside: 63 as Square,
   },
-});
+} as const;
 
 export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
   [Color.White]: {
@@ -36,6 +35,13 @@ export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
     queenside: false,
   },
 });
+
+export const PROMOTION_OPTION_PIECE_TYPES = [
+  PieceType.Bishop,
+  PieceType.Knight,
+  PieceType.Queen,
+  PieceType.Rook,
+] as const;
 
 export const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
   b: PieceType.Bishop,
@@ -76,10 +82,10 @@ const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
 
 type Nullable<T> = T | undefined | null;
 
-export const rankFileToSquare = ({ rank, file }: RankFile): Square =>
-  rank * 8 + file;
+export const rankForSquare = (square: Square) => square % 8; // ????????????????????????
 
-export const rankForSquare = (square: Square) => square % 8;
+export const rankIndexForSquare = (square: Square) => Math.floor(square / 8);
+export const fileIndexForSquare = (square: Square) => square % 8;
 
 export const squareLabel = (square: Square): SquareLabel =>
   SQUARE_LABEL_LOOKUP[square];
@@ -87,11 +93,9 @@ export const squareLabel = (square: Square): SquareLabel =>
 export const labelToSquare = (label: SquareLabel): Square =>
   SQUARE_LABEL_LOOKUP.indexOf(label);
 
-export const squareGenerator = function* () {
-  for (let rank = 0; rank < 8; rank++) {
-    for (let file = 0; file < 8; file++) {
-      yield { rank, file };
-    }
+export const squareGenerator: () => Generator<Square> = function* () {
+  for (let square = 0 as Square; square < 64; square++) {
+    yield square;
   }
 };
 
@@ -105,8 +109,10 @@ export const isSliderPieceType = (
 export const isSlider = (piece: Piece): piece is SlidingPiece =>
   isSliderPieceType(piece.type);
 
-export const squaresInclude = (squares: Square[], square: Square): boolean =>
-  squares.includes(square);
+export const squaresInclude = (
+  squares: Readonly<Square[]>,
+  square: Square,
+): boolean => squares.includes(square);
 
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
   Boolean(a && b && a.from === b.from && a.to === b.to);
@@ -217,3 +223,8 @@ export const isPositionEqual = (a: Position, b: Position): boolean => {
 
   return fenA === fenB;
 };
+
+export const buildMove = (from: number, to: number): Move => ({
+  from: from as Square,
+  to: to as Square,
+});

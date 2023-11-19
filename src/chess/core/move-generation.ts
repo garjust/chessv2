@@ -14,10 +14,10 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import { squareControlXraysMove } from './move-utils';
-import { expandPromotions, kingMoves, pawnMoves } from './piece-movement';
+import { expandPromotions, squareControlXraysMove } from './move-utils';
+import { castlingKingMoves, advancePawnMoves } from './piece-movement';
 import Pins from './pins';
-import { KingSquares, PinsByColor, AttackedSquares } from './types';
+import { KingSquares, AttackedSquares } from './types';
 
 const buildMove = (
   squareControl: SquareControlObject,
@@ -53,7 +53,7 @@ const pseudoMovesForPosition = (
   const { enPassantSquare, castlingAvailability, attackedSquares } = options;
 
   for (const [square, piece] of pieces) {
-    if (color && piece.color !== color) {
+    if (piece.color !== color) {
       continue;
     }
 
@@ -87,24 +87,20 @@ const pseudoMovesForPosition = (
       }
     }
 
+    // Below handle moves that don't really exert "control" so are not covered
+    // by SqsuareControlObject state. These moves are castling and pawn
+    // advancement.
     if (piece.type === PieceType.King) {
       // Add castling moves
       moves.push(
-        ...kingMoves(pieces, piece.color, square, {
-          castlingOnly: true,
+        ...castlingKingMoves(pieces, piece.color, square, {
           castlingAvailability,
           opponentAttackMap: attackedSquares[flipColor(color)],
         }),
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
-      moves.push(
-        ...pawnMoves(pieces, piece.color, square, {
-          attacksOnly: false,
-          advanceOnly: true,
-          enPassantSquare,
-        }),
-      );
+      moves.push(...advancePawnMoves(pieces, piece.color, square));
     }
   }
 

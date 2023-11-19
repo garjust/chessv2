@@ -38,7 +38,6 @@ export class SearchExecutor {
   search: SearchInterface;
 
   constructor(version: Version, infoReporter: InfoReporter) {
-    infoReporter({ currmovenumber: 'ok' });
     this.search = new Registry[version](infoReporter);
   }
 

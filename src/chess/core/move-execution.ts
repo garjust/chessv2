@@ -14,6 +14,7 @@ import {
 } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
+import { CASTLING_ROOK_MOVES } from './lookup';
 import { down, up } from './move-utils';
 import { updatePinsOnKings } from './pins';
 import { Position, ZobristKey } from './types';
@@ -159,10 +160,7 @@ export const applyMove = (
     if (move.from - move.to === 2) {
       // queenside
       const rook = PIECES[piece.color][PieceType.Rook];
-      castlingRookMove = {
-        from: ROOK_STARTING_SQUARES[piece.color].queenside,
-        to: piece.color === Color.White ? 3 : 59,
-      };
+      castlingRookMove = CASTLING_ROOK_MOVES[piece.color].queenside;
 
       position.pieces.delete(castlingRookMove.from);
       position.pieces.set(castlingRookMove.to, rook);
@@ -171,10 +169,7 @@ export const applyMove = (
     } else if (move.from - move.to === -2) {
       // kingside
       const rook = PIECES[piece.color][PieceType.Rook];
-      castlingRookMove = {
-        from: ROOK_STARTING_SQUARES[piece.color].kingside,
-        to: piece.color === Color.White ? 5 : 61,
-      };
+      castlingRookMove = CASTLING_ROOK_MOVES[piece.color].kingside;
 
       position.pieces.delete(castlingRookMove.from);
       position.pieces.set(castlingRookMove.to, rook);
@@ -266,19 +261,15 @@ export const undoMove = (
 
     if (move.from - move.to === 2) {
       // queenside
-      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].queenside;
-      const rookToSquare = piece.color === Color.White ? 3 : 59;
-      position.pieces.delete(rookToSquare);
-      position.pieces.set(rookFromSquare, {
+      position.pieces.delete(CASTLING_ROOK_MOVES[piece.color].queenside.to);
+      position.pieces.set(CASTLING_ROOK_MOVES[piece.color].queenside.from, {
         color: piece.color,
         type: PieceType.Rook,
       });
     } else if (move.from - move.to === -2) {
       // kingside
-      const rookFromSquare = ROOK_STARTING_SQUARES[piece.color].kingside;
-      const rookToSquare = piece.color === Color.White ? 5 : 61;
-      position.pieces.delete(rookToSquare);
-      position.pieces.set(rookFromSquare, {
+      position.pieces.delete(CASTLING_ROOK_MOVES[piece.color].kingside.to);
+      position.pieces.set(CASTLING_ROOK_MOVES[piece.color].kingside.from, {
         color: piece.color,
         type: PieceType.Rook,
       });

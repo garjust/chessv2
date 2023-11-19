@@ -1,9 +1,31 @@
 import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControlObject } from '../types';
-import { labelToSquare } from '../utils';
-import { RAY_BY_DIRECTION } from './move-lookup';
-import { rayControlScanner, squareControlXraysMove } from './move-utils';
+import { buildMove, labelToSquare } from '../utils';
+import { RAYS_BY_DIRECTION } from './lookup/move-lookup';
+import {
+  down,
+  downLeft,
+  downRight,
+  left,
+  rayControlScanner,
+  right,
+  squareControlXraysMove,
+  up,
+  upLeft,
+  upRight,
+} from './move-utils';
+
+test('movement functions', () => {
+  expect(up(4)).toEqual(12);
+  expect(down(11)).toEqual(3);
+  expect(left(20)).toEqual(19);
+  expect(right(20)).toEqual(21);
+  expect(upLeft(36)).toEqual(43);
+  expect(upRight(36)).toEqual(45);
+  expect(downLeft(36)).toEqual(27);
+  expect(downRight(36)).toEqual(29);
+});
 
 test('squareControlXraysMove', () => {
   let squareControl: SquareControlObject = {
@@ -12,25 +34,21 @@ test('squareControlXraysMove', () => {
     slideSquares: [27, 20],
   };
 
-  expect(squareControlXraysMove(squareControl, { from: 0, to: 8 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(0, 8))).toEqual(false);
+  expect(squareControlXraysMove(squareControl, buildMove(41, 48))).toEqual(
     false,
   );
-  expect(squareControlXraysMove(squareControl, { from: 41, to: 48 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(27, 36))).toEqual(
     false,
   );
-  expect(squareControlXraysMove(squareControl, { from: 27, to: 36 })).toEqual(
-    false,
-  );
-  expect(squareControlXraysMove(squareControl, { from: 14, to: 7 })).toEqual(
-    true,
-  );
+  expect(squareControlXraysMove(squareControl, buildMove(14, 7))).toEqual(true);
 
   squareControl = {
     attacker: { square: 44, type: PieceType.Queen },
     square: 52,
     slideSquares: [],
   };
-  expect(squareControlXraysMove(squareControl, { from: 52, to: 60 })).toEqual(
+  expect(squareControlXraysMove(squareControl, buildMove(52, 60))).toEqual(
     true,
   );
 });
@@ -41,10 +59,7 @@ test('rayControlScanner bishop', () => {
     square: labelToSquare('c4'),
     piece: { type: PieceType.Bishop, color: Color.White },
   };
-  const ray =
-    RAY_BY_DIRECTION[PieceType.Bishop][scanningPiece.square][
-      DirectionUnit.UpRight
-    ];
+  const ray = RAYS_BY_DIRECTION[scanningPiece.square][DirectionUnit.UpRight];
 
   expect(ray).toEqual([35, 44, 53, 62]);
 
@@ -83,10 +98,7 @@ test('rayControlScanner bishop skipPast', () => {
     square: labelToSquare('c4'),
     piece: { type: PieceType.Bishop, color: Color.White },
   };
-  const ray =
-    RAY_BY_DIRECTION[PieceType.Bishop][scanningPiece.square][
-      DirectionUnit.UpRight
-    ];
+  const ray = RAYS_BY_DIRECTION[scanningPiece.square][DirectionUnit.UpRight];
 
   const squareControl = rayControlScanner(
     position.pieces,
@@ -114,8 +126,7 @@ test('rayControlScanner queen skipPast through own piece', () => {
     square: labelToSquare('d1'),
     piece: { type: PieceType.Queen, color: Color.White },
   };
-  const ray =
-    RAY_BY_DIRECTION[PieceType.Queen][scanningPiece.square][DirectionUnit.Up];
+  const ray = RAYS_BY_DIRECTION[scanningPiece.square][DirectionUnit.Up];
 
   expect(ray).toEqual([11, 19, 27, 35, 43, 51, 59]);
 
@@ -138,8 +149,7 @@ test('rayControlScanner queen skipPast is a1', () => {
     square: labelToSquare('d1'),
     piece: { type: PieceType.Queen, color: Color.White },
   };
-  const ray =
-    RAY_BY_DIRECTION[PieceType.Queen][scanningPiece.square][DirectionUnit.Left];
+  const ray = RAYS_BY_DIRECTION[scanningPiece.square][DirectionUnit.Left];
 
   expect(ray).toEqual([2, 1, 0]);
 
@@ -163,8 +173,7 @@ test('rayControlScanner rook skipPast through opponent piece', () => {
     square: labelToSquare('a1'),
     piece: { type: PieceType.Rook, color: Color.White },
   };
-  const ray =
-    RAY_BY_DIRECTION[PieceType.Rook][scanningPiece.square][DirectionUnit.Up];
+  const ray = RAYS_BY_DIRECTION[scanningPiece.square][DirectionUnit.Up];
   const move = { from: 48, to: 40 };
 
   expect(ray).toEqual([8, 16, 24, 32, 40, 48, 56]);
