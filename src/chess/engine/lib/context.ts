@@ -88,7 +88,7 @@ export default class Context {
   }
 
   quiescenceOrderMoves(moves: MoveWithExtraData[]) {
-    return orderMoves(moves);
+    return orderMoves(this.core.position.pieces, moves);
   }
 
   orderMoves(
@@ -97,6 +97,7 @@ export default class Context {
   ): MoveWithExtraData[] {
     if (this.configuration.moveOrdering) {
       return orderMoves(
+        this.core.position.pieces,
         moves,
         this.configuration.moveOrderingHeuristics.hashMove
           ? this.state.tTable.get(this.core.zobrist)?.move
