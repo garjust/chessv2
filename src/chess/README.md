@@ -27,8 +27,7 @@ A chess engine can be loaded in two ways:
 - Pre-compute SquareControlObjects for all rays/moves so that objects are not
   created when assembling sets of SquareControlObjects
 - Refactor "Move" types to be subsets of each other for duck typing
-  - AttackObject > SquareControlObject > MoveWithExtraData > Move
-  - Probably remove AttackObject altogether
+  - SquareControlObject > MoveWithExtraData > Move
   - Remove buildMove function in move-generation
   - Remove a lot of object creation in move-generation
   - _iff_ color is removed from SquareControlObject the objects can be pre-computed with half as much space

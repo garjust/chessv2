@@ -27,19 +27,7 @@ const buildMove = (
   from: squareControl.from,
   to: squareControl.to,
   piece,
-  attack: attackedPiece
-    ? {
-        attacked: {
-          square: squareControl.to,
-          type: attackedPiece.type,
-        },
-        attacker: {
-          square: squareControl.from,
-          type: squareControl.piece.type,
-        },
-        slideSquares: squareControl.slideSquares,
-      }
-    : undefined,
+  attack: attackedPiece !== undefined,
 });
 
 const pseudoMovesForPosition = (

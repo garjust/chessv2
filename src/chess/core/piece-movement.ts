@@ -31,6 +31,7 @@ export const advancePawnMoves = (
       from,
       to: advanceFn(from),
       piece: { type: PieceType.Pawn, color },
+      attack: false,
     });
 
     // Space two squares forward of the pawn when it is in it's starting rank.
@@ -39,6 +40,7 @@ export const advancePawnMoves = (
         from,
         to: advanceFn(from, 2),
         piece: { type: PieceType.Pawn, color },
+        attack: false,
       });
     }
   }
@@ -98,5 +100,6 @@ export const castlingKingMoves = (
     from,
     to,
     piece: { type: PieceType.King, color },
+    attack: false,
   }));
 };

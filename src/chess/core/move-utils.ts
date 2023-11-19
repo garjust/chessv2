@@ -1,5 +1,4 @@
 import {
-  AttackObject,
   Move,
   MoveWithExtraData,
   Piece,
