@@ -96,7 +96,20 @@ export type SquareControl = {
    */
   readonly slideSquares: Readonly<Square[]>; // This data is used for handling when a king is checked by a single sliding piece.
 
+  /**
+   * Whether this square control is an attack on another piece. To find the type
+   * of piece use the current pieces map.
+   *
+   * Note: this state may hang around on moves between positions. The boolean
+   * is always re-set when generating a list of moves.
+   */
   attack?: boolean;
+  /**
+   * Weight of the move scored by the move ordering function.
+   *
+   * Note: This state may hang around on moves between positions. The move
+   * ordering function will always re-score moves before sorting.
+   */
   weight?: number;
 };
 
@@ -124,7 +137,7 @@ export type CastlingAvailability = Readonly<{
  */
 export type Position = {
   /** Map of board squares to pieces tracking where pieces are located. */
-  pieces: Map<Square, Piece>;
+  readonly pieces: Map<Square, Piece>;
   /** Which player's turn it is. */
   turn: Color;
   /** Castling availability map. */
