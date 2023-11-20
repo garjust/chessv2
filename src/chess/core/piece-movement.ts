@@ -61,13 +61,8 @@ export const castlingKingMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-  {
-    opponentAttackMap,
-    castlingAvailability,
-  }: {
-    opponentAttackMap: AttackMap;
-    castlingAvailability: CastlingAvailability;
-  },
+  opponentAttackMap: AttackMap,
+  castlingAvailability: CastlingAvailability,
 ): MoveWithExtraData[] => {
   const squares = [];
 

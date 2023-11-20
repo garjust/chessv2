@@ -101,14 +101,12 @@ export default class Core {
     return generateMoves(
       this.internalPosition.pieces,
       this.internalPosition.turn,
-      {
-        attackedSquares: this.internalPosition.attackedSquares,
-        pins: this.internalPosition.absolutePins[this.internalPosition.turn],
-        checks: this.checks(this.internalPosition.turn),
-        kings: this.internalPosition.kings,
-        enPassantSquare: this.internalPosition.enPassantSquare,
-        castlingAvailability: this.internalPosition.castlingAvailability,
-      },
+      this.internalPosition.attackedSquares,
+      this.internalPosition.absolutePins[this.internalPosition.turn],
+      this.internalPosition.kings,
+      this.checks(this.internalPosition.turn),
+      this.internalPosition.enPassantSquare,
+      this.internalPosition.castlingAvailability,
     );
   }
 

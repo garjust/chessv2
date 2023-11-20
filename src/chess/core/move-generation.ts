@@ -22,15 +22,11 @@ import { KingSquares, AttackedSquares } from './types';
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
-  options: {
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-    attackedSquares: AttackedSquares;
-  },
+  enPassantSquare: Square | null,
+  castlingAvailability: CastlingAvailability,
+  attackedSquares: AttackedSquares,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
-
-  const { enPassantSquare, castlingAvailability, attackedSquares } = options;
 
   for (const [square, piece] of pieces) {
     if (piece.color !== color) {
@@ -73,10 +69,13 @@ const pseudoMovesForPosition = (
     if (piece.type === PieceType.King) {
       // Add castling moves
       moves.push(
-        ...castlingKingMoves(pieces, piece, square, {
+        ...castlingKingMoves(
+          pieces,
+          piece,
+          square,
+          attackedSquares[flipColor(color)],
           castlingAvailability,
-          opponentAttackMap: attackedSquares[flipColor(color)],
-        }),
+        ),
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
@@ -173,30 +172,22 @@ const moveLeavesKingInCheck = (
 export const generateMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  {
-    attackedSquares,
-    pins,
-    kings,
-    checks,
-    enPassantSquare,
-    castlingAvailability,
-  }: {
-    attackedSquares: AttackedSquares;
-    pins: Pins;
-    kings: KingSquares;
-    checks: SquareControl[];
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-  },
+  attackedSquares: AttackedSquares,
+  pins: Pins,
+  kings: KingSquares,
+  checks: SquareControl[],
+  enPassantSquare: Square | null,
+  castlingAvailability: CastlingAvailability,
 ): MoveWithExtraData[] => {
   const kingSquare = kings[color];
 
-  const moves = pseudoMovesForPosition(pieces, color, {
+  const moves = pseudoMovesForPosition(
+    pieces,
+    color,
     enPassantSquare,
-    castlingAvailability:
-      checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
+    checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
     attackedSquares,
-  });
+  );
 
   if (kingSquare) {
     for (let i = moves.length - 1; i >= 0; i--) {
