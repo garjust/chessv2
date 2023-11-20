@@ -26,7 +26,7 @@ export const advancePawnMoves = (
   const advanceFn = piece.color === Color.White ? up : down;
 
   // Space forward of the pawn.
-  if (isLegalSquare(advanceFn(from)) && !pieces.get(advanceFn(from))) {
+  if (isLegalSquare(advanceFn(from)) && !pieces.has(advanceFn(from))) {
     squares.push({
       from,
       to: advanceFn(from),
@@ -36,7 +36,7 @@ export const advancePawnMoves = (
 
     // Space two squares forward of the pawn when it is in it's starting rank.
     if (
-      !pieces.get(advanceFn(from, 2)) &&
+      !pieces.has(advanceFn(from, 2)) &&
       isStartPositionPawn(piece.color, from)
     ) {
       squares.push({
@@ -71,8 +71,8 @@ export const castlingKingMoves = (
   if (
     castlingAvailability[piece.color].kingside &&
     // Check squares being castled through are empty
-    !pieces.get(right(from)) &&
-    !pieces.get(right(from, 2)) &&
+    !pieces.has(right(from)) &&
+    !pieces.has(right(from, 2)) &&
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
@@ -83,9 +83,9 @@ export const castlingKingMoves = (
   if (
     castlingAvailability[piece.color].queenside &&
     // Check squares being castled through are empty
-    !pieces.get(left(from)) &&
-    !pieces.get(left(from, 2)) &&
-    !pieces.get(left(from, 3)) &&
+    !pieces.has(left(from)) &&
+    !pieces.has(left(from, 2)) &&
+    !pieces.has(left(from, 3)) &&
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
