@@ -39,9 +39,8 @@ const pseudoMovesForPosition = (
       const attackedPiece = pieces.get(squareControl.to);
       squareControl.attack = attackedPiece !== undefined;
 
-      // Get rid of attacks on own-pieces.
       // Logic to discard moves:
-      // 1. Discard the move if it attacks a piece of the same control.
+      // 1. Discard the move if it attacks a piece of the same color.
       // 2. Discard pawn moves that don't capture a piece (only the diagonal
       //    captures are included in square control).
       if (
