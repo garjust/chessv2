@@ -73,7 +73,8 @@ const updatePiecesAttacks = (
       // The to square is further away so we add attacks.
       const newSquaresControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.from,
       );
@@ -89,7 +90,8 @@ const updatePiecesAttacks = (
       // The to square is closer so we remove attacks.
       const squaresNoLongerControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.to,
         move.from,
@@ -105,7 +107,8 @@ const updatePiecesAttacks = (
       const ray = RAYS_BY_DIRECTION[square][unit];
       const newSquaresControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.from,
       );
@@ -123,7 +126,8 @@ const updatePiecesAttacks = (
       const ray = RAYS_BY_DIRECTION[square][unit];
       const squaresNoLongerControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.to,
       );

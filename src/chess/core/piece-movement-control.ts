@@ -60,7 +60,7 @@ export const bishopMoves = (
   from: Square,
 ): SquareControl[] =>
   BISHOP_RAYS[from].flatMap((ray) =>
-    rayControlScanner(pieces, { square: from, piece }, ray),
+    rayControlScanner(pieces, piece, from, ray),
   );
 
 export const rookMoves = (
@@ -68,9 +68,7 @@ export const rookMoves = (
   piece: Piece,
   from: Square,
 ): SquareControl[] =>
-  ROOK_RAYS[from].flatMap((ray) =>
-    rayControlScanner(pieces, { square: from, piece }, ray),
-  );
+  ROOK_RAYS[from].flatMap((ray) => rayControlScanner(pieces, piece, from, ray));
 
 export const queenMoves = (
   pieces: Map<Square, Piece>,
@@ -78,7 +76,7 @@ export const queenMoves = (
   from: Square,
 ): SquareControl[] =>
   QUEEN_RAYS[from].flatMap((ray) =>
-    rayControlScanner(pieces, { square: from, piece }, ray),
+    rayControlScanner(pieces, piece, from, ray),
   );
 
 export const forPiece = (

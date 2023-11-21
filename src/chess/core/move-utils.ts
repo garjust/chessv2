@@ -39,14 +39,14 @@ export const squareControlXraysMove = (
 
 export const rayControlScanner = (
   pieces: Map<Square, Piece>,
-  scanningPiece: { square: Square; piece: Piece },
+  piece: Piece,
+  from: Square,
   ray: Square[],
   skipPast?: Square,
   stopAt?: Square,
 ): SquareControl[] => {
   const moves: SquareControl[] = [];
   const slideSquares: Square[] = [];
-  const from = scanningPiece.square;
   let skip = skipPast !== undefined ? true : false;
 
   for (const to of ray) {
@@ -56,8 +56,8 @@ export const rayControlScanner = (
       if (to === skipPast) {
         skip = false;
       } else {
-        const piece = pieces.get(to);
-        if (piece) {
+        const otherPiece = pieces.get(to);
+        if (otherPiece) {
           // Stop scanning if we hit a piece of either colour
           break;
         }
@@ -67,7 +67,7 @@ export const rayControlScanner = (
     }
 
     moves.push({
-      piece: scanningPiece.piece,
+      piece,
       from,
       to: to,
       slideSquares: [...slideSquares],
@@ -78,8 +78,8 @@ export const rayControlScanner = (
       break;
     }
 
-    const piece = pieces.get(to);
-    if (piece) {
+    const otherPiece = pieces.get(to);
+    if (otherPiece) {
       // Stop scanning if we hit a piece of either colour
       break;
     }
