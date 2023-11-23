@@ -22,7 +22,6 @@ export const pawnMoves = (piece: Piece, from: Square): SquareControl[] => {
       piece,
       from,
       to: leftCaptureSquare,
-      slideSquares: [],
     });
   }
   if (isLegalSquare(rightCaptureSquare) && rightCaptureSquare % 8 !== 0) {
@@ -30,7 +29,6 @@ export const pawnMoves = (piece: Piece, from: Square): SquareControl[] => {
       piece,
       from,
       to: rightCaptureSquare,
-      slideSquares: [],
     });
   }
 

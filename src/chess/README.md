@@ -32,7 +32,7 @@ A chess engine can be loaded in two ways:
     - 0 out the weight somewhere?
     - Store elsewhere?
     - If weight is stored elsewhere that removes a blocker to packing everything
-      into 32bits (other blocker is slideSquares)
+      into 32bit
 
 - Decrease weight of moves to squares attacked by pawns
 - *Opening book* (Kevin will fried liver me)

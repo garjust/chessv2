@@ -14,7 +14,11 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import { expandPromotions, squareControlXraysMove } from './move-utils';
+import {
+  expandPromotions,
+  isMoveIncidentWithCheck,
+  squareControlXraysMove,
+} from './move-utils';
 import { castlingKingMoves, advancePawnMoves } from './piece-movement';
 import Pins from './pins';
 import { KingSquares, AttackedSquares } from './types';
@@ -102,9 +106,7 @@ const moveResolvesCheck = (
     const check = checks[0];
     // In the case that the king is checked by a single piece we can capture
     // the piece or block the attack.
-    return (
-      squaresInclude(check.slideSquares, move.to) || check.from === move.to
-    );
+    return isMoveIncidentWithCheck(move, check);
   } else if (checks.length === 2) {
     // In the case that the king is checked by multiple pieces (can only be 2)
     // the king must move.

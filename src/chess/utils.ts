@@ -99,7 +99,7 @@ export const squareGenerator: () => Generator<Square> = function* () {
   }
 };
 
-export const isSliderPieceType = (
+const isSliderPieceType = (
   type: PieceType,
 ): type is PieceType.Bishop | PieceType.Queen | PieceType.Rook =>
   type === PieceType.Bishop ||

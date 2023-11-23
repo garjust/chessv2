@@ -90,11 +90,6 @@ export type SquareControl = {
   readonly from: Square;
   /** The square under control. */
   readonly to: Square;
-  /**
-   * If the attacker is a sliding piece this is the set of squares they move through
-   * for the attack. A move to one of these squares blocks the attack.
-   */
-  readonly slideSquares: Readonly<Square[]>; // This data is used for handling when a king is checked by a single sliding piece.
 
   /**
    * Whether this square control is an attack on another piece. To find the type

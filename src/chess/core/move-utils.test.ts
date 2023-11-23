@@ -32,7 +32,6 @@ test('squareControlXraysMove', () => {
     piece: { type: PieceType.Queen, color: Color.White },
     from: 34,
     to: 13,
-    slideSquares: [27, 20],
   };
 
   expect(squareControlXraysMove(squareControl, buildMove(0, 8))).toEqual(false);
@@ -48,7 +47,6 @@ test('squareControlXraysMove', () => {
     piece: { type: PieceType.Queen, color: Color.White },
     from: 44,
     to: 52,
-    slideSquares: [],
   };
   expect(squareControlXraysMove(squareControl, buildMove(52, 60))).toEqual(
     true,
@@ -69,19 +67,16 @@ test('rayControlScanner bishop', () => {
       piece,
       from,
       to: 35,
-      slideSquares: [],
     },
     {
       piece,
       from,
       to: 44,
-      slideSquares: [35],
     },
     {
       piece,
       from,
       to: 53,
-      slideSquares: [35, 44],
     },
   ]);
 });
@@ -104,7 +99,6 @@ test('rayControlScanner bishop skipPast', () => {
       piece,
       from,
       to: 62,
-      slideSquares: [35, 44, 53],
     },
   ]);
 });
@@ -180,7 +174,6 @@ test('rayControlScanner rook skipPast through opponent piece', () => {
       piece,
       from,
       to: 48,
-      slideSquares: [8, 16, 24, 32, 40],
     },
   ]);
 });
