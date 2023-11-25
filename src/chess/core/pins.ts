@@ -119,17 +119,27 @@ export default class Pins {
   ) {
     for (const ray of rays) {
       // looking for a friendly piece then an opponent's slider.
-      const friendlyPieces: Square[] = [];
       const openSquares: Square[] = [];
-      let opponentPiece: { square: Square; piece: Piece } | undefined;
+      let friendlySquare: Square | null = null;
+      let opponentSquare: Square | null = null;
 
       for (const square of ray) {
         const piece = pieces.get(square);
         if (piece) {
           if (piece.color === color) {
-            friendlyPieces.push(square);
+            if (friendlySquare === null) {
+              friendlySquare = square;
+            } else {
+              // Found a second friendly piece, so there is no pin.
+              friendlySquare = null;
+              break;
+            }
           } else {
-            opponentPiece = { square, piece };
+            // Found an opponent's piece. Check if it is the right type
+            // for the ray.
+            if (piece.type === pieceType || piece.type === PieceType.Queen) {
+              opponentSquare = square;
+            }
             break;
           }
         } else {
@@ -137,21 +147,17 @@ export default class Pins {
         }
       }
 
-      if (
-        opponentPiece &&
-        (opponentPiece.piece.type === pieceType ||
-          opponentPiece.piece.type === PieceType.Queen)
-      ) {
-        // We found a pin or sliding attack on the king!
-        if (friendlyPieces.length === 1) {
-          // With exactly one piece this is a standard pin to the king, which is
-          // what we care about for move generation.
-          this._map.set(friendlyPieces[0], {
-            pinned: friendlyPieces[0],
-            attacker: opponentPiece.square,
-            legalMoveSquares: [...openSquares, ...friendlyPieces],
-          });
-        }
+      // Check if we found a pin on the king!
+      if (friendlySquare !== null && opponentSquare !== null) {
+        // Mutate the array since it is re-initialized after this.
+        openSquares.push(friendlySquare);
+        // With exactly one piece this is a standard pin to the king, which is
+        // what we care about for move generation.
+        this._map.set(friendlySquare, {
+          pinned: friendlySquare,
+          attacker: opponentSquare,
+          legalMoveSquares: openSquares,
+        });
       }
     }
   }

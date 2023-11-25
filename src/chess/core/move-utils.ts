@@ -38,6 +38,10 @@ export const isMoveDown = (move: Move): boolean =>
 export const isMoveInFile = (move: Move): boolean =>
   (move.from - move.to) % 8 === 0;
 
+/**
+ * Return whether a SquareControl by a sliding piece intersects both squares
+ * of a move.
+ */
 export const squareControlXraysMove = (
   squareControl: SquareControl,
   move: Move,

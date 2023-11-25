@@ -144,9 +144,11 @@ const moveLeavesKingInCheck = (
       // Finally we need to consider the case the checking piece is effectively
       // skewering the king to the destination square, meaning the king will
       // still be in check even though that square is not currently attacked.
-      return checks.some((squareControl) =>
-        squareControlXraysMove(squareControl, move),
-      );
+      for (const squareControl of checks) {
+        if (squareControlXraysMove(squareControl, move)) {
+          return true;
+        }
+      }
     }
   } else {
     // The piece moving is not the king so we look to see if it is pinned
