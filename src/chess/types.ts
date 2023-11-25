@@ -69,9 +69,9 @@ export type Move = {
  */
 export type Pin = Readonly<{
   /** The square of the attacker creating the pin. */
-  attacker: Square;
+  from: Square;
   /** The square with the pinned or skewered piece. */
-  pinned: Square;
+  to: Square;
   /**
    * Legal squares the pinned piece can move to while maintaining the pin.
    * This includes it's resident square.

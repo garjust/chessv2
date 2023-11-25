@@ -160,7 +160,7 @@ const moveLeavesKingInCheck = (
 
     // The piece moving is absolutely pinned so it may only move within the
     // pinning ray.
-    return !pin.legalMoveSquares.includes(move.to) && move.to !== pin.attacker;
+    return !pin.legalMoveSquares.includes(move.to) && move.to !== pin.from;
   }
 };
 

@@ -90,10 +90,10 @@ export default class Pins {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.AddPin,
-        square: pin.pinned,
+        square: pin.to,
       });
     }
-    this._map.set(pin.pinned, pin);
+    this._map.set(pin.to, pin);
   }
 
   remove(square: Square, cache = true) {
@@ -154,8 +154,8 @@ export default class Pins {
         // With exactly one piece this is a standard pin to the king, which is
         // what we care about for move generation.
         this._map.set(friendlySquare, {
-          pinned: friendlySquare,
-          attacker: opponentSquare,
+          to: friendlySquare,
+          from: opponentSquare,
           legalMoveSquares: openSquares,
         });
       }

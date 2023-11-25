@@ -67,9 +67,9 @@ export const setOverlayForPins = (
     }
   }
   for (const pin of pins) {
-    map[pin.attacker] = SquareOverlayType.SelectedPiece;
+    map[pin.from] = SquareOverlayType.SelectedPiece;
   }
   for (const pin of pins) {
-    map[pin.pinned] = SquareOverlayType.Capturable;
+    map[pin.to] = SquareOverlayType.Capturable;
   }
 };
