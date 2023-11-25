@@ -124,19 +124,11 @@ const moveResolvesCheck = (
 // looking at king moves.
 const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
-  {
-    kingSquare,
-    pins,
-    checks,
-    opponentAttackMap,
-  }: {
-    kingSquare: Square;
-    pins: Pins;
-    checks: SquareControl[];
-    opponentAttackMap: AttackMap;
-  },
+  pins: Pins,
+  checks: SquareControl[],
+  opponentAttackMap: AttackMap,
 ): boolean => {
-  if (move.from === kingSquare) {
+  if (move.piece.type === PieceType.King) {
     // The piece moving is the king. We need to make sure the square it is
     // moving to is not attacked by any pieces.
     if (checks.length === 0) {
@@ -201,12 +193,12 @@ export const generateMoves = (
         }
       }
       if (
-        moveLeavesKingInCheck(move, {
-          kingSquare,
+        moveLeavesKingInCheck(
+          move,
           pins,
           checks,
-          opponentAttackMap: attackedSquares[flipColor(color)],
-        })
+          attackedSquares[flipColor(color)],
+        )
       ) {
         moves.splice(i, 1);
         continue;
