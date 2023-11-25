@@ -98,11 +98,11 @@ const rayScanForIntersection = (
   const direction = directionOfMove(from, toExclusive);
 
   // Short cuts to avoid computing and scanning the ray.
-  if (direction === DirectionUnit.Left) {
-    return intersect >= from && intersect < toExclusive;
-  } else if (direction === DirectionUnit.Right) {
-    return intersect <= from && intersect > toExclusive;
-  }
+  // if (direction === DirectionUnit.Left) {
+  //   return intersect >= from && intersect < toExclusive;
+  // } else if (direction === DirectionUnit.Right) {
+  //   return intersect <= from && intersect > toExclusive;
+  // }
 
   let square = from;
   do {
