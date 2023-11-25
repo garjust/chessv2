@@ -149,6 +149,8 @@ const moveLeavesKingInCheck = (
           return true;
         }
       }
+
+      return false;
     }
   } else {
     // The piece moving is not the king so we look to see if it is pinned
