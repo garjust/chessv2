@@ -1,4 +1,5 @@
 import {
+  DirectionUnit,
   Move,
   MoveWithExtraData,
   Piece,
@@ -95,6 +96,14 @@ const rayScanForIntersection = (
   intersect: Square,
 ): boolean => {
   const direction = directionOfMove(from, toExclusive);
+
+  // Short cuts to avoid computing and scanning the ray.
+  if (direction === DirectionUnit.Left) {
+    return intersect >= from && intersect < toExclusive;
+  } else if (direction === DirectionUnit.Right) {
+    return intersect <= from && intersect > toExclusive;
+  }
+
   let square = from;
   do {
     if (square === intersect) {
