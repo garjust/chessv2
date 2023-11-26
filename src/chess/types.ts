@@ -72,6 +72,8 @@ export type Pin = Readonly<{
   from: Square;
   /** The square with the pinned or skewered piece. */
   to: Square;
+  /** Stored computed direction from->to */
+  direction: DirectionUnit;
   /**
    * Legal squares the pinned piece can move to while maintaining the pin.
    * This includes it's resident square.

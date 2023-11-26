@@ -1,4 +1,5 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
+import { directionOfMove } from '../utils';
 import { BISHOP_RAYS, ROOK_RAYS, QUEEN_MOVE_BITARRAYS } from './lookup';
 import { KingSquares, PinsByColor } from './types';
 
@@ -156,6 +157,7 @@ export default class Pins {
         this._map.set(friendlySquare, {
           to: friendlySquare,
           from: opponentSquare,
+          direction: directionOfMove(friendlySquare, opponentSquare),
           legalMoveSquares: openSquares,
         });
       }
