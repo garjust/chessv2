@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
-import { Color } from '../types';
+import { Color, DirectionUnit } from '../types';
 import Pins from './pins';
+import { copyToInternal } from './position';
+import Core from '.';
 
 test('pins', () => {
   // Vienna gambit accepted with moreee pinsss.
@@ -15,21 +17,82 @@ test('pins', () => {
 
   expect(absolutePins[Color.White].allPins).toEqual([
     {
-      pinned: 21,
-      attacker: 30,
+      to: 21,
+      from: 30,
+      direction: DirectionUnit.DownLeft,
       legalMoveSquares: [12, 21],
     },
     {
-      pinned: 35,
-      attacker: 51,
+      to: 35,
+      from: 51,
+      direction: DirectionUnit.Down,
       legalMoveSquares: [11, 19, 27, 43, 35],
     },
   ]);
   expect(absolutePins[Color.Black].allPins).toEqual([
     {
-      pinned: 51,
-      attacker: 37,
+      to: 51,
+      from: 37,
+      direction: DirectionUnit.UpLeft,
       legalMoveSquares: [44, 51],
+    },
+  ]);
+});
+
+test('castling rook resolves pin and creates pin on opponent', () => {
+  const core = new Core(
+    parseFEN('5k1r/p3bppp/p3b3/P1p5/4n3/N7/R1PB2PP/1r1QK2R w K - 0 18'),
+  );
+
+  expect(core.pins).toEqual([
+    {
+      from: 1,
+      to: 3,
+      direction: DirectionUnit.Right,
+      legalMoveSquares: [2, 3],
+    },
+  ]);
+
+  core.applyMove({ from: 4, to: 6 }); // white kingside castle
+
+  expect(core.pins).toEqual([
+    {
+      from: 5,
+      to: 53,
+      direction: DirectionUnit.Up,
+      legalMoveSquares: [45, 37, 29, 21, 13, 53],
+    },
+  ]);
+});
+
+test('castling rook resolves 1 pin on opponent', () => {
+  const core = new Core(
+    parseFEN('5r1k/p4p1p/4b1p1/Pp2b3/2p5/2B2P2/1RP5/3QK2R w K - 0 30'),
+  );
+
+  expect(core.pins).toEqual([
+    {
+      from: 18,
+      to: 36,
+      direction: DirectionUnit.UpRight,
+      legalMoveSquares: [54, 45, 27, 36],
+    },
+    {
+      from: 7,
+      to: 55,
+      direction: DirectionUnit.Up,
+      legalMoveSquares: [47, 39, 31, 23, 15, 55],
+    },
+  ]);
+
+  core.applyMove({ from: 4, to: 6 }); // white kingside castle
+
+  expect(core.pins).toEqual([
+    {
+      from: 18,
+      to: 36,
+      direction: DirectionUnit.UpRight,
+      legalMoveSquares: [54, 45, 27, 36],
     },
   ]);
 });
