@@ -73,6 +73,15 @@ type Update =
   | { type: UpdateType.RayUpdate; direction: DirectionUnit; pin?: Pin }
   | { type: UpdateType.Reset; map: Map<DirectionUnit, Pin>; toSquare?: Square };
 
+/**
+ * Manages pieces that are currently pinned.
+ *
+ * A piece P is pinned if an opponent's piece P_a is attacking P and would be
+ * attacking another piece P' if P moves out of P_a's attacking ray.
+ *
+ * A pin where P' is a king is called an **absolute pin** and is what the chess
+ * core is primarily concerned with for move generation purposes.
+ */
 export default class Pins {
   private map = new Map<DirectionUnit, Pin>();
   private toSquare?: Square;
@@ -93,6 +102,16 @@ export default class Pins {
   /**
    * Return a pin object if it exists where the pinned piece resides on the
    * given square.
+   *
+   * The following must be true for a piece P to be absolutely pinned:
+   * - An opposing player's piece P_a must have control of P's resident square.
+   * - P_a must be a sliding piece
+   * - P_a's attacking ray can be extended into the player's king K.
+   * - The player has no other pieces in the squares between P and K.
+   *
+   * If P is also a sliding piece and is able to move along P_a's attacking ray
+   * then P is considered to be "partially pinned" since it can capture P_a or
+   * possibly move along the attacking ray.
    */
   pinByPinnedPiece(square: Square): Pin | undefined {
     // First check if the square intersects a queen ray. If not there cannot be
