@@ -46,7 +46,7 @@ const walkRay = (
     return {
       to: friendlySquare,
       from: opponentSquare,
-      direction: directionOfMove(friendlySquare, opponentSquare),
+      direction: directionOfMove(opponentSquare, friendlySquare),
       legalMoveSquares: openSquares,
     };
   }
