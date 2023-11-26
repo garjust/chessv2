@@ -1,7 +1,6 @@
 import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
 import { directionOfMove } from '../utils';
 import { BISHOP_RAYS, ROOK_RAYS, QUEEN_MOVE_BITARRAYS } from './lookup';
-import { KingSquares, PinsByColor } from './types';
 
 const walkRay = (
   pieces: Map<Square, Piece>,
@@ -54,42 +53,6 @@ const walkRay = (
   return null;
 };
 
-export const updatePinsOnKings = (
-  pinsByColor: PinsByColor,
-  pieces: Map<Square, Piece>,
-  kings: KingSquares,
-  move: Move,
-  piece: Piece,
-) => {
-  for (const color of [Color.White, Color.Black]) {
-    pinsByColor[color].startUpdates();
-    const king = kings[color];
-    if (king) {
-      if (
-        // If the moved piece is the king, recalcuate all pins on it.
-        piece.type === PieceType.King
-      ) {
-        pinsByColor[color].reset(pieces, king, color);
-      } else if (
-        // If the move from square interacts with any king ray we may need
-        // to remove or add a pin.
-        QUEEN_MOVE_BITARRAYS[king][move.from]
-      ) {
-        // const unit = directionOfMove(king, move.from);
-        // const ray = RAY_BY_DIRECTION[PieceType.Queen][king][unit];
-
-        pinsByColor[color].reset(pieces, king, color);
-      } else if (
-        // If the move to square interacts with any king ray we may need
-        // to remove or add a pin.
-        QUEEN_MOVE_BITARRAYS[king][move.to]
-      ) {
-        pinsByColor[color].reset(pieces, king, color);
-      }
-    }
-  }
-};
-
 enum UpdateType {
   AddPin,
   RemovePin,
@@ -105,19 +68,52 @@ export default class Pins {
   _map = new Map<Square, Pin>();
 
   _updatesStack: Update[][] = [];
+  color: Color;
 
   constructor(
     pieces: Map<Square, Piece>,
     kingSquare: Square | undefined,
     color: Color,
   ) {
-    if (!kingSquare) {
-      return;
+    this.color = color;
+    if (kingSquare) {
+      this.reset(pieces, kingSquare, false);
     }
-    this.reset(pieces, kingSquare, color, false);
   }
 
-  startUpdates(): void {
+  /**
+   * Run an update of pin state.
+   */
+  update(
+    pieces: Map<Square, Piece>,
+    move: Move,
+    piece: Piece,
+    toSquare?: Square,
+  ) {
+    this.startUpdates();
+
+    // If the square we are examining for pins is not set don't do any actual
+    // updates.
+    // $$$ TODO: should probably wipe the pins?
+    if (toSquare === undefined) {
+      return;
+    }
+
+    if (piece.type === PieceType.King) {
+      // If the moved piece is the king, recalcuate all pins on it.
+      this.reset(pieces, toSquare);
+    } else if (QUEEN_MOVE_BITARRAYS[toSquare][move.from]) {
+      // If the move from square interacts with any king ray we may need
+      // to remove or add a pin.
+      this.reset(pieces, toSquare);
+    } else if (QUEEN_MOVE_BITARRAYS[toSquare][move.to]) {
+      // If the move to square interacts with any king ray we may need
+      // to remove or add a pin.
+      this.reset(pieces, toSquare);
+    }
+  }
+
+  private startUpdates(): void {
     this._updatesStack.push([]);
   }
 
@@ -138,7 +134,7 @@ export default class Pins {
     }
   }
 
-  add(pin: Pin, cache = true) {
+  private add(pin: Pin, cache = true) {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.AddPin,
@@ -148,7 +144,7 @@ export default class Pins {
     this._map.set(pin.to, pin);
   }
 
-  remove(square: Square, cache = true) {
+  private remove(square: Square, cache = true) {
     const pin = this._map.get(square);
     if (!pin) {
       throw Error('cannot remove no pin');
@@ -163,12 +159,7 @@ export default class Pins {
     this._map.delete(square);
   }
 
-  reset(
-    pieces: Map<Square, Piece>,
-    kingSquare: Square,
-    color: Color,
-    cache = true,
-  ) {
+  private reset(pieces: Map<Square, Piece>, kingSquare: Square, cache = true) {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.Reset,
@@ -179,13 +170,13 @@ export default class Pins {
     this._map = new Map<Square, Pin>();
 
     for (const ray of BISHOP_RAYS[kingSquare]) {
-      const pin = walkRay(pieces, PieceType.Bishop, color, ray);
+      const pin = walkRay(pieces, PieceType.Bishop, this.color, ray);
       if (pin !== null) {
         this._map.set(pin.to, pin);
       }
     }
     for (const ray of ROOK_RAYS[kingSquare]) {
-      const pin = walkRay(pieces, PieceType.Rook, color, ray);
+      const pin = walkRay(pieces, PieceType.Rook, this.color, ray);
       if (pin !== null) {
         this._map.set(pin.to, pin);
       }

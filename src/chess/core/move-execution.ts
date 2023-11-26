@@ -16,7 +16,6 @@ import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';
 import { down, up } from './move-utils';
-import { updatePinsOnKings } from './pins';
 import { PositionWithComputedData, ZobristKey } from './types';
 
 export type MoveResult = {
@@ -193,13 +192,15 @@ export const applyMove = (
     }
   }
 
-  updatePinsOnKings(
-    position.absolutePins,
-    position.pieces,
-    position.kings,
-    move,
-    piece,
-  );
+  // Update pins state for both colors.
+  for (const color of [Color.White, Color.Black]) {
+    position.absolutePins[color].update(
+      position.pieces,
+      move,
+      piece,
+      position.kings[color],
+    );
+  }
   updateAttackedSquares(
     position.attackedSquares,
     position.pieces,
