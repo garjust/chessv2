@@ -33,6 +33,8 @@ A chess engine can be loaded in two ways:
     - Store elsewhere?
     - If weight is stored elsewhere that removes a blocker to packing everything
       into 32bit
+- Pack castling availabiltiy into integer as a first foray into bit packing
+  - move execution creates 3 objects for this every move
 
 - Decrease weight of moves to squares attacked by pawns
 - *Opening book* (Kevin will fried liver me)
