@@ -181,9 +181,10 @@ export default class Pins {
     for (const change of updates) {
       switch (change.type) {
         case UpdateType.RayUpdate:
-          this.map.delete(change.direction);
           if (change.pin) {
             this.map.set(change.direction, change.pin);
+          } else {
+            this.map.delete(change.direction);
           }
           break;
         case UpdateType.Reset:
@@ -212,9 +213,10 @@ export default class Pins {
       });
     }
 
-    this.map.delete(direction);
     if (pin !== null) {
       this.map.set(direction, pin);
+    } else {
+      this.map.delete(direction);
     }
   }
 
