@@ -134,6 +134,9 @@ export const isLegalSquare = (square: Square): boolean =>
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
 
+export const flipDirection = (direction: DirectionUnit): DirectionUnit =>
+  direction * -1;
+
 export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
   const diff = to - from;
   const fromRank = rankForSquare(from);

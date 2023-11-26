@@ -3,6 +3,7 @@ import { DirectionUnit } from './types';
 import {
   directionOfMove,
   fileIndexForSquare,
+  flipDirection,
   rankIndexForSquare,
 } from './utils';
 
@@ -37,6 +38,17 @@ test('directionOfMove', () => {
   expect(directionOfMove(4, 60)).toEqual(DirectionUnit.Up);
   expect(directionOfMove(56, 7)).toEqual(DirectionUnit.DownRight);
   expect(directionOfMove(56, 0)).toEqual(DirectionUnit.Down);
+});
+
+test('flipDirection', () => {
+  expect(flipDirection(DirectionUnit.Up)).toEqual(DirectionUnit.Down);
+  expect(flipDirection(DirectionUnit.Down)).toEqual(DirectionUnit.Up);
+  expect(flipDirection(DirectionUnit.Left)).toEqual(DirectionUnit.Right);
+  expect(flipDirection(DirectionUnit.Right)).toEqual(DirectionUnit.Left);
+  expect(flipDirection(DirectionUnit.UpLeft)).toEqual(DirectionUnit.DownRight);
+  expect(flipDirection(DirectionUnit.UpRight)).toEqual(DirectionUnit.DownLeft);
+  expect(flipDirection(DirectionUnit.DownLeft)).toEqual(DirectionUnit.UpRight);
+  expect(flipDirection(DirectionUnit.DownRight)).toEqual(DirectionUnit.UpLeft);
 });
 
 test('convert square into rank and file numbers', () => {
