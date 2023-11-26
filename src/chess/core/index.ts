@@ -8,6 +8,7 @@ import {
   Piece,
   Pin,
   Position,
+  Square,
   SquareControl,
 } from '../types';
 import { flipColor } from '../utils';
@@ -150,6 +151,10 @@ export default class Core {
       ...this.internalPosition.absolutePins[Color.White].allPins,
       ...this.internalPosition.absolutePins[Color.Black].allPins,
     ];
+  }
+
+  pinBy(color: Color, square: Square) {
+    return this.internalPosition.absolutePins[color].pinByPinnedPiece(square);
   }
 }
 
