@@ -1,6 +1,19 @@
-import { Color, Move, Piece, PieceType, Pin, Square } from '../types';
-import { directionOfMove } from '../utils';
-import { BISHOP_RAYS, ROOK_RAYS, QUEEN_MOVE_BITARRAYS } from './lookup';
+import {
+  Color,
+  DirectionUnit,
+  Move,
+  Piece,
+  PieceType,
+  Pin,
+  Square,
+} from '../types';
+import { directionOfMove, flipDirection, sliderType } from '../utils';
+import {
+  BISHOP_RAYS,
+  ROOK_RAYS,
+  QUEEN_MOVE_BITARRAYS,
+  RAYS_BY_DIRECTION,
+} from './lookup';
 
 const walkRay = (
   pieces: Map<Square, Piece>,
@@ -52,18 +65,16 @@ const walkRay = (
 };
 
 enum UpdateType {
-  AddPin,
-  RemovePin,
   Reset,
+  RayUpdate,
 }
 
 type Update =
-  | { type: UpdateType.AddPin; square: Square }
-  | { type: UpdateType.RemovePin; pin: Pin }
-  | { type: UpdateType.Reset; map: Map<Square, Pin>; toSquare?: Square };
+  | { type: UpdateType.RayUpdate; direction: DirectionUnit; pin?: Pin }
+  | { type: UpdateType.Reset; map: Map<DirectionUnit, Pin>; toSquare?: Square };
 
 export default class Pins {
-  private map = new Map<Square, Pin>();
+  private map = new Map<DirectionUnit, Pin>();
   private toSquare?: Square;
 
   private readonly color: Color;
@@ -84,7 +95,18 @@ export default class Pins {
    * given square.
    */
   pinByPinnedPiece(square: Square): Pin | undefined {
-    return this.map.get(square);
+    // First check if the square intersects a queen ray. If not there cannot be
+    // a pin.
+    if (!this.toSquare || !QUEEN_MOVE_BITARRAYS[this.toSquare][square]) {
+      return;
+    }
+
+    // If the square intersects then look for a pin in the corresponding ray
+    const pin = this.map.get(directionOfMove(square, this.toSquare));
+    if (pin !== undefined && pin.to === square) {
+      return pin;
+    }
+    return;
   }
 
   get allPins() {
@@ -110,21 +132,28 @@ export default class Pins {
       // The square we are calculating pins to is undefined and has not changed
       // so don't actually do any actual updates.
       return;
-    } else if (
-      QUEEN_MOVE_BITARRAYS[toSquare][move.from] ||
-      (castlingRookMove &&
-        QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.from])
-    ) {
-      // If the move from square interacts with any king ray we may need
-      // to remove or add a pin.
-      this.reset(pieces, toSquare);
-    } else if (
-      QUEEN_MOVE_BITARRAYS[toSquare][move.to] ||
-      (castlingRookMove && QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.to])
-    ) {
-      // If the move to square interacts with any king ray we may need
-      // to remove or add a pin.
-      this.reset(pieces, toSquare);
+    } else {
+      const raysToUpdate = new Set<DirectionUnit>();
+      // If any squares involved with the move intersect a queen ray originating
+      // at toSquare we may need to add or remove pins.
+      if (QUEEN_MOVE_BITARRAYS[toSquare][move.from]) {
+        raysToUpdate.add(directionOfMove(move.from, toSquare));
+      }
+      if (QUEEN_MOVE_BITARRAYS[toSquare][move.to]) {
+        raysToUpdate.add(directionOfMove(move.to, toSquare));
+      }
+      if (castlingRookMove !== undefined) {
+        if (QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.from]) {
+          raysToUpdate.add(directionOfMove(castlingRookMove.from, toSquare));
+        }
+        if (QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.to]) {
+          raysToUpdate.add(directionOfMove(castlingRookMove.to, toSquare));
+        }
+      }
+
+      for (const direction of raysToUpdate) {
+        this.updateRay(pieces, direction, toSquare);
+      }
     }
   }
 
@@ -132,11 +161,11 @@ export default class Pins {
     const updates = this.updatesStack.pop() ?? [];
     for (const change of updates) {
       switch (change.type) {
-        case UpdateType.AddPin:
-          this.remove(change.square, false);
-          break;
-        case UpdateType.RemovePin:
-          this.add(change.pin, false);
+        case UpdateType.RayUpdate:
+          this.map.delete(change.direction);
+          if (change.pin) {
+            this.map.set(change.direction, change.pin);
+          }
           break;
         case UpdateType.Reset:
           this.map = change.map;
@@ -146,29 +175,28 @@ export default class Pins {
     }
   }
 
-  private add(pin: Pin, cache = true) {
-    if (cache) {
-      this.updatesStack[this.updatesStack.length - 1].push({
-        type: UpdateType.AddPin,
-        square: pin.to,
-      });
-    }
-    this.map.set(pin.to, pin);
-  }
-
-  private remove(square: Square, cache = true) {
-    const pin = this.map.get(square);
-    if (!pin) {
-      throw Error('cannot remove no pin');
-    }
+  private updateRay(
+    pieces: Map<Square, Piece>,
+    direction: DirectionUnit,
+    toSquare: Square,
+    cache = true,
+  ) {
+    const currentPin = this.map.get(direction);
+    const ray = RAYS_BY_DIRECTION[toSquare][flipDirection(direction)];
+    const pin = walkRay(pieces, sliderType(direction), this.color, ray);
 
     if (cache) {
       this.updatesStack[this.updatesStack.length - 1].push({
-        type: UpdateType.RemovePin,
-        pin,
+        type: UpdateType.RayUpdate,
+        direction,
+        pin: currentPin,
       });
     }
-    this.map.delete(square);
+
+    this.map.delete(direction);
+    if (pin !== null) {
+      this.map.set(direction, pin);
+    }
   }
 
   private reset(pieces: Map<Square, Piece>, toSquare?: Square, cache = true) {
@@ -192,13 +220,13 @@ export default class Pins {
     for (const ray of BISHOP_RAYS[toSquare]) {
       const pin = walkRay(pieces, PieceType.Bishop, this.color, ray);
       if (pin !== null) {
-        this.map.set(pin.to, pin);
+        this.map.set(pin.direction, pin);
       }
     }
     for (const ray of ROOK_RAYS[toSquare]) {
       const pin = walkRay(pieces, PieceType.Rook, this.color, ray);
       if (pin !== null) {
-        this.map.set(pin.to, pin);
+        this.map.set(pin.direction, pin);
       }
     }
   }
