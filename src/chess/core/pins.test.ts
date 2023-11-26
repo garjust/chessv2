@@ -39,6 +39,23 @@ test('pins', () => {
   ]);
 });
 
+test('pawn capture and promotion creates pin', () => {
+  const core = new Core(parseFEN(FEN_LIBRARY.PERFT_5_FEN));
+
+  expect(core.pins).toEqual([]);
+
+  core.applyMove({ from: 51, to: 58 }); // capture & promote
+
+  expect(core.pins).toEqual([
+    {
+      from: 58,
+      to: 59,
+      direction: DirectionUnit.Right,
+      legalMoveSquares: [60, 59],
+    },
+  ]);
+});
+
 test('castling rook resolves pin and creates pin on opponent', () => {
   const core = new Core(
     parseFEN('5k1r/p3bppp/p3b3/P1p5/4n3/N7/R1PB2PP/1r1QK2R w K - 0 18'),
