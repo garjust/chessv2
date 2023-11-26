@@ -3,6 +3,57 @@ import { directionOfMove } from '../utils';
 import { BISHOP_RAYS, ROOK_RAYS, QUEEN_MOVE_BITARRAYS } from './lookup';
 import { KingSquares, PinsByColor } from './types';
 
+const walkRay = (
+  pieces: Map<Square, Piece>,
+  pieceType: PieceType,
+  color: Color,
+  ray: number[],
+): Pin | null => {
+  // looking for a friendly piece then an opponent's slider.
+  const openSquares: Square[] = [];
+  let friendlySquare: Square | null = null;
+  let opponentSquare: Square | null = null;
+
+  for (const square of ray) {
+    const piece = pieces.get(square);
+    if (piece) {
+      if (piece.color === color) {
+        if (friendlySquare === null) {
+          friendlySquare = square;
+        } else {
+          // Found a second friendly piece, so there is no pin.
+          friendlySquare = null;
+          break;
+        }
+      } else {
+        // Found an opponent's piece. Check if it is the right type
+        // for the ray.
+        if (piece.type === pieceType || piece.type === PieceType.Queen) {
+          opponentSquare = square;
+        }
+        break;
+      }
+    } else {
+      openSquares.push(square);
+    }
+  }
+
+  // Check if we found a pin on the king!
+  if (friendlySquare !== null && opponentSquare !== null) {
+    openSquares.push(friendlySquare);
+    // With exactly one piece this is a standard pin to the king, which is
+    // what we care about for move generation.
+    return {
+      to: friendlySquare,
+      from: opponentSquare,
+      direction: directionOfMove(friendlySquare, opponentSquare),
+      legalMoveSquares: openSquares,
+    };
+  }
+
+  return null;
+};
+
 export const updatePinsOnKings = (
   pinsByColor: PinsByColor,
   pieces: Map<Square, Piece>,
@@ -112,58 +163,6 @@ export default class Pins {
     this._map.delete(square);
   }
 
-  private walkRays(
-    pieces: Map<Square, Piece>,
-    pieceType: PieceType,
-    color: Color,
-    rays: number[][],
-  ) {
-    for (const ray of rays) {
-      // looking for a friendly piece then an opponent's slider.
-      const openSquares: Square[] = [];
-      let friendlySquare: Square | null = null;
-      let opponentSquare: Square | null = null;
-
-      for (const square of ray) {
-        const piece = pieces.get(square);
-        if (piece) {
-          if (piece.color === color) {
-            if (friendlySquare === null) {
-              friendlySquare = square;
-            } else {
-              // Found a second friendly piece, so there is no pin.
-              friendlySquare = null;
-              break;
-            }
-          } else {
-            // Found an opponent's piece. Check if it is the right type
-            // for the ray.
-            if (piece.type === pieceType || piece.type === PieceType.Queen) {
-              opponentSquare = square;
-            }
-            break;
-          }
-        } else {
-          openSquares.push(square);
-        }
-      }
-
-      // Check if we found a pin on the king!
-      if (friendlySquare !== null && opponentSquare !== null) {
-        // Mutate the array since it is re-initialized after this.
-        openSquares.push(friendlySquare);
-        // With exactly one piece this is a standard pin to the king, which is
-        // what we care about for move generation.
-        this._map.set(friendlySquare, {
-          to: friendlySquare,
-          from: opponentSquare,
-          direction: directionOfMove(friendlySquare, opponentSquare),
-          legalMoveSquares: openSquares,
-        });
-      }
-    }
-  }
-
   reset(
     pieces: Map<Square, Piece>,
     kingSquare: Square,
@@ -179,10 +178,24 @@ export default class Pins {
 
     this._map = new Map<Square, Pin>();
 
-    this.walkRays(pieces, PieceType.Bishop, color, BISHOP_RAYS[kingSquare]);
-    this.walkRays(pieces, PieceType.Rook, color, ROOK_RAYS[kingSquare]);
+    for (const ray of BISHOP_RAYS[kingSquare]) {
+      const pin = walkRay(pieces, PieceType.Bishop, color, ray);
+      if (pin !== null) {
+        this._map.set(pin.to, pin);
+      }
+    }
+    for (const ray of ROOK_RAYS[kingSquare]) {
+      const pin = walkRay(pieces, PieceType.Rook, color, ray);
+      if (pin !== null) {
+        this._map.set(pin.to, pin);
+      }
+    }
   }
 
+  /**
+   * Return a pin object if it exists where the pinned piece resides on the
+   * given square.
+   */
   pinByPinnedPiece(square: Square): Pin | undefined {
     return this._map.get(square);
   }
