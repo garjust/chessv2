@@ -197,8 +197,8 @@ export const applyMove = (
     position.absolutePins[color].update(
       position.pieces,
       move,
-      piece,
       position.kings[color],
+      castlingRookMove,
     );
   }
   updateAttackedSquares(

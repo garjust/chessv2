@@ -37,11 +37,9 @@ const walkRay = (
     }
   }
 
-  // Check if we found a pin on the king!
+  // Check if we found a pin!
   if (friendlySquare !== null && opponentSquare !== null) {
     openSquares.push(friendlySquare);
-    // With exactly one piece this is a standard pin to the king, which is
-    // what we care about for move generation.
     return {
       to: friendlySquare,
       from: opponentSquare,
@@ -62,10 +60,11 @@ enum UpdateType {
 type Update =
   | { type: UpdateType.AddPin; square: Square }
   | { type: UpdateType.RemovePin; pin: Pin }
-  | { type: UpdateType.Reset; map: Map<Square, Pin> };
+  | { type: UpdateType.Reset; map: Map<Square, Pin>; toSquare?: Square };
 
 export default class Pins {
   private map = new Map<Square, Pin>();
+  private toSquare?: Square;
 
   private readonly color: Color;
   private readonly updatesStack: Update[][] = [];
@@ -76,9 +75,8 @@ export default class Pins {
     color: Color,
   ) {
     this.color = color;
-    if (toSquare) {
-      this.reset(pieces, toSquare, false);
-    }
+    this.toSquare = toSquare;
+    this.reset(pieces, toSquare, false);
   }
 
   /**
@@ -99,26 +97,31 @@ export default class Pins {
   update(
     pieces: Map<Square, Piece>,
     move: Move,
-    piece: Piece,
     toSquare?: Square,
+    castlingRookMove?: Move,
   ) {
     this.updatesStack.push([]);
 
-    // If the square we are examining for pins is not set don't do any actual
-    // updates.
-    // $$$ TODO: should probably wipe the pins?
-    if (toSquare === undefined) {
-      return;
-    }
-
-    if (piece.type === PieceType.King) {
-      // If the moved piece is the king, recalcuate all pins on it.
+    if (toSquare !== this.toSquare) {
+      // The square we are calculating pins to has changed so recalculate all
+      // pins.
       this.reset(pieces, toSquare);
-    } else if (QUEEN_MOVE_BITARRAYS[toSquare][move.from]) {
+    } else if (toSquare === undefined) {
+      // The square we are calculating pins to is undefined and has not changed
+      // so don't actually do any actual updates.
+      return;
+    } else if (
+      QUEEN_MOVE_BITARRAYS[toSquare][move.from] ||
+      (castlingRookMove &&
+        QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.from])
+    ) {
       // If the move from square interacts with any king ray we may need
       // to remove or add a pin.
       this.reset(pieces, toSquare);
-    } else if (QUEEN_MOVE_BITARRAYS[toSquare][move.to]) {
+    } else if (
+      QUEEN_MOVE_BITARRAYS[toSquare][move.to] ||
+      (castlingRookMove && QUEEN_MOVE_BITARRAYS[toSquare][castlingRookMove.to])
+    ) {
       // If the move to square interacts with any king ray we may need
       // to remove or add a pin.
       this.reset(pieces, toSquare);
@@ -137,6 +140,7 @@ export default class Pins {
           break;
         case UpdateType.Reset:
           this.map = change.map;
+          this.toSquare = change.toSquare;
           break;
       }
     }
@@ -167,23 +171,31 @@ export default class Pins {
     this.map.delete(square);
   }
 
-  private reset(pieces: Map<Square, Piece>, kingSquare: Square, cache = true) {
+  private reset(pieces: Map<Square, Piece>, toSquare?: Square, cache = true) {
     if (cache) {
       this.updatesStack[this.updatesStack.length - 1].push({
         type: UpdateType.Reset,
         map: this.map,
+        toSquare: this.toSquare,
       });
     }
 
     this.map = new Map<Square, Pin>();
+    this.toSquare = toSquare;
 
-    for (const ray of BISHOP_RAYS[kingSquare]) {
+    // If the square we are examining for pins is undefined don't try and walk
+    // any rays.
+    if (toSquare === undefined) {
+      return;
+    }
+
+    for (const ray of BISHOP_RAYS[toSquare]) {
       const pin = walkRay(pieces, PieceType.Bishop, this.color, ray);
       if (pin !== null) {
         this.map.set(pin.to, pin);
       }
     }
-    for (const ray of ROOK_RAYS[kingSquare]) {
+    for (const ray of ROOK_RAYS[toSquare]) {
       const pin = walkRay(pieces, PieceType.Rook, this.color, ray);
       if (pin !== null) {
         this.map.set(pin.to, pin);
