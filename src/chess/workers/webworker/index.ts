@@ -11,6 +11,9 @@ export const loadPerft = async (): Promise<
   const worker = new Worker(new URL('./perft', import.meta.url), {
     type: 'module',
   });
+  worker.addEventListener('error', (event) => {
+    logger.error('perft web worker crashed', event.message, event);
+  });
   return [worker, () => worker.terminate()];
 };
 
