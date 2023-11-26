@@ -109,6 +109,14 @@ const isSliderPieceType = (
 export const isSlider = (piece: Piece): piece is SlidingPiece =>
   isSliderPieceType(piece.type);
 
+export const sliderType = (direction: DirectionUnit) =>
+  direction === DirectionUnit.Up ||
+  direction === DirectionUnit.Down ||
+  direction === DirectionUnit.Left ||
+  direction === DirectionUnit.Right
+    ? PieceType.Rook
+    : PieceType.Bishop;
+
 export const squaresInclude = (
   squares: Readonly<Square[]>,
   square: Square,
