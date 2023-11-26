@@ -27,14 +27,20 @@ A chess engine can be loaded in two ways:
 - Pre-compute SquareControl for all rays/moves so that objects are not
   created when assembling sets of SquareControls
 - Refactor "Move" types to be subsets of each other for duck typing
-  - _iff_ color is removed from SquareControl the objects can be pre-computed with half as much space
-  - Decide how to handle move weight if doing this since MoveWithExtraData objects will be reused at different tree nodes
-    - 0 out the weight somewhere?
-    - Store elsewhere?
-    - If weight is stored elsewhere that removes a blocker to packing everything
-      into 32bit
 - Pack castling availabiltiy into integer as a first foray into bit packing
   - move execution creates 3 objects for this every move
+
+### Pins
+- Attack map should hold some information related to pins already
+  - i.e. first half of pin ray (pinner to pinee) has been computed by the
+    attack map already
+  - can pin tracking be simplified using this information?
+- Do pins even need to be pre-computed?
+  - If attack map data is used a bit then can pins stop being pre-computed?
+  - Mostly the heavy work is scanning the second half of the pin ray (pinee to
+  square). Can this scan be done at "runtime"?
+
+### Old thoughts
 
 - Decrease weight of moves to squares attacked by pawns
 - *Opening book* (Kevin will fried liver me)
