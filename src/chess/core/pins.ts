@@ -65,20 +65,32 @@ type Update =
   | { type: UpdateType.Reset; map: Map<Square, Pin> };
 
 export default class Pins {
-  _map = new Map<Square, Pin>();
+  private map = new Map<Square, Pin>();
 
-  _updatesStack: Update[][] = [];
-  color: Color;
+  private readonly color: Color;
+  private readonly updatesStack: Update[][] = [];
 
   constructor(
     pieces: Map<Square, Piece>,
-    kingSquare: Square | undefined,
+    toSquare: Square | undefined,
     color: Color,
   ) {
     this.color = color;
-    if (kingSquare) {
-      this.reset(pieces, kingSquare, false);
+    if (toSquare) {
+      this.reset(pieces, toSquare, false);
     }
+  }
+
+  /**
+   * Return a pin object if it exists where the pinned piece resides on the
+   * given square.
+   */
+  pinByPinnedPiece(square: Square): Pin | undefined {
+    return this.map.get(square);
+  }
+
+  get allPins() {
+    return Array.from(this.map.values());
   }
 
   /**
@@ -90,7 +102,7 @@ export default class Pins {
     piece: Piece,
     toSquare?: Square,
   ) {
-    this.startUpdates();
+    this.updatesStack.push([]);
 
     // If the square we are examining for pins is not set don't do any actual
     // updates.
@@ -113,12 +125,8 @@ export default class Pins {
     }
   }
 
-  private startUpdates(): void {
-    this._updatesStack.push([]);
-  }
-
   revert(): void {
-    const updates = this._updatesStack.pop() ?? [];
+    const updates = this.updatesStack.pop() ?? [];
     for (const change of updates) {
       switch (change.type) {
         case UpdateType.AddPin:
@@ -128,7 +136,7 @@ export default class Pins {
           this.add(change.pin, false);
           break;
         case UpdateType.Reset:
-          this._map = change.map;
+          this.map = change.map;
           break;
       }
     }
@@ -136,62 +144,50 @@ export default class Pins {
 
   private add(pin: Pin, cache = true) {
     if (cache) {
-      this._updatesStack[this._updatesStack.length - 1].push({
+      this.updatesStack[this.updatesStack.length - 1].push({
         type: UpdateType.AddPin,
         square: pin.to,
       });
     }
-    this._map.set(pin.to, pin);
+    this.map.set(pin.to, pin);
   }
 
   private remove(square: Square, cache = true) {
-    const pin = this._map.get(square);
+    const pin = this.map.get(square);
     if (!pin) {
       throw Error('cannot remove no pin');
     }
 
     if (cache) {
-      this._updatesStack[this._updatesStack.length - 1].push({
+      this.updatesStack[this.updatesStack.length - 1].push({
         type: UpdateType.RemovePin,
         pin,
       });
     }
-    this._map.delete(square);
+    this.map.delete(square);
   }
 
   private reset(pieces: Map<Square, Piece>, kingSquare: Square, cache = true) {
     if (cache) {
-      this._updatesStack[this._updatesStack.length - 1].push({
+      this.updatesStack[this.updatesStack.length - 1].push({
         type: UpdateType.Reset,
-        map: this._map,
+        map: this.map,
       });
     }
 
-    this._map = new Map<Square, Pin>();
+    this.map = new Map<Square, Pin>();
 
     for (const ray of BISHOP_RAYS[kingSquare]) {
       const pin = walkRay(pieces, PieceType.Bishop, this.color, ray);
       if (pin !== null) {
-        this._map.set(pin.to, pin);
+        this.map.set(pin.to, pin);
       }
     }
     for (const ray of ROOK_RAYS[kingSquare]) {
       const pin = walkRay(pieces, PieceType.Rook, this.color, ray);
       if (pin !== null) {
-        this._map.set(pin.to, pin);
+        this.map.set(pin.to, pin);
       }
     }
-  }
-
-  /**
-   * Return a pin object if it exists where the pinned piece resides on the
-   * given square.
-   */
-  pinByPinnedPiece(square: Square): Pin | undefined {
-    return this._map.get(square);
-  }
-
-  get allPins() {
-    return Array.from(this._map.values());
   }
 }
