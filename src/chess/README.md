@@ -30,16 +30,6 @@ A chess engine can be loaded in two ways:
 - Pack castling availabiltiy into integer as a first foray into bit packing
   - move execution creates 3 objects for this every move
 
-### Pins
-- Attack map should hold some information related to pins already
-  - i.e. first half of pin ray (pinner to pinee) has been computed by the
-    attack map already
-  - can pin tracking be simplified using this information?
-- Do pins even need to be pre-computed?
-  - If attack map data is used a bit then can pins stop being pre-computed?
-  - Mostly the heavy work is scanning the second half of the pin ray (pinee to
-  square). Can this scan be done at "runtime"?
-
 ### Old thoughts
 
 - Decrease weight of moves to squares attacked by pawns
