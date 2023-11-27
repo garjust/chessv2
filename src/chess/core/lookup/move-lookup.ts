@@ -109,12 +109,6 @@ const knightMoves = (from: Square): Square[] =>
     .filter((square) => isLegalSquare(square))
     .map(rankFileToSquare);
 
-// const bishopMoves = (from: Square): Square[][] =>
-//   [upLeft, upRight, downLeft, downRight].map(scan(from));
-
-// const rookMoves = (from: Square): Square[][] =>
-//   [up, right, left, down].map(scan(from));
-
 type BishopRays = {
   [DirectionUnit.UpLeft]: Square[];
   [DirectionUnit.UpRight]: Square[];
@@ -171,32 +165,33 @@ const rookMovesByDirection = (from: Square): RookRays =>
     },
   );
 
+/**
+ * All rays by direction starting at the indexed square.
+ */
+const RAYS_BY_DIRECTION: Array<BishopRays & RookRays> = [];
+
 const KING_LOOKUP: Square[][] = [];
 const KNIGHT_LOOKUP: Square[][] = [];
 const BISHOP_LOOKUP: Square[][][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
-
-const BISHOP_LOOKUP_BY_DIRECTION: Array<BishopRays> = [];
-const ROOK_LOOKUP_BY_DIRECTION: Array<RookRays> = [];
-const RAYS_BY_DIRECTION: Array<BishopRays & RookRays> = [];
-
 const SUPER_PIECE_LOOKUP: Square[][] = [];
 
 for (const square of squareGenerator()) {
-  BISHOP_LOOKUP_BY_DIRECTION[square] = bishopMovesByDirection(square);
-  ROOK_LOOKUP_BY_DIRECTION[square] = rookMovesByDirection(square);
+  const bishopRays = bishopMovesByDirection(square);
+  const rookRays = rookMovesByDirection(square);
   RAYS_BY_DIRECTION[square] = {
-    ...bishopMovesByDirection(square),
-    ...rookMovesByDirection(square),
+    ...bishopRays,
+    ...rookRays,
   };
 
   KING_LOOKUP[square] = kingMoves(square);
   KNIGHT_LOOKUP[square] = knightMoves(square);
-  BISHOP_LOOKUP[square] = Object.values(BISHOP_LOOKUP_BY_DIRECTION[square]);
-  ROOK_LOOKUP[square] = Object.values(ROOK_LOOKUP_BY_DIRECTION[square]);
+  BISHOP_LOOKUP[square] = Object.values(bishopRays);
+  ROOK_LOOKUP[square] = Object.values(rookRays);
   QUEEN_LOOKUP[square] = Object.values(RAYS_BY_DIRECTION[square]);
 
+  // $$$ should this handle double advance pawn moves?
   SUPER_PIECE_LOOKUP[square] = [
     ...BISHOP_LOOKUP[square].flat(),
     ...ROOK_LOOKUP[square].flat(),
