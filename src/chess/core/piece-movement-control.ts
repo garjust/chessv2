@@ -1,56 +1,22 @@
-import { Color, Piece, PieceType, Square, SquareControl } from '../types';
-import { isLegalSquare } from '../utils';
+import { Piece, PieceType, Square, SquareControl } from '../types';
 import {
   BISHOP_RAYS,
   KING_MOVES,
   KNIGHT_MOVES,
+  PAWN_CAPTURE_MOVES,
   QUEEN_RAYS,
   ROOK_RAYS,
 } from './lookup';
-import { down, left, right, up, rayControlScanner } from './move-utils';
+import { rayControlScanner } from './move-utils';
 
-export const pawnMoves = (piece: Piece, from: Square): SquareControl[] => {
-  const squares: SquareControl[] = [];
-  const advanceFn = piece.color === Color.White ? up : down;
-
-  const leftCaptureSquare = advanceFn(left(from));
-  const rightCaptureSquare = advanceFn(right(from));
-
-  // Pawn captures diagonally.
-  if (isLegalSquare(leftCaptureSquare) && leftCaptureSquare % 8 !== 7) {
-    squares.push({
-      piece,
-      from,
-      to: leftCaptureSquare,
-    });
-  }
-  if (isLegalSquare(rightCaptureSquare) && rightCaptureSquare % 8 !== 0) {
-    squares.push({
-      piece,
-      from,
-      to: rightCaptureSquare,
-    });
-  }
-
-  return squares;
-};
+export const pawnMoves = (piece: Piece, from: Square): SquareControl[] =>
+  PAWN_CAPTURE_MOVES[piece.color][from];
 
 export const knightMoves = (from: Square, piece: Piece): SquareControl[] =>
-  KNIGHT_MOVES[from].map((to) => ({
-    piece,
-    from,
-    to,
-    slideSquares: [],
-  }));
+  KNIGHT_MOVES[piece.color][from];
 
-export const kingMoves = (from: Square, piece: Piece): SquareControl[] => {
-  return KING_MOVES[from].map((to) => ({
-    piece,
-    from,
-    to,
-    slideSquares: [],
-  }));
-};
+export const kingMoves = (from: Square, piece: Piece): SquareControl[] =>
+  KING_MOVES[piece.color][from];
 
 export const bishopMoves = (
   pieces: Map<Square, Piece>,

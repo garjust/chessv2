@@ -28,7 +28,7 @@ import {
 import { ray } from './rays';
 
 const pawnAdvanceMoves = (from: Square, color: Color): MoveWithExtraData[] => {
-  let moves: MoveWithExtraData[] = [];
+  const moves: MoveWithExtraData[] = [];
 
   const advanceFn = color === Color.White ? up : down;
   const advance = advanceFn(rankFileSquare(from));
@@ -50,7 +50,32 @@ const pawnAdvanceMoves = (from: Square, color: Color): MoveWithExtraData[] => {
     });
   }
   if (isPromotionPositionPawn(color, from)) {
-    moves = moves.flatMap(expandPromotions);
+    return moves.flatMap(expandPromotions);
+  }
+
+  return moves;
+};
+
+const pawnCaptureMoves = (from: Square, color: Color): MoveWithExtraData[] => {
+  const moves: MoveWithExtraData[] = [];
+
+  const advanceFn = color === Color.White ? up : down;
+  const leftCaptureSquare = advanceFn(left(rankFileSquare(from)));
+  const rightCaptureSquare = advanceFn(right(rankFileSquare(from)));
+
+  if (isLegalSquare(leftCaptureSquare)) {
+    moves.push({
+      piece: { color, type: PieceType.Pawn },
+      from,
+      to: rankFileToSquare(leftCaptureSquare),
+    });
+  }
+  if (isLegalSquare(rightCaptureSquare)) {
+    moves.push({
+      piece: { color, type: PieceType.Pawn },
+      from,
+      to: rankFileToSquare(rightCaptureSquare),
+    });
   }
 
   return moves;
@@ -146,25 +171,11 @@ const rookMovesByDirection = (from: Square): RookRays =>
     },
   );
 
+const KING_LOOKUP: Square[][] = [];
+const KNIGHT_LOOKUP: Square[][] = [];
 const BISHOP_LOOKUP: Square[][][] = [];
-const KNIGHT_MOVES: Square[][] = [];
-const KING_MOVES: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
-
-/**
- * Pawn advance pseudo moves by from square.
- *
- * Move arrays can be 3 different lengths:
- * - 1: normal advance in the middle of the board
- * - 2: the pawn is in the starting position and has two advance moves
- * - 4: the pawn can promote when it advances and each move is a different
- *      promotion.
- */
-const PAWN_ADVANCE_MOVES: ColorData<Array<MoveWithExtraData[]>> = {
-  [Color.White]: [],
-  [Color.Black]: [],
-};
 
 const BISHOP_LOOKUP_BY_DIRECTION: Array<BishopRays> = [];
 const ROOK_LOOKUP_BY_DIRECTION: Array<RookRays> = [];
@@ -180,11 +191,75 @@ for (const square of squareGenerator()) {
     ...rookMovesByDirection(square),
   };
 
+  KING_LOOKUP[square] = kingMoves(square);
+  KNIGHT_LOOKUP[square] = knightMoves(square);
   BISHOP_LOOKUP[square] = Object.values(BISHOP_LOOKUP_BY_DIRECTION[square]);
-  KING_MOVES[square] = kingMoves(square);
-  KNIGHT_MOVES[square] = knightMoves(square);
   ROOK_LOOKUP[square] = Object.values(ROOK_LOOKUP_BY_DIRECTION[square]);
   QUEEN_LOOKUP[square] = Object.values(RAYS_BY_DIRECTION[square]);
+
+  SUPER_PIECE_LOOKUP[square] = [
+    ...BISHOP_LOOKUP[square].flat(),
+    ...ROOK_LOOKUP[square].flat(),
+    ...KNIGHT_LOOKUP[square],
+    ...KING_LOOKUP[square],
+  ];
+}
+
+/**
+ * Pawn advance pseudo moves by from square.
+ *
+ * Move arrays can be 3 different lengths:
+ * - 1: normal advance in the middle of the board
+ * - 2: the pawn is in the starting position and has two advance moves
+ * - 4: the pawn can promote when it advances and each move is a different
+ *      promotion.
+ */
+const PAWN_ADVANCE_MOVES: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+/**
+ * Pawn capture pseudo moves by square.
+ */
+const PAWN_CAPTURE_MOVES: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+const KNIGHT_MOVES: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+const KING_MOVES: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+// Iterate through all the squares again this time generating actual move
+// objects that can be reused.
+for (const square of squareGenerator()) {
+  KING_MOVES[Color.White][square] = KING_LOOKUP[square].map((to) => ({
+    piece: { color: Color.White, type: PieceType.King },
+    from: square,
+    to,
+  }));
+  KING_MOVES[Color.Black][square] = KING_LOOKUP[square].map((to) => ({
+    piece: { color: Color.Black, type: PieceType.King },
+    from: square,
+    to,
+  }));
+  KNIGHT_MOVES[Color.White][square] = KNIGHT_LOOKUP[square].map((to) => ({
+    piece: { color: Color.White, type: PieceType.Knight },
+    from: square,
+    to,
+  }));
+  KNIGHT_MOVES[Color.Black][square] = KNIGHT_LOOKUP[square].map((to) => ({
+    piece: { color: Color.Black, type: PieceType.Knight },
+    from: square,
+    to,
+  }));
   PAWN_ADVANCE_MOVES[Color.White][square] = pawnAdvanceMoves(
     square,
     Color.White,
@@ -193,13 +268,14 @@ for (const square of squareGenerator()) {
     square,
     Color.Black,
   );
-
-  SUPER_PIECE_LOOKUP[square] = [
-    ...BISHOP_LOOKUP[square].flat(),
-    ...ROOK_LOOKUP[square].flat(),
-    ...KNIGHT_MOVES[square],
-    ...KING_MOVES[square],
-  ];
+  PAWN_CAPTURE_MOVES[Color.White][square] = pawnCaptureMoves(
+    square,
+    Color.White,
+  );
+  PAWN_CAPTURE_MOVES[Color.Black][square] = pawnCaptureMoves(
+    square,
+    Color.Black,
+  );
 }
 
 // Move lookup bitarrays
@@ -213,5 +289,6 @@ export {
   KNIGHT_MOVES,
   ROOK_LOOKUP,
   PAWN_ADVANCE_MOVES,
+  PAWN_CAPTURE_MOVES,
   RAYS_BY_DIRECTION,
 };

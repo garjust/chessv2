@@ -4,11 +4,15 @@ export {
   ROOK_LOOKUP as ROOK_RAYS,
   QUEEN_LOOKUP as QUEEN_RAYS,
   RAYS_BY_DIRECTION,
-  PAWN_ADVANCE_MOVES,
 } from './move-lookup';
 
 // moves
-export { KING_MOVES, KNIGHT_MOVES } from './move-lookup';
+export {
+  PAWN_ADVANCE_MOVES,
+  PAWN_CAPTURE_MOVES,
+  KING_MOVES,
+  KNIGHT_MOVES,
+} from './move-lookup';
 export { CASTLING_ROOK_MOVES, CASTLING_KING_MOVES } from './constants';
 
 // bitarrays
