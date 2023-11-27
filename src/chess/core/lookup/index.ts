@@ -1,21 +1,21 @@
 // by direction lookup
 export {
-  BISHOP_LOOKUP as BISHOP_RAYS,
-  ROOK_LOOKUP as ROOK_RAYS,
-  QUEEN_LOOKUP as QUEEN_RAYS,
+  BISHOP_RAYS,
+  ROOK_RAYS,
+  QUEEN_RAYS,
   RAYS_BY_DIRECTION,
-} from './move-lookup';
+} from './piece-squares';
 
-// moves
+// Lookup moves by square
 export {
   PAWN_ADVANCE_MOVES,
   PAWN_CAPTURE_MOVES,
   KING_MOVES,
   KNIGHT_MOVES,
-} from './move-lookup';
+} from './piece-moves';
 export { CASTLING_ROOK_MOVES, CASTLING_KING_MOVES } from './constants';
 
-// bitarrays
+// Lookup if a piece in some square has a pseudo move to another square.
 export {
   BISHOP_MOVE_BITARRAYS,
   ROOK_MOVE_BITARRAYS,
