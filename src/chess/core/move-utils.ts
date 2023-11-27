@@ -1,8 +1,10 @@
 import {
+  BishopDirection,
   DirectionUnit,
   Move,
   MoveWithExtraData,
   Piece,
+  RookDirection,
   Square,
   SquareControl,
 } from '../types';
@@ -87,11 +89,7 @@ export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
 
 export const isBishopDirection = (
   direction: DirectionUnit,
-): direction is
-  | DirectionUnit.UpLeft
-  | DirectionUnit.UpRight
-  | DirectionUnit.DownLeft
-  | DirectionUnit.DownRight =>
+): direction is BishopDirection =>
   direction === DirectionUnit.UpLeft ||
   direction === DirectionUnit.UpRight ||
   direction === DirectionUnit.DownLeft ||
@@ -99,15 +97,7 @@ export const isBishopDirection = (
 
 export const isRookDirection = (
   direction: DirectionUnit,
-): direction is
-  | DirectionUnit.Up
-  | DirectionUnit.Down
-  | DirectionUnit.Left
-  | DirectionUnit.Right =>
-  direction === DirectionUnit.Up ||
-  direction === DirectionUnit.Down ||
-  direction === DirectionUnit.Left ||
-  direction === DirectionUnit.Right;
+): direction is RookDirection => !isBishopDirection(direction);
 
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
   Boolean(a && b && a.from === b.from && a.to === b.to);

@@ -57,6 +57,18 @@ export enum DirectionUnit {
   DownRight = -7,
 }
 
+export type BishopDirection =
+  | DirectionUnit.UpLeft
+  | DirectionUnit.UpRight
+  | DirectionUnit.DownLeft
+  | DirectionUnit.DownRight;
+
+export type RookDirection =
+  | DirectionUnit.Up
+  | DirectionUnit.Down
+  | DirectionUnit.Left
+  | DirectionUnit.Right;
+
 export type PromotionOption =
   | PieceType.Bishop
   | PieceType.Knight

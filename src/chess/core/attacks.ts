@@ -66,9 +66,11 @@ const updatePiecesAttacks = (
     directionOfMove(square, move.to) === directionOfMove(square, move.from)
   ) {
     const unit = directionOfMove(square, move.from);
-    const ray = RAY_MOVES_BY_DIRECTION[piece.color][square][piece.type][
-      unit
-    ] as MoveWithExtraData[];
+    const ray = (
+      RAY_MOVES_BY_DIRECTION[piece.color][square][
+        piece.type
+      ] as unknown as MoveWithExtraData[][]
+    )[unit];
 
     const moveUnit = directionOfMove(move.from, move.to);
 
@@ -99,9 +101,11 @@ const updatePiecesAttacks = (
     //   obstructed is no longer obstructed, therefore we want to add attacks.
     if (isIncidentFrom) {
       const unit = directionOfMove(square, move.from);
-      const ray = RAY_MOVES_BY_DIRECTION[piece.color][square][piece.type][
-        unit
-      ] as MoveWithExtraData[];
+      const ray = (
+        RAY_MOVES_BY_DIRECTION[piece.color][square][
+          piece.type
+        ] as unknown as MoveWithExtraData[][]
+      )[unit];
       const newSquaresControlled = rayControlScanner(pieces, ray, move.from);
 
       attackMap.addAttacks(square, newSquaresControlled);
@@ -114,9 +118,11 @@ const updatePiecesAttacks = (
     //   obstructed, therefore we want to remove attacks.
     if (!isCapture && isIncidentTo) {
       const unit = directionOfMove(square, move.to);
-      const ray = RAY_MOVES_BY_DIRECTION[piece.color][square][piece.type][
-        unit
-      ] as MoveWithExtraData[];
+      const ray = (
+        RAY_MOVES_BY_DIRECTION[piece.color][square][
+          piece.type
+        ] as unknown as MoveWithExtraData[][]
+      )[unit];
       const squaresNoLongerControlled = rayControlScanner(pieces, ray, move.to);
 
       attackMap.removeAttacks(square, squaresNoLongerControlled);
