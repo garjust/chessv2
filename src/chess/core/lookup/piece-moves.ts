@@ -1,7 +1,13 @@
 import { ColorData, MoveWithExtraData, Color, PieceType } from '../../types';
 import { squareGenerator } from '../../utils';
 import { pawnAdvanceMoves, pawnCaptureMoves } from './movement';
-import { KING_LOOKUP, KNIGHT_LOOKUP } from './piece-squares';
+import {
+  BISHOP_RAYS,
+  KING_LOOKUP,
+  KNIGHT_LOOKUP,
+  QUEEN_RAYS,
+  ROOK_RAYS,
+} from './piece-squares';
 
 /**
  * Pawn advance pseudo moves by square.
@@ -26,6 +32,14 @@ const PAWN_CAPTURE_MOVES: ColorData<MoveWithExtraData[][]> = {
 };
 
 /**
+ * King pseudo moves by square.
+ */
+const KING_MOVES: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+/**
  * Knight pseudo moves by square.
  */
 const KNIGHT_MOVES: ColorData<MoveWithExtraData[][]> = {
@@ -34,52 +48,87 @@ const KNIGHT_MOVES: ColorData<MoveWithExtraData[][]> = {
 };
 
 /**
- * King pseudo moves by square.
+ * Bishop pseudo move rays by square.
  */
-const KING_MOVES: ColorData<MoveWithExtraData[][]> = {
+const BISHOP_RAY_MOVES: ColorData<MoveWithExtraData[][][]> = {
   [Color.White]: [],
   [Color.Black]: [],
 };
 
+/**
+ * Rook pseudo move rays by square.
+ */
+const ROOK_RAY_MOVES: ColorData<MoveWithExtraData[][][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+/**
+ * Queen pseudo move rays by square.
+ */
+const QUEEN_RAY_MOVES: ColorData<MoveWithExtraData[][][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
+/**
+ * Pesudo moves for a sliding piece in a direction by square.
+ */
+const RAY_MOVES_BY_DIRECTION: ColorData<MoveWithExtraData[][]> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+// RAY_MOVES_BY_DIRECTION[color][square][direction][pieceType] = [{}, {}];
+
 // Iterate through all the squares generating actual move objects that can
 // be reused.
-for (const square of squareGenerator()) {
-  KING_MOVES[Color.White][square] = KING_LOOKUP[square].map((to) => ({
-    piece: { color: Color.White, type: PieceType.King },
-    from: square,
-    to,
-  }));
-  KING_MOVES[Color.Black][square] = KING_LOOKUP[square].map((to) => ({
-    piece: { color: Color.Black, type: PieceType.King },
-    from: square,
-    to,
-  }));
-  KNIGHT_MOVES[Color.White][square] = KNIGHT_LOOKUP[square].map((to) => ({
-    piece: { color: Color.White, type: PieceType.Knight },
-    from: square,
-    to,
-  }));
-  KNIGHT_MOVES[Color.Black][square] = KNIGHT_LOOKUP[square].map((to) => ({
-    piece: { color: Color.Black, type: PieceType.Knight },
-    from: square,
-    to,
-  }));
-  PAWN_ADVANCE_MOVES[Color.White][square] = pawnAdvanceMoves(
-    square,
-    Color.White,
-  );
-  PAWN_ADVANCE_MOVES[Color.Black][square] = pawnAdvanceMoves(
-    square,
-    Color.Black,
-  );
-  PAWN_CAPTURE_MOVES[Color.White][square] = pawnCaptureMoves(
-    square,
-    Color.White,
-  );
-  PAWN_CAPTURE_MOVES[Color.Black][square] = pawnCaptureMoves(
-    square,
-    Color.Black,
-  );
+for (const color of [Color.White, Color.Black]) {
+  for (const square of squareGenerator()) {
+    PAWN_ADVANCE_MOVES[color][square] = pawnAdvanceMoves(square, color);
+    PAWN_CAPTURE_MOVES[color][square] = pawnCaptureMoves(square, color);
+    KING_MOVES[color][square] = KING_LOOKUP[square].map((to) => ({
+      piece: { color, type: PieceType.King },
+      from: square,
+      to,
+    }));
+    KNIGHT_MOVES[color][square] = KNIGHT_LOOKUP[square].map((to) => ({
+      piece: { color, type: PieceType.Knight },
+      from: square,
+      to,
+    }));
+    BISHOP_RAY_MOVES[color][square] = BISHOP_RAYS[square].map((ray) =>
+      ray.map((to) => ({
+        piece: { color, type: PieceType.Bishop },
+        from: square,
+        to,
+      })),
+    );
+    ROOK_RAY_MOVES[color][square] = ROOK_RAYS[square].map((ray) =>
+      ray.map((to) => ({
+        piece: { color, type: PieceType.Rook },
+        from: square,
+        to,
+      })),
+    );
+    QUEEN_RAY_MOVES[color][square] = QUEEN_RAYS[square].map((ray) =>
+      ray.map((to) => ({
+        piece: { color, type: PieceType.Queen },
+        from: square,
+        to,
+      })),
+    );
+
+    // Directional..
+    // RAY_MOVES_BY_DIRECTION[color][square][direction][pieceType] = [{}, {}];
+  }
 }
 
-export { KING_MOVES, KNIGHT_MOVES, PAWN_ADVANCE_MOVES, PAWN_CAPTURE_MOVES };
+export {
+  PAWN_ADVANCE_MOVES,
+  PAWN_CAPTURE_MOVES,
+  KING_MOVES,
+  KNIGHT_MOVES,
+  BISHOP_RAY_MOVES,
+  ROOK_RAY_MOVES,
+  QUEEN_RAY_MOVES,
+};
