@@ -8,7 +8,7 @@ import AttackMap from './attack-map';
 import { CASTLING_KING_MOVES, PAWN_ADVANCE_MOVES } from './lookup';
 import { left, right } from './move-utils';
 
-export const advancePawnMoves = (
+export const pawnAdvanceMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
@@ -37,7 +37,7 @@ export const advancePawnMoves = (
   }
 };
 
-export const castlingKingMoves = (
+export const kingCastlingMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
