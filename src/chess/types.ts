@@ -118,16 +118,18 @@ export type MoveWithExtraData = Move & {
 
 export type CastlingSide = 'kingside' | 'queenside';
 
-export type CastlingAvailability = Readonly<{
+export type CastlingData<T> = Readonly<{
   [Color.White]: {
-    kingside: boolean;
-    queenside: boolean;
+    kingside: T;
+    queenside: T;
   };
   [Color.Black]: {
-    kingside: boolean;
-    queenside: boolean;
+    kingside: T;
+    queenside: T;
   };
 }>;
+
+export type CastlingAvailability = CastlingData<boolean>;
 
 /**
  * Fully represent a unique chess position.

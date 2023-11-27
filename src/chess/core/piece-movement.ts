@@ -12,6 +12,7 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
+import { CASTLING_KING_MOVES } from './lookup';
 import { down, expandPromotions, left, right, up } from './move-utils';
 
 const expandAllPromotions = (moves: MoveWithExtraData[]) =>
@@ -64,7 +65,7 @@ export const castlingKingMoves = (
   opponentAttackMap: AttackMap,
   castlingAvailability: CastlingAvailability,
 ): MoveWithExtraData[] => {
-  const squares = [];
+  const moves: MoveWithExtraData[] = [];
 
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
@@ -78,7 +79,7 @@ export const castlingKingMoves = (
     // will detect that later in move generation
     !opponentAttackMap.isAttacked(right(from))
   ) {
-    squares.push(right(from, 2));
+    moves.push(CASTLING_KING_MOVES[piece.color].kingside);
   }
   if (
     castlingAvailability[piece.color].queenside &&
@@ -91,13 +92,8 @@ export const castlingKingMoves = (
     // will detect that later in move generation
     !opponentAttackMap.isAttacked(left(from))
   ) {
-    squares.push(left(from, 2));
+    moves.push(CASTLING_KING_MOVES[piece.color].queenside);
   }
 
-  return squares.map((to) => ({
-    from,
-    to,
-    piece,
-    attack: false,
-  }));
+  return moves;
 };
