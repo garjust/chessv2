@@ -1,12 +1,10 @@
 import { Piece, PieceType, Square, SquareControl } from '../types';
+import { KING_MOVES, KNIGHT_MOVES, PAWN_CAPTURE_MOVES } from './lookup';
 import {
-  BISHOP_RAYS,
-  KING_MOVES,
-  KNIGHT_MOVES,
-  PAWN_CAPTURE_MOVES,
-  QUEEN_RAYS,
-  ROOK_RAYS,
-} from './lookup';
+  BISHOP_RAY_MOVES,
+  QUEEN_RAY_MOVES,
+  ROOK_RAY_MOVES,
+} from './lookup/piece-moves';
 import { rayControlScanner } from './move-utils';
 
 export const forPiece = (
@@ -22,16 +20,16 @@ export const forPiece = (
     case PieceType.Knight:
       return KNIGHT_MOVES[piece.color][square];
     case PieceType.Bishop:
-      return BISHOP_RAYS[square].flatMap((ray) =>
-        rayControlScanner(pieces, piece, square, ray),
+      return BISHOP_RAY_MOVES[piece.color][square].flatMap((ray) =>
+        rayControlScanner(pieces, ray),
       );
     case PieceType.Rook:
-      return ROOK_RAYS[square].flatMap((ray) =>
-        rayControlScanner(pieces, piece, square, ray),
+      return ROOK_RAY_MOVES[piece.color][square].flatMap((ray) =>
+        rayControlScanner(pieces, ray),
       );
     case PieceType.Queen:
-      return QUEEN_RAYS[square].flatMap((ray) =>
-        rayControlScanner(pieces, piece, square, ray),
+      return QUEEN_RAY_MOVES[piece.color][square].flatMap((ray) =>
+        rayControlScanner(pieces, ray),
       );
   }
 };

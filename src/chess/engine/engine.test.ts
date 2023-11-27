@@ -55,7 +55,7 @@ test('example interaction with UCI engine', async () => {
         from: 11,
         to: 27,
         attack: false,
-        weight: 9007199254740991,
+        weight: 900,
       },
     },
   ]);

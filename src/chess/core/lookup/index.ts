@@ -12,6 +12,7 @@ export {
   PAWN_CAPTURE_MOVES,
   KING_MOVES,
   KNIGHT_MOVES,
+  RAY_MOVES_BY_DIRECTION,
 } from './piece-moves';
 export { CASTLING_ROOK_MOVES, CASTLING_KING_MOVES } from './constants';
 

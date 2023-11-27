@@ -1,5 +1,12 @@
-import { ColorData, MoveWithExtraData, Color, PieceType } from '../../types';
+import {
+  ColorData,
+  MoveWithExtraData,
+  Color,
+  PieceType,
+  DirectionUnit,
+} from '../../types';
 import { squareGenerator } from '../../utils';
+import { directionOfMove, isBishopDirection } from '../move-utils';
 import { pawnAdvanceMoves, pawnCaptureMoves } from './movement';
 import {
   BISHOP_RAYS,
@@ -8,6 +15,7 @@ import {
   QUEEN_RAYS,
   ROOK_RAYS,
 } from './piece-squares';
+import { BishopRays, RookRays } from './rays';
 
 /**
  * Pawn advance pseudo moves by square.
@@ -71,14 +79,25 @@ const QUEEN_RAY_MOVES: ColorData<MoveWithExtraData[][][]> = {
   [Color.Black]: [],
 };
 
+type RayMovesByPieceDirection = {
+  [PieceType.Bishop]: Record<keyof BishopRays, MoveWithExtraData[]>;
+  [PieceType.Rook]: Record<keyof RookRays, MoveWithExtraData[]>;
+  [PieceType.Queen]: Record<
+    keyof BishopRays | keyof RookRays,
+    MoveWithExtraData[]
+  >;
+};
+
 /**
- * Pesudo moves for a sliding piece in a direction by square.
+ * Pesudo move rays for a sliding piece in a direction by square.
+ *
+ * Move rays are accessed in this manner:
+ * `RAY_MOVES_BY_DIRECTION[color][square][pieceType][direction]`
  */
-const RAY_MOVES_BY_DIRECTION: ColorData<MoveWithExtraData[][]> = {
+const RAY_MOVES_BY_DIRECTION: ColorData<RayMovesByPieceDirection[]> = {
   [Color.White]: [],
   [Color.Black]: [],
 };
-// RAY_MOVES_BY_DIRECTION[color][square][direction][pieceType] = [{}, {}];
 
 // Iterate through all the squares generating actual move objects that can
 // be reused.
@@ -118,8 +137,58 @@ for (const color of [Color.White, Color.Black]) {
       })),
     );
 
-    // Directional..
-    // RAY_MOVES_BY_DIRECTION[color][square][direction][pieceType] = [{}, {}];
+    // Things are getting a bit crazy here yeesh!
+    RAY_MOVES_BY_DIRECTION[color][square] = QUEEN_RAYS[
+      square
+    ].reduce<RayMovesByPieceDirection>(
+      (obj, ray) => {
+        const direction = directionOfMove(square, ray[0]);
+
+        if (isBishopDirection(direction)) {
+          obj[PieceType.Bishop][direction] = ray.map((to) => ({
+            piece: { color, type: PieceType.Bishop },
+            from: square,
+            to,
+          }));
+        } else {
+          obj[PieceType.Rook][direction] = ray.map((to) => ({
+            piece: { color, type: PieceType.Rook },
+            from: square,
+            to,
+          }));
+        }
+        obj[PieceType.Queen][direction] = ray.map((to) => ({
+          piece: { color, type: PieceType.Queen },
+          from: square,
+          to,
+        }));
+        return obj;
+      },
+      {
+        [PieceType.Bishop]: {
+          [DirectionUnit.UpLeft]: [],
+          [DirectionUnit.UpRight]: [],
+          [DirectionUnit.DownLeft]: [],
+          [DirectionUnit.DownRight]: [],
+        },
+        [PieceType.Rook]: {
+          [DirectionUnit.Up]: [],
+          [DirectionUnit.Down]: [],
+          [DirectionUnit.Left]: [],
+          [DirectionUnit.Right]: [],
+        },
+        [PieceType.Queen]: {
+          [DirectionUnit.UpLeft]: [],
+          [DirectionUnit.UpRight]: [],
+          [DirectionUnit.DownLeft]: [],
+          [DirectionUnit.DownRight]: [],
+          [DirectionUnit.Up]: [],
+          [DirectionUnit.Down]: [],
+          [DirectionUnit.Left]: [],
+          [DirectionUnit.Right]: [],
+        },
+      },
+    );
   }
 }
 
@@ -131,4 +200,5 @@ export {
   BISHOP_RAY_MOVES,
   ROOK_RAY_MOVES,
   QUEEN_RAY_MOVES,
+  RAY_MOVES_BY_DIRECTION,
 };
