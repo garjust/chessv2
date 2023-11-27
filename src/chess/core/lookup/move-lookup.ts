@@ -1,5 +1,17 @@
-import { DirectionUnit, Square } from '../../types';
-import { squareGenerator } from '../../utils';
+import {
+  Color,
+  ColorData,
+  DirectionUnit,
+  MoveWithExtraData,
+  PieceType,
+  Square,
+} from '../../types';
+import {
+  isPromotionPositionPawn,
+  isStartPositionPawn,
+  squareGenerator,
+} from '../../utils';
+import { expandPromotions } from '../move-utils';
 import {
   isLegalSquare,
   down,
@@ -14,6 +26,35 @@ import {
   rankFileToSquare,
 } from './movement';
 import { ray } from './rays';
+
+const pawnAdvanceMoves = (from: Square, color: Color): MoveWithExtraData[] => {
+  let moves: MoveWithExtraData[] = [];
+
+  const advanceFn = color === Color.White ? up : down;
+  const advance = advanceFn(rankFileSquare(from));
+
+  if (isLegalSquare(advance)) {
+    moves.push({
+      piece: { color, type: PieceType.Pawn },
+      from,
+      to: rankFileToSquare(advance),
+      attack: false,
+    });
+  }
+  if (isStartPositionPawn(color, from)) {
+    moves.push({
+      piece: { color, type: PieceType.Pawn },
+      from,
+      to: rankFileToSquare(advanceFn(advance)),
+      attack: false,
+    });
+  }
+  if (isPromotionPositionPawn(color, from)) {
+    moves = moves.flatMap(expandPromotions);
+  }
+
+  return moves;
+};
 
 const kingMoves = (from: Square): Square[] =>
   [
@@ -111,6 +152,20 @@ const KING_MOVES: Square[][] = [];
 const ROOK_LOOKUP: Square[][][] = [];
 const QUEEN_LOOKUP: Square[][][] = [];
 
+/**
+ * Pawn advance pseudo moves by from square.
+ *
+ * Move arrays can be 3 different lengths:
+ * - 1: normal advance in the middle of the board
+ * - 2: the pawn is in the starting position and has two advance moves
+ * - 4: the pawn can promote when it advances and each move is a different
+ *      promotion.
+ */
+const PAWN_ADVANCE_MOVES: ColorData<Array<MoveWithExtraData[]>> = {
+  [Color.White]: [],
+  [Color.Black]: [],
+};
+
 const BISHOP_LOOKUP_BY_DIRECTION: Array<BishopRays> = [];
 const ROOK_LOOKUP_BY_DIRECTION: Array<RookRays> = [];
 const RAYS_BY_DIRECTION: Array<BishopRays & RookRays> = [];
@@ -130,6 +185,14 @@ for (const square of squareGenerator()) {
   KNIGHT_MOVES[square] = knightMoves(square);
   ROOK_LOOKUP[square] = Object.values(ROOK_LOOKUP_BY_DIRECTION[square]);
   QUEEN_LOOKUP[square] = Object.values(RAYS_BY_DIRECTION[square]);
+  PAWN_ADVANCE_MOVES[Color.White][square] = pawnAdvanceMoves(
+    square,
+    Color.White,
+  );
+  PAWN_ADVANCE_MOVES[Color.Black][square] = pawnAdvanceMoves(
+    square,
+    Color.Black,
+  );
 
   SUPER_PIECE_LOOKUP[square] = [
     ...BISHOP_LOOKUP[square].flat(),
@@ -149,5 +212,6 @@ export {
   SUPER_PIECE_LOOKUP,
   KNIGHT_MOVES,
   ROOK_LOOKUP,
+  PAWN_ADVANCE_MOVES,
   RAYS_BY_DIRECTION,
 };

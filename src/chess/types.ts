@@ -13,6 +13,11 @@ export enum Color {
   Black = 1,
 }
 
+export type ColorData<T> = Readonly<{
+  [Color.White]: T;
+  [Color.Black]: T;
+}>;
+
 /**
  * Type of piece.
  *
@@ -118,15 +123,9 @@ export type MoveWithExtraData = Move & {
 
 export type CastlingSide = 'kingside' | 'queenside';
 
-export type CastlingData<T> = Readonly<{
-  [Color.White]: {
-    kingside: T;
-    queenside: T;
-  };
-  [Color.Black]: {
-    kingside: T;
-    queenside: T;
-  };
+export type CastlingData<T> = ColorData<{
+  kingside: T;
+  queenside: T;
 }>;
 
 export type CastlingAvailability = CastlingData<boolean>;

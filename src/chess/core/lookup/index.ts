@@ -4,6 +4,7 @@ export {
   ROOK_LOOKUP as ROOK_RAYS,
   QUEEN_LOOKUP as QUEEN_RAYS,
   RAYS_BY_DIRECTION,
+  PAWN_ADVANCE_MOVES,
 } from './move-lookup';
 
 // moves

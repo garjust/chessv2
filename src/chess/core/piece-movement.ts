@@ -1,61 +1,40 @@
 import {
-  Color,
   MoveWithExtraData,
   Piece,
-  PieceType,
   Square,
   CastlingAvailability,
 } from '../types';
-import {
-  isLegalSquare,
-  isStartPositionPawn,
-  isPromotionPositionPawn,
-} from '../utils';
 import AttackMap from './attack-map';
-import { CASTLING_KING_MOVES } from './lookup';
-import { down, expandPromotions, left, right, up } from './move-utils';
-
-const expandAllPromotions = (moves: MoveWithExtraData[]) =>
-  moves.flatMap((move) => expandPromotions(move));
+import { CASTLING_KING_MOVES, PAWN_ADVANCE_MOVES } from './lookup';
+import { left, right } from './move-utils';
 
 export const advancePawnMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
 ): MoveWithExtraData[] => {
-  let squares: MoveWithExtraData[] = [];
-  const advanceFn = piece.color === Color.White ? up : down;
+  // Note: the array returned here can have 3 specific lengths which we can
+  // use for checking move legality.
+  const moves = PAWN_ADVANCE_MOVES[piece.color][from];
 
-  // Space forward of the pawn.
-  if (isLegalSquare(advanceFn(from)) && !pieces.has(advanceFn(from))) {
-    squares.push({
-      from,
-      to: advanceFn(from),
-      piece,
-      attack: false,
-    });
+  if (moves.length === 0) {
+    return moves;
+  } else {
+    if (pieces.has(moves[0].to)) {
+      // There is a piece blocking pawn advancement.
+      return [];
+    }
 
-    // Space two squares forward of the pawn when it is in it's starting rank.
-    if (
-      !pieces.has(advanceFn(from, 2)) &&
-      isStartPositionPawn(piece.color, from)
-    ) {
-      squares.push({
-        from,
-        to: advanceFn(from, 2),
-        piece,
-        attack: false,
-      });
+    if (moves.length === 2) {
+      if (pieces.has(moves[1].to)) {
+        return [moves[0]];
+      } else {
+        return moves;
+      }
+    } else {
+      return moves;
     }
   }
-
-  // If the pawn will promote on next advancement take the possible pawn moves
-  // and add possible promotions.
-  if (isPromotionPositionPawn(piece.color, from)) {
-    squares = expandAllPromotions(squares);
-  }
-
-  return squares;
 };
 
 export const castlingKingMoves = (
