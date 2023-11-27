@@ -1,3 +1,4 @@
+import { ROOK_STARTING_SQUARES } from '../castling';
 import { PIECES } from '../piece-consants';
 import {
   CastlingAvailability,
@@ -7,11 +8,7 @@ import {
   PieceType,
   Square,
 } from '../types';
-import {
-  ROOK_STARTING_SQUARES,
-  flipColor,
-  isStartPositionPawn,
-} from '../utils';
+import { flipColor, isStartPositionPawn } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';

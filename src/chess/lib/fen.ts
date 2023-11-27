@@ -1,11 +1,12 @@
-import { Color, Piece, Position, Square, SquareLabel } from '../types';
 import {
-  squareLabel,
-  labelToSquare,
-  PIECE_TYPE_TO_FEN_PIECE,
-  FEN_PIECE_TO_PIECE_TYPE,
-  squareGenerator,
-} from '../utils';
+  Color,
+  Piece,
+  PieceType,
+  Position,
+  Square,
+  SquareLabel,
+} from '../types';
+import { squareLabel, labelToSquare, squareGenerator } from '../utils';
 
 // Basic positions
 // -----------------------------------------------------------------------------
@@ -32,9 +33,8 @@ const ROOK_ENDGAME_FEN = '3r4/8/3k4/8/8/3K4/8/8 w - - 0 1';
 const QUEEN_ENDGAME_FEN = '8/3K4/4P3/8/8/8/6k1/7q w - - 0 1';
 const FIXED_PAWN_ENDGAME_FEN = '8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - - 0 1';
 
-// Fen-string handling
+// Exported library of FEN strings
 // -----------------------------------------------------------------------------
-
 export const FEN_LIBRARY = {
   BLANK_POSITION_FEN,
   STARTING_POSITION_FEN,
@@ -48,6 +48,32 @@ export const FEN_LIBRARY = {
   FIXED_PAWN_ENDGAME_FEN,
   KEVIN_FRIED_LIVER_BUSTED,
 };
+
+// Fen-string handling
+// -----------------------------------------------------------------------------
+export const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
+  b: PieceType.Bishop,
+  B: PieceType.Bishop,
+  k: PieceType.King,
+  K: PieceType.King,
+  n: PieceType.Knight,
+  N: PieceType.Knight,
+  p: PieceType.Pawn,
+  P: PieceType.Pawn,
+  q: PieceType.Queen,
+  Q: PieceType.Queen,
+  r: PieceType.Rook,
+  R: PieceType.Rook,
+});
+
+export const PIECE_TYPE_TO_FEN_PIECE = Object.freeze({
+  [PieceType.Bishop]: 'b',
+  [PieceType.King]: 'k',
+  [PieceType.Knight]: 'n',
+  [PieceType.Pawn]: 'p',
+  [PieceType.Queen]: 'q',
+  [PieceType.Rook]: 'r',
+});
 
 export const isValid = (fenString: string): boolean => {
   const parts = fenString.split(' ');

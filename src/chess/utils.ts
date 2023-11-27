@@ -1,3 +1,4 @@
+import { copyCastlingAvailability } from './castling';
 import { formatPosition } from './lib/fen';
 import {
   Color,
@@ -14,58 +15,12 @@ import {
 export const WHITE_PAWN_STARTING_RANK = 1;
 export const BLACK_PAWN_STARTING_RANK = 6;
 
-export const ROOK_STARTING_SQUARES = {
-  [Color.White]: {
-    queenside: 0 as Square,
-    kingside: 7 as Square,
-  },
-  [Color.Black]: {
-    queenside: 56 as Square,
-    kingside: 63 as Square,
-  },
-} as const;
-
-export const CASTLING_AVAILABILITY_BLOCKED = Object.freeze({
-  [Color.White]: {
-    kingside: false,
-    queenside: false,
-  },
-  [Color.Black]: {
-    kingside: false,
-    queenside: false,
-  },
-});
-
 export const PROMOTION_OPTION_PIECE_TYPES = [
   PieceType.Bishop,
   PieceType.Knight,
   PieceType.Queen,
   PieceType.Rook,
 ] as const;
-
-export const FEN_PIECE_TO_PIECE_TYPE = Object.freeze({
-  b: PieceType.Bishop,
-  B: PieceType.Bishop,
-  k: PieceType.King,
-  K: PieceType.King,
-  n: PieceType.Knight,
-  N: PieceType.Knight,
-  p: PieceType.Pawn,
-  P: PieceType.Pawn,
-  q: PieceType.Queen,
-  Q: PieceType.Queen,
-  r: PieceType.Rook,
-  R: PieceType.Rook,
-});
-
-export const PIECE_TYPE_TO_FEN_PIECE = Object.freeze({
-  [PieceType.Bishop]: 'b',
-  [PieceType.King]: 'k',
-  [PieceType.Knight]: 'n',
-  [PieceType.Pawn]: 'p',
-  [PieceType.Queen]: 'q',
-  [PieceType.Rook]: 'r',
-});
 
 const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
   ['a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'] as const,
@@ -204,21 +159,12 @@ export const findKing = (
 export const copyPosition = (position: Position): Position => {
   const pieces = new Map(position.pieces);
 
-  const castlingAvailability = {
-    [Color.White]: {
-      kingside: position.castlingAvailability[Color.White].kingside,
-      queenside: position.castlingAvailability[Color.White].queenside,
-    },
-    [Color.Black]: {
-      kingside: position.castlingAvailability[Color.Black].kingside,
-      queenside: position.castlingAvailability[Color.Black].queenside,
-    },
-  };
-
   return {
     pieces,
     turn: position.turn,
-    castlingAvailability,
+    castlingAvailability: copyCastlingAvailability(
+      position.castlingAvailability,
+    ),
     enPassantSquare: position.enPassantSquare,
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,

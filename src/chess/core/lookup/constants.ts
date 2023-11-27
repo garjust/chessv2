@@ -1,5 +1,6 @@
+import { ROOK_STARTING_SQUARES } from '../../castling';
 import { Color } from '../../types';
-import { ROOK_STARTING_SQUARES, buildMove } from '../../utils';
+import { buildMove } from '../../utils';
 
 /**
  * Set of pre-created moves a rook makes when participating

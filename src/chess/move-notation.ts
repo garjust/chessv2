@@ -1,10 +1,6 @@
+import { FEN_PIECE_TO_PIECE_TYPE, PIECE_TYPE_TO_FEN_PIECE } from './lib/fen';
 import { Move, PromotionOption, SquareLabel } from './types';
-import {
-  FEN_PIECE_TO_PIECE_TYPE,
-  PIECE_TYPE_TO_FEN_PIECE,
-  labelToSquare,
-  squareLabel,
-} from './utils';
+import { labelToSquare, squareLabel } from './utils';
 
 const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
   PIECE_TYPE_TO_FEN_PIECE[type];

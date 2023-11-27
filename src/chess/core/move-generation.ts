@@ -1,3 +1,4 @@
+import { CASTLING_AVAILABILITY_BLOCKED } from '../castling';
 import {
   Color,
   MoveWithExtraData,
@@ -7,12 +8,7 @@ import {
   CastlingAvailability,
   SquareControl,
 } from '../types';
-import {
-  flipColor,
-  squaresInclude,
-  CASTLING_AVAILABILITY_BLOCKED,
-  isPromotionPositionPawn,
-} from '../utils';
+import { flipColor, isPromotionPositionPawn } from '../utils';
 import AttackMap from './attack-map';
 import {
   expandPromotions,
