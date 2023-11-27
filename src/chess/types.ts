@@ -69,9 +69,11 @@ export type Move = {
  */
 export type Pin = Readonly<{
   /** The square of the attacker creating the pin. */
-  attacker: Square;
+  from: Square;
   /** The square with the pinned or skewered piece. */
-  pinned: Square;
+  to: Square;
+  /** Stored computed direction from->to */
+  direction: DirectionUnit;
   /**
    * Legal squares the pinned piece can move to while maintaining the pin.
    * This includes it's resident square.
@@ -80,38 +82,37 @@ export type Pin = Readonly<{
 }>;
 
 /**
- * Describes control a piece has on a square.
+ * Describes control a piece has on a square. Fully represents a move that can
+ * be executed or evaluated, although the move may not be legal.
  */
-export type SquareControlObject = Readonly<{
+export type SquareControl = {
   /** The controlling piece. */
-  attacker: Readonly<{ square: Square; type: PieceType }>;
-  /** The square under control */
-  square: Square;
-  /**
-   * If the attacker is a sliding piece this is the set of squares they move through
-   * for the attack. A move to one of these squares blocks the attack.
-   */
-  slideSquares: Readonly<Square[]>; // This data is used for handlnig when a king is checked by a single sliding piece
-}>;
+  readonly piece: Piece;
+  /** The square of the controlling piece. */
+  readonly from: Square;
+  /** The square under control. */
+  readonly to: Square;
 
-/**
- * Describes an attack a piece is making on another piece.
- */
-export type AttackObject = Readonly<{
-  /** The attacking piece. */
-  attacker: Readonly<{ square: Square; type: PieceType }>;
-  /** The square being attacked for this object. */
-  attacked: Readonly<{ square: Square; type: PieceType }>;
   /**
-   * If the attacker is a sliding piece this is the set of squares they move through
-   * for the attack. A move to one of these squares blocks the attack.
+   * Whether this square control is an attack on another piece. To find the type
+   * of piece use the current pieces map.
+   *
+   * Note: this state may hang around on moves between positions. The boolean
+   * is always re-set when generating a list of moves.
    */
-  slideSquares: Readonly<Square[]>; // NOTE: This data is unused
-}>;
+  attack?: boolean;
+  /**
+   * Weight of the move scored by the move ordering function.
+   *
+   * Note: This state may hang around on moves between positions. The move
+   * ordering function will always re-score moves before sorting.
+   */
+  weight?: number;
+};
 
 export type MoveWithExtraData = Move & {
   piece: Piece;
-  attack?: AttackObject;
+  attack?: boolean;
   weight?: number;
 };
 
@@ -133,7 +134,7 @@ export type CastlingAvailability = Readonly<{
  */
 export type Position = {
   /** Map of board squares to pieces tracking where pieces are located. */
-  pieces: Map<Square, Piece>;
+  readonly pieces: Map<Square, Piece>;
   /** Which player's turn it is. */
   turn: Color;
   /** Castling availability map. */

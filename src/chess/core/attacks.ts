@@ -4,7 +4,7 @@ import {
   PieceType,
   Square,
   Move,
-  SquareControlObject,
+  SquareControl,
   SlidingPiece,
 } from '../types';
 import { flipColor, directionOfMove, isSlider } from '../utils';
@@ -53,7 +53,7 @@ const updatePiecesAttacks = (
     castlingRookMove
   ) {
     attackMap.removeAttacksForPiece(square);
-    const newAttacks: SquareControlObject[] = forPiece(piece, pieces, square);
+    const newAttacks: SquareControl[] = forPiece(piece, pieces, square);
     attackMap.addAttacksForPiece(square, newAttacks);
   } else if (
     // If the sliding piece is incident with a move's from and two squares in
@@ -73,7 +73,8 @@ const updatePiecesAttacks = (
       // The to square is further away so we add attacks.
       const newSquaresControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.from,
       );
@@ -89,7 +90,8 @@ const updatePiecesAttacks = (
       // The to square is closer so we remove attacks.
       const squaresNoLongerControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.to,
         move.from,
@@ -105,7 +107,8 @@ const updatePiecesAttacks = (
       const ray = RAYS_BY_DIRECTION[square][unit];
       const newSquaresControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.from,
       );
@@ -123,7 +126,8 @@ const updatePiecesAttacks = (
       const ray = RAYS_BY_DIRECTION[square][unit];
       const squaresNoLongerControlled = rayControlScanner(
         pieces,
-        { square, piece },
+        piece,
+        square,
         ray,
         move.to,
       );
@@ -190,7 +194,7 @@ export const updateAttackedSquaresForMove = (
   map.removeAttacksForPiece(move.to);
 
   // Find the squares that are now attacked by the moved piece.
-  const newAttacks: SquareControlObject[] = forPiece(piece, pieces, move.to);
+  const newAttacks: SquareControl[] = forPiece(piece, pieces, move.to);
   map.addAttacksForPiece(move.to, newAttacks);
 };
 

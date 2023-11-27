@@ -1,25 +1,33 @@
 import {
-  AttackObject,
+  DirectionUnit,
   Move,
   MoveWithExtraData,
   Piece,
   Square,
-  SquareControlObject,
+  SquareControl,
 } from '../types';
 import {
   PROMOTION_OPTION_PIECE_TYPES,
   directionOfMove,
-  isSliderPieceType,
+  isSlider,
 } from '../utils';
 
-export const up = (square: Square, n = 1): Square => square + 8 * n;
-export const down = (square: Square, n = 1): Square => square - 8 * n;
-export const left = (square: Square, n = 1): Square => square - 1 * n;
-export const right = (square: Square, n = 1): Square => square + 1 * n;
-export const upLeft = (square: Square, n = 1): Square => square + 7 * n;
-export const upRight = (square: Square, n = 1): Square => square + 9 * n;
-export const downLeft = (square: Square, n = 1): Square => square - 9 * n;
-export const downRight = (square: Square, n = 1): Square => square - 7 * n;
+export const up = (square: Square, n = 1): Square =>
+  square + DirectionUnit.Up * n;
+export const down = (square: Square, n = 1): Square =>
+  square + DirectionUnit.Down * n;
+export const left = (square: Square, n = 1): Square =>
+  square + DirectionUnit.Left * n;
+export const right = (square: Square, n = 1): Square =>
+  square + DirectionUnit.Right * n;
+export const upLeft = (square: Square, n = 1): Square =>
+  square + DirectionUnit.UpLeft * n;
+export const upRight = (square: Square, n = 1): Square =>
+  square + DirectionUnit.UpRight * n;
+export const downLeft = (square: Square, n = 1): Square =>
+  square + DirectionUnit.DownLeft * n;
+export const downRight = (square: Square, n = 1): Square =>
+  square + DirectionUnit.DownRight * n;
 
 export const isMoveUp = (move: Move): boolean =>
   move.from < move.to && isMoveInFile(move);
@@ -30,35 +38,36 @@ export const isMoveDown = (move: Move): boolean =>
 export const isMoveInFile = (move: Move): boolean =>
   (move.from - move.to) % 8 === 0;
 
+/**
+ * Return whether a SquareControl by a sliding piece intersects both squares
+ * of a move.
+ */
 export const squareControlXraysMove = (
-  squareControl: SquareControlObject,
+  squareControl: SquareControl,
   move: Move,
 ): boolean =>
-  isSliderPieceType(squareControl.attacker.type) &&
-  directionOfMove(squareControl.attacker.square, squareControl.square) ===
+  isSlider(squareControl.piece) &&
+  directionOfMove(squareControl.from, squareControl.to) ===
     directionOfMove(move.from, move.to);
 
 export const rayControlScanner = (
   pieces: Map<Square, Piece>,
-  scanningPiece: { square: Square; piece: Piece },
+  piece: Piece,
+  from: Square,
   ray: Square[],
   skipPast?: Square,
   stopAt?: Square,
-): SquareControlObject[] => {
-  const moves: SquareControlObject[] = [];
-  const slideSquares: Square[] = [];
-  const from = scanningPiece.square;
+): SquareControl[] => {
+  const moves: SquareControl[] = [];
   let skip = skipPast !== undefined ? true : false;
 
   for (const to of ray) {
     if (skip) {
-      slideSquares.push(to);
-
       if (to === skipPast) {
         skip = false;
       } else {
-        const piece = pieces.get(to);
-        if (piece) {
+        const otherPiece = pieces.get(to);
+        if (otherPiece) {
           // Stop scanning if we hit a piece of either colour
           break;
         }
@@ -68,18 +77,17 @@ export const rayControlScanner = (
     }
 
     moves.push({
-      attacker: { square: from, type: scanningPiece.piece.type },
-      square: to,
-      slideSquares: [...slideSquares],
+      piece,
+      from,
+      to: to,
     });
-    slideSquares.push(to);
 
     if (to === stopAt) {
       break;
     }
 
-    const piece = pieces.get(to);
-    if (piece) {
+    const otherPiece = pieces.get(to);
+    if (otherPiece) {
       // Stop scanning if we hit a piece of either colour
       break;
     }
@@ -93,3 +101,39 @@ export const expandPromotions = (move: MoveWithExtraData) =>
     ...move,
     promotion: pieceType,
   }));
+
+const rayScanForIntersection = (
+  from: Square,
+  toExclusive: Square, // Note: this square is exclusive in the scan since we are doing this for a check.
+  intersect: Square,
+): boolean => {
+  const direction = directionOfMove(from, toExclusive);
+
+  // Short cuts to avoid computing and scanning the ray.
+  // if (direction === DirectionUnit.Left) {
+  //   return intersect >= from && intersect < toExclusive;
+  // } else if (direction === DirectionUnit.Right) {
+  //   return intersect <= from && intersect > toExclusive;
+  // }
+
+  let square = from;
+  do {
+    if (square === intersect) {
+      return true;
+    }
+    square += direction;
+  } while (square !== toExclusive);
+
+  return false;
+};
+
+export const isMoveIncidentWithCheck = (
+  move: Move,
+  check: SquareControl,
+): boolean => {
+  if (isSlider(check.piece)) {
+    return rayScanForIntersection(check.from, check.to, move.to);
+  } else {
+    return check.from === move.to;
+  }
+};

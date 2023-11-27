@@ -2,4 +2,4 @@
 # $1 : depth
 # $2 : FEN string
 # $3 : optional moves to apply first
-node build/perft.mjs $1 "$2" "$3"
+node ./build/perft.mjs $1 "$2" "$3"

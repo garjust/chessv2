@@ -16,8 +16,7 @@ import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';
 import { down, up } from './move-utils';
-import { updatePinsOnKings } from './pins';
-import { Position, ZobristKey } from './types';
+import { PositionWithComputedData, ZobristKey } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -45,7 +44,7 @@ const isTwoSquarePawnMove = (piece: Piece, move: Move): boolean => {
 };
 
 export const applyMove = (
-  position: Position,
+  position: PositionWithComputedData,
   move: Move,
   currentZobrist: CurrentZobrist,
 ): MoveResult => {
@@ -193,13 +192,15 @@ export const applyMove = (
     }
   }
 
-  updatePinsOnKings(
-    position.absolutePins,
-    position.pieces,
-    position.kings,
-    move,
-    piece,
-  );
+  // Update pins state for both colors.
+  for (const color of [Color.White, Color.Black]) {
+    position.absolutePins[color].update(
+      position.pieces,
+      move,
+      position.kings[color],
+      castlingRookMove,
+    );
+  }
   updateAttackedSquares(
     position.attackedSquares,
     position.pieces,
@@ -232,7 +233,7 @@ export const applyMove = (
 };
 
 export const undoMove = (
-  position: Position,
+  position: PositionWithComputedData,
   result: MoveResult,
   currentZobrist: CurrentZobrist,
 ): void => {

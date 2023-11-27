@@ -12,7 +12,7 @@ test('perft of move ordering', () => {
 
   const start = Date.now();
   for (let i = 0; i < N; i++) {
-    orderMoves([...moves]);
+    orderMoves(position.pieces, [...moves]);
   }
   const timing = Date.now() - start;
 

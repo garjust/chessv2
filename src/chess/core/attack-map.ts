@@ -1,9 +1,4 @@
-import {
-  Color,
-  Square,
-  SquareControlObject,
-  Position as ExternalPosition,
-} from '../types';
+import { Color, Square, SquareControl, Position } from '../types';
 import { squareGenerator } from '../utils';
 import { forPiece } from './piece-movement-control';
 
@@ -16,28 +11,38 @@ enum UpdateType {
 type Update = {
   type: UpdateType;
   square: Square;
-  squares: SquareControlObject[];
+  squares: SquareControl[];
 };
 
 export default class AttackMap {
-  // Store all squares controlled by the piece residing in
-  // the key square.
-  _squareControlByPiece = new Map<Square, SquareControlObject[]>();
-  // Store all squares which attack each square. Use a Square-keyed map so we
-  // can quickly add/remove/enumerate the attacks on a square.
-  _squareControlByAttackedSquare = new Map<
-    Square,
-    Map<Square, SquareControlObject>
-  >();
+  /**
+   * Store all SquareControl objects owned by the piece residing in the
+   * key square. This is effectively a near-complete set of moves in the
+   * position keyed by piece.
+   *
+   * Originally implemented as a Map, this was refactored to an array for
+   * faster access.
+   */
+  _squareControlByPiece = new Array<SquareControl[]>(64);
+  /**
+   * Store all squares which attack each square. This acts as an inverse to
+   * the other data structure, storing SquareControl objects from the perspective
+   * of the controlled square rather than the controller's square.
+   *
+   * Originally implemented as a Map, this was refactored to an array for
+   * faster access. The array values are still maps to be able to query size
+   * quickly.
+   */
+  _squareControlByAttackedSquare = new Array<Map<Square, SquareControl>>(64);
 
   _updatesStack: Update[][] = [];
 
-  constructor(position: ExternalPosition, color: Color) {
+  constructor(position: Position, color: Color) {
     for (const square of squareGenerator()) {
-      this._squareControlByPiece.set(square, []);
+      this._squareControlByPiece[square] = [];
     }
     for (const square of squareGenerator()) {
-      this._squareControlByAttackedSquare.set(square, new Map());
+      this._squareControlByAttackedSquare[square] = new Map();
     }
 
     for (const [square, piece] of position.pieces) {
@@ -51,24 +56,24 @@ export default class AttackMap {
   }
 
   isAttacked(square: Square): boolean {
-    return (this._squareControlByAttackedSquare.get(square)?.size ?? 0) > 0;
+    return this._squareControlByAttackedSquare[square].size > 0;
   }
 
-  controlForPiece(square: Square): SquareControlObject[] {
-    return this._squareControlByPiece.get(square) ?? [];
+  controlForPiece(square: Square): SquareControl[] {
+    return this._squareControlByPiece[square] ?? [];
   }
 
   attackCounts(): IterableIterator<[Square, number]> {
     const byAttackedSquare = this._squareControlByAttackedSquare;
     return (function* () {
-      for (const [square, map] of byAttackedSquare) {
-        yield [square, map.size];
+      for (const square of squareGenerator()) {
+        yield [square, byAttackedSquare[square].size];
       }
     })();
   }
 
   controlOfSquare(square: Square) {
-    const map = this._squareControlByAttackedSquare.get(square);
+    const map = this._squareControlByAttackedSquare[square];
     if (!map) {
       throw Error('there should be a map');
     }
@@ -97,20 +102,17 @@ export default class AttackMap {
     }
   }
 
-  addAttacksForPiece(square: Square, squares: SquareControlObject[]): void {
+  addAttacksForPiece(square: Square, squares: SquareControl[]): void {
     for (const squareControl of squares) {
-      this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.set(squareControl.attacker.square, squareControl);
+      this._squareControlByAttackedSquare[squareControl.to].set(
+        squareControl.from,
+        squareControl,
+      );
     }
-    this._squareControlByPiece.set(square, squares);
+    this._squareControlByPiece[square] = squares;
   }
 
-  addAttacks(
-    square: Square,
-    squares: SquareControlObject[],
-    cache = true,
-  ): void {
+  addAttacks(square: Square, squares: SquareControl[], cache = true): void {
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.PartialAdd,
@@ -120,11 +122,12 @@ export default class AttackMap {
     }
 
     for (const squareControl of squares) {
-      this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.set(squareControl.attacker.square, squareControl);
+      this._squareControlByAttackedSquare[squareControl.to].set(
+        squareControl.from,
+        squareControl,
+      );
     }
-    const existing = this._squareControlByPiece.get(square);
+    const existing = this._squareControlByPiece[square];
     if (!existing) {
       throw Error('there should be square control from this square');
     }
@@ -132,7 +135,7 @@ export default class AttackMap {
   }
 
   removeAttacksForPiece(square: Square, cache = true): void {
-    const squares = this._squareControlByPiece.get(square) ?? [];
+    const squares = this._squareControlByPiece[square] ?? [];
     if (cache) {
       this._updatesStack[this._updatesStack.length - 1].push({
         type: UpdateType.FullRemove,
@@ -142,26 +145,22 @@ export default class AttackMap {
     }
 
     for (const squareControl of squares) {
-      const squareControlExists = this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.has(squareControl.attacker.square);
+      const squareControlExists = this._squareControlByAttackedSquare[
+        squareControl.to
+      ].has(squareControl.from);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
-      this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.delete(squareControl.attacker.square);
+      this._squareControlByAttackedSquare[squareControl.to].delete(
+        squareControl.from,
+      );
     }
-    this._squareControlByPiece.set(square, []);
+    this._squareControlByPiece[square] = [];
   }
 
-  removeAttacks(
-    square: Square,
-    squares: SquareControlObject[],
-    cache = true,
-  ): void {
-    const existing = this._squareControlByPiece.get(square);
+  removeAttacks(square: Square, squares: SquareControl[], cache = true): void {
+    const existing = this._squareControlByPiece[square];
     if (!existing) {
       throw Error('there should be square control from this square');
     }
@@ -174,26 +173,24 @@ export default class AttackMap {
       });
     }
 
-    const squaresToRemove = squares.map(
-      (squareControl) => squareControl.square,
-    );
+    const squaresToRemove = squares.map((squareControl) => squareControl.to);
 
     for (const squareControl of squares) {
-      const squareControlExists = this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.has(squareControl.attacker.square);
+      const squareControlExists = this._squareControlByAttackedSquare[
+        squareControl.to
+      ].has(squareControl.from);
       if (!squareControlExists) {
         throw Error('cannot remove attack that does not exist');
       }
 
-      this._squareControlByAttackedSquare
-        .get(squareControl.square)
-        ?.delete(squareControl.attacker.square);
+      this._squareControlByAttackedSquare[squareControl.to].delete(
+        squareControl.from,
+      );
     }
 
     for (let i = existing.length - 1; i >= 0; i--) {
       const control = existing[i];
-      if (squaresToRemove.includes(control.square)) {
+      if (squaresToRemove.includes(control.to)) {
         existing.splice(i, 1);
       }
     }

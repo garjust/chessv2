@@ -48,12 +48,13 @@ test('example interaction with UCI engine', async () => {
     {
       type: UCIResponseType.BestMove,
       move: {
-        from: 11,
         piece: {
           color: Color.White,
           type: PieceType.Pawn,
         },
+        from: 11,
         to: 27,
+        attack: false,
         weight: 9007199254740991,
       },
     },

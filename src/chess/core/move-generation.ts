@@ -5,7 +5,7 @@ import {
   PieceType,
   Square,
   CastlingAvailability,
-  SquareControlObject,
+  SquareControl,
 } from '../types';
 import {
   flipColor,
@@ -14,43 +14,23 @@ import {
   isPromotionPositionPawn,
 } from '../utils';
 import AttackMap from './attack-map';
-import { expandPromotions, squareControlXraysMove } from './move-utils';
+import {
+  expandPromotions,
+  isMoveIncidentWithCheck,
+  squareControlXraysMove,
+} from './move-utils';
 import { castlingKingMoves, advancePawnMoves } from './piece-movement';
 import Pins from './pins';
 import { KingSquares, AttackedSquares } from './types';
 
-const buildMove = (
-  squareControl: SquareControlObject,
-  piece: Piece,
-  attackedPiece?: Piece,
-): MoveWithExtraData => ({
-  from: squareControl.attacker.square,
-  to: squareControl.square,
-  piece,
-  attack: attackedPiece
-    ? {
-        attacked: {
-          square: squareControl.square,
-          type: attackedPiece.type,
-        },
-        attacker: squareControl.attacker,
-        slideSquares: squareControl.slideSquares,
-      }
-    : undefined,
-});
-
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
-  options: {
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-    attackedSquares: AttackedSquares;
-  },
+  enPassantSquare: Square | null,
+  castlingAvailability: CastlingAvailability,
+  attackedSquares: AttackedSquares,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
-
-  const { enPassantSquare, castlingAvailability, attackedSquares } = options;
 
   for (const [square, piece] of pieces) {
     if (piece.color !== color) {
@@ -60,47 +40,49 @@ const pseudoMovesForPosition = (
     const attacks = attackedSquares[piece.color].controlForPiece(square);
 
     for (const squareControl of attacks) {
-      const attackedPiece = pieces.get(squareControl.square);
+      const attackedPiece = pieces.get(squareControl.to);
+      squareControl.attack = attackedPiece !== undefined;
 
-      // Get rid of attacks on own-pieces.
-      if (attackedPiece?.color === color) {
+      // Logic to discard moves:
+      // 1. Discard the move if it attacks a piece of the same color.
+      // 2. Discard pawn moves that don't capture a piece (only the diagonal
+      //    captures are included in square control).
+      if (
+        attackedPiece?.color === color ||
+        (piece.type === PieceType.Pawn &&
+          !squareControl.attack &&
+          squareControl.to !== enPassantSquare)
+      ) {
         continue;
       }
-
-      if (piece.type === PieceType.Pawn) {
-        // The only pawn moves here are capturing moves, so make sure they
-        // are actually captures.
-        if (!attackedPiece && squareControl.square !== enPassantSquare) {
-          continue;
-        }
-      }
-
-      const move = buildMove(squareControl, piece, attackedPiece);
 
       if (
         piece.type === PieceType.Pawn &&
         isPromotionPositionPawn(piece.color, square)
       ) {
-        moves.push(...expandPromotions(move));
+        moves.push(...expandPromotions(squareControl));
       } else {
-        moves.push(move);
+        moves.push(squareControl);
       }
     }
 
-    // Below handle moves that don't really exert "control" so are not covered
-    // by SqsuareControlObject state. These moves are castling and pawn
-    // advancement.
+    // Add moves that are not included in square control:
+    // 1. Castling moves
+    // 2. Pawn advancement
     if (piece.type === PieceType.King) {
       // Add castling moves
       moves.push(
-        ...castlingKingMoves(pieces, piece.color, square, {
+        ...castlingKingMoves(
+          pieces,
+          piece,
+          square,
+          attackedSquares[flipColor(color)],
           castlingAvailability,
-          opponentAttackMap: attackedSquares[flipColor(color)],
-        }),
+        ),
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
-      moves.push(...advancePawnMoves(pieces, piece.color, square));
+      moves.push(...advancePawnMoves(pieces, piece, square));
     }
   }
 
@@ -109,7 +91,7 @@ const pseudoMovesForPosition = (
 
 // When in check we need to prune moves that do not resolve the check.
 const moveResolvesCheck = (
-  checks: SquareControlObject[],
+  checks: SquareControl[],
   move: MoveWithExtraData,
 ): boolean => {
   // If the moving piece is a king all it's moves should be retained. Moves
@@ -124,10 +106,7 @@ const moveResolvesCheck = (
     const check = checks[0];
     // In the case that the king is checked by a single piece we can capture
     // the piece or block the attack.
-    return (
-      squaresInclude(check.slideSquares, move.to) ||
-      check.attacker.square === move.to
-    );
+    return isMoveIncidentWithCheck(move, check);
   } else if (checks.length === 2) {
     // In the case that the king is checked by multiple pieces (can only be 2)
     // the king must move.
@@ -145,19 +124,11 @@ const moveResolvesCheck = (
 // looking at king moves.
 const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
-  {
-    kingSquare,
-    pins,
-    checks,
-    opponentAttackMap,
-  }: {
-    kingSquare: Square;
-    pins: Pins;
-    checks: SquareControlObject[];
-    opponentAttackMap: AttackMap;
-  },
+  pins: Pins,
+  checks: SquareControl[],
+  opponentAttackMap: AttackMap,
 ): boolean => {
-  if (move.from === kingSquare) {
+  if (move.piece.type === PieceType.King) {
     // The piece moving is the king. We need to make sure the square it is
     // moving to is not attacked by any pieces.
     if (checks.length === 0) {
@@ -173,9 +144,13 @@ const moveLeavesKingInCheck = (
       // Finally we need to consider the case the checking piece is effectively
       // skewering the king to the destination square, meaning the king will
       // still be in check even though that square is not currently attacked.
-      return checks.some((squareControl) =>
-        squareControlXraysMove(squareControl, move),
-      );
+      for (const squareControl of checks) {
+        if (squareControlXraysMove(squareControl, move)) {
+          return true;
+        }
+      }
+
+      return false;
     }
   } else {
     // The piece moving is not the king so we look to see if it is pinned
@@ -187,37 +162,29 @@ const moveLeavesKingInCheck = (
 
     // The piece moving is absolutely pinned so it may only move within the
     // pinning ray.
-    return !pin.legalMoveSquares.includes(move.to) && move.to !== pin.attacker;
+    return !pin.legalMoveSquares.includes(move.to) && move.to !== pin.from;
   }
 };
 
 export const generateMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  {
-    attackedSquares,
-    pins,
-    kings,
-    checks,
-    enPassantSquare,
-    castlingAvailability,
-  }: {
-    attackedSquares: AttackedSquares;
-    pins: Pins;
-    kings: KingSquares;
-    checks: SquareControlObject[];
-    enPassantSquare: Square | null;
-    castlingAvailability: CastlingAvailability;
-  },
+  attackedSquares: AttackedSquares,
+  pins: Pins,
+  kings: KingSquares,
+  checks: SquareControl[],
+  enPassantSquare: Square | null,
+  castlingAvailability: CastlingAvailability,
 ): MoveWithExtraData[] => {
   const kingSquare = kings[color];
 
-  const moves = pseudoMovesForPosition(pieces, color, {
+  const moves = pseudoMovesForPosition(
+    pieces,
+    color,
     enPassantSquare,
-    castlingAvailability:
-      checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
+    checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
     attackedSquares,
-  });
+  );
 
   if (kingSquare) {
     for (let i = moves.length - 1; i >= 0; i--) {
@@ -230,12 +197,12 @@ export const generateMoves = (
         }
       }
       if (
-        moveLeavesKingInCheck(move, {
-          kingSquare,
+        moveLeavesKingInCheck(
+          move,
           pins,
           checks,
-          opponentAttackMap: attackedSquares[flipColor(color)],
-        })
+          attackedSquares[flipColor(color)],
+        )
       ) {
         moves.splice(i, 1);
         continue;

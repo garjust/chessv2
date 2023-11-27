@@ -1,4 +1,4 @@
-import { Color, Position as ExternalPosition, Square } from '../types';
+import { Color, Position, Square } from '../types';
 import AttackMap from './attack-map';
 import Pins from './pins';
 
@@ -10,18 +10,19 @@ export type KingSquares = {
   [Color.Black]?: Square;
 };
 
-export type PinsByColor = {
+export type PinsByColor = Readonly<{
   [Color.White]: Pins;
   [Color.Black]: Pins;
-};
+}>;
 
-export type AttackedSquares = {
+export type AttackedSquares = Readonly<{
   [Color.White]: AttackMap;
   [Color.Black]: AttackMap;
-};
+}>;
 
-export type Position = ExternalPosition & {
-  kings: KingSquares;
-  absolutePins: PinsByColor;
-  attackedSquares: AttackedSquares;
-};
+export type PositionWithComputedData = Position &
+  Readonly<{
+    kings: KingSquares;
+    absolutePins: PinsByColor;
+    attackedSquares: AttackedSquares;
+  }>;

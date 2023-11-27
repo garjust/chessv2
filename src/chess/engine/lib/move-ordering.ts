@@ -1,13 +1,14 @@
-import { sort } from 'fast-sort';
+import { inPlaceSort } from 'fast-sort';
 import { PieceValue } from '../../core/evaluation';
 import { squareValueDiff } from '../../lib/heatmaps';
-import { Move, MoveWithExtraData } from '../../types';
+import { Move, MoveWithExtraData, Piece, Square } from '../../types';
 import { moveEquals } from '../../utils';
 import HistoryTable from './history-table';
 
 const MAX = Number.MAX_SAFE_INTEGER;
 
 const moveWeight = (
+  pieces: Map<Square, Piece>,
   move: MoveWithExtraData,
   tableMove?: Move,
   pvMove?: Move,
@@ -30,8 +31,8 @@ const moveWeight = (
     n += Math.max(
       50,
       Math.min(
-        PieceValue[move.attack.attacked.type] -
-          PieceValue[move.attack.attacker.type],
+        PieceValue[(pieces.get(move.to) as Piece).type] -
+          PieceValue[move.piece.type],
         1000,
       ),
     );
@@ -47,26 +48,26 @@ const moveWeight = (
   return n;
 };
 
+const getMoveWeight = (move: MoveWithExtraData) => move.weight;
+
 export const orderMoves = (
+  pieces: Map<Square, Piece>,
   moves: MoveWithExtraData[],
   tableMove?: Move,
   pvMove?: Move,
   killerMove?: Move,
   historyTable?: HistoryTable,
 ): MoveWithExtraData[] => {
-  const sortBy = (move: MoveWithExtraData) => {
-    if (!move.weight) {
-      move.weight = moveWeight(
-        move,
-        tableMove,
-        pvMove,
-        killerMove,
-        historyTable,
-      );
-    }
+  for (const move of moves) {
+    move.weight = moveWeight(
+      pieces,
+      move,
+      tableMove,
+      pvMove,
+      killerMove,
+      historyTable,
+    );
+  }
 
-    return move.weight;
-  };
-
-  return sort(moves).desc(sortBy);
+  return inPlaceSort(moves).desc(getMoveWeight);
 };

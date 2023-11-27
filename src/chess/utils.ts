@@ -99,7 +99,7 @@ export const squareGenerator: () => Generator<Square> = function* () {
   }
 };
 
-export const isSliderPieceType = (
+const isSliderPieceType = (
   type: PieceType,
 ): type is PieceType.Bishop | PieceType.Queen | PieceType.Rook =>
   type === PieceType.Bishop ||
@@ -108,6 +108,14 @@ export const isSliderPieceType = (
 
 export const isSlider = (piece: Piece): piece is SlidingPiece =>
   isSliderPieceType(piece.type);
+
+export const sliderType = (direction: DirectionUnit) =>
+  direction === DirectionUnit.Up ||
+  direction === DirectionUnit.Down ||
+  direction === DirectionUnit.Left ||
+  direction === DirectionUnit.Right
+    ? PieceType.Rook
+    : PieceType.Bishop;
 
 export const squaresInclude = (
   squares: Readonly<Square[]>,
@@ -125,6 +133,9 @@ export const isLegalSquare = (square: Square): boolean =>
 
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
+
+export const flipDirection = (direction: DirectionUnit): DirectionUnit =>
+  direction * -1;
 
 export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
   const diff = to - from;
@@ -191,10 +202,7 @@ export const findKing = (
 };
 
 export const copyPosition = (position: Position): Position => {
-  const pieces = new Map<Square, Piece>();
-  for (const [key, value] of position.pieces) {
-    pieces.set(key, value);
-  }
+  const pieces = new Map(position.pieces);
 
   const castlingAvailability = {
     [Color.White]: {
