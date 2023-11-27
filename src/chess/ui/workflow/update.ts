@@ -4,7 +4,6 @@ import {
   flipColor,
   isPositionEqual,
   isPromotionPositionPawn,
-  movesIncludes,
 } from '../../utils';
 import { parseFEN, FEN_LIBRARY } from '../../lib/fen';
 import {
@@ -55,6 +54,7 @@ import { delayEmit } from '../../../rx-workflow/util';
 import Logger from '../../../lib/logger';
 import { moveString } from '../../move-notation';
 import { Command } from '../../../rx-workflow/commands';
+import { movesIncludes } from '../../core/move-utils';
 
 export type Context = {
   core: Core;

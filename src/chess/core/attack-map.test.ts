@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import Core from '.';
 import { parseFEN } from '../lib/fen';
-import { buildMove } from '../utils';
+import { buildMove } from './move-utils';
 
 test('pawn capture pawn position', () => {
   const position = parseFEN(

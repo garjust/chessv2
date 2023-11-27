@@ -35,8 +35,6 @@ const SQUARE_LABEL_LOOKUP: SquareLabel[] = [
   .reverse()
   .flat();
 
-type Nullable<T> = T | undefined | null;
-
 export const rankForSquare = (square: Square) => square % 8; // ????????????????????????
 
 export const rankIndexForSquare = (square: Square) => Math.floor(square / 8);
@@ -77,59 +75,11 @@ export const squaresInclude = (
   square: Square,
 ): boolean => squares.includes(square);
 
-export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
-  Boolean(a && b && a.from === b.from && a.to === b.to);
-
-export const movesIncludes = (moves: Readonly<Move[]>, move: Move): boolean =>
-  moves.some((x) => moveEquals(x, move));
-
 export const isLegalSquare = (square: Square): boolean =>
   square >= 0 && square < 64;
 
 export const flipColor = (color: Color): Color =>
   color === Color.White ? Color.Black : Color.White;
-
-export const flipDirection = (direction: DirectionUnit): DirectionUnit =>
-  direction * -1;
-
-export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
-  const diff = to - from;
-  const fromRank = rankForSquare(from);
-
-  if (from === 0 && to === 63) {
-    return DirectionUnit.UpRight;
-  }
-
-  if (diff > 0) {
-    if (diff % DirectionUnit.Up === 0) {
-      return DirectionUnit.Up;
-    } else if (diff % DirectionUnit.UpLeft === 0) {
-      if (fromRank === 0) {
-        return DirectionUnit.Right;
-      } else {
-        return DirectionUnit.UpLeft;
-      }
-    } else if (diff % DirectionUnit.UpRight === 0) {
-      return DirectionUnit.UpRight;
-    } else {
-      return DirectionUnit.Right;
-    }
-  } else {
-    if (diff % DirectionUnit.Down === 0) {
-      return DirectionUnit.Down;
-    } else if (diff % DirectionUnit.DownLeft === 0) {
-      return DirectionUnit.DownLeft;
-    } else if (diff % DirectionUnit.DownRight === 0) {
-      if (fromRank === 7) {
-        return DirectionUnit.Left;
-      } else {
-        return DirectionUnit.DownRight;
-      }
-    } else {
-      return DirectionUnit.Left;
-    }
-  }
-};
 
 export const isStartPositionPawn = (color: Color, square: Square): boolean =>
   color === Color.White
@@ -177,8 +127,3 @@ export const isPositionEqual = (a: Position, b: Position): boolean => {
 
   return fenA === fenB;
 };
-
-export const buildMove = (from: number, to: number): Move => ({
-  from: from as Square,
-  to: to as Square,
-});

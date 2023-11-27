@@ -7,13 +7,14 @@ import {
   Pin,
   Square,
 } from '../types';
-import { directionOfMove, flipDirection, sliderType } from '../utils';
+import { sliderType } from '../utils';
 import {
   BISHOP_RAYS,
   ROOK_RAYS,
   QUEEN_MOVE_BITARRAYS,
   RAYS_BY_DIRECTION,
 } from './lookup';
+import { directionOfMove, flipDirection } from './move-utils';
 
 const walkRay = (
   pieces: Map<Square, Piece>,

@@ -8,9 +8,14 @@ import {
 } from '../types';
 import {
   PROMOTION_OPTION_PIECE_TYPES,
-  directionOfMove,
   isSlider,
+  rankForSquare,
 } from '../utils';
+
+export const buildMove = (from: number, to: number): Move => ({
+  from: from as Square,
+  to: to as Square,
+});
 
 export const up = (square: Square, n = 1): Square =>
   square + DirectionUnit.Up * n;
@@ -37,6 +42,54 @@ export const isMoveDown = (move: Move): boolean =>
 
 export const isMoveInFile = (move: Move): boolean =>
   (move.from - move.to) % 8 === 0;
+
+export const flipDirection = (direction: DirectionUnit): DirectionUnit =>
+  direction * -1;
+
+export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
+  const diff = to - from;
+  const fromRank = rankForSquare(from);
+
+  if (from === 0 && to === 63) {
+    return DirectionUnit.UpRight;
+  }
+
+  if (diff > 0) {
+    if (diff % DirectionUnit.Up === 0) {
+      return DirectionUnit.Up;
+    } else if (diff % DirectionUnit.UpLeft === 0) {
+      if (fromRank === 0) {
+        return DirectionUnit.Right;
+      } else {
+        return DirectionUnit.UpLeft;
+      }
+    } else if (diff % DirectionUnit.UpRight === 0) {
+      return DirectionUnit.UpRight;
+    } else {
+      return DirectionUnit.Right;
+    }
+  } else {
+    if (diff % DirectionUnit.Down === 0) {
+      return DirectionUnit.Down;
+    } else if (diff % DirectionUnit.DownLeft === 0) {
+      return DirectionUnit.DownLeft;
+    } else if (diff % DirectionUnit.DownRight === 0) {
+      if (fromRank === 7) {
+        return DirectionUnit.Left;
+      } else {
+        return DirectionUnit.DownRight;
+      }
+    } else {
+      return DirectionUnit.Left;
+    }
+  }
+};
+
+export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
+  Boolean(a && b && a.from === b.from && a.to === b.to);
+
+export const movesIncludes = (moves: Readonly<Move[]>, move: Move): boolean =>
+  moves.some((x) => moveEquals(x, move));
 
 /**
  * Return whether a SquareControl by a sliding piece intersects both squares

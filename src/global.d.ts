@@ -14,3 +14,5 @@ declare const brandSymbol: unique symbol;
  * https://github.com/microsoft/TypeScript/issues/202
  */
 type Brand<T, B> = T & { [brandSymbol]: B };
+
+type Nullable<T> = T | undefined | null;

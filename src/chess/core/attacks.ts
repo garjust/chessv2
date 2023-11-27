@@ -7,14 +7,14 @@ import {
   SquareControl,
   SlidingPiece,
 } from '../types';
-import { flipColor, directionOfMove, isSlider } from '../utils';
+import { flipColor, isSlider } from '../utils';
 import {
   BISHOP_MOVE_BITARRAYS,
   ROOK_MOVE_BITARRAYS,
   QUEEN_MOVE_BITARRAYS,
   RAYS_BY_DIRECTION,
 } from './lookup';
-import { rayControlScanner } from './move-utils';
+import { directionOfMove, rayControlScanner } from './move-utils';
 import { forPiece } from './piece-movement-control';
 import { AttackedSquares } from './types';
 import AttackMap from './attack-map';

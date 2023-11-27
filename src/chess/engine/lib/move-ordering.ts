@@ -2,8 +2,8 @@ import { inPlaceSort } from 'fast-sort';
 import { PieceValue } from '../../core/evaluation';
 import { squareValueDiff } from '../../lib/heatmaps';
 import { Move, MoveWithExtraData, Piece, Square } from '../../types';
-import { moveEquals } from '../../utils';
 import HistoryTable from './history-table';
+import { moveEquals } from '../../core/move-utils';
 
 const MAX = Number.MAX_SAFE_INTEGER;
 
