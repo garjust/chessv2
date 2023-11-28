@@ -24,7 +24,6 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
-- Remove new Array(<size>) since it makes a sparse array.
 - Pack castling availabiltiy into integer as a first foray into bit packing
   - move execution creates 3 objects for this every move
 

@@ -23,7 +23,7 @@ export default class AttackMap {
    * Originally implemented as a Map, this was refactored to an array for
    * faster access.
    */
-  _squareControlByPiece = new Array<SquareControl[]>(64);
+  _squareControlByPiece: SquareControl[][] = [];
   /**
    * Store all squares which attack each square. This acts as an inverse to
    * the other data structure, storing SquareControl objects from the perspective
@@ -33,7 +33,7 @@ export default class AttackMap {
    * faster access. The array values are still maps to be able to query size
    * quickly.
    */
-  _squareControlByAttackedSquare = new Array<Map<Square, SquareControl>>(64);
+  _squareControlByAttackedSquare: Map<Square, SquareControl>[] = [];
 
   _updatesStack: Update[][] = [];
 
