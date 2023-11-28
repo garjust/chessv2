@@ -43,18 +43,20 @@ export type SlidingPiece =
   | { color: Color; type: PieceType.Queen };
 
 /**
- * Each value corresponds to moving from one square to an adjacent square in
- * the defined direction.
+ * Directions you can move on a board (or 2-dimensional grid).
+ *
+ * This enum is preferred when building objects key'd by directions to allow
+ * an array lookup instead of object lookup.
  */
-export const enum DirectionUnit {
-  Up = 8,
-  Right = 1,
-  Down = -8,
-  Left = -1,
-  UpLeft = 7,
-  UpRight = 9,
-  DownLeft = -9,
-  DownRight = -7,
+export const enum Direction {
+  Up,
+  Right,
+  Down,
+  Left,
+  UpLeft,
+  UpRight,
+  DownLeft,
+  DownRight,
 }
 
 export type BishopDirection =
@@ -68,6 +70,22 @@ export type RookDirection =
   | DirectionUnit.Down
   | DirectionUnit.Left
   | DirectionUnit.Right;
+
+/**
+ * Directions you can move on a board (or 2-dimensional grid). Enum values are
+ * set to integer values which actually reflect moving on the 8x8 board we
+ * construct.
+ */
+export const enum DirectionUnit {
+  Up = 8,
+  Right = 1,
+  Down = -8,
+  Left = -1,
+  UpLeft = 7,
+  UpRight = 9,
+  DownLeft = -9,
+  DownRight = -7,
+}
 
 export type PromotionOption =
   | PieceType.Bishop
