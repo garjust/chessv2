@@ -1,9 +1,8 @@
 import { expose } from 'comlink';
-import Logger from '../../../lib/logger';
-import Timer from '../../../lib/timer';
-
 import nodeEndpoint from 'comlink/src/node-adapter';
 import { parentPort } from 'node:worker_threads';
+import Timer from '../../../lib/timer';
+import Logger from '../../../lib/logger';
 
 new Logger('worker').debug('running timer thread');
 

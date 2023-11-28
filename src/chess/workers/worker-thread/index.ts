@@ -32,7 +32,10 @@ export const loadSearchExecutor = async (
   // const { load } = await import('./search-executor.mjs');
   // [RemoteClass, cleanup] = load();
   const worker = new Worker(
-    new URL('./worker-thread/search-executor', import.meta.url),
+    new URL(
+      '../chess/workers/worker-thread/search-executor.mjs',
+      import.meta.url,
+    ),
   );
   const RemoteClass = wrap<typeof SearchExecutor>(nodeEndpoint(worker));
 
@@ -47,10 +50,8 @@ export const loadTimer = async (
 ): Promise<[timer: Remote<Timer>, cleanup: () => void]> => {
   const { Worker } = await import('node:worker_threads');
   console.log('loaded worker class');
-  const worker = new Worker(new URL('./timer.mjs', import.meta.url));
-  console.log(
-    'post new worker',
-    new URL('./timer', import.meta.url).toString(),
+  const worker = new Worker(
+    new URL('../chess/workers/worker-thread/timer.mjs', import.meta.url),
   );
   const RemoteClass = wrap<typeof Timer>(nodeEndpoint(worker));
 
