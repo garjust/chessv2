@@ -1,7 +1,7 @@
 /**
  * A square on the chess board.
  *
- * Npte: fits in 6 bits.
+ * Note: fits in 6 bits.
  */
 export type Square = Readonly<number>;
 
