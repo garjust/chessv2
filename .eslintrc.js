@@ -14,7 +14,7 @@ module.exports = {
     // 'plugin:react/recommended',
     // 'plugin:react/jsx-runtime',
   ],
-  ignorePatterns: ['**/dist/*', '**/.yarn/*'],
+  ignorePatterns: ['**/dist/*', '**/.yarn/*', '**/build/*'],
   settings: {
     react: {
       createClass: 'createReactClass', // Regex for Component Factory to use,
