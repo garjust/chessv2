@@ -9,7 +9,9 @@ yarn esbuild src/script/perft.ts \
   --bundle \
   --platform=node \
   --format=esm \
-  > ${OUT_DIR}/perft.mjs
+  --minify \
+  --outfile=${OUT_DIR}/perft.mjs "$@"
+  # --analyze
 
 # yarn esbuild src/script/engine.ts \
 #   --bundle \
