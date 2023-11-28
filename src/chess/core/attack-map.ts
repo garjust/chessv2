@@ -2,7 +2,7 @@ import { Color, Square, SquareControl, Position } from '../types';
 import { squareGenerator } from '../utils';
 import { forPiece } from './piece-movement-control';
 
-enum UpdateType {
+const enum UpdateType {
   FullRemove,
   PartialRemove,
   PartialAdd,

@@ -8,7 +8,7 @@ export type Square = Readonly<number>;
 /**
  * Color of a square or piece.
  */
-export enum Color {
+export const enum Color {
   White = 0,
   Black = 1,
 }
@@ -23,7 +23,7 @@ export type ColorData<T> = Readonly<{
  *
  * Indexed at 1 for convenience. Either way a piece type will fit in 3 bits.
  */
-export enum PieceType {
+export const enum PieceType {
   Pawn = 1,
   Knight = 2,
   Bishop = 3,
@@ -46,7 +46,7 @@ export type SlidingPiece =
  * Each value corresponds to moving from one square to an adjacent square in
  * the defined direction.
  */
-export enum DirectionUnit {
+export const enum DirectionUnit {
   Up = 8,
   Right = 1,
   Down = -8,
@@ -82,25 +82,12 @@ export type Move = {
 };
 
 /**
- * Describes a pin in a position.
- */
-export type Pin = Readonly<{
-  /** The square of the attacker creating the pin. */
-  from: Square;
-  /** The square with the pinned or skewered piece. */
-  to: Square;
-  /** Stored computed direction from->to */
-  direction: DirectionUnit;
-  /**
-   * Legal squares the pinned piece can move to while maintaining the pin.
-   * This includes it's resident square.
-   */
-  legalMoveSquares: Readonly<Square[]>;
-}>;
-
-/**
  * Describes control a piece has on a square. Fully represents a move that can
  * be executed or evaluated, although the move may not be legal.
+ *
+ * Note that a piece must be able to capture or defend a square to have
+ * control of it therefore pawn advancement and castling moves do not control
+ * squares.
  */
 export type SquareControl = {
   /** The controlling piece. */
@@ -127,11 +114,24 @@ export type SquareControl = {
   weight?: number;
 };
 
-export type MoveWithExtraData = Move & {
-  piece: Piece;
-  attack?: boolean;
-  weight?: number;
-};
+export type MoveWithExtraData = Move & SquareControl;
+
+/**
+ * Describes a pin in a position.
+ */
+export type Pin = Readonly<{
+  /** The square of the attacker creating the pin. */
+  from: Square;
+  /** The square with the pinned or skewered piece. */
+  to: Square;
+  /** Stored computed direction from->to */
+  direction: DirectionUnit;
+  /**
+   * Legal squares the pinned piece can move to while maintaining the pin.
+   * This includes it's resident square.
+   */
+  legalMoveSquares: Readonly<Square[]>;
+}>;
 
 export type CastlingSide = 'kingside' | 'queenside';
 

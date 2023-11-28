@@ -65,7 +65,7 @@ const walkRay = (
   return null;
 };
 
-enum UpdateType {
+const enum UpdateType {
   Reset,
   RayUpdate,
 }
