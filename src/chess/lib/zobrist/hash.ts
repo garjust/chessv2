@@ -1,3 +1,4 @@
+import { CastlingMask } from '../../castling';
 import { Color, Position } from '../../types';
 import { Type, ZobristNumbers } from './types';
 
@@ -15,16 +16,16 @@ export const hash = (
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  if (position.castlingAvailability[Color.White].kingside) {
+  if ((position.castlingAvailability & CastlingMask.WhiteKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if (position.castlingAvailability[Color.White].queenside) {
+  if ((position.castlingAvailability & CastlingMask.WhiteQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].queenside;
   }
-  if (position.castlingAvailability[Color.Black].kingside) {
+  if ((position.castlingAvailability & CastlingMask.BlackKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if (position.castlingAvailability[Color.Black].queenside) {
+  if ((position.castlingAvailability & CastlingMask.BlackQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.Black].queenside;
   }
 
@@ -45,16 +46,16 @@ export const hash64 = (
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  if (position.castlingAvailability[Color.White].kingside) {
+  if ((position.castlingAvailability & CastlingMask.WhiteKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if (position.castlingAvailability[Color.White].queenside) {
+  if ((position.castlingAvailability & CastlingMask.WhiteQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].queenside;
   }
-  if (position.castlingAvailability[Color.Black].kingside) {
+  if ((position.castlingAvailability & CastlingMask.BlackKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if (position.castlingAvailability[Color.Black].queenside) {
+  if ((position.castlingAvailability & CastlingMask.BlackQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.Black].queenside;
   }
 

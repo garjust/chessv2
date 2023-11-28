@@ -1,4 +1,3 @@
-import { copyCastlingAvailability } from './castling';
 import { isBishopDirection } from './core/move-utils';
 import { formatPosition } from './lib/fen';
 import {
@@ -108,9 +107,7 @@ export const copyPosition = (position: Position): Position => {
   return {
     pieces,
     turn: position.turn,
-    castlingAvailability: copyCastlingAvailability(
-      position.castlingAvailability,
-    ),
+    castlingAvailability: position.castlingAvailability,
     enPassantSquare: position.enPassantSquare,
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,

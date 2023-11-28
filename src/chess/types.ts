@@ -140,7 +140,7 @@ export type CastlingData<T> = ColorData<{
   queenside: T;
 }>;
 
-export type CastlingAvailability = CastlingData<boolean>;
+export type CastlingAvailability = number;
 
 /**
  * Fully represent a unique chess position.

@@ -1,3 +1,4 @@
+import { CastlingMask } from '../castling';
 import {
   MoveWithExtraData,
   Piece,
@@ -49,7 +50,8 @@ export const kingCastlingMoves = (
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
   if (
-    castlingAvailability[piece.color].kingside &&
+    (castlingAvailability & (CastlingMask.WhiteKingside << (piece.color * 2))) >
+      0 &&
     // Check squares being castled through are empty
     !pieces.has(right(from)) &&
     !pieces.has(right(from, 2)) &&
@@ -61,7 +63,9 @@ export const kingCastlingMoves = (
     moves.push(CASTLING_KING_MOVES[piece.color].kingside);
   }
   if (
-    castlingAvailability[piece.color].queenside &&
+    (castlingAvailability &
+      (CastlingMask.WhiteQueenside << (piece.color * 2))) >
+      0 &&
     // Check squares being castled through are empty
     !pieces.has(left(from)) &&
     !pieces.has(left(from, 2)) &&

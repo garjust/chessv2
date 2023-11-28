@@ -1,4 +1,4 @@
-import { ROOK_STARTING_SQUARES, copyCastlingAvailability } from '../castling';
+import { CastlingMask, ROOK_STARTING_SQUARES } from '../castling';
 import { PIECES } from '../piece-consants';
 import {
   CastlingAvailability,
@@ -61,9 +61,7 @@ export const applyMove = (
   const result: MoveResult = {
     move,
     previousState: {
-      castlingAvailability: copyCastlingAvailability(
-        position.castlingAvailability,
-      ),
+      castlingAvailability: position.castlingAvailability,
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
       // The pin data can be stored in result state because new maps are created
@@ -97,9 +95,15 @@ export const applyMove = (
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
       if (move.to === ROOK_STARTING_SQUARES[captured.color].queenside) {
-        position.castlingAvailability[captured.color].queenside = false;
+        position.castlingAvailability &= ~(
+          CastlingMask.WhiteQueenside <<
+          (captured.color * 2)
+        );
       } else if (move.to === ROOK_STARTING_SQUARES[captured.color].kingside) {
-        position.castlingAvailability[captured.color].kingside = false;
+        position.castlingAvailability &= ~(
+          CastlingMask.WhiteKingside <<
+          (captured.color * 2)
+        );
       }
     }
   }
@@ -136,13 +140,27 @@ export const applyMove = (
     position.kings[piece.color] = move.to;
 
     // The king moved, no more castling.
-    if (position.castlingAvailability[piece.color].queenside) {
+    if (
+      (position.castlingAvailability &
+        (CastlingMask.WhiteQueenside << (piece.color * 2))) >
+      0
+    ) {
       currentZobrist.updateCastling(piece.color, 'queenside');
-      position.castlingAvailability[piece.color].queenside = false;
+      position.castlingAvailability &= ~(
+        CastlingMask.WhiteQueenside <<
+        (piece.color * 2)
+      );
     }
-    if (position.castlingAvailability[piece.color].kingside) {
+    if (
+      (position.castlingAvailability &
+        (CastlingMask.WhiteKingside << (piece.color * 2))) >
+      0
+    ) {
       currentZobrist.updateCastling(piece.color, 'kingside');
-      position.castlingAvailability[piece.color].kingside = false;
+      position.castlingAvailability &= ~(
+        CastlingMask.WhiteKingside <<
+        (piece.color * 2)
+      );
     }
 
     // If the king move is a castle we need to move the corresponding rook.
@@ -170,14 +188,28 @@ export const applyMove = (
   // If the moved piece is a rook update castling state.
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
-      if (position.castlingAvailability[piece.color].queenside) {
+      if (
+        (position.castlingAvailability &
+          (CastlingMask.WhiteQueenside << (piece.color * 2))) >
+        0
+      ) {
         currentZobrist.updateCastling(piece.color, 'queenside');
-        position.castlingAvailability[piece.color].queenside = false;
+        position.castlingAvailability &= ~(
+          CastlingMask.WhiteQueenside <<
+          (piece.color * 2)
+        );
       }
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
-      if (position.castlingAvailability[piece.color].kingside) {
+      if (
+        (position.castlingAvailability &
+          (CastlingMask.WhiteKingside << (piece.color * 2))) >
+        0
+      ) {
         currentZobrist.updateCastling(piece.color, 'kingside');
-        position.castlingAvailability[piece.color].kingside = false;
+        position.castlingAvailability &= ~(
+          CastlingMask.WhiteKingside <<
+          (piece.color * 2)
+        );
       }
     }
   }

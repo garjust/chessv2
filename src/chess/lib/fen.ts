@@ -1,3 +1,4 @@
+import { CastlingMask } from '../castling';
 import {
   Color,
   Piece,
@@ -198,19 +199,24 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
     fullMoveNumber,
   ] = fenString.split(' ');
 
+  let castlingBits = 0b0000;
+  if (castlingAvailability.includes('K')) {
+    castlingBits |= CastlingMask.WhiteKingside;
+  }
+  if (castlingAvailability.includes('Q')) {
+    castlingBits |= CastlingMask.WhiteQueenside;
+  }
+  if (castlingAvailability.includes('k')) {
+    castlingBits |= CastlingMask.BlackKingside;
+  }
+  if (castlingAvailability.includes('q')) {
+    castlingBits |= CastlingMask.BlackQueenside;
+  }
+
   return Object.freeze({
     pieces: pieceMapFromFenPieces(piecePlacements),
     turn: activeColor === 'w' ? Color.White : Color.Black,
-    castlingAvailability: Object.freeze({
-      [Color.White]: {
-        kingside: castlingAvailability.includes('K'),
-        queenside: castlingAvailability.includes('Q'),
-      },
-      [Color.Black]: {
-        kingside: castlingAvailability.includes('k'),
-        queenside: castlingAvailability.includes('q'),
-      },
-    }),
+    castlingAvailability: castlingBits,
     enPassantSquare:
       enPassantSquare !== '-'
         ? labelToSquare(enPassantSquare as SquareLabel)
@@ -220,20 +226,24 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
   });
 };
 
-export const formatPosition = (fen: Position): string => {
+export const formatPosition = (position: Position): string => {
   const castlingAvailability = [
-    fen.castlingAvailability[Color.White].kingside ? 'K' : '',
-    fen.castlingAvailability[Color.White].queenside ? 'Q' : '',
-    fen.castlingAvailability[Color.Black].kingside ? 'k' : '',
-    fen.castlingAvailability[Color.Black].queenside ? 'q' : '',
+    (position.castlingAvailability & CastlingMask.WhiteKingside) > 0 ? 'K' : '',
+    (position.castlingAvailability & CastlingMask.WhiteQueenside) > 0
+      ? 'Q'
+      : '',
+    (position.castlingAvailability & CastlingMask.BlackKingside) > 0 ? 'k' : '',
+    (position.castlingAvailability & CastlingMask.BlackQueenside) > 0
+      ? 'q'
+      : '',
   ].join('');
 
   return [
-    piecesToFenPieces(fen.pieces),
-    fen.turn === Color.White ? 'w' : 'b',
+    piecesToFenPieces(position.pieces),
+    position.turn === Color.White ? 'w' : 'b',
     castlingAvailability.length === 0 ? '-' : castlingAvailability,
-    fen.enPassantSquare ? squareLabel(fen.enPassantSquare) : '-',
-    fen.halfMoveCount,
-    fen.fullMoveCount,
+    position.enPassantSquare ? squareLabel(position.enPassantSquare) : '-',
+    position.halfMoveCount,
+    position.fullMoveCount,
   ].join(' ');
 };
