@@ -5,20 +5,19 @@ OUT_DIR=build
 rm -rf ${OUT_DIR}
 mkdir -p ${OUT_DIR}
 
-yarn esbuild src/script/perft.ts \
-  --bundle \
-  --platform=node \
-  --format=esm \
-  --minify \
-  --outfile=${OUT_DIR}/perft.mjs "$@"
-  # --analyze
-
-yarn esbuild src/script/engine.ts \
+yarn esbuild \
+  src/script/perft.ts \
+  src/script/engine.ts \
+  src/chess/workers/worker-thread/timer.ts \
+  src/chess/workers/worker-thread/search-executor.ts \
   --bundle \
   --platform=node \
   --format=esm \
   --define:USE_NODE_WORKER_THREAD=true \
-  --outfile=${OUT_DIR}/engine.mjs "$@"
+  --out-extension:.js=.mjs \
+  --outdir=${OUT_DIR} "$@"
+  # --analyze
+  # --minify
 
 # Build the chess web app
 # vite build
