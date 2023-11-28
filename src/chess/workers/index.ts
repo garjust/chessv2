@@ -12,7 +12,7 @@ export const loadPerftWorker = async (): Promise<
 export const loadSearchExecutorWorker = async (
   ...args: ConstructorParameters<typeof SearchExecutor>
 ): Promise<[engine: Remote<SearchExecutor>, cleanup: () => void]> => {
-  if (import.meta.env.VITE_WORKER_MODE === 'node_worker_thread') {
+  if (USE_NODE_WORKER_THREAD) {
     const { loadSearchExecutor: load } = await import('./worker-thread');
     return load(...args);
   } else {
@@ -24,7 +24,7 @@ export const loadSearchExecutorWorker = async (
 export const loadTimerWorker = async (
   ...args: ConstructorParameters<typeof Timer>
 ): Promise<[engine: Remote<Timer>, cleanup: () => void]> => {
-  if (import.meta.env.VITE_WORKER_MODE === 'node_worker_thread') {
+  if (USE_NODE_WORKER_THREAD) {
     const { loadTimer: load } = await import('./worker-thread');
     return load(...args);
   } else {

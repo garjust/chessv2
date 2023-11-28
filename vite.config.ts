@@ -28,6 +28,9 @@ export default defineConfig({
     }),
     react(),
   ],
+  define: {
+    USE_NODE_WORKER_THREAD: false,
+  },
   test: {
     setupFiles: ['@vitest/web-worker', 'src/test/audio'],
   },

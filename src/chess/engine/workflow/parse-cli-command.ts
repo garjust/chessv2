@@ -60,7 +60,7 @@ const parseGoCommand = (parts: string[]): GoCommand => {
         result.infinite = true;
         break;
       default:
-        console.log('blah');
+        throw new Error(`unsupported go command: "${cursor}"`);
         break;
     }
   }
@@ -120,9 +120,6 @@ export const parse = (commandString: string): Public => {
     case 'quit':
       return quitAction();
     default:
-      console.log('blah');
-      break;
+      throw Error(`unrecognized UCI command: "${commandString}"`);
   }
-
-  throw Error(`unrecognized UCI command: "${commandString}"`);
 };

@@ -17,6 +17,7 @@ yarn esbuild src/script/engine.ts \
   --bundle \
   --platform=node \
   --format=esm \
+  --define:USE_NODE_WORKER_THREAD=true \
   --outfile=${OUT_DIR}/engine.mjs "$@"
 
 # Build the chess web app

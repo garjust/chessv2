@@ -4,6 +4,11 @@
 declare const brandSymbol: unique symbol;
 
 /**
+ * Replaced at build time to switch to node worker thread code for concurrency.
+ */
+declare const USE_NODE_WORKER_THREAD: boolean;
+
+/**
  * Brand a type T to make it distinct from other T's.
  *
  * For example: a literal type (number, string, etc) can be branded so that

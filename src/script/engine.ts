@@ -16,10 +16,10 @@ const rl = readline.createInterface({
   terminal: false,
 });
 
-const engine = new Engine(ENGINE_VERSION);
+const engine = new Engine(ENGINE_VERSION, false);
 
 engine.responses.subscribe((response: UCIResponse) => {
-  toUCI(response).map((str: string) => rl.write(`${str}\n`));
+  toUCI(response).map((str: string) => console.log(`\t${str}`));
 });
 
 if (DEBUG) {
