@@ -1,7 +1,22 @@
 import { defineConfig } from 'vite';
-import { base } from './config/base';
+import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+
+export function base(): Plugin {
+  return {
+    name: 'base',
+    config() {
+      return {
+        build: {
+          outDir: 'build/app',
+        },
+        clearScreen: false,
+      };
+    },
+    apply: 'build',
+  };
+}
 
 export default defineConfig({
   plugins: [

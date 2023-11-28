@@ -4,13 +4,11 @@
   "private": true,
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "build:engine": "vite build -c config/engine-vite.config.ts",
-    "build:perft": "vite build -c config/perft-vite.config.ts",
+    "build": "script/build",
     "serve": "vite preview",
     "lint": "eslint --ext .ts,.tsx,.js src",
     "test": "vitest src/",
-    "test:perft": "./script/perft.sh 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""
+    "test:perft": "./script/perft 4 \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" \"e2e4 e7e5\""
   },
   "dependencies": {
     "@types/lodash.isequal": "^4.5.8",
@@ -32,6 +30,7 @@
     "@typescript-eslint/parser": "^6.9.0",
     "@vitejs/plugin-react": "^4.1.0",
     "@vitest/web-worker": "^0.34.6",
+    "esbuild": "^0.19.8",
     "eslint": "^8.52.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.1",
