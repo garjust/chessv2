@@ -2,8 +2,8 @@ import { expect, test } from 'vitest';
 import { FEN_LIBRARY, formatPosition, parseFEN } from './fen';
 import { Color, PieceType, Position } from '../types';
 import {
-  CASTLING_AVAILABILITY_ENABLED,
-  CASTLING_AVAILABILITY_BLOCKED,
+  CASTLING_ENABLED,
+  CASTLING_BLOCKED,
 } from '../castling';
 
 test('parse/encode starting position', () => {
@@ -43,7 +43,7 @@ test('parse/encode starting position', () => {
       [7, { color: Color.White, type: PieceType.Rook }],
     ]),
     turn: Color.White,
-    castlingAvailability: CASTLING_AVAILABILITY_ENABLED,
+    castlingState: CASTLING_ENABLED,
     enPassantSquare: null,
     fullMoveCount: 1,
     halfMoveCount: 0,
@@ -61,7 +61,7 @@ test('parse/encode blank fen', () => {
   const expectedPosition: Position = {
     pieces: new Map(),
     turn: Color.White,
-    castlingAvailability: CASTLING_AVAILABILITY_BLOCKED,
+    castlingState: CASTLING_BLOCKED,
     enPassantSquare: null,
     fullMoveCount: 1,
     halfMoveCount: 0,

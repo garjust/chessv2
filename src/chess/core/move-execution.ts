@@ -1,13 +1,6 @@
 import { CastlingMask, ROOK_STARTING_SQUARES } from '../castling';
 import { PIECES } from '../piece-consants';
-import {
-  CastlingAvailability,
-  Color,
-  Move,
-  Piece,
-  PieceType,
-  Square,
-} from '../types';
+import { CastlingState, Color, Move, Piece, PieceType, Square } from '../types';
 import { flipColor, isStartPositionPawn } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
@@ -21,7 +14,7 @@ export type MoveResult = {
   // Store state on the move result that we cannot reverse.
   previousState: {
     halfMoveCount: number;
-    castlingAvailability: CastlingAvailability;
+    castlingState: CastlingState;
     enPassantSquare: Square | null;
     zobrist?: ZobristKey;
   };
@@ -61,7 +54,7 @@ export const applyMove = (
   const result: MoveResult = {
     move,
     previousState: {
-      castlingAvailability: position.castlingAvailability,
+      castlingState: position.castlingState,
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
       // The pin data can be stored in result state because new maps are created
@@ -95,12 +88,12 @@ export const applyMove = (
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
       if (move.to === ROOK_STARTING_SQUARES[captured.color].queenside) {
-        position.castlingAvailability &= ~(
+        position.castlingState &= ~(
           CastlingMask.WhiteQueenside <<
           (captured.color * 2)
         );
       } else if (move.to === ROOK_STARTING_SQUARES[captured.color].kingside) {
-        position.castlingAvailability &= ~(
+        position.castlingState &= ~(
           CastlingMask.WhiteKingside <<
           (captured.color * 2)
         );
@@ -141,23 +134,23 @@ export const applyMove = (
 
     // The king moved, no more castling.
     if (
-      (position.castlingAvailability &
+      (position.castlingState &
         (CastlingMask.WhiteQueenside << (piece.color * 2))) >
       0
     ) {
       currentZobrist.updateCastling(piece.color, 'queenside');
-      position.castlingAvailability &= ~(
+      position.castlingState &= ~(
         CastlingMask.WhiteQueenside <<
         (piece.color * 2)
       );
     }
     if (
-      (position.castlingAvailability &
+      (position.castlingState &
         (CastlingMask.WhiteKingside << (piece.color * 2))) >
       0
     ) {
       currentZobrist.updateCastling(piece.color, 'kingside');
-      position.castlingAvailability &= ~(
+      position.castlingState &= ~(
         CastlingMask.WhiteKingside <<
         (piece.color * 2)
       );
@@ -189,24 +182,24 @@ export const applyMove = (
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
       if (
-        (position.castlingAvailability &
+        (position.castlingState &
           (CastlingMask.WhiteQueenside << (piece.color * 2))) >
         0
       ) {
         currentZobrist.updateCastling(piece.color, 'queenside');
-        position.castlingAvailability &= ~(
+        position.castlingState &= ~(
           CastlingMask.WhiteQueenside <<
           (piece.color * 2)
         );
       }
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
       if (
-        (position.castlingAvailability &
+        (position.castlingState &
           (CastlingMask.WhiteKingside << (piece.color * 2))) >
         0
       ) {
         currentZobrist.updateCastling(piece.color, 'kingside');
-        position.castlingAvailability &= ~(
+        position.castlingState &= ~(
           CastlingMask.WhiteKingside <<
           (piece.color * 2)
         );
@@ -313,7 +306,7 @@ export const undoMove = (
     position.fullMoveCount--;
   }
   position.turn = flipColor(position.turn);
-  position.castlingAvailability = result.previousState.castlingAvailability;
+  position.castlingState = result.previousState.castlingState;
   position.enPassantSquare = result.previousState.enPassantSquare;
   position.halfMoveCount = result.previousState.halfMoveCount;
 };

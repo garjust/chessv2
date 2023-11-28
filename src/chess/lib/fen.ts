@@ -199,24 +199,24 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
     fullMoveNumber,
   ] = fenString.split(' ');
 
-  let castlingBits = 0b0000;
+  let castlingState = 0b0000;
   if (castlingAvailability.includes('K')) {
-    castlingBits |= CastlingMask.WhiteKingside;
+    castlingState |= CastlingMask.WhiteKingside;
   }
   if (castlingAvailability.includes('Q')) {
-    castlingBits |= CastlingMask.WhiteQueenside;
+    castlingState |= CastlingMask.WhiteQueenside;
   }
   if (castlingAvailability.includes('k')) {
-    castlingBits |= CastlingMask.BlackKingside;
+    castlingState |= CastlingMask.BlackKingside;
   }
   if (castlingAvailability.includes('q')) {
-    castlingBits |= CastlingMask.BlackQueenside;
+    castlingState |= CastlingMask.BlackQueenside;
   }
 
   return Object.freeze({
     pieces: pieceMapFromFenPieces(piecePlacements),
     turn: activeColor === 'w' ? Color.White : Color.Black,
-    castlingAvailability: castlingBits,
+    castlingState,
     enPassantSquare:
       enPassantSquare !== '-'
         ? labelToSquare(enPassantSquare as SquareLabel)
@@ -228,14 +228,10 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
 
 export const formatPosition = (position: Position): string => {
   const castlingAvailability = [
-    (position.castlingAvailability & CastlingMask.WhiteKingside) > 0 ? 'K' : '',
-    (position.castlingAvailability & CastlingMask.WhiteQueenside) > 0
-      ? 'Q'
-      : '',
-    (position.castlingAvailability & CastlingMask.BlackKingside) > 0 ? 'k' : '',
-    (position.castlingAvailability & CastlingMask.BlackQueenside) > 0
-      ? 'q'
-      : '',
+    (position.castlingState & CastlingMask.WhiteKingside) > 0 ? 'K' : '',
+    (position.castlingState & CastlingMask.WhiteQueenside) > 0 ? 'Q' : '',
+    (position.castlingState & CastlingMask.BlackKingside) > 0 ? 'k' : '',
+    (position.castlingState & CastlingMask.BlackQueenside) > 0 ? 'q' : '',
   ].join('');
 
   return [

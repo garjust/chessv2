@@ -140,7 +140,7 @@ export type CastlingData<T> = ColorData<{
   queenside: T;
 }>;
 
-export type CastlingAvailability = number;
+export type CastlingState = number;
 
 /**
  * Fully represent a unique chess position.
@@ -150,8 +150,8 @@ export type Position = {
   readonly pieces: Map<Square, Piece>;
   /** Which player's turn it is. */
   turn: Color;
-  /** Castling availability map. */
-  castlingAvailability: CastlingAvailability;
+  /** Castling state  */
+  castlingState: CastlingState;
   /**
    * If a pawn has just made a two-square move, this is the
    * square "behind" the pawn.

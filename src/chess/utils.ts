@@ -107,7 +107,7 @@ export const copyPosition = (position: Position): Position => {
   return {
     pieces,
     turn: position.turn,
-    castlingAvailability: position.castlingAvailability,
+    castlingState: position.castlingState,
     enPassantSquare: position.enPassantSquare,
     halfMoveCount: position.halfMoveCount,
     fullMoveCount: position.fullMoveCount,

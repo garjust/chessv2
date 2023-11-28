@@ -16,16 +16,16 @@ export const hash = (
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  if ((position.castlingAvailability & CastlingMask.WhiteKingside) > 0) {
+  if ((position.castlingState & CastlingMask.WhiteKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if ((position.castlingAvailability & CastlingMask.WhiteQueenside) > 0) {
+  if ((position.castlingState & CastlingMask.WhiteQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].queenside;
   }
-  if ((position.castlingAvailability & CastlingMask.BlackKingside) > 0) {
+  if ((position.castlingState & CastlingMask.BlackKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if ((position.castlingAvailability & CastlingMask.BlackQueenside) > 0) {
+  if ((position.castlingState & CastlingMask.BlackQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.Black].queenside;
   }
 
@@ -46,16 +46,16 @@ export const hash64 = (
     h ^= zobristNumbers[Type.PieceSquare][piece.color][square][piece.type];
   }
 
-  if ((position.castlingAvailability & CastlingMask.WhiteKingside) > 0) {
+  if ((position.castlingState & CastlingMask.WhiteKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if ((position.castlingAvailability & CastlingMask.WhiteQueenside) > 0) {
+  if ((position.castlingState & CastlingMask.WhiteQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].queenside;
   }
-  if ((position.castlingAvailability & CastlingMask.BlackKingside) > 0) {
+  if ((position.castlingState & CastlingMask.BlackKingside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.White].kingside;
   }
-  if ((position.castlingAvailability & CastlingMask.BlackQueenside) > 0) {
+  if ((position.castlingState & CastlingMask.BlackQueenside) > 0) {
     h ^= zobristNumbers[Type.CastlingAvailability][Color.Black].queenside;
   }
 

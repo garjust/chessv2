@@ -3,7 +3,7 @@ import {
   MoveWithExtraData,
   Piece,
   Square,
-  CastlingAvailability,
+  CastlingState,
 } from '../types';
 import AttackMap from './attack-map';
 import { CASTLING_KING_MOVES, PAWN_ADVANCE_MOVES } from './lookup';
@@ -43,7 +43,7 @@ export const kingCastlingMoves = (
   piece: Piece,
   from: Square,
   opponentAttackMap: AttackMap,
-  castlingAvailability: CastlingAvailability,
+  castlingAvailability: CastlingState,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 

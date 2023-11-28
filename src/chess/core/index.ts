@@ -107,7 +107,7 @@ export default class Core {
       this.internalPosition.kings,
       this.checks(this.internalPosition.turn),
       this.internalPosition.enPassantSquare,
-      this.internalPosition.castlingAvailability,
+      this.internalPosition.castlingState,
     );
   }
 

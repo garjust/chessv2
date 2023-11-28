@@ -1,11 +1,11 @@
-import { CASTLING_AVAILABILITY_BLOCKED } from '../castling';
+import { CASTLING_BLOCKED } from '../castling';
 import {
   Color,
   MoveWithExtraData,
   Piece,
   PieceType,
   Square,
-  CastlingAvailability,
+  CastlingState,
   SquareControl,
 } from '../types';
 import { flipColor, isPromotionPositionPawn } from '../utils';
@@ -23,7 +23,7 @@ const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
   enPassantSquare: Square | null,
-  castlingAvailability: CastlingAvailability,
+  castlingAvailability: CastlingState,
   attackedSquares: AttackedSquares,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
@@ -170,7 +170,7 @@ export const generateMoves = (
   kings: KingSquares,
   checks: SquareControl[],
   enPassantSquare: Square | null,
-  castlingAvailability: CastlingAvailability,
+  castlingAvailability: CastlingState,
 ): MoveWithExtraData[] => {
   const kingSquare = kings[color];
 
@@ -178,7 +178,7 @@ export const generateMoves = (
     pieces,
     color,
     enPassantSquare,
-    checks.length > 0 ? CASTLING_AVAILABILITY_BLOCKED : castlingAvailability,
+    checks.length > 0 ? CASTLING_BLOCKED : castlingAvailability,
     attackedSquares,
   );
 

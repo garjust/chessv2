@@ -1,4 +1,4 @@
-import { CastlingAvailability, Color, Square } from './types';
+import { CastlingState, Color, Square } from './types';
 
 const enum CastlingShift {
   WhiteKingside = 0,
@@ -14,16 +14,16 @@ export const enum CastlingMask {
   BlackQueenside = 1 << CastlingShift.BlackQueenside,
 }
 
-export const CASTLING_AVAILABILITY_ENABLED: CastlingAvailability = 0b1111;
-export const CASTLING_AVAILABILITY_BLOCKED: CastlingAvailability = 0b0000;
+export const CASTLING_ENABLED: CastlingState = 0b1111;
+export const CASTLING_BLOCKED: CastlingState = 0b0000;
 
 export const ROOK_STARTING_SQUARES = {
   [Color.White]: {
-    queenside: 0 as Square,
-    kingside: 7 as Square,
+    queenside: 0,
+    kingside: 7,
   },
   [Color.Black]: {
-    queenside: 56 as Square,
-    kingside: 63 as Square,
+    queenside: 56,
+    kingside: 63,
   },
 } as const;
