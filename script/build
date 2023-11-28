@@ -13,11 +13,11 @@ yarn esbuild \
   --bundle \
   --platform=node \
   --format=esm \
+  --minify \
   --define:USE_NODE_WORKER_THREAD=true \
   --out-extension:.js=.mjs \
   --outdir=${OUT_DIR} "$@"
   # --analyze
-  # --minify
 
 # Build the chess web app
 # vite build
