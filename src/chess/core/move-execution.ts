@@ -1,11 +1,18 @@
 import { CastlingMask, ROOK_STARTING_SQUARES } from '../castling';
 import { PIECES } from '../piece-consants';
-import { CastlingState, Color, Move, Piece, PieceType, Square } from '../types';
+import {
+  CastlingState,
+  Color,
+  DirectionUnit,
+  Move,
+  Piece,
+  PieceType,
+  Square,
+} from '../types';
 import { flipColor, isStartPositionPawn } from '../utils';
 import { updateAttackedSquares } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';
-import { down, up } from './move-utils';
 import { PositionWithComputedData, ZobristKey } from './types';
 
 export type MoveResult = {
@@ -106,7 +113,9 @@ export const applyMove = (
     if (position.enPassantSquare === move.to) {
       // This is an en passant capture
       enPassantCaptureSquare =
-        piece.color === Color.White ? down(move.to) : up(move.to);
+        piece.color === Color.White
+          ? move.to + DirectionUnit.Down
+          : move.to + DirectionUnit.Up;
       captured = pieces.get(enPassantCaptureSquare);
       if (captured) {
         result.captured = {
@@ -122,7 +131,9 @@ export const applyMove = (
 
   if (isTwoSquarePawnMove(piece, move)) {
     position.enPassantSquare =
-      piece.color === Color.White ? up(move.from) : down(move.from);
+      piece.color === Color.White
+        ? move.from + DirectionUnit.Up
+        : move.from + DirectionUnit.Down;
   } else {
     position.enPassantSquare = null;
   }

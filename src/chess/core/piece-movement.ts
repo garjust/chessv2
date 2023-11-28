@@ -1,6 +1,7 @@
 import { CastlingMask } from '../castling';
 import {
   CastlingState,
+  DirectionUnit,
   MoveWithExtraData,
   Piece,
   PieceType,
@@ -20,7 +21,7 @@ import {
   QUEEN_RAY_MOVES,
   ROOK_RAY_MOVES,
 } from './lookup/piece-moves';
-import { left, rayControlScanner, right } from './move-utils';
+import { rayControlScanner } from './move-utils';
 
 export const controlForPiece = (
   piece: Piece,
@@ -92,25 +93,25 @@ export const kingCastlingMoves = (
   if (
     (castlingState & (CastlingMask.WhiteKingside << (piece.color * 2))) > 0 &&
     // Check squares being castled through are empty
-    !pieces.has(right(from)) &&
-    !pieces.has(right(from, 2)) &&
+    !pieces.has(from + DirectionUnit.Right) &&
+    !pieces.has(from + DirectionUnit.Right * 2) &&
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
-    !opponentAttackMap.isAttacked(right(from))
+    !opponentAttackMap.isAttacked(from + DirectionUnit.Right)
   ) {
     moves.push(CASTLING_KING_MOVES[piece.color].kingside);
   }
   if (
     (castlingState & (CastlingMask.WhiteQueenside << (piece.color * 2))) > 0 &&
     // Check squares being castled through are empty
-    !pieces.has(left(from)) &&
-    !pieces.has(left(from, 2)) &&
-    !pieces.has(left(from, 3)) &&
+    !pieces.has(from + DirectionUnit.Left) &&
+    !pieces.has(from + DirectionUnit.Left * 2) &&
+    !pieces.has(from + DirectionUnit.Left * 3) &&
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
-    !opponentAttackMap.isAttacked(left(from))
+    !opponentAttackMap.isAttacked(from + DirectionUnit.Left)
   ) {
     moves.push(CASTLING_KING_MOVES[piece.color].queenside);
   }

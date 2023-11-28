@@ -19,23 +19,6 @@ export const buildMove = (from: number, to: number): Move => ({
   to: to as Square,
 });
 
-export const up = (square: Square, n = 1): Square =>
-  square + DirectionUnit.Up * n;
-export const down = (square: Square, n = 1): Square =>
-  square + DirectionUnit.Down * n;
-export const left = (square: Square, n = 1): Square =>
-  square + DirectionUnit.Left * n;
-export const right = (square: Square, n = 1): Square =>
-  square + DirectionUnit.Right * n;
-export const upLeft = (square: Square, n = 1): Square =>
-  square + DirectionUnit.UpLeft * n;
-export const upRight = (square: Square, n = 1): Square =>
-  square + DirectionUnit.UpRight * n;
-export const downLeft = (square: Square, n = 1): Square =>
-  square + DirectionUnit.DownLeft * n;
-export const downRight = (square: Square, n = 1): Square =>
-  square + DirectionUnit.DownRight * n;
-
 export const isMoveUp = (move: Move): boolean =>
   move.from < move.to && isMoveInFile(move);
 

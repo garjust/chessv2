@@ -2,33 +2,24 @@ import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControl } from '../types';
 import { labelToSquare } from '../utils';
-import { RAYS_BY_DIRECTION } from './lookup/piece-squares';
 import {
   buildMove,
   directionOfMove,
-  down,
-  downLeft,
-  downRight,
   flipDirection,
-  left,
   rayControlScanner,
-  right,
   squareControlXraysMove,
-  up,
-  upLeft,
-  upRight,
 } from './move-utils';
 import { RAY_MOVES_BY_DIRECTION } from './lookup';
 
-test('movement functions', () => {
-  expect(up(4)).toEqual(12);
-  expect(down(11)).toEqual(3);
-  expect(left(20)).toEqual(19);
-  expect(right(20)).toEqual(21);
-  expect(upLeft(36)).toEqual(43);
-  expect(upRight(36)).toEqual(45);
-  expect(downLeft(36)).toEqual(27);
-  expect(downRight(36)).toEqual(29);
+test('direction unit enum', () => {
+  expect(4 + DirectionUnit.Up).toEqual(12);
+  expect(11 + DirectionUnit.Down).toEqual(3);
+  expect(20 + DirectionUnit.Left).toEqual(19);
+  expect(20 + DirectionUnit.Right).toEqual(21);
+  expect(36 + DirectionUnit.UpLeft).toEqual(43);
+  expect(36 + DirectionUnit.UpRight).toEqual(45);
+  expect(36 + DirectionUnit.DownLeft).toEqual(27);
+  expect(36 + DirectionUnit.DownRight).toEqual(29);
 });
 
 test('directionOfMove', () => {
