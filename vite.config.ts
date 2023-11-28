@@ -20,6 +20,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // This alias allows us to shim the node worker_threads module when
+      // bundling for the browser. With this we can consolidate worker code
+      // further.
       'node:worker_threads': './src/worker_threads-shim.ts',
     },
   },
