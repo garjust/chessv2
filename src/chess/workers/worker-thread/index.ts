@@ -1,5 +1,5 @@
 import { Remote, wrap } from 'comlink';
-import nodeEndpoint from 'comlink/dist/esm/node-adapter';
+import nodeEndpoint from 'comlink/src/node-adapter';
 import Timer from '../../../lib/timer';
 import Logger from '../../../lib/logger';
 import { SearchExecutor } from '../../engine/search-executor';

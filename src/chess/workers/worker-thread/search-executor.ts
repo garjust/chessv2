@@ -1,5 +1,5 @@
 import { Remote, expose, wrap } from 'comlink';
-import nodeEndpoint from 'comlink/dist/esm/node-adapter';
+import nodeEndpoint from 'comlink/src/node-adapter';
 import { Worker, parentPort, isMainThread } from 'node:worker_threads';
 import { SearchExecutor } from '../../engine/search-executor';
 import Logger from '../../../lib/logger';
