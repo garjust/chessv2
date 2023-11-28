@@ -1,4 +1,4 @@
-import { ROOK_STARTING_SQUARES } from '../castling';
+import { ROOK_STARTING_SQUARES, copyCastlingAvailability } from '../castling';
 import { PIECES } from '../piece-consants';
 import {
   CastlingAvailability,
@@ -61,16 +61,9 @@ export const applyMove = (
   const result: MoveResult = {
     move,
     previousState: {
-      castlingAvailability: {
-        [Color.White]: {
-          kingside: position.castlingAvailability[Color.White].kingside,
-          queenside: position.castlingAvailability[Color.White].queenside,
-        },
-        [Color.Black]: {
-          kingside: position.castlingAvailability[Color.Black].kingside,
-          queenside: position.castlingAvailability[Color.Black].queenside,
-        },
-      },
+      castlingAvailability: copyCastlingAvailability(
+        position.castlingAvailability,
+      ),
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
       // The pin data can be stored in result state because new maps are created

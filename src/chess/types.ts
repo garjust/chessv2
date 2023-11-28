@@ -13,6 +13,11 @@ export enum Color {
   Black = 1,
 }
 
+export type ColorData<T> = Readonly<{
+  [Color.White]: T;
+  [Color.Black]: T;
+}>;
+
 /**
  * Type of piece.
  *
@@ -51,6 +56,18 @@ export enum DirectionUnit {
   DownLeft = -9,
   DownRight = -7,
 }
+
+export type BishopDirection =
+  | DirectionUnit.UpLeft
+  | DirectionUnit.UpRight
+  | DirectionUnit.DownLeft
+  | DirectionUnit.DownRight;
+
+export type RookDirection =
+  | DirectionUnit.Up
+  | DirectionUnit.Down
+  | DirectionUnit.Left
+  | DirectionUnit.Right;
 
 export type PromotionOption =
   | PieceType.Bishop
@@ -118,16 +135,12 @@ export type MoveWithExtraData = Move & {
 
 export type CastlingSide = 'kingside' | 'queenside';
 
-export type CastlingAvailability = Readonly<{
-  [Color.White]: {
-    kingside: boolean;
-    queenside: boolean;
-  };
-  [Color.Black]: {
-    kingside: boolean;
-    queenside: boolean;
-  };
+export type CastlingData<T> = ColorData<{
+  kingside: T;
+  queenside: T;
 }>;
+
+export type CastlingAvailability = CastlingData<boolean>;
 
 /**
  * Fully represent a unique chess position.

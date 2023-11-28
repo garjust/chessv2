@@ -15,7 +15,7 @@ import {
   isMoveIncidentWithCheck,
   squareControlXraysMove,
 } from './move-utils';
-import { castlingKingMoves, advancePawnMoves } from './piece-movement';
+import { kingCastlingMoves, pawnAdvanceMoves } from './piece-movement';
 import Pins from './pins';
 import { KingSquares, AttackedSquares } from './types';
 
@@ -68,7 +68,7 @@ const pseudoMovesForPosition = (
     if (piece.type === PieceType.King) {
       // Add castling moves
       moves.push(
-        ...castlingKingMoves(
+        ...kingCastlingMoves(
           pieces,
           piece,
           square,
@@ -78,7 +78,7 @@ const pseudoMovesForPosition = (
       );
     } else if (piece.type === PieceType.Pawn) {
       // Add advance moves.
-      moves.push(...advancePawnMoves(pieces, piece, square));
+      moves.push(...pawnAdvanceMoves(pieces, piece, square));
     }
   }
 

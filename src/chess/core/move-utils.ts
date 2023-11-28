@@ -1,8 +1,10 @@
 import {
+  BishopDirection,
   DirectionUnit,
   Move,
   MoveWithExtraData,
   Piece,
+  RookDirection,
   Square,
   SquareControl,
 } from '../types';
@@ -85,6 +87,18 @@ export const directionOfMove = (from: Square, to: Square): DirectionUnit => {
   }
 };
 
+export const isBishopDirection = (
+  direction: DirectionUnit,
+): direction is BishopDirection =>
+  direction === DirectionUnit.UpLeft ||
+  direction === DirectionUnit.UpRight ||
+  direction === DirectionUnit.DownLeft ||
+  direction === DirectionUnit.DownRight;
+
+export const isRookDirection = (
+  direction: DirectionUnit,
+): direction is RookDirection => !isBishopDirection(direction);
+
 export const moveEquals = (a: Nullable<Move>, b: Nullable<Move>): boolean =>
   Boolean(a && b && a.from === b.from && a.to === b.to);
 
@@ -105,21 +119,19 @@ export const squareControlXraysMove = (
 
 export const rayControlScanner = (
   pieces: Map<Square, Piece>,
-  piece: Piece,
-  from: Square,
-  ray: Square[],
+  ray: SquareControl[],
   skipPast?: Square,
   stopAt?: Square,
 ): SquareControl[] => {
   const moves: SquareControl[] = [];
   let skip = skipPast !== undefined ? true : false;
 
-  for (const to of ray) {
+  for (const control of ray) {
     if (skip) {
-      if (to === skipPast) {
+      if (control.to === skipPast) {
         skip = false;
       } else {
-        const otherPiece = pieces.get(to);
+        const otherPiece = pieces.get(control.to);
         if (otherPiece) {
           // Stop scanning if we hit a piece of either colour
           break;
@@ -129,17 +141,13 @@ export const rayControlScanner = (
       continue;
     }
 
-    moves.push({
-      piece,
-      from,
-      to: to,
-    });
+    moves.push(control);
 
-    if (to === stopAt) {
+    if (control.to === stopAt) {
       break;
     }
 
-    const otherPiece = pieces.get(to);
+    const otherPiece = pieces.get(control.to);
     if (otherPiece) {
       // Stop scanning if we hit a piece of either colour
       break;

@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { parseFEN, FEN_LIBRARY } from '../lib/fen';
 import { Color, DirectionUnit, PieceType, SquareControl } from '../types';
 import { labelToSquare } from '../utils';
-import { RAYS_BY_DIRECTION } from './lookup/move-lookup';
+import { RAYS_BY_DIRECTION } from './lookup/piece-squares';
 import {
   buildMove,
   directionOfMove,
@@ -18,6 +18,7 @@ import {
   upLeft,
   upRight,
 } from './move-utils';
+import { RAY_MOVES_BY_DIRECTION } from './lookup';
 
 test('movement functions', () => {
   expect(up(4)).toEqual(12);
@@ -103,12 +104,15 @@ test('squareControlXraysMove', () => {
 test('rayControlScanner bishop', () => {
   const position = parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN);
   const from = labelToSquare('c4');
-  const piece = { type: PieceType.Bishop, color: Color.White };
-  const ray = RAYS_BY_DIRECTION[from][DirectionUnit.UpRight];
+  const piece = { type: PieceType.Bishop, color: Color.White } as const;
+  const ray =
+    RAY_MOVES_BY_DIRECTION[piece.color][from][piece.type][
+      DirectionUnit.UpRight
+    ];
 
-  expect(ray).toEqual([35, 44, 53, 62]);
+  expect(ray.map(({ to }) => to)).toEqual([35, 44, 53, 62]);
 
-  const squareControl = rayControlScanner(position.pieces, piece, from, ray);
+  const squareControl = rayControlScanner(position.pieces, ray);
   expect(squareControl).toEqual([
     {
       piece,
@@ -131,16 +135,13 @@ test('rayControlScanner bishop', () => {
 test('rayControlScanner bishop skipPast', () => {
   const position = parseFEN(FEN_LIBRARY.VIENNA_OPENING_FEN);
   const from = labelToSquare('c4');
-  const piece = { type: PieceType.Bishop, color: Color.White };
-  const ray = RAYS_BY_DIRECTION[from][DirectionUnit.UpRight];
+  const piece = { type: PieceType.Bishop, color: Color.White } as const;
+  const ray =
+    RAY_MOVES_BY_DIRECTION[piece.color][from][piece.type][
+      DirectionUnit.UpRight
+    ];
 
-  const squareControl = rayControlScanner(
-    position.pieces,
-    piece,
-    from,
-    ray,
-    53,
-  );
+  const squareControl = rayControlScanner(position.pieces, ray, 53);
   expect(squareControl).toEqual([
     {
       piece,
@@ -155,18 +156,13 @@ test('rayControlScanner queen skipPast through own piece', () => {
     'rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq e3 0 2',
   );
   const from = labelToSquare('d1');
-  const piece = { type: PieceType.Queen, color: Color.White };
-  const ray = RAYS_BY_DIRECTION[from][DirectionUnit.Up];
+  const piece = { type: PieceType.Queen, color: Color.White } as const;
+  const ray =
+    RAY_MOVES_BY_DIRECTION[piece.color][from][piece.type][DirectionUnit.Up];
 
-  expect(ray).toEqual([11, 19, 27, 35, 43, 51, 59]);
+  expect(ray.map(({ to }) => to)).toEqual([11, 19, 27, 35, 43, 51, 59]);
 
-  const squareControl = rayControlScanner(
-    position.pieces,
-    piece,
-    from,
-    ray,
-    35,
-  );
+  const squareControl = rayControlScanner(position.pieces, ray, 35);
   // No square control because a piece is blocking the ray before the skipPast
   // square.
   expect(squareControl).toEqual([]);
@@ -177,15 +173,13 @@ test('rayControlScanner queen skipPast is a1', () => {
     'r1bqkbnr/pppppppp/n7/8/8/P7/RPPPPPPP/1NBQKBNR b Kkq - 2 2',
   );
   const from = labelToSquare('d1');
-  const piece = { type: PieceType.Queen, color: Color.White };
-  const ray = RAYS_BY_DIRECTION[from][DirectionUnit.Left];
-
-  expect(ray).toEqual([2, 1, 0]);
+  const piece = { type: PieceType.Queen, color: Color.White } as const;
+  const ray =
+    RAY_MOVES_BY_DIRECTION[piece.color][from][piece.type][DirectionUnit.Left];
+  expect(ray.map(({ to }) => to)).toEqual([2, 1, 0]);
 
   const squareControl = rayControlScanner(
     position.pieces,
-    piece,
-    from,
     ray,
     // The bug here was the 0-square being treated as false
     0,
@@ -200,17 +194,16 @@ test('rayControlScanner rook skipPast through opponent piece', () => {
     'rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR w KQkq - 0 3',
   );
   const from = labelToSquare('a1');
-  const piece = { type: PieceType.Rook, color: Color.White };
-  const ray = RAYS_BY_DIRECTION[from][DirectionUnit.Up];
+  const piece = { type: PieceType.Rook, color: Color.White } as const;
+  const ray =
+    RAY_MOVES_BY_DIRECTION[piece.color][from][piece.type][DirectionUnit.Up];
   const move = { from: 48, to: 40 };
 
-  expect(ray).toEqual([8, 16, 24, 32, 40, 48, 56]);
+  expect(ray.map(({ to }) => to)).toEqual([8, 16, 24, 32, 40, 48, 56]);
 
   // A pawn has just moved close to the scanning piece.
   const squareControl = rayControlScanner(
     position.pieces,
-    piece,
-    from,
     ray,
     move.to,
     move.from,

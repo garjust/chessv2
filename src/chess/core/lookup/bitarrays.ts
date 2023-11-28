@@ -1,9 +1,9 @@
 import {
-  BISHOP_LOOKUP,
-  QUEEN_LOOKUP,
-  ROOK_LOOKUP,
+  BISHOP_RAYS,
+  QUEEN_RAYS,
+  ROOK_RAYS,
   SUPER_PIECE_LOOKUP,
-} from './move-lookup';
+} from './piece-squares';
 
 /**
  * For each square a bitarray representing squares that a bishop can move to
@@ -11,7 +11,7 @@ import {
  * This allows array index lookup (square as index) to determine
  * if a square intersects any of the bishop's movement.
  */
-export const BISHOP_MOVE_BITARRAYS: boolean[][] = BISHOP_LOOKUP.map((raySet) =>
+export const BISHOP_MOVE_BITARRAYS: boolean[][] = BISHOP_RAYS.map((raySet) =>
   raySet.flat(),
 ).map((squares) => {
   const array = Array<boolean>(64);
@@ -25,7 +25,7 @@ export const BISHOP_MOVE_BITARRAYS: boolean[][] = BISHOP_LOOKUP.map((raySet) =>
  * This allows array index lookup (square as index) to determine
  * if a square intersects any of the rook's movement.
  */
-export const ROOK_MOVE_BITARRAYS: boolean[][] = ROOK_LOOKUP.map((raySet) =>
+export const ROOK_MOVE_BITARRAYS: boolean[][] = ROOK_RAYS.map((raySet) =>
   raySet.flat(),
 ).map((squares) => {
   const array = Array<boolean>(64);
@@ -39,7 +39,7 @@ export const ROOK_MOVE_BITARRAYS: boolean[][] = ROOK_LOOKUP.map((raySet) =>
  * This allows array index lookup (square as index) to determine
  * if a square intersects any of the queen's movement.
  */
-export const QUEEN_MOVE_BITARRAYS: boolean[][] = QUEEN_LOOKUP.map((raySet) =>
+export const QUEEN_MOVE_BITARRAYS: boolean[][] = QUEEN_RAYS.map((raySet) =>
   raySet.flat(),
 ).map((squares) => {
   const array = Array<boolean>(64);

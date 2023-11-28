@@ -1,4 +1,5 @@
 import { copyCastlingAvailability } from './castling';
+import { isBishopDirection } from './core/move-utils';
 import { formatPosition } from './lib/fen';
 import {
   Color,
@@ -63,12 +64,7 @@ export const isSlider = (piece: Piece): piece is SlidingPiece =>
   isSliderPieceType(piece.type);
 
 export const sliderType = (direction: DirectionUnit) =>
-  direction === DirectionUnit.Up ||
-  direction === DirectionUnit.Down ||
-  direction === DirectionUnit.Left ||
-  direction === DirectionUnit.Right
-    ? PieceType.Rook
-    : PieceType.Bishop;
+  isBishopDirection(direction) ? PieceType.Bishop : PieceType.Rook;
 
 export const squaresInclude = (
   squares: Readonly<Square[]>,
