@@ -1,6 +1,6 @@
 import { Color, Square, SquareControl, Position } from '../types';
 import { squareGenerator } from '../utils';
-import { forPiece } from './piece-movement-control';
+import { controlForPiece } from './piece-movement';
 
 const enum UpdateType {
   FullRemove,
@@ -50,7 +50,7 @@ export default class AttackMap {
         continue;
       }
 
-      const squareControl = forPiece(piece, position.pieces, square);
+      const squareControl = controlForPiece(piece, position.pieces, square);
       this.addAttacksForPiece(square, squareControl);
     }
   }

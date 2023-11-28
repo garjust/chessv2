@@ -23,7 +23,7 @@ const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
   enPassantSquare: Square | null,
-  castlingAvailability: CastlingState,
+  castlingState: CastlingState,
   attackedSquares: AttackedSquares,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
@@ -37,6 +37,7 @@ const pseudoMovesForPosition = (
 
     for (const squareControl of attacks) {
       const attackedPiece = pieces.get(squareControl.to);
+      // Set current attack state of the move.
       squareControl.attack = attackedPiece !== undefined;
 
       // Logic to discard moves:
@@ -73,7 +74,7 @@ const pseudoMovesForPosition = (
           piece,
           square,
           attackedSquares[flipColor(color)],
-          castlingAvailability,
+          castlingState,
         ),
       );
     } else if (piece.type === PieceType.Pawn) {

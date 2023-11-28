@@ -16,7 +16,7 @@ import {
   RAY_MOVES_BY_DIRECTION,
 } from './lookup';
 import { directionOfMove, rayControlScanner } from './move-utils';
-import { forPiece } from './piece-movement-control';
+import { controlForPiece } from './piece-movement';
 import { AttackedSquares } from './types';
 import AttackMap from './attack-map';
 import { PIECES } from '../piece-consants';
@@ -54,7 +54,7 @@ const updatePiecesAttacks = (
     castlingRookMove
   ) {
     attackMap.removeAttacksForPiece(square);
-    const newAttacks: SquareControl[] = forPiece(piece, pieces, square);
+    const newAttacks: SquareControl[] = controlForPiece(piece, pieces, square);
     attackMap.addAttacksForPiece(square, newAttacks);
   } else if (
     // If the sliding piece is incident with a move's from and two squares in
@@ -187,7 +187,7 @@ export const updateAttackedSquaresForMove = (
   map.removeAttacksForPiece(move.to);
 
   // Find the squares that are now attacked by the moved piece.
-  const newAttacks: SquareControl[] = forPiece(piece, pieces, move.to);
+  const newAttacks: SquareControl[] = controlForPiece(piece, pieces, move.to);
   map.addAttacksForPiece(move.to, newAttacks);
 };
 
