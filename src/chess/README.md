@@ -25,9 +25,6 @@ A chess engine can be loaded in two ways:
 ## TODO
 
 - Remove new Array(<size>) since it makes a sparse array.
-- Pre-compute SquareControl for all rays/moves so that objects are not
-  created when assembling sets of SquareControls
-- Refactor "Move" types to be subsets of each other for duck typing
 - Pack castling availabiltiy into integer as a first foray into bit packing
   - move execution creates 3 objects for this every move
 
