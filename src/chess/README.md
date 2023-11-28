@@ -24,9 +24,6 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
-- Pack castling availabiltiy into integer as a first foray into bit packing
-  - move execution creates 3 objects for this every move
-
 ### Old thoughts
 
 - Decrease weight of moves to squares attacked by pawns
