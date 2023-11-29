@@ -8,8 +8,8 @@ mkdir -p ${OUT_DIR}
 yarn esbuild \
   src/script/perft.ts \
   src/script/engine.ts \
-  src/chess/workers/webworker/timer.ts \
-  src/chess/workers/webworker/search-executor.ts \
+  src/chess/workers/timer.ts \
+  src/chess/workers/search-executor.ts \
   --bundle \
   --platform=node \
   --format=esm \
