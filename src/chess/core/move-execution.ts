@@ -72,7 +72,7 @@ export const applyMove = (
   // In this case swap out the piece before executing the move so we only insert
   // a piece once.
   if (move.promotion) {
-    piece = { ...piece, type: move.promotion };
+    piece = { color: piece.color, type: move.promotion };
   }
 
   // Execute the move
