@@ -83,7 +83,7 @@ export const kingCastlingMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-  opponentAttackMap: SquareControlMap,
+  opponentControl: SquareControlMap,
   castlingState: CastlingState,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
@@ -98,7 +98,7 @@ export const kingCastlingMoves = (
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
-    !opponentAttackMap.isAttacked(from + DirectionUnit.Right)
+    !opponentControl.isAttacked(from + DirectionUnit.Right)
   ) {
     moves.push(CASTLING_KING_MOVES[piece.color].kingside);
   }
@@ -111,7 +111,7 @@ export const kingCastlingMoves = (
     // Also check nothing is attacking the square being castled through. It is
     // still possible the king is skewered to this square by a check but we
     // will detect that later in move generation
-    !opponentAttackMap.isAttacked(from + DirectionUnit.Left)
+    !opponentControl.isAttacked(from + DirectionUnit.Left)
   ) {
     moves.push(CASTLING_KING_MOVES[piece.color].queenside);
   }

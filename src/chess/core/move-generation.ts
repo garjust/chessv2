@@ -123,7 +123,7 @@ const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
   pins: Pins,
   checks: SquareControl[],
-  opponentAttackMap: SquareControlMap,
+  opponentControl: SquareControlMap,
 ): boolean => {
   if (move.piece.type === PieceType.King) {
     // The piece moving is the king. We need to make sure the square it is
@@ -131,10 +131,10 @@ const moveLeavesKingInCheck = (
     if (checks.length === 0) {
       // If we are not in check just look for attacks on the destination
       // square
-      return opponentAttackMap.isAttacked(move.to);
+      return opponentControl.isAttacked(move.to);
     } else {
       // If we are in check first look for attacks on the destination square.
-      if (opponentAttackMap.isAttacked(move.to)) {
+      if (opponentControl.isAttacked(move.to)) {
         return true;
       }
 

@@ -18,7 +18,7 @@ import { PositionWithComputedData, ZobristKey } from './types';
 export type MoveResult = {
   move: Move;
   captured?: { square: Square; piece: Piece };
-  // Store state on the move result that we cannot reverse.
+  // Store state on the move result that we cannot reverse as easily as copying.
   previousState: {
     halfMoveCount: number;
     castlingState: CastlingState;
@@ -64,8 +64,6 @@ export const applyMove = (
       castlingState: position.castlingState,
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
-      // The pin data can be stored in result state because new maps are created
-      // when pin data is updated
       zobrist: currentZobrist.key,
     },
   };
