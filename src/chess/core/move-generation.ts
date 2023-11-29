@@ -17,7 +17,7 @@ import {
 } from './move-utils';
 import { kingCastlingMoves, pawnAdvanceMoves } from './piece-movement';
 import Pins from './pins';
-import { KingSquares, SquareControlByColor } from './types';
+import { PositionWithComputedData, SquareControlByColor } from './types';
 
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
@@ -164,23 +164,17 @@ const moveLeavesKingInCheck = (
 };
 
 export const generateMoves = (
-  pieces: Map<Square, Piece>,
-  color: Color,
-  squareControlByColor: SquareControlByColor,
-  pins: Pins,
-  kings: KingSquares,
+  position: PositionWithComputedData,
   checks: SquareControl[],
-  enPassantSquare: Square | null,
-  castlingAvailability: CastlingState,
 ): MoveWithExtraData[] => {
-  const kingSquare = kings[color];
+  const kingSquare = position.kings[position.turn];
 
   const moves = pseudoMovesForPosition(
-    pieces,
-    color,
-    enPassantSquare,
-    checks.length > 0 ? CASTLING_BLOCKED : castlingAvailability,
-    squareControlByColor,
+    position.pieces,
+    position.turn,
+    position.enPassantSquare,
+    checks.length > 0 ? CASTLING_BLOCKED : position.castlingState,
+    position.squareControlByColor,
   );
 
   if (kingSquare) {
@@ -196,9 +190,9 @@ export const generateMoves = (
       if (
         moveLeavesKingInCheck(
           move,
-          pins,
+          position.absolutePins[position.turn],
           checks,
-          squareControlByColor[flipColor(color)],
+          position.squareControlByColor[flipColor(position.turn)],
         )
       ) {
         moves.splice(i, 1);

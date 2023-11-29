@@ -42,20 +42,8 @@ export default class Core {
     if (DEBUG_FLAG) {
       const moves = [...this.moveStack.map((moveResult) => moveResult.move)];
 
-      verifyAttackMap(
-        this.internalPosition.squareControlByColor[Color.White],
-        this.internalPosition,
-        Color.White,
-        moves,
-        'makeMove',
-      );
-      verifyAttackMap(
-        this.internalPosition.squareControlByColor[Color.Black],
-        this.internalPosition,
-        Color.Black,
-        moves,
-        'makeMove',
-      );
+      verifyAttackMap(this.internalPosition, Color.White, moves, 'makeMove');
+      verifyAttackMap(this.internalPosition, Color.Black, moves, 'makeMove');
     }
 
     return result.captured?.piece;
@@ -75,20 +63,8 @@ export default class Core {
         moveResult.move,
       ];
 
-      verifyAttackMap(
-        this.internalPosition.squareControlByColor[Color.White],
-        this.internalPosition,
-        Color.White,
-        moves,
-        'unmakeMove',
-      );
-      verifyAttackMap(
-        this.internalPosition.squareControlByColor[Color.Black],
-        this.internalPosition,
-        Color.Black,
-        moves,
-        'unmakeMove',
-      );
+      verifyAttackMap(this.internalPosition, Color.White, moves, 'unmakeMove');
+      verifyAttackMap(this.internalPosition, Color.Black, moves, 'unmakeMove');
     }
   }
 
@@ -104,14 +80,8 @@ export default class Core {
 
   generateMoves(): MoveWithExtraData[] {
     return generateMoves(
-      this.internalPosition.pieces,
-      this.internalPosition.turn,
-      this.internalPosition.squareControlByColor,
-      this.internalPosition.absolutePins[this.internalPosition.turn],
-      this.internalPosition.kings,
+      this.internalPosition,
       this.checks(this.internalPosition.turn),
-      this.internalPosition.enPassantSquare,
-      this.internalPosition.castlingState,
     );
   }
 
@@ -166,13 +136,13 @@ export default class Core {
 }
 
 const verifyAttackMap = (
-  map: SquareControlMap,
-  position: Position,
+  position: PositionWithComputedData,
   color: Color,
   moves: Move[],
   lastAction: 'makeMove' | 'unmakeMove',
 ) => {
   const computed = new SquareControlMap(position, color);
+  const map = position.squareControlByColor[color];
 
   // Note: this code is broken because the equal function wants arrays to be
   // in the same order which they are not.
