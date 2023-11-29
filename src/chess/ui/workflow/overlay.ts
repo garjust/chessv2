@@ -1,4 +1,4 @@
-import AttackMap from '../../core/attack-map';
+import SquareControlMap from '../../core/square-control-map';
 import { Pin, Square } from '../../types';
 import {
   State,
@@ -46,7 +46,7 @@ export const setOverlayForPlay = (
 
 export const setOverlayForAttacks = (
   map: Record<Square, SquareOverlayType>,
-  attacks: AttackMap,
+  attacks: SquareControlMap,
 ) => {
   for (const [square, count] of attacks.attackCounts()) {
     if (count > 0) {

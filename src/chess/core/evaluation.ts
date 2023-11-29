@@ -1,4 +1,4 @@
-import { Position, PieceType, Color, Piece, Square } from '../types';
+import { Position, PieceType, Color } from '../types';
 import { squareValue } from '../lib/heatmaps';
 import { rankForSquare } from '../utils';
 

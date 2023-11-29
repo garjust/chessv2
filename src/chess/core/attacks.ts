@@ -17,8 +17,8 @@ import {
 } from './lookup';
 import { directionOfMove, rayControlScanner } from './move-utils';
 import { controlForPiece } from './piece-movement';
-import { AttackedSquares } from './types';
-import AttackMap from './attack-map';
+import { SquareControlByColor } from './types';
+import SquareControlMap from './square-control-map';
 import { PIECES } from '../piece-consants';
 
 const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
@@ -37,7 +37,7 @@ const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
 const updatePiecesAttacks = (
   square: Square,
   piece: SlidingPiece,
-  attackMap: AttackMap,
+  attackMap: SquareControlMap,
   pieces: Map<Square, Piece>,
   move: Move,
   isCapture: boolean,
@@ -132,16 +132,16 @@ const updatePiecesAttacks = (
 
 const squaresControllingSquare = (
   controlledSquare: Square,
-  attackedSquares: AttackedSquares,
+  squareControlByColor: SquareControlByColor,
 ) => {
   const squares = new Set<Square>();
 
-  for (const [square] of attackedSquares[Color.White].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.White].controlOfSquare(
     controlledSquare,
   )) {
     squares.add(square);
   }
-  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.Black].controlOfSquare(
     controlledSquare,
   )) {
     squares.add(square);
@@ -151,25 +151,25 @@ const squaresControllingSquare = (
 
 const squaresControllingMoveSquares = (
   move: Move,
-  attackedSquares: AttackedSquares,
+  squareControlByColor: SquareControlByColor,
 ) => {
   const squares = new Set<Square>();
-  for (const [square] of attackedSquares[Color.White].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.White].controlOfSquare(
     move.from,
   )) {
     squares.add(square);
   }
-  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.Black].controlOfSquare(
     move.from,
   )) {
     squares.add(square);
   }
-  for (const [square] of attackedSquares[Color.White].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.White].controlOfSquare(
     move.to,
   )) {
     squares.add(square);
   }
-  for (const [square] of attackedSquares[Color.Black].controlOfSquare(
+  for (const [square] of squareControlByColor[Color.Black].controlOfSquare(
     move.to,
   )) {
     squares.add(square);
@@ -177,9 +177,9 @@ const squaresControllingMoveSquares = (
   return squares;
 };
 
-export const updateAttackedSquaresForMove = (
+export const updateSquareControlMapForMove = (
   pieces: Map<Square, Piece>,
-  map: AttackMap,
+  map: SquareControlMap,
   piece: Piece,
   move: Move,
 ) => {
@@ -191,8 +191,8 @@ export const updateAttackedSquaresForMove = (
   map.addAttacksForPiece(move.to, newAttacks);
 };
 
-export const updateAttackedSquares = (
-  attackedSquares: AttackedSquares,
+export const updateSquareControlMaps = (
+  squareControlByColor: SquareControlByColor,
   pieces: Map<Square, Piece>,
   move: Move,
   movedPiece: Piece,
@@ -200,37 +200,37 @@ export const updateAttackedSquares = (
   enPassantCaptureSquare?: Square,
   castlingRookMove?: Move,
 ) => {
-  attackedSquares[Color.White].startUpdates();
-  attackedSquares[Color.Black].startUpdates();
+  squareControlByColor[Color.White].startUpdates();
+  squareControlByColor[Color.Black].startUpdates();
 
   const opponentColor = flipColor(movedPiece.color);
-  attackedSquares[opponentColor].removeAttacksForPiece(move.to);
+  squareControlByColor[opponentColor].removeAttacksForPiece(move.to);
 
-  updateAttackedSquaresForMove(
+  updateSquareControlMapForMove(
     pieces,
-    attackedSquares[movedPiece.color],
+    squareControlByColor[movedPiece.color],
     movedPiece,
     move,
   );
   if (castlingRookMove) {
-    updateAttackedSquaresForMove(
+    updateSquareControlMapForMove(
       pieces,
-      attackedSquares[movedPiece.color],
+      squareControlByColor[movedPiece.color],
       PIECES[movedPiece.color][PieceType.Rook],
       castlingRookMove,
     );
   }
 
   // Find pieces possibly affected by the moved piece.
-  const squares = squaresControllingMoveSquares(move, attackedSquares);
+  const squares = squaresControllingMoveSquares(move, squareControlByColor);
 
   if (enPassantCaptureSquare) {
-    attackedSquares[opponentColor].removeAttacksForPiece(
+    squareControlByColor[opponentColor].removeAttacksForPiece(
       enPassantCaptureSquare,
     );
     const enPassantSquareSquares = squaresControllingSquare(
       enPassantCaptureSquare,
-      attackedSquares,
+      squareControlByColor,
     );
     for (const square of enPassantSquareSquares) {
       squares.add(square);
@@ -259,7 +259,7 @@ export const updateAttackedSquares = (
     updatePiecesAttacks(
       square,
       piece,
-      attackedSquares[piece.color],
+      squareControlByColor[piece.color],
       pieces,
       move,
       isCapture,

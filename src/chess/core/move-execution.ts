@@ -10,7 +10,7 @@ import {
   Square,
 } from '../types';
 import { flipColor, isStartPositionPawn } from '../utils';
-import { updateAttackedSquares } from './attacks';
+import { updateSquareControlMaps } from './attacks';
 import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';
 import { PositionWithComputedData, ZobristKey } from './types';
@@ -227,8 +227,8 @@ export const applyMove = (
       castlingRookMove,
     );
   }
-  updateAttackedSquares(
-    position.attackedSquares,
+  updateSquareControlMaps(
+    position.squareControlByColor,
     position.pieces,
     move,
     piece,
@@ -303,8 +303,8 @@ export const undoMove = (
     }
   }
 
-  position.attackedSquares[Color.White].revert();
-  position.attackedSquares[Color.Black].revert();
+  position.squareControlByColor[Color.White].revert();
+  position.squareControlByColor[Color.Black].revert();
   position.absolutePins[Color.White].revert();
   position.absolutePins[Color.Black].revert();
 

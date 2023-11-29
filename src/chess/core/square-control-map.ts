@@ -14,7 +14,7 @@ type Update = {
   squares: SquareControl[];
 };
 
-export default class AttackMap {
+export default class SquareControlMap {
   /**
    * Store all SquareControl objects owned by the piece residing in the
    * key square. This is effectively a near-complete set of moves in the

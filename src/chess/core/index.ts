@@ -12,14 +12,18 @@ import {
   SquareControl,
 } from '../types';
 import { flipColor } from '../utils';
-import AttackMap from './attack-map';
+import SquareControlMap from './square-control-map';
 import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
 import { DEBUG_FLAG } from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import { AttackedSquares, PositionWithComputedData, ZobristKey } from './types';
+import {
+  SquareControlByColor,
+  PositionWithComputedData,
+  ZobristKey,
+} from './types';
 
 export default class Core {
   private internalPosition: PositionWithComputedData;
@@ -39,14 +43,14 @@ export default class Core {
       const moves = [...this.moveStack.map((moveResult) => moveResult.move)];
 
       verifyAttackMap(
-        this.internalPosition.attackedSquares[Color.White],
+        this.internalPosition.squareControlByColor[Color.White],
         this.internalPosition,
         Color.White,
         moves,
         'makeMove',
       );
       verifyAttackMap(
-        this.internalPosition.attackedSquares[Color.Black],
+        this.internalPosition.squareControlByColor[Color.Black],
         this.internalPosition,
         Color.Black,
         moves,
@@ -72,14 +76,14 @@ export default class Core {
       ];
 
       verifyAttackMap(
-        this.internalPosition.attackedSquares[Color.White],
+        this.internalPosition.squareControlByColor[Color.White],
         this.internalPosition,
         Color.White,
         moves,
         'unmakeMove',
       );
       verifyAttackMap(
-        this.internalPosition.attackedSquares[Color.Black],
+        this.internalPosition.squareControlByColor[Color.Black],
         this.internalPosition,
         Color.Black,
         moves,
@@ -102,7 +106,7 @@ export default class Core {
     return generateMoves(
       this.internalPosition.pieces,
       this.internalPosition.turn,
-      this.internalPosition.attackedSquares,
+      this.internalPosition.squareControlByColor,
       this.internalPosition.absolutePins[this.internalPosition.turn],
       this.internalPosition.kings,
       this.checks(this.internalPosition.turn),
@@ -133,7 +137,10 @@ export default class Core {
     const king = this.internalPosition.kings[color];
     const checks: SquareControl[] = [];
     if (king) {
-      for (const [, squareControl] of this.internalPosition.attackedSquares[
+      for (const [
+        ,
+        squareControl,
+      ] of this.internalPosition.squareControlByColor[
         flipColor(color)
       ].controlOfSquare(king)) {
         checks.push(squareControl);
@@ -142,8 +149,8 @@ export default class Core {
     return checks;
   }
 
-  get attacks(): AttackedSquares {
-    return this.internalPosition.attackedSquares;
+  get attacks(): SquareControlByColor {
+    return this.internalPosition.squareControlByColor;
   }
 
   get pins(): Pin[] {
@@ -159,13 +166,13 @@ export default class Core {
 }
 
 const verifyAttackMap = (
-  map: AttackMap,
+  map: SquareControlMap,
   position: Position,
   color: Color,
   moves: Move[],
   lastAction: 'makeMove' | 'unmakeMove',
 ) => {
-  const computed = new AttackMap(position, color);
+  const computed = new SquareControlMap(position, color);
 
   // Note: this code is broken because the equal function wants arrays to be
   // in the same order which they are not.

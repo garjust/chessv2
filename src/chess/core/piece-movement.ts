@@ -8,7 +8,7 @@ import {
   Square,
   SquareControl,
 } from '../types';
-import AttackMap from './attack-map';
+import SquareControlMap from './square-control-map';
 import {
   CASTLING_KING_MOVES,
   KING_MOVES,
@@ -83,7 +83,7 @@ export const kingCastlingMoves = (
   pieces: Map<Square, Piece>,
   piece: Piece,
   from: Square,
-  opponentAttackMap: AttackMap,
+  opponentAttackMap: SquareControlMap,
   castlingState: CastlingState,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];

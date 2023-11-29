@@ -1,6 +1,6 @@
 import { Color, Position } from '../types';
 import { copyPosition, findKing } from '../utils';
-import AttackMap from './attack-map';
+import SquareControlMap from './square-control-map';
 import Pins from './pins';
 import { KingSquares, PositionWithComputedData } from './types';
 
@@ -15,9 +15,9 @@ const computeExtraPositionData = (
     [Color.Black]: blackKing,
   };
 
-  const attackedSquares = {
-    [Color.White]: new AttackMap(position, Color.White),
-    [Color.Black]: new AttackMap(position, Color.Black),
+  const squareControlByColor = {
+    [Color.White]: new SquareControlMap(position, Color.White),
+    [Color.Black]: new SquareControlMap(position, Color.Black),
   };
 
   const absolutePins = {
@@ -29,7 +29,7 @@ const computeExtraPositionData = (
     ...position,
     kings,
     absolutePins,
-    attackedSquares,
+    squareControlByColor,
   };
 };
 

@@ -9,7 +9,7 @@ import {
   SquareControl,
 } from '../types';
 import { flipColor, isPromotionPositionPawn } from '../utils';
-import AttackMap from './attack-map';
+import SquareControlMap from './square-control-map';
 import {
   expandPromotions,
   isMoveIncidentWithCheck,
@@ -17,14 +17,14 @@ import {
 } from './move-utils';
 import { kingCastlingMoves, pawnAdvanceMoves } from './piece-movement';
 import Pins from './pins';
-import { KingSquares, AttackedSquares } from './types';
+import { KingSquares, SquareControlByColor } from './types';
 
 const pseudoMovesForPosition = (
   pieces: Map<Square, Piece>,
   color: Color,
   enPassantSquare: Square | null,
   castlingState: CastlingState,
-  attackedSquares: AttackedSquares,
+  squareControlByColor: SquareControlByColor,
 ): MoveWithExtraData[] => {
   const moves: MoveWithExtraData[] = [];
 
@@ -33,7 +33,7 @@ const pseudoMovesForPosition = (
       continue;
     }
 
-    const attacks = attackedSquares[piece.color].controlForPiece(square);
+    const attacks = squareControlByColor[piece.color].controlForPiece(square);
 
     for (const squareControl of attacks) {
       const attackedPiece = pieces.get(squareControl.to);
@@ -73,7 +73,7 @@ const pseudoMovesForPosition = (
           pieces,
           piece,
           square,
-          attackedSquares[flipColor(color)],
+          squareControlByColor[flipColor(color)],
           castlingState,
         ),
       );
@@ -123,7 +123,7 @@ const moveLeavesKingInCheck = (
   move: MoveWithExtraData,
   pins: Pins,
   checks: SquareControl[],
-  opponentAttackMap: AttackMap,
+  opponentAttackMap: SquareControlMap,
 ): boolean => {
   if (move.piece.type === PieceType.King) {
     // The piece moving is the king. We need to make sure the square it is
@@ -166,7 +166,7 @@ const moveLeavesKingInCheck = (
 export const generateMoves = (
   pieces: Map<Square, Piece>,
   color: Color,
-  attackedSquares: AttackedSquares,
+  squareControlByColor: SquareControlByColor,
   pins: Pins,
   kings: KingSquares,
   checks: SquareControl[],
@@ -180,7 +180,7 @@ export const generateMoves = (
     color,
     enPassantSquare,
     checks.length > 0 ? CASTLING_BLOCKED : castlingAvailability,
-    attackedSquares,
+    squareControlByColor,
   );
 
   if (kingSquare) {
@@ -198,7 +198,7 @@ export const generateMoves = (
           move,
           pins,
           checks,
-          attackedSquares[flipColor(color)],
+          squareControlByColor[flipColor(color)],
         )
       ) {
         moves.splice(i, 1);
