@@ -29,6 +29,16 @@ A chess engine can be loaded in two ways:
 - Tests for CurrentZobrist via applyMove
   - Ensure number is equal when arriving at same position through different
   paths
+- Using WASM means getting into TypedArrays. What if I just implmenet a HashMap
+  for the TTable by hand backed by a block of memory via TypedArray? This could be as fast as WASM (faster?).
+    - How is concurrency impacted if trying to make a concurrent safe TTable?
+  - Keys into the map are going to be 32bits or less because of memory. Therefore I just need a hashing function to convert the key tuple [32bit, 32bit] into a single 32bit number
+  - Indeed the current WASM TTable is using a std collection HashMap which is likely really poor (it grows and stuff)
+  1. Work on the TTable entry representation getting it packed into bits the way
+  it needs to be for the WASM TTable. Then getting an entry that can go into WASM will be the same as getting an entry into a homerolled TypedArray.
+  2. Implement a hashing function for the key tuple given a memory size.
+  3. Combine and profit.
+
 
 ### Old thoughts
 

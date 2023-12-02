@@ -1,0 +1,34 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export function __wbg_managedkey_free(a: number): void;
+export function __wbg_get_managedkey_key(a: number): number;
+export function managedkey_new(a: number): number;
+export function managedkey_pushKey(a: number): void;
+export function managedkey_popKey(a: number, b: number): void;
+export function managedkey_updateTurn(a: number): void;
+export function managedkey_updateEnPassantFile(a: number, b: number): void;
+export function managedkey_updateCastlingState(a: number, b: number): void;
+export function managedkey_updateSquareOccupancy(a: number, b: number, c: number, d: number): void;
+export function __wbg_stats_free(a: number): void;
+export function __wbg_get_stats_hits(a: number): number;
+export function __wbg_get_stats_miss(a: number): number;
+export function __wbg_get_stats_type1(a: number): number;
+export function __wbg_ttable_free(a: number): void;
+export function ttable_new(a: number): number;
+export function ttable_currentKey(a: number): number;
+export function ttable_stats(a: number): number;
+export function ttable_get(a: number, b: number): void;
+export function ttable_getPtr(a: number): number;
+export function ttable_getAsU64(a: number): number;
+export function ttable_set(a: number, b: number, c: number): void;
+export function ttable_key(a: number): number;
+export function ttable_pushKey(a: number): void;
+export function ttable_popKey(a: number, b: number): void;
+export function ttable_updateTurn(a: number): void;
+export function ttable_updateEnPassantFile(a: number, b: number): void;
+export function ttable_updateCastlingState(a: number, b: number): void;
+export function ttable_updateSquareOccupancy(a: number, b: number, c: number, d: number): void;
+export function __wbindgen_add_to_stack_pointer(a: number): number;
+export function __wbindgen_free(a: number, b: number, c: number): void;
+export function __wbindgen_malloc(a: number, b: number): number;
