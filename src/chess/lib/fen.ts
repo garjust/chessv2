@@ -1,5 +1,5 @@
-import { CastlingMask } from '../castling';
 import {
+  CastlingState,
   Color,
   Piece,
   PieceType,
@@ -201,16 +201,16 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
 
   let castlingState = 0b0000;
   if (castlingAvailability.includes('K')) {
-    castlingState |= CastlingMask.WhiteKingside;
+    castlingState |= CastlingState.White_OO;
   }
   if (castlingAvailability.includes('Q')) {
-    castlingState |= CastlingMask.WhiteQueenside;
+    castlingState |= CastlingState.White_OOO;
   }
   if (castlingAvailability.includes('k')) {
-    castlingState |= CastlingMask.BlackKingside;
+    castlingState |= CastlingState.Black_OO;
   }
   if (castlingAvailability.includes('q')) {
-    castlingState |= CastlingMask.BlackQueenside;
+    castlingState |= CastlingState.Black_OOO;
   }
 
   return Object.freeze({
@@ -228,10 +228,10 @@ export const parseFEN = (fenString: 'startpos' | string): Position => {
 
 export const formatPosition = (position: Position): string => {
   const castlingAvailability = [
-    (position.castlingState & CastlingMask.WhiteKingside) > 0 ? 'K' : '',
-    (position.castlingState & CastlingMask.WhiteQueenside) > 0 ? 'Q' : '',
-    (position.castlingState & CastlingMask.BlackKingside) > 0 ? 'k' : '',
-    (position.castlingState & CastlingMask.BlackQueenside) > 0 ? 'q' : '',
+    (position.castlingState & CastlingState.White_OO) > 0 ? 'K' : '',
+    (position.castlingState & CastlingState.White_OOO) > 0 ? 'Q' : '',
+    (position.castlingState & CastlingState.Black_OO) > 0 ? 'k' : '',
+    (position.castlingState & CastlingState.Black_OOO) > 0 ? 'q' : '',
   ].join('');
 
   return [

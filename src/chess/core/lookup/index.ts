@@ -23,3 +23,7 @@ export {
   QUEEN_MOVE_BITARRAYS,
   SUPER_MOVE_BITARRAYS,
 } from './bitarrays';
+
+// Piece objects that are needed in the chess core we don't want to create
+// every time.
+export { PIECES } from './piece-constants';

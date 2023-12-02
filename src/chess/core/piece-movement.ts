@@ -1,4 +1,3 @@
-import { CastlingMask } from '../castling';
 import {
   CastlingState,
   DirectionUnit,
@@ -22,6 +21,7 @@ import {
   ROOK_RAY_MOVES,
 } from './lookup/piece-moves';
 import { rayControlScanner } from './move-utils';
+import { isKingsideOn, isQueensideOn } from '../lib/castling';
 
 export const controlForPiece = (
   piece: Piece,
@@ -91,7 +91,7 @@ export const kingCastlingMoves = (
   // Check if castling is possible and there are no pieces between the king
   // and the corresponding rook.
   if (
-    (castlingState & (CastlingMask.WhiteKingside << (piece.color * 2))) > 0 &&
+    isKingsideOn(castlingState, piece.color) &&
     // Check squares being castled through are empty
     !pieces.has(from + DirectionUnit.Right) &&
     !pieces.has(from + DirectionUnit.Right * 2) &&
@@ -103,7 +103,7 @@ export const kingCastlingMoves = (
     moves.push(CASTLING_KING_MOVES[piece.color].kingside);
   }
   if (
-    (castlingState & (CastlingMask.WhiteQueenside << (piece.color * 2))) > 0 &&
+    isQueensideOn(castlingState, piece.color) &&
     // Check squares being castled through are empty
     !pieces.has(from + DirectionUnit.Left) &&
     !pieces.has(from + DirectionUnit.Left * 2) &&

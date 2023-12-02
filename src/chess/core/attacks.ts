@@ -19,7 +19,7 @@ import { directionOfMove, rayControlScanner } from './move-utils';
 import { controlForPiece } from './piece-movement';
 import { SquareControlByColor } from './types';
 import SquareControlMap from './square-control-map';
-import { PIECES } from '../piece-consants';
+import { PIECES } from './lookup';
 
 const sliderHasVision = (piece: Piece, pieceSquare: Square, square: Square) => {
   switch (piece.type) {

@@ -1,11 +1,10 @@
-import { CASTLING_BLOCKED } from '../castling';
 import {
+  CastlingState,
   Color,
   MoveWithExtraData,
   Piece,
   PieceType,
   Square,
-  CastlingState,
   SquareControl,
 } from '../types';
 import { flipColor, isPromotionPositionPawn } from '../utils';
@@ -173,7 +172,7 @@ export const generateMoves = (
     position.pieces,
     position.turn,
     position.enPassantSquare,
-    checks.length > 0 ? CASTLING_BLOCKED : position.castlingState,
+    checks.length > 0 ? CastlingState.None : position.castlingState,
     position.squareControlByColor,
   );
 

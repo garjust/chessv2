@@ -1,4 +1,4 @@
-import { Color, PieceType } from './types';
+import { Color, PieceType } from '../../types';
 
 export const PIECES = {
   [Color.White]: {

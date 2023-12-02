@@ -1,5 +1,10 @@
-import { CastlingMask, ROOK_STARTING_SQUARES } from '../castling';
-import { PIECES } from '../piece-consants';
+import {
+  ROOK_STARTING_SQUARES,
+  castlingOff,
+  kingsideOff,
+  queensideOff,
+} from '../lib/castling';
+import { PIECES } from './lookup';
 import {
   CastlingState,
   Color,
@@ -93,14 +98,14 @@ export const applyMove = (
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
       if (move.to === ROOK_STARTING_SQUARES[captured.color].queenside) {
-        position.castlingState &= ~(
-          CastlingMask.WhiteQueenside <<
-          (captured.color * 2)
+        position.castlingState = queensideOff(
+          position.castlingState,
+          captured.color,
         );
       } else if (move.to === ROOK_STARTING_SQUARES[captured.color].kingside) {
-        position.castlingState &= ~(
-          CastlingMask.WhiteKingside <<
-          (captured.color * 2)
+        position.castlingState = kingsideOff(
+          position.castlingState,
+          captured.color,
         );
       }
     }
@@ -127,6 +132,7 @@ export const applyMove = (
     }
   }
 
+  // Update en passant square in the position
   if (isTwoSquarePawnMove(piece, move)) {
     position.enPassantSquare =
       piece.color === Color.White
@@ -142,28 +148,9 @@ export const applyMove = (
     position.kings[piece.color] = move.to;
 
     // The king moved, no more castling.
-    if (
-      (position.castlingState &
-        (CastlingMask.WhiteQueenside << (piece.color * 2))) >
-      0
-    ) {
-      currentZobrist.updateCastling(piece.color, 'queenside');
-      position.castlingState &= ~(
-        CastlingMask.WhiteQueenside <<
-        (piece.color * 2)
-      );
-    }
-    if (
-      (position.castlingState &
-        (CastlingMask.WhiteKingside << (piece.color * 2))) >
-      0
-    ) {
-      currentZobrist.updateCastling(piece.color, 'kingside');
-      position.castlingState &= ~(
-        CastlingMask.WhiteKingside <<
-        (piece.color * 2)
-      );
-    }
+    position.castlingState = castlingOff(position.castlingState, piece.color);
+    currentZobrist.updateCastling(piece.color, 'queenside');
+    currentZobrist.updateCastling(piece.color, 'kingside');
 
     // If the king move is a castle we need to move the corresponding rook.
     if (move.from - move.to === 2) {
@@ -182,37 +169,30 @@ export const applyMove = (
 
       position.pieces.delete(castlingRookMove.from);
       position.pieces.set(castlingRookMove.to, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.from, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.to, rook);
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.from,
+      );
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.to,
+      );
     }
   }
 
   // If the moved piece is a rook update castling state.
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
-      if (
-        (position.castlingState &
-          (CastlingMask.WhiteQueenside << (piece.color * 2))) >
-        0
-      ) {
-        currentZobrist.updateCastling(piece.color, 'queenside');
-        position.castlingState &= ~(
-          CastlingMask.WhiteQueenside <<
-          (piece.color * 2)
-        );
-      }
+      position.castlingState = queensideOff(
+        position.castlingState,
+        piece.color,
+      );
+      currentZobrist.updateCastling(piece.color, 'queenside');
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
-      if (
-        (position.castlingState &
-          (CastlingMask.WhiteKingside << (piece.color * 2))) >
-        0
-      ) {
-        currentZobrist.updateCastling(piece.color, 'kingside');
-        position.castlingState &= ~(
-          CastlingMask.WhiteKingside <<
-          (piece.color * 2)
-        );
-      }
+      position.castlingState = kingsideOff(position.castlingState, piece.color);
+      currentZobrist.updateCastling(piece.color, 'kingside');
     }
   }
 
