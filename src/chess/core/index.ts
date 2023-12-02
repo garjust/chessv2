@@ -13,17 +13,15 @@ import {
 } from '../types';
 import { flipColor } from '../utils';
 import SquareControlMap from './square-control-map';
-import CurrentZobrist from './current-zobrist';
 import { evaluate } from './evaluation';
 import { DEBUG_FLAG } from './global-config';
 import { applyMove, MoveResult, undoMove } from './move-execution';
 import { generateMoves } from './move-generation';
 import { copyToInternal, copyToExternal } from './position';
-import {
-  SquareControlByColor,
-  PositionWithComputedData,
-  ZobristKey,
-} from './types';
+import { SquareControlByColor, PositionWithComputedData } from './types';
+import { CurrentZobrist } from '../lib/zobrist/types';
+import { Int32TupleZobrist } from '../lib/zobrist/int32-tuple-zobrist';
+import { setFromPosition } from '../lib/zobrist/utils';
 
 export default class Core {
   private internalPosition: PositionWithComputedData;
@@ -32,7 +30,8 @@ export default class Core {
 
   constructor(position: Position = parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN)) {
     this.internalPosition = copyToInternal(position);
-    this.currentZobrist = new CurrentZobrist(position);
+    this.currentZobrist = new Int32TupleZobrist();
+    setFromPosition(this.currentZobrist, position);
   }
 
   applyMove(move: Move): Piece | undefined {
@@ -95,12 +94,16 @@ export default class Core {
 
   set position(position: Position) {
     this.internalPosition = copyToInternal(position);
-    this.currentZobrist = new CurrentZobrist(position);
+    setFromPosition(this.currentZobrist, position);
     this.moveStack = [];
   }
 
-  get zobrist(): ZobristKey {
-    return this.currentZobrist.key;
+  get zobrist() {
+    return this.currentZobrist;
+  }
+
+  set zobrist(newZobrist: CurrentZobrist) {
+    this.currentZobrist = newZobrist;
   }
 
   checks(color: Color): SquareControl[] {

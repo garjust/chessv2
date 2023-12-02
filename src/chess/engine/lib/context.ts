@@ -51,6 +51,7 @@ export default class Context {
     this.reporter = reporter;
     this.core = new Core();
     this.state = new State();
+    this.core.zobrist = this.state.tTable.currentKey;
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
   }
 
@@ -100,7 +101,7 @@ export default class Context {
         this.core.position.pieces,
         moves,
         this.configuration.moveOrderingHeuristics.hashMove
-          ? this.state.tTable.get(this.core.zobrist)?.move
+          ? this.state.tTable.get()?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
           ? this.state.pvMove(currentDepth)

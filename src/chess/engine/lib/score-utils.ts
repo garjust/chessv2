@@ -1,8 +1,7 @@
 import Core from '../../core';
 import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
-import TranspositionTable from './transposition-table';
-import { NodeType, TranspositionTableEntry } from './types';
+import { NodeType, TranspositionTable, TranspositionTableEntry } from './types';
 
 export const humanEvaluation = (score: number, maxDepth: number): string => {
   let str: number | string = score;
@@ -27,7 +26,7 @@ export const extractPV = (
 
   // Probe the transposition table until we are no longer at a PV-node.
   for (; i < Infinity; i++) {
-    const entry = table.get(engine.zobrist);
+    const entry = table.get();
     if (entry?.nodeType === NodeType.PV && entry?.move) {
       pv.push(entry.move);
     } else {

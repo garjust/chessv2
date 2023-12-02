@@ -7,7 +7,7 @@ import { moveFromString } from '../move-notation';
 test('vienna accepted game', () => {
   const engine = new Core(parseFEN(FEN_LIBRARY.STARTING_POSITION_FEN));
   const moves = VIENNA_GAMBIT_ACCEPTED_GAME.map(moveFromString);
-  const initialZobrist = engine.zobrist;
+  const initialZobrist = engine.zobrist.key;
 
   for (const move of moves) {
     engine.applyMove(move);
@@ -17,5 +17,5 @@ test('vienna accepted game', () => {
     engine.undoLastMove();
   }
 
-  expect(engine.zobrist).toEqual(initialZobrist);
+  expect(engine.zobrist.key).toEqual(initialZobrist);
 });

@@ -1,3 +1,4 @@
+import { CurrentZobrist } from '../../lib/zobrist/types';
 import { Move } from '../../types';
 
 // Object returned from the search function
@@ -37,6 +38,17 @@ export type TranspositionTableEntry = {
   score: number;
   move?: Move;
 };
+
+export interface TranspositionTable<T> {
+  get: () => T | undefined;
+  set: (value: T) => void;
+  currentKey: CurrentZobrist;
+  stats: () => {
+    hits: number;
+    miss: number;
+    type1: number;
+  };
+}
 
 export type SearchConfiguration = {
   // Enable pruning of branches in the search tree.
