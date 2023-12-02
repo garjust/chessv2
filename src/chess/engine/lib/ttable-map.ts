@@ -50,6 +50,7 @@ export default class TTableMap<T> implements TranspositionTable<T> {
       hits: this.hits,
       miss: this.miss,
       type1: this.type1,
+      size: this.map.size,
     };
   }
 }

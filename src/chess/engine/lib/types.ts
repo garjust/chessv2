@@ -47,6 +47,7 @@ export interface TranspositionTable<T> {
     hits: number;
     miss: number;
     type1: number;
+    size: number;
   };
 }
 

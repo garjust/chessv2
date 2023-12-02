@@ -26,9 +26,6 @@ A chess engine can be loaded in two ways:
 
 ## TODO
 
-- Tests for CurrentZobrist via applyMove
-  - Ensure number is equal when arriving at same position through different
-  paths
 - Using WASM means getting into TypedArrays. What if I just implmenet a HashMap
   for the TTable by hand backed by a block of memory via TypedArray? This could be as fast as WASM (faster?).
     - How is concurrency impacted if trying to make a concurrent safe TTable?

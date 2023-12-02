@@ -16,6 +16,7 @@ const numbers = (n: number): number[] => {
 };
 
 const N = 1 + 8 + 16 + 64 * 6 * 2; // 793
+const NUMBERS = [numbers(N), numbers(N)];
 
 export const squareOccupancyIndex = (
   color: Color,
@@ -33,8 +34,8 @@ export class Int32TupleZobrist implements CurrentZobrist {
   private keyYStack: number[] = [];
 
   constructor() {
-    this.zobristNumbersX = numbers(N);
-    this.zobristNumbersY = numbers(N);
+    this.zobristNumbersX = NUMBERS[0];
+    this.zobristNumbersY = NUMBERS[1];
 
     this.keyX = 0;
     this.keyY = 0;

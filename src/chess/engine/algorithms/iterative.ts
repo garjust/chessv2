@@ -95,6 +95,7 @@ export default class Iterative implements SearchInterface {
         this.diagnostics.result?.evaluation,
         this.diagnostics?.result?.principleVariation,
       );
+      this.logger.debug('ttable', this.context.state.tTable.stats());
       this.logger.debug('remaining time', await timer.value);
     }
 
