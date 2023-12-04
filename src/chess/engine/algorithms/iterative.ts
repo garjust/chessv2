@@ -48,7 +48,7 @@ export default class Iterative implements SearchInterface {
       },
       pruneFromTTable: true,
     });
-    this.logger = new Logger('iterative-executor');
+    this.logger = new Logger('iterative');
   }
 
   get diagnosticsResult() {
