@@ -23,8 +23,8 @@ import { CurrentZobrist } from '../lib/zobrist/types';
 import { Int32TupleZobrist } from '../lib/zobrist/int32-tuple-zobrist';
 import { setFromPosition } from '../lib/zobrist/utils';
 
-import { verifyEnums } from './wasm-chess-verify';
-verifyEnums();
+// import { verifyEnums } from './wasm-chess-verify';
+// verifyEnums();
 
 export default class Core {
   private internalPosition: PositionWithComputedData;

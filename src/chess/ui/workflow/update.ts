@@ -47,7 +47,7 @@ import {
 import { EVALUATION_DIVIDER } from '../../core/evaluation';
 import { LATEST } from '../../engine/search-executor';
 import { Version } from '../../engine/search-executor';
-import { UCIResponseType } from '../../engine/workflow/uci-response';
+import { UCIResponseType, toUCI } from '../../engine/workflow/uci-response';
 import * as EngineWorkflow from '../../engine/workflow';
 import { Engine } from '../../engine/engine';
 import { delayEmit } from '../../../rx-workflow/util';
@@ -178,7 +178,10 @@ function handleEngineResponse(
         null,
       ];
     case UCIResponseType.Info:
-      logger.debug(`info from ${action.engineId}`, response.info);
+      logger.debug(
+        `uci-info ${action.engineId}\n`,
+        `${toUCI(response).join()}`,
+      );
       return [state, null];
     case UCIResponseType.Option:
       return [state, null];

@@ -30,7 +30,8 @@ export type InfoKey =
   // the hash is x permill full, the engine should send this info regularly
   | 'hashfull'
   // x nodes per second searched, the engine should send this info regularly
-  | 'nps';
+  | 'nps'
+  | 'string';
 
 export type Info = Partial<Record<InfoKey, string>>;
 
@@ -51,7 +52,7 @@ export type UCIResponse =
   | { type: UCIResponseType.BestMove; move: Move; ponder?: Move }
   | { type: UCIResponseType.CopyProtection }
   | { type: UCIResponseType.Registration }
-  | { type: UCIResponseType.Info; info: Record<InfoKey, string> }
+  | { type: UCIResponseType.Info; info: Info }
   | { type: UCIResponseType.Option; name: EngineOptionName };
 
 const toUCIString = (response: UCIResponse): string[] => {

@@ -6,6 +6,7 @@ import { TestFens, MoveTest } from '../lib/perft';
 import './Debug.css';
 import { loadPerftWorker, loadSearchExecutorWorker } from '../workers';
 import { proxy } from 'comlink';
+import { UCIResponseType, toUCI } from '../engine/workflow/uci-response';
 
 const ENGINE_DEPTH = 4;
 
@@ -21,8 +22,7 @@ async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
     proxy((info) => {
-      logger.next(`${info}`);
-      console.log(info);
+      logger.next(toUCI({ type: UCIResponseType.Info, info })[0]);
     }),
   );
 
@@ -31,17 +31,17 @@ async function runSingleEngineNextMoveTest(logger: Observer<string>) {
     FEN_LIBRARY.VIENNA_OPENING_FEN,
     FEN_LIBRARY.PERFT_5_FEN,
     FEN_LIBRARY.BLACK_CHECKMATE_FEN,
+    FEN_LIBRARY.FIXED_PAWN_ENDGAME_FEN,
   ];
 
   for (const fen of fens) {
     await searchExecutor.nextMove(parseFEN(fen), [], Number.MAX_SAFE_INTEGER, {
       depth: ENGINE_DEPTH,
     });
+    logger.next('--');
   }
 
   cleanup();
-
-  logger.next('--');
 }
 
 const Debug = () => {

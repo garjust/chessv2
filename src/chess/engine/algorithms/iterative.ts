@@ -12,6 +12,7 @@ import {
   SearchLimit,
 } from '../search-interface';
 import { MAX_DEPTH } from '../lib/state';
+import { formatNumber } from '../../../lib/formatter';
 
 const INITIAL_DEPTH = 1;
 
@@ -89,14 +90,21 @@ export default class Iterative implements SearchInterface {
       }
 
       this.diagnostics = diagnostics;
-      this.logger.debug(
-        'intermediate result:',
-        this.diagnostics?.result?.logStringLight,
-        this.diagnostics.result?.evaluation,
-        this.diagnostics?.result?.principleVariation,
-      );
-      this.logger.debug('ttable', this.context.state.tTable.stats());
-      this.logger.debug('remaining time', await timer.value);
+      if (diagnostics.result) {
+        this.context.reporter({
+          depth: diagnostics.result.depth.toString(),
+          score: diagnostics.result.evaluation,
+          time: diagnostics.result.timing.toString(),
+          nodes: diagnostics.result.totalNodes.toString(),
+          nps: (
+            (diagnostics.result.totalNodes / diagnostics.result.timing) *
+            1000
+          ).toFixed(0),
+          pv: diagnostics.result.principleVariation?.join(' '),
+        });
+        this.logger.debug('full diagnostic result', diagnostics.result);
+        this.logger.debug(`remaining time: ${(await timer.value).toFixed(0)}`);
+      }
     }
 
     timerCleanup();

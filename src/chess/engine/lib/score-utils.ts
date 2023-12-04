@@ -3,15 +3,14 @@ import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
 import { NodeType, TranspositionTable, TranspositionTableEntry } from './types';
 
-export const humanEvaluation = (score: number, maxDepth: number): string => {
-  let str: number | string = score;
-  if (str >= MATE_SCORE) {
-    str = `+M${(maxDepth - (str - MATE_SCORE) + 1) / 2}`;
-  } else if (str <= -1 * MATE_SCORE) {
-    str = `-M${(maxDepth - (str + MATE_SCORE)) / 2}`;
+export const uciInfoEvaluation = (score: number, maxDepth: number): string => {
+  let str: string;
+  if (score >= MATE_SCORE) {
+    str = `mate ${(maxDepth - (score - MATE_SCORE) + 1) / 2}`;
+  } else if (score <= -1 * MATE_SCORE) {
+    str = `mate -${(maxDepth - (score + MATE_SCORE)) / 2}`;
   } else {
-    str /= EVALUATION_DIVIDER;
-    str = str.toString();
+    str = `cp ${score / EVALUATION_DIVIDER}`;
   }
 
   return str;
