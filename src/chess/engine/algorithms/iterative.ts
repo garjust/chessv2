@@ -12,7 +12,6 @@ import {
   SearchLimit,
 } from '../search-interface';
 import { MAX_DEPTH } from '../lib/state';
-import { formatNumber } from '../../../lib/formatter';
 
 const INITIAL_DEPTH = 1;
 
