@@ -1,12 +1,11 @@
-import { ROOK_STARTING_SQUARES } from '../../castling';
-import { CastlingData, Color, MoveWithExtraData, PieceType } from '../../types';
-import { buildMove } from '../move-utils';
+import { ROOK_STARTING_SQUARES } from '../../lib/castling';
+import { Color, PieceType } from '../../types';
 
 /**
  * Set of pre-created moves a rook makes when participating
  * in a castling.
  */
-export const CASTLING_ROOK_MOVES: CastlingData<MoveWithExtraData> = {
+export const CASTLING_ROOK_MOVES = {
   [Color.White]: {
     kingside: {
       piece: { color: Color.White, type: PieceType.Rook },
@@ -37,7 +36,7 @@ export const CASTLING_ROOK_MOVES: CastlingData<MoveWithExtraData> = {
   },
 } as const;
 
-export const CASTLING_KING_MOVES: CastlingData<MoveWithExtraData> = {
+export const CASTLING_KING_MOVES = {
   [Color.White]: {
     kingside: {
       piece: { color: Color.White, type: PieceType.King },

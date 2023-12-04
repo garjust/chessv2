@@ -2051,7 +2051,9 @@ __metadata:
     typescript: ^5.2.2
     vite: ^4.5.0
     vite-plugin-svgr: ^3.3.0
+    vite-plugin-wasm: ^3.2.2
     vitest: ^0.34.6
+    wasm-chess: "file:./vendor/wasm-chess"
     web-vitals: ^3.5.0
   languageName: unknown
   linkType: soft
@@ -5747,6 +5749,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vite-plugin-wasm@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "vite-plugin-wasm@npm:3.2.2"
+  peerDependencies:
+    vite: ^2 || ^3 || ^4
+  checksum: ed9b56b3cd47e6376c21592f4d24f818334d5796226f6c1dfca89a4f744d69a34cb85dd5e06f164a2670827113ccfa5f03d0361e51210012706123374b0f8277
+  languageName: node
+  linkType: hard
+
 "vite@npm:^3.0.0 || ^4.0.0 || ^5.0.0-0, vite@npm:^3.1.0 || ^4.0.0 || ^5.0.0-0":
   version: 5.0.0-beta.19
   resolution: "vite@npm:5.0.0-beta.19"
@@ -5884,6 +5895,13 @@ __metadata:
   bin:
     vitest: vitest.mjs
   checksum: 45f5c1987fa8c76dbaf5db379bbdb4f6e3713c484e850149af38247b627e70016c1863286fd7fcfab08a1d98430f66ba1f45af6f14f5c467ded4b1ea6f26afa3
+  languageName: node
+  linkType: hard
+
+"wasm-chess@file:./vendor/wasm-chess::locator=chessv2%40workspace%3A.":
+  version: 0.1.0
+  resolution: "wasm-chess@file:./vendor/wasm-chess#./vendor/wasm-chess::hash=699b8b&locator=chessv2%40workspace%3A."
+  checksum: db9bd3dbca2d05827c1b33cceaef14b1ea4219b34951a2b7ec37d352ad746206d6defdc9dbc064553ad8df052af9a035c7c463d5b8d1b4000200c0caa658d201
   languageName: node
   linkType: hard
 

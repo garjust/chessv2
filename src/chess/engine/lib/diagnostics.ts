@@ -1,6 +1,6 @@
 import { formatNumber } from '../../../lib/formatter';
 import { moveString } from '../../move-notation';
-import { humanEvaluation } from './score-utils';
+import { uciInfoEvaluation } from './score-utils';
 import State from './state';
 import SearchTree from './tree-diagnostics';
 import { NodeType, SearchResult } from './types';
@@ -36,8 +36,7 @@ const emptyPlyCounter = (): PlyCounter => ({
 
 export type DiagnosticsResult = {
   label: string;
-  logString: string;
-  logStringLight: string;
+  logStringTTable: string;
   move: string;
   evaluation: string;
   moveScores: MoveScores;
@@ -122,21 +121,23 @@ export default class Diagnotics {
           tTable: state.tTable,
         }
       : undefined;
+    const ttableStats = stateData?.tTable.stats();
 
     const diagnosticsResults: DiagnosticsResult = {
       label: this.label,
-      logString: `${this.label} ${moveString(move)}: depth=${
-        this.maxDepth
-      }; timing=${formatNumber(timing)}ms; nodes=${formatNumber(
-        totalNodes,
-      )}; (${((timing / totalNodes) * 1000).toPrecision(
-        5,
-      )}μs/node); cuts=${formatNumber(totalCuts)}`,
-      logStringLight: `depth=${this.maxDepth}; timing=${formatNumber(
-        timing,
-      )}ms; nodes=${formatNumber(totalNodes)}`,
+      logStringTTable: ttableStats
+        ? `ttable: size=${formatNumber(
+            ttableStats.size,
+          )} :: hits=${formatNumber(ttableStats.hits)}, miss=${formatNumber(
+            ttableStats.miss,
+          )}, type1=${formatNumber(ttableStats.type1)} cachehit=${(
+            (ttableStats.hits /
+              (ttableStats.hits + ttableStats.miss + ttableStats.type1)) *
+            100
+          ).toFixed(2)}%`
+        : '',
       move: moveString(move),
-      evaluation: humanEvaluation(result.bestScore.score, this.maxDepth),
+      evaluation: uciInfoEvaluation(result.bestScore.score, this.maxDepth),
       moveScores: scores.map(({ move, score }) => ({
         move: moveString(move),
         score,

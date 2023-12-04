@@ -56,7 +56,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set(this.context.core.zobrist, {
+    this.context.state.tTable.set({
       nodeType: NodeType.PV,
       depth,
       score: alpha,
@@ -86,7 +86,7 @@ export default class Search {
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
 
-    const cacheHit = this.context.state.tTable.get(this.context.core.zobrist);
+    const cacheHit = this.context.state.tTable.get();
 
     // If we found this position in the TTable and it was a CUT node then we can
     // test against beta before move generation.
@@ -152,7 +152,7 @@ export default class Search {
       }
     }
 
-    this.context.state.tTable.set(this.context.core.zobrist, {
+    this.context.state.tTable.set({
       nodeType,
       depth,
       score: alpha,

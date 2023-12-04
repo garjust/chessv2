@@ -1,5 +1,11 @@
-import { CastlingMask, ROOK_STARTING_SQUARES } from '../castling';
-import { PIECES } from '../piece-consants';
+import {
+  ROOK_STARTING_SQUARES,
+  castlingOff,
+  kingsideOff,
+  queensideOff,
+} from '../lib/castling';
+import { CurrentZobrist } from '../lib/zobrist/types';
+import { PIECES } from './lookup';
 import {
   CastlingState,
   Color,
@@ -9,11 +15,10 @@ import {
   PieceType,
   Square,
 } from '../types';
-import { flipColor, isStartPositionPawn } from '../utils';
+import { fileIndexForSquare, flipColor, isStartPositionPawn } from '../utils';
 import { updateSquareControlMaps } from './attacks';
-import CurrentZobrist from './current-zobrist';
 import { CASTLING_ROOK_MOVES } from './lookup';
-import { PositionWithComputedData, ZobristKey } from './types';
+import { PositionWithComputedData } from './types';
 
 export type MoveResult = {
   move: Move;
@@ -23,7 +28,6 @@ export type MoveResult = {
     halfMoveCount: number;
     castlingState: CastlingState;
     enPassantSquare: Square | null;
-    zobrist?: ZobristKey;
   };
 };
 
@@ -64,9 +68,9 @@ export const applyMove = (
       castlingState: position.castlingState,
       enPassantSquare: position.enPassantSquare,
       halfMoveCount: position.halfMoveCount,
-      zobrist: currentZobrist.key,
     },
   };
+  currentZobrist.pushKey();
 
   // If the move is a pawn promoting it will have the promotion property set.
   // In this case swap out the piece before executing the move so we only insert
@@ -86,21 +90,21 @@ export const applyMove = (
   pieces.delete(move.from);
   pieces.set(move.to, piece);
 
-  currentZobrist.updateSquareOccupancy(move.from, piece);
-  currentZobrist.updateSquareOccupancy(move.to, piece);
+  currentZobrist.updateSquareOccupancy(piece.color, piece.type, move.from);
+  currentZobrist.updateSquareOccupancy(piece.color, piece.type, move.to);
 
   if (captured) {
     // If the captured piece is a rook we need to update castling state.
     if (captured.type === PieceType.Rook) {
       if (move.to === ROOK_STARTING_SQUARES[captured.color].queenside) {
-        position.castlingState &= ~(
-          CastlingMask.WhiteQueenside <<
-          (captured.color * 2)
+        position.castlingState = queensideOff(
+          position.castlingState,
+          captured.color,
         );
       } else if (move.to === ROOK_STARTING_SQUARES[captured.color].kingside) {
-        position.castlingState &= ~(
-          CastlingMask.WhiteKingside <<
-          (captured.color * 2)
+        position.castlingState = kingsideOff(
+          position.castlingState,
+          captured.color,
         );
       }
     }
@@ -127,6 +131,7 @@ export const applyMove = (
     }
   }
 
+  // Update en passant square in the position
   if (isTwoSquarePawnMove(piece, move)) {
     position.enPassantSquare =
       piece.color === Color.White
@@ -142,28 +147,7 @@ export const applyMove = (
     position.kings[piece.color] = move.to;
 
     // The king moved, no more castling.
-    if (
-      (position.castlingState &
-        (CastlingMask.WhiteQueenside << (piece.color * 2))) >
-      0
-    ) {
-      currentZobrist.updateCastling(piece.color, 'queenside');
-      position.castlingState &= ~(
-        CastlingMask.WhiteQueenside <<
-        (piece.color * 2)
-      );
-    }
-    if (
-      (position.castlingState &
-        (CastlingMask.WhiteKingside << (piece.color * 2))) >
-      0
-    ) {
-      currentZobrist.updateCastling(piece.color, 'kingside');
-      position.castlingState &= ~(
-        CastlingMask.WhiteKingside <<
-        (piece.color * 2)
-      );
-    }
+    position.castlingState = castlingOff(position.castlingState, piece.color);
 
     // If the king move is a castle we need to move the corresponding rook.
     if (move.from - move.to === 2) {
@@ -173,8 +157,16 @@ export const applyMove = (
 
       position.pieces.delete(castlingRookMove.from);
       position.pieces.set(castlingRookMove.to, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.from, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.to, rook);
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.from,
+      );
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.to,
+      );
     } else if (move.from - move.to === -2) {
       // kingside
       const rook = PIECES[piece.color][PieceType.Rook];
@@ -182,37 +174,28 @@ export const applyMove = (
 
       position.pieces.delete(castlingRookMove.from);
       position.pieces.set(castlingRookMove.to, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.from, rook);
-      currentZobrist.updateSquareOccupancy(castlingRookMove.to, rook);
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.from,
+      );
+      currentZobrist.updateSquareOccupancy(
+        rook.color,
+        rook.type,
+        castlingRookMove.to,
+      );
     }
   }
 
   // If the moved piece is a rook update castling state.
   if (piece.type === PieceType.Rook) {
     if (move.from === ROOK_STARTING_SQUARES[piece.color].queenside) {
-      if (
-        (position.castlingState &
-          (CastlingMask.WhiteQueenside << (piece.color * 2))) >
-        0
-      ) {
-        currentZobrist.updateCastling(piece.color, 'queenside');
-        position.castlingState &= ~(
-          CastlingMask.WhiteQueenside <<
-          (piece.color * 2)
-        );
-      }
+      position.castlingState = queensideOff(
+        position.castlingState,
+        piece.color,
+      );
     } else if (move.from === ROOK_STARTING_SQUARES[piece.color].kingside) {
-      if (
-        (position.castlingState &
-          (CastlingMask.WhiteKingside << (piece.color * 2))) >
-        0
-      ) {
-        currentZobrist.updateCastling(piece.color, 'kingside');
-        position.castlingState &= ~(
-          CastlingMask.WhiteKingside <<
-          (piece.color * 2)
-        );
-      }
+      position.castlingState = kingsideOff(position.castlingState, piece.color);
     }
   }
 
@@ -235,14 +218,6 @@ export const applyMove = (
     castlingRookMove,
   );
 
-  if (result.captured) {
-    currentZobrist.updateSquareOccupancy(
-      result.captured.square,
-      result.captured.piece,
-    );
-  }
-  currentZobrist.updateTurn();
-
   if (position.turn === Color.Black) {
     position.fullMoveCount++;
   }
@@ -252,6 +227,32 @@ export const applyMove = (
     position.halfMoveCount = 0;
   }
   position.turn = flipColor(position.turn);
+
+  // Final zobrist updates
+  if (result.captured) {
+    currentZobrist.updateSquareOccupancy(
+      result.captured.piece.color,
+      result.captured.piece.type,
+      result.captured.square,
+    );
+  }
+  if (result.previousState.castlingState !== position.castlingState) {
+    currentZobrist.updateCastlingState(result.previousState.castlingState);
+    currentZobrist.updateCastlingState(position.castlingState);
+  }
+  if (result.previousState.enPassantSquare !== position.enPassantSquare) {
+    if (result.previousState.enPassantSquare !== null) {
+      currentZobrist.updateEnPassantFile(
+        fileIndexForSquare(result.previousState.enPassantSquare),
+      );
+    }
+    if (position.enPassantSquare !== null) {
+      currentZobrist.updateEnPassantFile(
+        fileIndexForSquare(position.enPassantSquare),
+      );
+    }
+  }
+  currentZobrist.updateTurn();
 
   return result;
 };
@@ -305,10 +306,7 @@ export const undoMove = (
   position.squareControlByColor[Color.Black].revert();
   position.absolutePins[Color.White].revert();
   position.absolutePins[Color.Black].revert();
-
-  if (result.previousState.zobrist) {
-    currentZobrist.key = result.previousState.zobrist;
-  }
+  currentZobrist.popKey();
 
   // Undo rest of the position state.
   if (position.turn === Color.White) {

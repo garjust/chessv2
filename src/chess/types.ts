@@ -6,17 +6,40 @@
 export type Square = Readonly<number>;
 
 /**
+ * A rank on the chess board.
+ */
+export const enum SquareRank {
+  _1,
+  _2,
+  _3,
+  _4,
+  _5,
+  _6,
+  _7,
+  _8,
+}
+
+/**
+ * A file on the chess board.
+ */
+export const enum SquareFile {
+  _A,
+  _B,
+  _C,
+  _D,
+  _E,
+  _F,
+  _G,
+  _H,
+}
+
+/**
  * Color of a square or piece.
  */
 export const enum Color {
   White = 0,
   Black = 1,
 }
-
-export type ColorData<T> = Readonly<{
-  [Color.White]: T;
-  [Color.Black]: T;
-}>;
 
 /**
  * Type of piece.
@@ -32,6 +55,15 @@ export const enum PieceType {
   King = 6,
 }
 
+/**
+ * Types of pieces a pawn can promote to.
+ */
+export type PromotionOption =
+  | PieceType.Bishop
+  | PieceType.Knight
+  | PieceType.Queen
+  | PieceType.Rook;
+
 export type Piece = Readonly<{
   type: PieceType;
   color: Color;
@@ -41,6 +73,32 @@ export type SlidingPiece =
   | { color: Color; type: PieceType.Bishop }
   | { color: Color; type: PieceType.Rook }
   | { color: Color; type: PieceType.Queen };
+
+/**
+ * Castling state of the position represented as 4 bits.
+ */
+export enum CastlingState {
+  None = 0b0000,
+
+  White_OO = 0b0001,
+  White_OOO = 0b0010,
+  Black_OO = 0b0100,
+  Black_OOO = 0b1000,
+
+  White = White_OO | White_OOO,
+  Black = Black_OO | Black_OOO,
+  Kingside = White_OO | Black_OO,
+  Queenside = White_OOO | Black_OOO,
+
+  White_OO__Black_OOO = White_OO | Black_OOO,
+  White_OO__Black = White_OO | Black,
+  White_OOO__Black_OO = White_OOO | Black_OO,
+  White_OOO__Black = White_OOO | Black,
+  White__Black_OO = White | Black_OO,
+  White__Black_OOO = White | Black_OOO,
+
+  All = White | Black,
+}
 
 /**
  * Directions you can move on a board (or 2-dimensional grid).
@@ -87,12 +145,9 @@ export const enum DirectionUnit {
   DownRight = -7,
 }
 
-export type PromotionOption =
-  | PieceType.Bishop
-  | PieceType.Knight
-  | PieceType.Queen
-  | PieceType.Rook;
-
+/**
+ * Simplest representation of a move that can be applied by the chess core.
+ */
 export type Move = {
   from: Square;
   to: Square;
@@ -151,15 +206,6 @@ export type Pin = Readonly<{
   legalMoveSquares: Readonly<Square[]>;
 }>;
 
-export type CastlingSide = 'kingside' | 'queenside';
-
-export type CastlingData<T> = ColorData<{
-  kingside: T;
-  queenside: T;
-}>;
-
-export type CastlingState = number;
-
 /**
  * Fully represent a unique chess position.
  */
@@ -186,6 +232,11 @@ export type Position = {
    */
   fullMoveCount: number;
 };
+
+export type ColorData<T> = Readonly<{
+  [Color.White]: T;
+  [Color.Black]: T;
+}>;
 
 export type SquareLabel =
   | 'a1'

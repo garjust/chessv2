@@ -2,9 +2,10 @@ import { Remote } from 'comlink';
 import Timer from '../../../lib/timer';
 import HistoryTable from './history-table';
 import PVTable from './pv-table';
-import TranspositionTable from './transposition-table';
+import TTableMap from './ttable-map';
 import { Move } from '../../types';
-import { TranspositionTableEntry } from './types';
+import { TranspositionTable, TranspositionTableEntry } from './types';
+import { Int32TupleZobrist } from '../../lib/zobrist/int32-tuple-zobrist';
 
 // Communication with web workers is slow, too slow to do at every node.
 //
@@ -40,7 +41,7 @@ export default class State {
   constructor(maxDepth: number = MAX_DEPTH) {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
-    this.tTable = new TranspositionTable();
+    this.tTable = new TTableMap(new Int32TupleZobrist());
     this.pvTable = new PVTable(maxDepth);
   }
 

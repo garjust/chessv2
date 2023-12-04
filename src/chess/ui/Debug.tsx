@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Observer, Subject } from 'rxjs';
 import { LATEST } from '../engine/search-executor';
-import { Version } from '../engine/search-executor';
-import { Registry } from '../engine/search-executor';
-import { parseFEN } from '../lib/fen';
+import { FEN_LIBRARY, parseFEN } from '../lib/fen';
 import { TestFens, MoveTest } from '../lib/perft';
 import './Debug.css';
 import { loadPerftWorker, loadSearchExecutorWorker } from '../workers';
+import { proxy } from 'comlink';
+import { UCIResponseType, toUCI } from '../engine/workflow/uci-response';
 
-const EXCLUDED_VERSIONS: Version[] = ['random'];
 const ENGINE_DEPTH = 4;
 
 async function runMoveGenerationTest(
@@ -22,83 +21,27 @@ async function runMoveGenerationTest(
 async function runSingleEngineNextMoveTest(logger: Observer<string>) {
   const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
     LATEST,
-    (info) => {
-      logger.next(`${info}`);
-      console.log(info);
-    },
-  );
-
-  const tests = [
-    TestFens.STARTING_POSITION,
-    TestFens.VIENNA_OPENING,
-    TestFens.PERFT_POSITION_5,
-  ];
-
-  for (const test of tests) {
-    await searchExecutor.nextMove(
-      parseFEN(test.fen),
-      [],
-      Number.MAX_SAFE_INTEGER,
-      { depth: ENGINE_DEPTH },
-    );
-    // const diagnosticsResult = await searchExecutor.diagnosticsResult;
-    // if (diagnosticsResult) {
-    //   logger.next(diagnosticsResult.logString);
-    //   console.log(diagnosticsResult.label, diagnosticsResult);
-    // }
-  }
-
-  cleanup();
-
-  logger.next('--');
-}
-
-async function runEngineNextMoveTest(logger: Observer<string>, test: MoveTest) {
-  const searchExecutors = await Promise.all(
-    Object.keys(Registry).map(async (version) => {
-      const [searchExecutor, cleanup] = await loadSearchExecutorWorker(
-        version as Version,
-        () => {},
-      );
-      return {
-        version: version as Version,
-        searchExecutor,
-        cleanup,
-      };
+    proxy((info) => {
+      logger.next(toUCI({ type: UCIResponseType.Info, info })[0]);
     }),
   );
 
-  for (const { version, searchExecutor, cleanup } of searchExecutors) {
-    if (EXCLUDED_VERSIONS.includes(version)) {
-      continue;
-    }
+  const fens = [
+    FEN_LIBRARY.STARTING_POSITION_FEN,
+    FEN_LIBRARY.VIENNA_OPENING_FEN,
+    FEN_LIBRARY.PERFT_5_FEN,
+    FEN_LIBRARY.BLACK_CHECKMATE_FEN,
+    FEN_LIBRARY.FIXED_PAWN_ENDGAME_FEN,
+  ];
 
-    await searchExecutor.nextMove(
-      parseFEN(test.fen),
-      [],
-      Number.MAX_SAFE_INTEGER,
-      { depth: ENGINE_DEPTH },
-    );
-
-    // const diagnosticsResult = await searchExecutor.diagnosticsResult;
-    // if (diagnosticsResult) {
-    //   logger.next(diagnosticsResult.logString);
-    //   console.log(diagnosticsResult.label, diagnosticsResult);
-
-    // const cutPercentage =
-    //   1 -
-    //   diagnosticsResult.totalNodes / test.counts[diagnosticsResult.depth - 1];
-
-    // console.log(
-    //   diagnosticsResult.label,
-    //   `cut=${(cutPercentage * 100).toPrecision(5)}%`
-    // );
-    // }
-
-    cleanup();
+  for (const fen of fens) {
+    await searchExecutor.nextMove(parseFEN(fen), [], Number.MAX_SAFE_INTEGER, {
+      depth: ENGINE_DEPTH,
+    });
+    logger.next('--');
   }
 
-  logger.next('--');
+  cleanup();
 }
 
 const Debug = () => {
@@ -145,6 +88,7 @@ const Debug = () => {
               ? runMoveGenerationTest(worker, TestFens.STARTING_POSITION)
               : null
           }
+          disabled={worker === null}
         >
           Move generation perft
         </button>
@@ -155,6 +99,7 @@ const Debug = () => {
               ? runMoveGenerationTest(worker, TestFens.PERFT_POSITION_5)
               : null
           }
+          disabled={worker === null}
         >
           Move generation perft PERFT_5
         </button>
@@ -165,6 +110,7 @@ const Debug = () => {
               ? runMoveGenerationTest(worker, TestFens.VIENNA_OPENING)
               : null
           }
+          disabled={worker === null}
         >
           Move generation perft VIENNA
         </button>
@@ -175,42 +121,13 @@ const Debug = () => {
               ? runMoveGenerationTest(worker, TestFens.BLACK_CHECKMATE)
               : null
           }
+          disabled={worker === null}
         >
           Move generation perft BLACK MATE
         </button>
 
-        <button
-          onClick={() =>
-            runEngineNextMoveTest(logger, TestFens.STARTING_POSITION)
-          }
-        >
-          Move AI perft
-        </button>
-
-        <button
-          onClick={() =>
-            runEngineNextMoveTest(logger, TestFens.PERFT_POSITION_5)
-          }
-        >
-          Move AI perft PERFT_5
-        </button>
-
-        <button
-          onClick={() => runEngineNextMoveTest(logger, TestFens.VIENNA_OPENING)}
-        >
-          Move AI perft VIENNA
-        </button>
-
-        <button
-          onClick={() =>
-            runEngineNextMoveTest(logger, TestFens.BLACK_CHECKMATE)
-          }
-        >
-          Move AI perft BLACK MATE
-        </button>
-
         <button onClick={() => runSingleEngineNextMoveTest(logger)}>
-          Single Move AI perft
+          Next move perft
         </button>
       </div>
       <pre style={{ gridArea: 'log' }}>

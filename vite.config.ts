@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
+import wasm from 'vite-plugin-wasm';
 
 export default defineConfig({
   clearScreen: false,
@@ -11,6 +12,7 @@ export default defineConfig({
       },
     }),
     react(),
+    wasm(),
   ],
   build: {
     outDir: 'build/app',
