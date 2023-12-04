@@ -12,6 +12,8 @@ import {
   SearchLimit,
 } from '../search-interface';
 import { MAX_DEPTH } from '../lib/state';
+import { Remote } from 'comlink';
+import Timer from '../../../lib/timer';
 
 const INITIAL_DEPTH = 1;
 
@@ -34,6 +36,7 @@ export default class Iterative implements SearchInterface {
   diagnostics?: Diagnotics;
   context: Context;
   logger: Logger;
+  timer?: Remote<Timer>;
 
   constructor(reporter: InfoReporter) {
     this.context = new Context(this.label, reporter, {
@@ -69,10 +72,16 @@ export default class Iterative implements SearchInterface {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    const [timer, timerCleanup] = await loadTimerWorker(timeout, {
-      label: `${this.label}-search`,
-    });
-    this.context.state.timer = timer;
+    if (this.timer === undefined) {
+      const [timer] = await loadTimerWorker(timeout, {
+        label: `${this.label}-search`,
+        autoStart: false,
+      });
+      this.context.state.timer = timer;
+      this.timer = timer;
+    }
+
+    this.timer.start(timeout);
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       try {
@@ -102,11 +111,11 @@ export default class Iterative implements SearchInterface {
           pv: diagnostics.result.principleVariation?.join(' '),
         });
         this.logger.debug('full diagnostic result', diagnostics.result);
-        this.logger.debug(`remaining time: ${(await timer.value).toFixed(0)}`);
+        this.logger.debug(
+          `remaining time: ${(await this.timer.value).toFixed(0)}`,
+        );
       }
     }
-
-    timerCleanup();
 
     if (currentResult === null) {
       throw Error('no search result');
