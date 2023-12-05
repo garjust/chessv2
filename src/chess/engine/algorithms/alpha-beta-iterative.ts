@@ -103,9 +103,6 @@ export default class AlphaBetaIterative implements SearchInterface {
           pv: diagnostics.result.principleVariation?.join(' '),
         });
         this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
-        this.logger.debug(
-          `remaining time: ${this.context.timer.value.toFixed(0)}`,
-        );
       }
     }
 

@@ -8,6 +8,7 @@ import {
   SearchLimit,
 } from '../types';
 import { MAX_DEPTH } from '../lib/state';
+import Logger from '../../../lib/logger';
 
 /**
  * A step up from the negamax algorithm, this is the classic tree search
@@ -19,11 +20,13 @@ import { MAX_DEPTH } from '../lib/state';
 export default class AlphaBeta implements SearchInterface {
   context: Context;
   diagnostics?: Diagnotics;
+  logger: Logger;
 
   constructor(reporter: InfoReporter) {
     this.context = new Context(reporter, {
       pruneNodes: true,
     });
+    this.logger = new Logger('alpha-beta');
   }
 
   get diagnosticsResult() {
@@ -49,6 +52,20 @@ export default class AlphaBeta implements SearchInterface {
     );
 
     this.diagnostics = diagnostics;
+    if (diagnostics.result) {
+      this.context.reporter({
+        depth: diagnostics.result.depth.toString(),
+        score: diagnostics.result.evaluation,
+        time: diagnostics.result.timing.toString(),
+        nodes: diagnostics.result.totalNodes.toString(),
+        nps: (
+          (diagnostics.result.totalNodes / diagnostics.result.timing) *
+          1000
+        ).toFixed(0),
+        pv: diagnostics.result.principleVariation?.join(' '),
+      });
+      this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
+    }
     return move;
   }
 

@@ -45,9 +45,9 @@ export type TranspositionTableEntry = {
   nodeType: NodeType;
   // The depth of search which resulted in this entry. For example when entries
   // are created at the second ply of an N-depth search this value will be
-  // equal to N-1. Higher values mean more plys were searched to determine the
+  // equal to N-1. Lower values mean more plys were searched to determine the
   // score.
-  depth: number;
+  inverseDepth: number;
   // This is the score returned by the search function when this entry was
   // made.
   // - When the node type is CUT this represents a lower-bound for the score

@@ -50,7 +50,7 @@ export type DiagnosticsResult = {
 };
 
 export default class Diagnotics {
-  plyCounters: Record<number, PlyCounter> = {};
+  plyCounters: PlyCounter[] = [];
   searchTree?: SearchTree;
   result?: DiagnosticsResult;
 
@@ -63,8 +63,7 @@ export default class Diagnotics {
     this.enableTreeDiagnostics = enableTreeDiagnostics;
     this.start = Date.now();
 
-    this.plyCounters[-1] = emptyPlyCounter();
-    for (let i = 1; i <= maxDepth; i++) {
+    for (let i = 0; i <= maxDepth; i++) {
       this.plyCounters[i] = emptyPlyCounter();
     }
 
@@ -73,29 +72,29 @@ export default class Diagnotics {
     }
   }
 
-  nodeVisit(depth: number) {
-    this.plyCounters[this.maxDepth - depth].nodes++;
+  nodeVisit(inverseDepth: number) {
+    this.plyCounters[inverseDepth].nodes++;
   }
 
-  nodeType(depth: number, type: NodeType) {
-    this.plyCounters[this.maxDepth - depth].nodeType[type]++;
+  nodeType(inverseDepth: number, type: NodeType) {
+    this.plyCounters[inverseDepth].nodeType[type]++;
   }
 
-  cut(depth: number) {
-    this.plyCounters[this.maxDepth - depth].cuts++;
+  cut(inverseDepth: number) {
+    this.plyCounters[inverseDepth].cuts++;
   }
 
-  cutFromTable(depth: number) {
-    this.plyCounters[this.maxDepth - depth].tableCuts++;
-    this.cut(depth);
+  cutFromTable(inverseDepth: number) {
+    this.plyCounters[inverseDepth].tableCuts++;
+    this.cut(inverseDepth);
   }
 
   quiescenceNodeVisit() {
-    this.plyCounters[-1].nodes++;
+    this.plyCounters[this.maxDepth].nodes++;
   }
 
   quiescenceCut() {
-    this.plyCounters[-1].cuts++;
+    this.plyCounters[this.maxDepth].cuts++;
   }
 
   recordResult(result: SearchResult, state?: State) {

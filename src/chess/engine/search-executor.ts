@@ -3,8 +3,8 @@ import { AlphaBeta, AlphaBetaIterative } from './algorithms';
 import { SearchInterface, InfoReporter, SearchLimit } from './types';
 
 export const Registry = {
-  iterative: AlphaBetaIterative,
   alphaBeta: AlphaBeta,
+  iterative: AlphaBetaIterative,
 } as const;
 
 export type Version = keyof typeof Registry;

@@ -12,7 +12,7 @@ export default class Search {
   }
 
   // Alpha-beta negamax search with various optional features.
-  async search(depth: number, movesToSearch: Move[]): Promise<SearchResult> {
+  async search(maxDepth: number, movesToSearch: Move[]): Promise<SearchResult> {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -23,7 +23,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      depth,
+      maxDepth,
     );
     if (movesToSearch.length > 0) {
       for (let i = moves.length - 1; i >= 0; i--) {
@@ -49,7 +49,8 @@ export default class Search {
       this.context.core.applyMove(move);
       const result = {
         move,
-        score: -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1)),
+        score:
+          -1 * (await this.searchNodes(maxDepth - 1, beta * -1, alpha * -1)),
       };
       this.context.core.undoLastMove();
 
@@ -59,13 +60,13 @@ export default class Search {
         bestMove = result.move;
         bestScore = result.score;
         alpha = result.score;
-        this.context.state.pvTable.set(depth, result.move);
+        this.context.state.pvTable.set(maxDepth, result.move);
       }
     }
 
     this.context.state.tTable.set({
       nodeType: NodeType.PV,
-      depth,
+      inverseDepth: maxDepth,
       score: alpha,
       move: bestMove,
     });
@@ -80,7 +81,7 @@ export default class Search {
 
   // Recursive search function for the alpha-beta negamax search.
   async searchNodes(
-    depth: number,
+    inverseDepth: number,
     alpha: number,
     beta: number,
   ): Promise<number> {
@@ -88,7 +89,7 @@ export default class Search {
       throw new TimeoutError();
     }
 
-    this.context.diagnostics?.nodeVisit(depth);
+    this.context.diagnostics?.nodeVisit(inverseDepth);
 
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
@@ -102,13 +103,13 @@ export default class Search {
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      cacheHit.depth >= depth
+      cacheHit.inverseDepth >= inverseDepth
     ) {
-      this.context.diagnostics?.cutFromTable(depth);
+      this.context.diagnostics?.cutFromTable(inverseDepth);
       return cacheHit.score;
     }
 
-    if (depth === 0) {
+    if (inverseDepth === 0) {
       if (this.context.configuration.quiescenceSearch) {
         return this.quiescenceSearch(alpha, beta);
       } else {
@@ -118,7 +119,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      depth,
+      inverseDepth,
     );
 
     // If there are no moves at this node then the game has ended.
@@ -126,7 +127,7 @@ export default class Search {
       if (
         this.context.core.checks(this.context.core.position.turn).length > 0
       ) {
-        return -1 * (MATE_SCORE + depth);
+        return -1 * (MATE_SCORE + inverseDepth);
       } else {
         return DRAW_SCORE;
       }
@@ -134,26 +135,27 @@ export default class Search {
 
     for (const move of moves) {
       this.context.core.applyMove(move);
-      const x = -1 * (await this.searchNodes(depth - 1, beta * -1, alpha * -1));
+      const x =
+        -1 * (await this.searchNodes(inverseDepth - 1, beta * -1, alpha * -1));
       this.context.core.undoLastMove();
 
       if (x > alpha) {
         nodeType = NodeType.PV;
         nodeMove = move;
-        this.context.state.pvTable.set(depth, move);
+        this.context.state.pvTable.set(inverseDepth, move);
 
         alpha = x;
       }
       if (this.context.configuration.pruneNodes && alpha >= beta) {
-        this.context.diagnostics?.cut(depth);
+        this.context.diagnostics?.cut(inverseDepth);
         nodeType = NodeType.Cut;
         nodeMove = move;
 
         if (!move.attack) {
           // New killer move for this depth.
-          this.context.state.killerMoves[depth] = move;
+          this.context.state.killerMoves[inverseDepth] = move;
         }
-        this.context.state.historyTable.increment(move, depth);
+        this.context.state.historyTable.increment(move, inverseDepth);
 
         break;
       }
@@ -161,12 +163,12 @@ export default class Search {
 
     this.context.state.tTable.set({
       nodeType,
-      depth,
+      inverseDepth: inverseDepth,
       score: alpha,
       move: nodeMove,
     });
 
-    this.context.diagnostics?.nodeType(depth, nodeType);
+    this.context.diagnostics?.nodeType(inverseDepth, nodeType);
 
     return alpha;
   }
