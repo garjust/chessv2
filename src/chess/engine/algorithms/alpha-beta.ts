@@ -6,14 +6,14 @@ import {
   SearchConstructor,
   SearchInterface,
   SearchLimit,
-} from '../search-interface';
+} from '../types';
 import { MAX_DEPTH } from '../lib/state';
 
 // A step up from the negamax algorithm, this is the classic tree search
 // algorithm used for games like chess.
 //
-// Alpha-beta adds tree-pruning to the tree search in a way that is completely
-// safe. Alpha-beta will always return the same move as negamax.
+// Alpha-beta adds tree-pruning to the negamax tree search in a way that is
+// completely safe. Alpha-beta will always return the same move as negamax.
 export default class AlphaBeta implements SearchInterface {
   context: Context;
   diagnostics?: Diagnotics;

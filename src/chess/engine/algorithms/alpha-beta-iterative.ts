@@ -3,14 +3,14 @@ import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
 import { loadTimerWorker } from '../../workers';
 import TimeoutError from '../lib/timeout-error';
-import { SearchResult } from '../lib/types';
-import Logger from '../../../lib/logger';
 import {
   InfoReporter,
   SearchConstructor,
   SearchInterface,
   SearchLimit,
-} from '../search-interface';
+  SearchResult,
+} from '../types';
+import Logger from '../../../lib/logger';
 import { MAX_DEPTH } from '../lib/state';
 import { Remote } from 'comlink';
 import Timer from '../../../lib/timer';

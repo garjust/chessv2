@@ -1,6 +1,6 @@
 import { Move, Position } from '../types';
 import { AlphaBeta, AlphaBetaIterative } from './algorithms';
-import { InfoReporter, SearchInterface, SearchLimit } from './search-interface';
+import { SearchInterface, InfoReporter, SearchLimit } from './types';
 
 export const Registry = {
   iterative: AlphaBetaIterative,

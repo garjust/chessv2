@@ -1,5 +1,24 @@
-import { CurrentZobrist } from '../../lib/zobrist/types';
-import { Move } from '../../types';
+import { CurrentZobrist } from '../lib/zobrist/types';
+import { Move, Position } from '../types';
+import { Info } from './workflow/uci-response';
+
+export type InfoReporter = (info: Info) => void;
+
+export type SearchLimit = { nodes?: number; depth?: number; time?: number };
+
+export interface SearchInterface {
+  nextMove(
+    position: Position,
+    movesToSearch: Move[],
+    timeout: number,
+    limits: SearchLimit,
+  ): Promise<Move>;
+  ponderMove(position: Position, move: Move): void;
+}
+
+export interface SearchConstructor {
+  new (infoReporter: InfoReporter): SearchInterface;
+}
 
 // Object returned from the search function
 export type SearchResult = {

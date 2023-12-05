@@ -1,7 +1,11 @@
 import Core from '../../core';
 import { EVALUATION_DIVIDER, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
-import { NodeType, TranspositionTable, TranspositionTableEntry } from './types';
+import {
+  NodeType,
+  TranspositionTable,
+  TranspositionTableEntry,
+} from '../types';
 
 export const uciInfoEvaluation = (score: number, maxDepth: number): string => {
   let str: string;

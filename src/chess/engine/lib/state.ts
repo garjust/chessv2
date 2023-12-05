@@ -4,7 +4,7 @@ import HistoryTable from './history-table';
 import PVTable from './pv-table';
 import TTableMap from './ttable-map';
 import { Move } from '../../types';
-import { TranspositionTable, TranspositionTableEntry } from './types';
+import { TranspositionTable, TranspositionTableEntry } from '../types';
 import { Int32TupleZobrist } from '../../lib/zobrist/int32-tuple-zobrist';
 
 // Communication with web workers is slow, too slow to do at every node.

@@ -1,13 +1,12 @@
 import Search from '.';
 import Core from '../../core';
 import { MoveWithExtraData, Position } from '../../types';
-import { InfoReporter } from '../search-interface';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
 import { extractPV } from './score-utils';
 import State from './state';
-import { SearchConfiguration, SearchResult } from './types';
+import { InfoReporter, SearchConfiguration, SearchResult } from '../types';
 
 // All search features disabled. A search with the default configuration
 // will be a plain negamax search.

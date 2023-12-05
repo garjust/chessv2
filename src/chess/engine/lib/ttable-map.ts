@@ -1,5 +1,5 @@
 import { CurrentZobrist } from '../../lib/zobrist/types';
-import { TranspositionTable } from './types';
+import { TranspositionTable } from '../types';
 
 type Entry<T> = {
   data: T;

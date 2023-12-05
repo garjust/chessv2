@@ -7,7 +7,7 @@ import {
   SquareRank,
 } from '../types';
 import { CurrentZobrist } from '../lib/zobrist/types';
-import { TranspositionTable } from '../engine/lib/types';
+import { TranspositionTable } from '../engine/types';
 
 // Check the wasm types implement interfaces the chess core/engine uses.
 const _1: TranspositionTable<Uint8Array> =

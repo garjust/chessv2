@@ -2,7 +2,7 @@ import { DRAW_SCORE, MATE_SCORE } from '../../core/evaluation';
 import { Move } from '../../types';
 import type Context from './context';
 import TimeoutError from './timeout-error';
-import { NodeType, SearchResult } from './types';
+import { NodeType, SearchResult } from '../types';
 
 export default class Search {
   context: Context;

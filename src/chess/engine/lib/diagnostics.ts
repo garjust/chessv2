@@ -3,7 +3,7 @@ import { moveString } from '../../move-notation';
 import { uciInfoEvaluation } from './score-utils';
 import State from './state';
 import SearchTree from './tree-diagnostics';
-import { NodeType, SearchResult } from './types';
+import { NodeType, SearchResult } from '../types';
 
 type PlyCounter = {
   nodes: number;
