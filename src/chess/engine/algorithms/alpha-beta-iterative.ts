@@ -88,6 +88,7 @@ export default class AlphaBetaIterative implements SearchInterface {
         [currentResult, diagnostics] = await this.context.withDiagnostics(
           position,
           i,
+          movesToSearch,
         );
       } catch (error) {
         if (error instanceof TimeoutError) {

@@ -1,6 +1,6 @@
 import Search from './search';
 import Core from '../../core';
-import { MoveWithExtraData, Position } from '../../types';
+import { Move, MoveWithExtraData, Position } from '../../types';
 import Diagnostics from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
@@ -58,9 +58,10 @@ export default class Context {
   async withDiagnostics(
     position: Position,
     maxDepth: number,
+    movesToSearch: Move[],
   ): Promise<[SearchResult, Diagnostics]> {
     this.diagnostics = new Diagnostics(this.label, maxDepth);
-    const result = await this.run(position, maxDepth);
+    const result = await this.run(position, maxDepth, movesToSearch);
     this.diagnostics.recordResult(result, this.state);
 
     return [result, this.diagnostics];
@@ -68,13 +69,13 @@ export default class Context {
 
   useTTForPV = true;
 
-  async run(position: Position, maxDepth: number) {
+  async run(position: Position, maxDepth: number, movesToSearch: Move[]) {
     this.core.position = position;
 
     // Before executing a search update state.
     this.state.pvTable = new PVTable(maxDepth);
 
-    const result = await new Search(this).search(maxDepth);
+    const result = await new Search(this).search(maxDepth, movesToSearch);
 
     // If we want to use the TT to extract the PV we overwrite the result's
     // PV.

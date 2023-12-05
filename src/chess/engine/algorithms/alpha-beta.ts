@@ -34,7 +34,7 @@ export default class AlphaBeta implements SearchInterface {
 
   async nextMove(
     position: Position,
-    _1: Move[],
+    movesToSearch: Move[],
     _2: number,
     limits: SearchLimit,
   ) {
@@ -43,6 +43,7 @@ export default class AlphaBeta implements SearchInterface {
     const [{ move }, diagnostics] = await this.context.withDiagnostics(
       position,
       limits.depth ?? MAX_DEPTH,
+      movesToSearch,
     );
 
     this.diagnostics = diagnostics;

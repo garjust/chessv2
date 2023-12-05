@@ -12,7 +12,7 @@ export default class Search {
   }
 
   // Alpha-beta negamax search with various optional features.
-  async search(depth: number): Promise<SearchResult> {
+  async search(depth: number, movesToSearch: Move[]): Promise<SearchResult> {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -25,6 +25,13 @@ export default class Search {
       this.context.core.generateMoves(),
       depth,
     );
+    if (movesToSearch.length > 0) {
+      for (let i = moves.length - 1; i >= 0; i--) {
+        if (!movesToSearch.includes(moves[i])) {
+          moves.splice(i, 1);
+        }
+      }
+    }
 
     bestMove = moves[0];
     bestScore = 0;
