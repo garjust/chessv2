@@ -2,13 +2,11 @@ import { expect, test } from 'vitest';
 import { FEN_LIBRARY, parseFEN } from '../src/chess/lib/fen';
 import { squareLabel } from '../src/chess/utils';
 import { moveString } from '../src/chess/move-notation';
-import Iterative from '../src/chess/engine/algorithms/iterative';
-import OrderMoves from '../src/chess/engine/algorithms/order-moves';
-import { AlphaBeta } from '../src/chess/engine/algorithms';
+import { AlphaBeta, AlphaBetaIterative } from '../src/chess/engine/algorithms';
 
 test('alphaBeta finds checkmate in black mate position', async () => {
   const position = parseFEN(FEN_LIBRARY.BLACK_CHECKMATE_FEN);
-  const search = new OrderMoves(() => {});
+  const search = new AlphaBeta(() => {});
 
   const result = await search.nextMove(position, [], Number.MAX_SAFE_INTEGER, {
     depth: 6,
@@ -21,7 +19,7 @@ test('alphaBeta finds checkmate in black mate position', async () => {
 
 test.skip('iterative finds checkmate in black mate position', async () => {
   const position = parseFEN(FEN_LIBRARY.BLACK_CHECKMATE_FEN);
-  const search = new Iterative(() => {});
+  const search = new AlphaBetaIterative(() => {});
 
   const result = await search.nextMove(position, [], Number.MAX_SAFE_INTEGER, {
     depth: 6,

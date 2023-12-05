@@ -5,10 +5,6 @@ export type InfoReporter = (info: Info) => void;
 
 export type SearchLimit = { nodes?: number; depth?: number; time?: number };
 
-export interface SearchConstructor {
-  new (infoReporter: InfoReporter): SearchInterface;
-}
-
 export interface SearchInterface {
   nextMove(
     position: Position,
@@ -17,4 +13,8 @@ export interface SearchInterface {
     limits: SearchLimit,
   ): Promise<Move>;
   ponderMove(position: Position, move: Move): void;
+}
+
+export interface SearchConstructor {
+  new (infoReporter: InfoReporter): SearchInterface;
 }

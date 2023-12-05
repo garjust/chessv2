@@ -1,30 +1,11 @@
 import { Move, Position } from '../types';
-import {
-  AlphaBeta,
-  Iterative,
-  Negamax,
-  OrderMoves,
-  Quiescence,
-  Random,
-  SearchExecutorVersion,
-} from './algorithms';
-import {
-  InfoReporter,
-  SearchConstructor,
-  SearchInterface,
-  SearchLimit,
-} from './search-interface';
+import { AlphaBeta, AlphaBetaIterative } from './algorithms';
+import { InfoReporter, SearchInterface, SearchLimit } from './search-interface';
 
-export const Registry: Readonly<
-  Record<SearchExecutorVersion, SearchConstructor>
-> = Object.freeze({
-  iterative: Iterative,
-  quiescence: Quiescence,
-  orderMoves: OrderMoves,
+export const Registry = {
+  iterative: AlphaBetaIterative,
   alphaBeta: AlphaBeta,
-  negamax: Negamax,
-  random: Random,
-});
+} as const;
 
 export type Version = keyof typeof Registry;
 export const LATEST: Version = 'iterative';

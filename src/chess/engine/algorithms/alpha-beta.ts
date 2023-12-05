@@ -29,7 +29,7 @@ export default class AlphaBeta implements SearchInterface {
   }
 
   get label() {
-    return 'alphabeta';
+    return 'alpha-beta';
   }
 
   async nextMove(

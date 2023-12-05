@@ -32,7 +32,7 @@ const INITIAL_DEPTH = 1;
 //   than an immediate search at depth N. This is because we create state
 //   during each iteration which can make future iterations faster than they
 //   would otherwise be (better move ordering, more TTable hits, etc).
-export default class Iterative implements SearchInterface {
+export default class AlphaBetaIterative implements SearchInterface {
   diagnostics?: Diagnotics;
   context: Context;
   logger: Logger;
@@ -59,7 +59,7 @@ export default class Iterative implements SearchInterface {
   }
 
   get label() {
-    return 'alphabeta-iterative';
+    return 'alpha-beta-iterative';
   }
 
   async nextMove(
@@ -127,4 +127,4 @@ export default class Iterative implements SearchInterface {
     throw new Error(`search ${this.label} cannot ponder`);
   }
 }
-const _: SearchConstructor = Iterative;
+const _: SearchConstructor = AlphaBetaIterative;

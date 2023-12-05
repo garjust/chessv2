@@ -39,7 +39,7 @@ const INITIAL_STATE: State = {
   debug: false,
   positionForGo: parseFEN(FEN_LIBRARY.BLANK_POSITION_FEN),
   config: {
-    version: 'random',
+    version: 'iterative',
   },
   options: {
     hashSize: OptionDefinitions.Hash.default,
