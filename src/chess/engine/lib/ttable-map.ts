@@ -6,6 +6,13 @@ type Entry<T> = {
   checkKey: [number, number];
 };
 
+/**
+ * Transposition table implementation based on a plain Map.
+ *
+ * This works ok until it starts to fill up and we start to run into growth
+ * issues with the map. Map is designed to avoid key collisions but we expect
+ * them to happen with a TTable.
+ */
 export default class TTableMap<T> implements TranspositionTable<T> {
   private readonly map;
   private zobrist;
