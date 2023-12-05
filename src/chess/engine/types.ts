@@ -69,28 +69,3 @@ export interface TranspositionTable<T> {
     size: number;
   };
 }
-
-export type SearchConfiguration = {
-  // Enable pruning of branches in the search tree.
-  readonly pruneNodes: boolean;
-  // Enable ordering of moves in the search.
-  readonly moveOrdering: boolean;
-  // Various heuristics used for move ordering requiring some stored state.
-  readonly moveOrderingHeuristics: {
-    // The killer move is the last quiet move to cause a beta-cutoff at the
-    // current depth.
-    readonly killerMove: boolean;
-    // The history table is a more general form of the killer move. All moves
-    // which cause a beta-cutoff are incremented in the table. Quiet moves can
-    // be ordered by the value of the move in the history table.
-    readonly historyTable: boolean;
-    // The PV move is the move for an existing PV from a previous search at
-    // the current depth. This is a good move to search first.
-    readonly pvMove: boolean;
-    // The hash move is the move returned by a hit in the TTable. This move
-    // is often a PV move or a move which caused a beta-cutoff.
-    readonly hashMove: boolean;
-  };
-  readonly quiescenceSearch: boolean;
-  readonly pruneFromTTable: boolean;
-};

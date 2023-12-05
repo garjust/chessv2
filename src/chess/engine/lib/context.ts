@@ -6,22 +6,8 @@ import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
 import { extractPV } from './score-utils';
 import State from './state';
-import { InfoReporter, SearchConfiguration, SearchResult } from '../types';
-
-// All search features disabled. A search with the default configuration
-// will be a plain negamax search.
-export const DEFAULT_CONFIGURATION: SearchConfiguration = {
-  pruneNodes: false,
-  moveOrdering: false,
-  moveOrderingHeuristics: {
-    killerMove: false,
-    historyTable: false,
-    pvMove: false,
-    hashMove: false,
-  },
-  quiescenceSearch: false,
-  pruneFromTTable: false,
-};
+import { InfoReporter, SearchResult } from '../types';
+import { DEFAULT_CONFIGURATION } from './config';
 
 /**
  * The context object contains any information, state, or other objects
@@ -36,13 +22,13 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
 export default class Context {
   readonly reporter: InfoReporter;
   readonly core: Core;
-  readonly configuration: SearchConfiguration;
+  readonly configuration: typeof DEFAULT_CONFIGURATION;
   readonly state: State;
   diagnostics?: Diagnostics;
 
   constructor(
     reporter: InfoReporter,
-    config: Partial<SearchConfiguration> = {},
+    config: Partial<typeof DEFAULT_CONFIGURATION> = {},
   ) {
     this.reporter = reporter;
     this.core = new Core();
