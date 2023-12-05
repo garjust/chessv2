@@ -13,7 +13,6 @@ import {
 import Logger from '../../../lib/logger';
 import { MAX_DEPTH } from '../lib/state';
 import { Remote } from 'comlink';
-import Timer from '../../../lib/timer';
 
 const INITIAL_DEPTH = 1;
 
@@ -38,7 +37,6 @@ export default class AlphaBetaIterative implements SearchInterface {
   diagnostics?: Diagnotics;
   context: Context;
   logger: Logger;
-  timer?: Remote<Timer>;
 
   constructor(reporter: InfoReporter) {
     this.context = new Context(reporter, {
@@ -74,16 +72,7 @@ export default class AlphaBetaIterative implements SearchInterface {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    if (this.timer === undefined) {
-      const [timer] = await loadTimerWorker(0, {
-        label: `${this.label}-search`,
-        autoStart: false,
-      });
-      this.context.state.timer = timer;
-      this.timer = timer;
-    }
-
-    this.timer.start(limits?.time ?? timeout);
+    this.context.timer.value = limits?.time ?? timeout;
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       try {
@@ -115,7 +104,7 @@ export default class AlphaBetaIterative implements SearchInterface {
         });
         this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
         this.logger.debug(
-          `remaining time: ${(await this.timer.value).toFixed(0)}`,
+          `remaining time: ${this.context.timer.value.toFixed(0)}`,
         );
       }
     }

@@ -84,7 +84,7 @@ export default class Search {
     alpha: number,
     beta: number,
   ): Promise<number> {
-    if (await this.context.state.timeoutReached()) {
+    if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
 

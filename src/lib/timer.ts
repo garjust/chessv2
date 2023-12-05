@@ -9,6 +9,7 @@ export default class Timer {
   #value: number;
   #tickerId?: NodeJS.Timeout;
   #current?: Promise<void>;
+  #lastTick = 0;
 
   constructor(
     timeout: number,
@@ -29,12 +30,34 @@ export default class Timer {
     return this.#value;
   }
 
+  set value(timeout: number) {
+    if (this.#tickerId) {
+      this.stop();
+    }
+    this.#value = timeout;
+  }
+
   get promise() {
     return this.#current;
   }
 
   brrring(): boolean {
     return this.#value === 0;
+  }
+
+  /**
+   * Manually ticks the timer.
+   */
+  tick() {
+    if (this.#value !== 0) {
+      const tick = performance.now();
+      this.#value -= tick - this.#lastTick;
+      this.#lastTick = tick;
+      if (this.#value <= 0) {
+        this.#value = 0;
+      }
+    }
+    return this.brrring();
   }
 
   start(timeout?: number): Promise<void> {
@@ -48,13 +71,13 @@ export default class Timer {
     logger.debug(`started ${this.label}`, { timeout: this.value });
 
     this.#current = new Promise((resolve) => {
-      let lastTick = performance.now();
+      this.#lastTick = performance.now();
       this.#tickerId = setInterval(() => {
         const tick = performance.now();
-        this.#value -= tick - lastTick;
-        lastTick = tick;
+        this.#value -= tick - this.#lastTick;
+        this.#lastTick = tick;
 
-        if (this.value <= 0) {
+        if (this.#value <= 0) {
           this.#value = 0;
           resolve();
           this.stop();
