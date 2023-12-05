@@ -19,7 +19,7 @@ export default class AlphaBeta implements SearchInterface {
   diagnostics?: Diagnotics;
 
   constructor(reporter: InfoReporter) {
-    this.context = new Context(this.label, reporter, {
+    this.context = new Context(reporter, {
       pruneNodes: true,
     });
   }
@@ -40,7 +40,7 @@ export default class AlphaBeta implements SearchInterface {
   ) {
     this.diagnostics = undefined;
 
-    const [{ move }, diagnostics] = await this.context.withDiagnostics(
+    const [{ move }, diagnostics] = await this.context.search(
       position,
       limits.depth ?? MAX_DEPTH,
       movesToSearch,

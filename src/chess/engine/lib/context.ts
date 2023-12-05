@@ -34,7 +34,6 @@ export const DEFAULT_CONFIGURATION: SearchConfiguration = {
  * PV from the state, etc.
  */
 export default class Context {
-  readonly label: string;
   readonly reporter: InfoReporter;
   readonly core: Core;
   readonly configuration: SearchConfiguration;
@@ -42,11 +41,9 @@ export default class Context {
   diagnostics?: Diagnostics;
 
   constructor(
-    label: string,
     reporter: InfoReporter,
     config: Partial<SearchConfiguration> = {},
   ) {
-    this.label = label;
     this.reporter = reporter;
     this.core = new Core();
     this.state = new State();
@@ -54,13 +51,12 @@ export default class Context {
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
   }
 
-  // Run a search with diagnostics.
-  async withDiagnostics(
+  async search(
     position: Position,
     maxDepth: number,
     movesToSearch: Move[],
   ): Promise<[SearchResult, Diagnostics]> {
-    this.diagnostics = new Diagnostics(this.label, maxDepth);
+    this.diagnostics = new Diagnostics(maxDepth);
     const result = await this.run(position, maxDepth, movesToSearch);
     this.diagnostics.recordResult(result, this.state);
 

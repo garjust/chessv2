@@ -39,7 +39,7 @@ export default class AlphaBetaIterative implements SearchInterface {
   timer?: Remote<Timer>;
 
   constructor(reporter: InfoReporter) {
-    this.context = new Context(this.label, reporter, {
+    this.context = new Context(reporter, {
       pruneNodes: true,
       quiescenceSearch: true,
       moveOrdering: true,
@@ -85,7 +85,7 @@ export default class AlphaBetaIterative implements SearchInterface {
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       try {
-        [currentResult, diagnostics] = await this.context.withDiagnostics(
+        [currentResult, diagnostics] = await this.context.search(
           position,
           i,
           movesToSearch,
@@ -111,7 +111,7 @@ export default class AlphaBetaIterative implements SearchInterface {
           ).toFixed(0),
           pv: diagnostics.result.principleVariation?.join(' '),
         });
-        this.logger.debug('full diagnostic result', diagnostics.result);
+        this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
         this.logger.debug(
           `remaining time: ${(await this.timer.value).toFixed(0)}`,
         );

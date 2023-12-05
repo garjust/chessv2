@@ -35,7 +35,6 @@ const emptyPlyCounter = (): PlyCounter => ({
 });
 
 export type DiagnosticsResult = {
-  label: string;
   logStringTTable: string;
   move: string;
   evaluation: string;
@@ -51,7 +50,6 @@ export type DiagnosticsResult = {
 };
 
 export default class Diagnotics {
-  label: string;
   maxDepth: number;
   enableTreeDiagnostics;
   plyCounters: Record<number, PlyCounter> = {};
@@ -59,8 +57,7 @@ export default class Diagnotics {
   searchTree?: SearchTree;
   start: number;
 
-  constructor(label: string, maxDepth: number, enableTreeDiagnostics = false) {
-    this.label = label;
+  constructor(maxDepth: number, enableTreeDiagnostics = false) {
     this.maxDepth = maxDepth;
     this.enableTreeDiagnostics = enableTreeDiagnostics;
     this.start = Date.now();
@@ -124,7 +121,6 @@ export default class Diagnotics {
     const ttableStats = stateData?.tTable.stats();
 
     const diagnosticsResults: DiagnosticsResult = {
-      label: this.label,
       logStringTTable: ttableStats
         ? `ttable: size=${formatNumber(
             ttableStats.size,
