@@ -14,6 +14,7 @@ export function __wbg_stats_free(a: number): void;
 export function __wbg_get_stats_hits(a: number): number;
 export function __wbg_get_stats_miss(a: number): number;
 export function __wbg_get_stats_type1(a: number): number;
+export function __wbg_get_stats_size(a: number): number;
 export function __wbg_ttable_free(a: number): void;
 export function ttable_new(a: number): number;
 export function ttable_currentKey(a: number): number;

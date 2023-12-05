@@ -1,19 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* A rank on the chess board.
-*/
-export enum Rank {
-  _1 = 0,
-  _2 = 1,
-  _3 = 2,
-  _4 = 3,
-  _5 = 4,
-  _6 = 5,
-  _7 = 6,
-  _8 = 7,
-}
-/**
 * A file on the chess board.
 */
 export enum File {
@@ -25,33 +12,6 @@ export enum File {
   _F = 5,
   _G = 6,
   _H = 7,
-}
-/**
-*/
-export enum CastlingState {
-  None = 0,
-  All = 15,
-  White_OO = 1,
-  White_OOO = 2,
-  Black_OO = 4,
-  Black_OOO = 8,
-  White = 3,
-  Black = 12,
-  Kingside = 5,
-  Queenside = 10,
-  White_OO__Black_OOO = 9,
-  White_OO__Black = 13,
-  White_OOO__Black_OO = 6,
-  White_OOO__Black = 14,
-  White__Black_OO = 7,
-  White__Black_OOO = 11,
-}
-/**
-* Color of a square or piece.
-*/
-export enum Color {
-  White = 0,
-  Black = 1,
 }
 /**
 * A square on the chess board.
@@ -123,6 +83,46 @@ export enum Square {
   H8 = 63,
 }
 /**
+*/
+export enum CastlingState {
+  None = 0,
+  All = 15,
+  White_OO = 1,
+  White_OOO = 2,
+  Black_OO = 4,
+  Black_OOO = 8,
+  White = 3,
+  Black = 12,
+  Kingside = 5,
+  Queenside = 10,
+  White_OO__Black_OOO = 9,
+  White_OO__Black = 13,
+  White_OOO__Black_OO = 6,
+  White_OOO__Black = 14,
+  White__Black_OO = 7,
+  White__Black_OOO = 11,
+}
+/**
+* A rank on the chess board.
+*/
+export enum Rank {
+  _1 = 0,
+  _2 = 1,
+  _3 = 2,
+  _4 = 3,
+  _5 = 4,
+  _6 = 5,
+  _7 = 6,
+  _8 = 7,
+}
+/**
+* Color of a square or piece.
+*/
+export enum Color {
+  White = 0,
+  Black = 1,
+}
+/**
 * Type of piece. Real pieces have values 1..6.
 */
 export enum PieceType {
@@ -183,6 +183,9 @@ export class Stats {
 /**
 */
   readonly miss: number;
+/**
+*/
+  readonly size: number;
 /**
 */
   readonly type1: number;
