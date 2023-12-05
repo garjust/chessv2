@@ -1,5 +1,8 @@
 import { Move } from '../../types';
 
+/**
+ * Triangular PV table.
+ */
 export default class PVTable {
   _table: Move[][] = [[]];
 

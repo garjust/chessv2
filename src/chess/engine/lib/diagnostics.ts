@@ -50,12 +50,13 @@ export type DiagnosticsResult = {
 };
 
 export default class Diagnotics {
-  maxDepth: number;
-  enableTreeDiagnostics;
   plyCounters: Record<number, PlyCounter> = {};
-  result?: DiagnosticsResult;
   searchTree?: SearchTree;
-  start: number;
+  result?: DiagnosticsResult;
+
+  private readonly maxDepth: number;
+  private readonly enableTreeDiagnostics;
+  private readonly start: number;
 
   constructor(maxDepth: number, enableTreeDiagnostics = false) {
     this.maxDepth = maxDepth;
