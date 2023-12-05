@@ -114,7 +114,7 @@ function handleGo(
   }
 
   // TODO: determine timeout based on go command time control info
-  const timeout = 5000;
+  const timeout = 10000;
 
   const nextMove = executorInstance.executor.nextMove(
     context.core.position,

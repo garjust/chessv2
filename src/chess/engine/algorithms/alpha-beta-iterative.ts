@@ -73,7 +73,7 @@ export default class AlphaBetaIterative implements SearchInterface {
     let diagnostics: Diagnotics | undefined;
 
     if (this.timer === undefined) {
-      const [timer] = await loadTimerWorker(timeout, {
+      const [timer] = await loadTimerWorker(0, {
         label: `${this.label}-search`,
         autoStart: false,
       });
@@ -81,7 +81,7 @@ export default class AlphaBetaIterative implements SearchInterface {
       this.timer = timer;
     }
 
-    this.timer.start(timeout);
+    this.timer.start(limits?.time ?? timeout);
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       try {

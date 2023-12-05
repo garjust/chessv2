@@ -78,7 +78,11 @@ function handleAttemptEngineMove(state: State): Update<State, Action> {
         delayEmit(
           instance.engine.workflow,
           EngineWorkflow.positionAction('startpos', state.game.moveList),
-          EngineWorkflow.goAction({ depth: 10, nodes: 20000000 }),
+          EngineWorkflow.goAction({
+            depth: 10,
+            nodes: 20000000,
+            movetime: 1000,
+          }),
         ),
     ];
   }
