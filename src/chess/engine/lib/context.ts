@@ -1,4 +1,4 @@
-import Search from '.';
+import Search from './search';
 import Core from '../../core';
 import { MoveWithExtraData, Position } from '../../types';
 import Diagnostics from './diagnostics';
