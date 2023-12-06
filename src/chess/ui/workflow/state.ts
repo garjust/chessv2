@@ -92,6 +92,7 @@ export type State = Readonly<{
   overlayCategory: SquareOverlayCategory;
   squareOverlay: Record<Square, SquareOverlayType>;
   game: Readonly<{
+    startFen: string;
     winner: Color | typeof Draw | null;
     evaluation: number;
     turn: Color;
@@ -127,6 +128,7 @@ const INITIAL_STATE: State = {
   overlayCategory: SquareOverlayCategory.Play,
   squareOverlay: {},
   game: {
+    startFen: FEN_LIBRARY.BLANK_POSITION_FEN,
     winner: null,
     evaluation: 0,
     turn: Color.White,

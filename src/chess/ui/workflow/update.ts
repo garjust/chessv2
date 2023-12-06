@@ -77,7 +77,10 @@ function handleAttemptEngineMove(state: State): Update<State, Action> {
       () =>
         delayEmit(
           instance.engine.workflow,
-          EngineWorkflow.positionAction('startpos', state.game.moveList),
+          EngineWorkflow.positionAction(
+            state.game.startFen,
+            state.game.moveList,
+          ),
           EngineWorkflow.goAction({
             depth: 10,
             nodes: 20000000,
@@ -517,9 +520,18 @@ function handleSetPositionFromFEN(
 ): Update<State, Action> {
   const position = parseFEN(action.fenString);
   core.position = position;
+  const isStartPos = action.fenString === FEN_LIBRARY.STARTING_POSITION_FEN;
 
   return [
-    { ...state, game: { ...state.game, winner: null, turn: position.turn } },
+    {
+      ...state,
+      game: {
+        ...state.game,
+        winner: null,
+        turn: position.turn,
+        startFen: isStartPos ? 'startpos' : action.fenString,
+      },
+    },
     () => setPositionAction(position),
   ];
 }
