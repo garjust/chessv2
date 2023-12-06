@@ -122,7 +122,7 @@ export default class Diagnotics {
 
     const diagnosticsResults: DiagnosticsResult = {
       logStringTTable: ttableStats
-        ? `ttable: size=${formatNumber(ttableStats.size)} (${(
+        ? `ttable info: size=${formatNumber(ttableStats.size)} (${(
             ttableStats.percentFull * 100
           ).toFixed(2)}%) :: hits=${formatNumber(
             ttableStats.hits,

@@ -6,6 +6,9 @@ const CHECK_KEY_BYTES_SIZE = 8;
 const ENTRY_BYTES_SIZE = 8;
 const ELEMENT_BYTES_SIZE = CHECK_KEY_BYTES_SIZE + ENTRY_BYTES_SIZE;
 
+const sizeInElements = (mb: number): number =>
+  (mb * 1000 * 1000) / ELEMENT_BYTES_SIZE;
+
 export default class TTableArrayBuffer
   implements TranspositionTable<TranspositionTableEntry>
 {
@@ -19,13 +22,10 @@ export default class TTableArrayBuffer
   private type1 = 0;
   private size = 0;
 
-  constructor(
-    sizeInElements: number,
-    zobrist: CurrentZobrist<[number, number]>,
-  ) {
+  constructor(sizeInMb: number, zobrist: CurrentZobrist<[number, number]>) {
     this.zobrist = zobrist;
-    this.sizeInElements = sizeInElements;
-    this.buffer = new ArrayBuffer(sizeInElements * ELEMENT_BYTES_SIZE);
+    this.sizeInElements = sizeInElements(sizeInMb);
+    this.buffer = new ArrayBuffer(this.sizeInElements * ELEMENT_BYTES_SIZE);
     this.data = new Uint32Array(this.buffer);
   }
 

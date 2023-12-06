@@ -21,9 +21,10 @@ export default class State {
   constructor(maxDepth: number = MAX_DEPTH) {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
-    this.tTable = new TTableMap(new Int32TupleZobrist());
-    // this.tTable = new TypedArrayMap(8000000, new Int32TupleZobrist()); // 128mb
-    // this.tTable = new TypedArrayMap(512, new Int32TupleZobrist());
+    // this.tTable = new TTableMap(new Int32TupleZobrist());
+    this.tTable = new TTableArrayBuffer(256, new Int32TupleZobrist()); // 256mb
+    // this.tTable = new TTableArrayBuffer(128, new Int32TupleZobrist()); // 128mb
+    // this.tTable = new TTableArrayBuffer(0.001, new Int32TupleZobrist());// 1kb
     this.pvTable = new PVTable(maxDepth);
   }
 
