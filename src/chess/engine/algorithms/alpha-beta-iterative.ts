@@ -72,7 +72,7 @@ export default class AlphaBetaIterative implements SearchInterface {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    this.context.timer.value = limits?.time ?? timeout;
+    this.context.timer.start(limits?.time ?? timeout);
 
     for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
       try {
@@ -83,6 +83,7 @@ export default class AlphaBetaIterative implements SearchInterface {
         );
       } catch (error) {
         if (error instanceof TimeoutError) {
+          console.warn('search timeout');
           break;
         } else {
           throw error;

@@ -8,7 +8,7 @@ import { extractPV } from './score-utils';
 import State from './state';
 import { InfoReporter, SearchResult } from '../types';
 import { DEFAULT_CONFIGURATION } from './config';
-import Timer from '../../../lib/timer';
+import TimerSync from '../../../lib/timer-sync';
 
 /**
  * The context object contains any information, state, or other objects
@@ -26,7 +26,7 @@ export default class Context {
   readonly configuration: typeof DEFAULT_CONFIGURATION;
   readonly state: State;
   diagnostics?: Diagnostics;
-  timer: Timer;
+  timer: TimerSync;
 
   constructor(
     reporter: InfoReporter,
@@ -37,7 +37,7 @@ export default class Context {
     this.state = new State();
     this.core.zobrist = this.state.tTable.currentKey;
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
-    this.timer = new Timer(0);
+    this.timer = new TimerSync(0);
   }
 
   async search(

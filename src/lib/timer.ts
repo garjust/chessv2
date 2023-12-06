@@ -45,21 +45,6 @@ export default class Timer {
     return this.#value === 0;
   }
 
-  /**
-   * Manually ticks the timer.
-   */
-  tick() {
-    if (this.#value !== 0) {
-      const tick = performance.now();
-      this.#value -= tick - this.#lastTick;
-      this.#lastTick = tick;
-      if (this.#value <= 0) {
-        this.#value = 0;
-      }
-    }
-    return this.brrring();
-  }
-
   start(timeout?: number): Promise<void> {
     if (this.#tickerId !== undefined) {
       throw new Error(`timer ${this.label} already started`);
