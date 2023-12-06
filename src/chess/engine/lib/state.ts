@@ -4,6 +4,7 @@ import TTableMap from './ttable/ttable-map';
 import { Move } from '../../types';
 import { TranspositionTable, TranspositionTableEntry } from '../types';
 import { Int32TupleZobrist } from '../../lib/zobrist/int32-tuple-zobrist';
+import TTableArrayBuffer from './ttable/ttable-array-buffer';
 
 // Reasonable max depth. Since a search can now be infinite time we need a
 // reasonable value for initializing our data structures.
@@ -21,6 +22,8 @@ export default class State {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
     this.tTable = new TTableMap(new Int32TupleZobrist());
+    // this.tTable = new TypedArrayMap(8000000, new Int32TupleZobrist()); // 128mb
+    // this.tTable = new TypedArrayMap(512, new Int32TupleZobrist());
     this.pvTable = new PVTable(maxDepth);
   }
 
