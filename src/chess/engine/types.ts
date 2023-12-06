@@ -4,7 +4,7 @@ import { Info } from './workflow/uci-response';
 
 export type InfoReporter = (info: Info) => void;
 
-export type SearchLimit = { nodes?: number; depth?: number; time?: number };
+export type SearchLimit = { nodes?: number; depth?: number; moveTime?: number };
 
 export interface SearchInterface {
   nextMove(

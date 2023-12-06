@@ -120,7 +120,7 @@ function handleGo(
     context.core.position,
     go.searchmoves ?? [],
     go.infinite ? Number.MAX_SAFE_INTEGER : timeout,
-    { depth: go.depth, nodes: go.nodes, time: go.movetime },
+    { depth: go.depth, nodes: go.nodes, moveTime: go.movetime },
   );
 
   return [

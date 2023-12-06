@@ -1,7 +1,6 @@
 import { Move, Position } from '../../types';
 import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
-import { loadTimerWorker } from '../../workers';
 import TimeoutError from '../lib/timeout-error';
 import {
   InfoReporter,
@@ -12,7 +11,6 @@ import {
 } from '../types';
 import Logger from '../../../lib/logger';
 import { MAX_DEPTH } from '../lib/state';
-import { Remote } from 'comlink';
 
 const INITIAL_DEPTH = 1;
 
@@ -72,9 +70,10 @@ export default class AlphaBetaIterative implements SearchInterface {
     let currentResult: SearchResult | null = null;
     let diagnostics: Diagnotics | undefined;
 
-    this.context.timer.start(limits?.time ?? timeout);
+    const maxDepth = limits?.depth ?? MAX_DEPTH;
+    this.context.timer.start(limits?.moveTime ?? timeout);
 
-    for (let i = INITIAL_DEPTH; i <= (limits?.depth ?? MAX_DEPTH); i++) {
+    for (let i = INITIAL_DEPTH; i <= maxDepth; i++) {
       try {
         [currentResult, diagnostics] = await this.context.search(
           position,
@@ -103,7 +102,7 @@ export default class AlphaBetaIterative implements SearchInterface {
           ).toFixed(0),
           pv: diagnostics.result.principleVariation?.join(' '),
         });
-        this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
+        this.logger.warn(`${this.label} search result`, diagnostics.result);
       }
     }
 
