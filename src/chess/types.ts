@@ -43,10 +43,13 @@ export const enum Color {
 
 /**
  * Type of piece.
- *
- * Indexed at 1 for convenience. Either way a piece type will fit in 3 bits.
  */
 export const enum PieceType {
+  /**
+   * The null piece. Not a real piece but represented in the enum for certain
+   * bit packing or null cases.
+   */
+  Null = 0,
   Pawn = 1,
   Knight = 2,
   Bishop = 3,
@@ -59,6 +62,7 @@ export const enum PieceType {
  * Types of pieces a pawn can promote to.
  */
 export type PromotionOption =
+  | PieceType.Null
   | PieceType.Bishop
   | PieceType.Knight
   | PieceType.Queen

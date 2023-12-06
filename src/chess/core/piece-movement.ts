@@ -29,6 +29,8 @@ export const controlForPiece = (
   square: Square,
 ): SquareControl[] => {
   switch (piece.type) {
+    case PieceType.Null:
+      return [];
     case PieceType.Pawn:
       return PAWN_CAPTURE_MOVES[piece.color][square];
     case PieceType.King:

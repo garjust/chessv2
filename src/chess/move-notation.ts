@@ -1,9 +1,10 @@
 import { FEN_PIECE_TO_PIECE_TYPE, PIECE_TYPE_TO_FEN_PIECE } from './lib/fen';
-import { Move, PromotionOption, SquareLabel } from './types';
+import { Move, PieceType, PromotionOption, SquareLabel } from './types';
 import { labelToSquare, squareLabel } from './utils';
 
-const pieceTypeToMoveStringCharacter = (type: PromotionOption): string =>
-  PIECE_TYPE_TO_FEN_PIECE[type];
+const pieceTypeToMoveStringCharacter = (
+  type: Exclude<PromotionOption, PieceType.Null>,
+): string => PIECE_TYPE_TO_FEN_PIECE[type];
 
 // UCI-variant long algebraic notation
 export const moveString = (move: Move, delimiter = ''): string =>

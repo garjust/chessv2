@@ -4,6 +4,17 @@ export const HEATMAP_MULTIPLIER = 100;
 const heatmapMultiplier = (arr: number[]) =>
   arr.map((x) => x * HEATMAP_MULTIPLIER);
 
+const NULL_MATRIX = [
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+];
+
 const BISHOP_MATRIX = [
   [0, 0, 0, 2, 2, 0, 0, 0],
   [1, 1, 2, 2, 2, 2, 1, 1],
@@ -71,6 +82,11 @@ const ROOK_MATRIX = [
 ].map(heatmapMultiplier);
 
 export const HEATMAPS = {
+  [PieceType.Null]: {
+    [Color.White]: [...NULL_MATRIX].reverse().flat(),
+    [Color.Black]: [...NULL_MATRIX].flat(),
+  },
+
   [PieceType.Bishop]: {
     [Color.White]: [...BISHOP_MATRIX].reverse().flat(),
     [Color.Black]: [...BISHOP_MATRIX].flat(),

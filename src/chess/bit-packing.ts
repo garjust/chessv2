@@ -1,15 +1,21 @@
 import { Color, PieceType, Square } from './types';
 
-export const PIECE_SHIFT = 1;
-export const FROM_SHIFT = PIECE_SHIFT + 3;
-export const TO_SHIFT = FROM_SHIFT + 6;
-export const PROMOTION_SHIFT = TO_SHIFT + 6;
-
 export const COLOR_MASK = 0b1;
-export const PIECE_MASK = 0b111 << PIECE_SHIFT;
-export const FROM_MASK = 0b111111 << FROM_SHIFT;
-export const TO_MASK = 0b111111 << TO_SHIFT;
-export const PROMOTION_MASK = 0b111 << PROMOTION_SHIFT;
+export const COLOR_BITS = 1;
+export const SQUARE_MASK = 0b111111;
+export const SQUARE_BITS = 6;
+export const PIECE_TYPE_MASK = 0b111;
+export const PIECE_TYPE_BITS = 3;
+
+export const PIECE_SHIFT = COLOR_BITS;
+export const FROM_SHIFT = PIECE_SHIFT + PIECE_TYPE_BITS;
+export const TO_SHIFT = FROM_SHIFT + SQUARE_BITS;
+export const PROMOTION_SHIFT = TO_SHIFT + SQUARE_BITS;
+
+const PIECE_MASK = PIECE_TYPE_MASK << PIECE_SHIFT;
+const FROM_MASK = SQUARE_MASK << FROM_SHIFT;
+const TO_MASK = SQUARE_MASK << TO_SHIFT;
+const PROMOTION_MASK = PIECE_TYPE_MASK << PROMOTION_SHIFT;
 
 type intMove = Brand<number, 'intMove'>;
 type intPiece = Brand<number, 'intPiece'>;

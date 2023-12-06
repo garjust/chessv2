@@ -20,8 +20,11 @@ const Piece = (
   },
   storeImage: React.ForwardedRef<SVGSVGElement>,
 ) => {
-  let Svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  let Svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>> | null;
   switch (type) {
+    case PieceType.Null:
+      Svg = null;
+      break;
     case PieceType.Bishop:
       Svg = PieceSvg.Bishop;
       break;
@@ -48,7 +51,13 @@ const Piece = (
     marginBottom: -3,
   };
 
-  return <Svg ref={storeImage} width={size} height={size} style={css} />;
+  return (
+    <>
+      {Svg ? (
+        <Svg ref={storeImage} width={size} height={size} style={css} />
+      ) : null}
+    </>
+  );
 };
 
 export default memo(forwardRef(Piece));

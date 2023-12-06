@@ -11,6 +11,7 @@ export const DOUBLED_PAWN_PENALTY = 100;
 export const INITIATIVE_SCORE = 200;
 
 export const PieceValue: Record<PieceType, number> = Object.freeze({
+  [PieceType.Null]: 0,
   [PieceType.Bishop]: 3000,
   [PieceType.King]: Infinity,
   [PieceType.Knight]: 3000,

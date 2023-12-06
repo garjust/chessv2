@@ -95,10 +95,13 @@ export const isValid = (fenString: string): boolean => {
   return true;
 };
 
-const pieceToFenPiece = (piece: Piece): string =>
-  piece.color === Color.White
-    ? PIECE_TYPE_TO_FEN_PIECE[piece.type].toUpperCase()
-    : PIECE_TYPE_TO_FEN_PIECE[piece.type].toLowerCase();
+const pieceToFenPiece = (
+  color: Color,
+  pieceType: Exclude<PieceType, PieceType.Null>,
+): string =>
+  color === Color.White
+    ? PIECE_TYPE_TO_FEN_PIECE[pieceType].toUpperCase()
+    : PIECE_TYPE_TO_FEN_PIECE[pieceType].toLowerCase();
 
 const fenPieceToColor = (pieceCharacter: string): Color =>
   'PNBRQK'.includes(pieceCharacter) ? Color.White : Color.Black;
@@ -164,11 +167,11 @@ const piecesToFenPieces = (pieces: Map<Square, Piece>): string => {
     }
 
     const piece = pieces.get(square);
-    if (piece) {
+    if (piece && piece.type !== PieceType.Null) {
       if (emptyCounter > 0) {
         rankString += String(emptyCounter);
       }
-      rankString += pieceToFenPiece(piece);
+      rankString += pieceToFenPiece(piece.color, piece.type);
       emptyCounter = 0;
     } else {
       emptyCounter++;
