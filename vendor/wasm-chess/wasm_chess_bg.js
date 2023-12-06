@@ -76,24 +76,17 @@ function passArray8ToWasm0(arg, malloc) {
     return ptr;
 }
 /**
-* A file on the chess board.
-*/
-export const File = Object.freeze({ _A:0,"0":"_A",_B:1,"1":"_B",_C:2,"2":"_C",_D:3,"3":"_D",_E:4,"4":"_E",_F:5,"5":"_F",_G:6,"6":"_G",_H:7,"7":"_H", });
-/**
 * A square on the chess board.
 */
 export const Square = Object.freeze({ A1:0,"0":"A1",A2:1,"1":"A2",A3:2,"2":"A3",A4:3,"3":"A4",A5:4,"4":"A5",A6:5,"5":"A6",A7:6,"6":"A7",A8:7,"7":"A8",B1:8,"8":"B1",B2:9,"9":"B2",B3:10,"10":"B3",B4:11,"11":"B4",B5:12,"12":"B5",B6:13,"13":"B6",B7:14,"14":"B7",B8:15,"15":"B8",C1:16,"16":"C1",C2:17,"17":"C2",C3:18,"18":"C3",C4:19,"19":"C4",C5:20,"20":"C5",C6:21,"21":"C6",C7:22,"22":"C7",C8:23,"23":"C8",D1:24,"24":"D1",D2:25,"25":"D2",D3:26,"26":"D3",D4:27,"27":"D4",D5:28,"28":"D5",D6:29,"29":"D6",D7:30,"30":"D7",D8:31,"31":"D8",E1:32,"32":"E1",E2:33,"33":"E2",E3:34,"34":"E3",E4:35,"35":"E4",E5:36,"36":"E5",E6:37,"37":"E6",E7:38,"38":"E7",E8:39,"39":"E8",F1:40,"40":"F1",F2:41,"41":"F2",F3:42,"42":"F3",F4:43,"43":"F4",F5:44,"44":"F5",F6:45,"45":"F6",F7:46,"46":"F7",F8:47,"47":"F8",G1:48,"48":"G1",G2:49,"49":"G2",G3:50,"50":"G3",G4:51,"51":"G4",G5:52,"52":"G5",G6:53,"53":"G6",G7:54,"54":"G7",G8:55,"55":"G8",H1:56,"56":"H1",H2:57,"57":"H2",H3:58,"58":"H3",H4:59,"59":"H4",H5:60,"60":"H5",H6:61,"61":"H6",H7:62,"62":"H7",H8:63,"63":"H8", });
 /**
-*/
-export const CastlingState = Object.freeze({ None:0,"0":"None",All:15,"15":"All",White_OO:1,"1":"White_OO",White_OOO:2,"2":"White_OOO",Black_OO:4,"4":"Black_OO",Black_OOO:8,"8":"Black_OOO",White:3,"3":"White",Black:12,"12":"Black",Kingside:5,"5":"Kingside",Queenside:10,"10":"Queenside",White_OO__Black_OOO:9,"9":"White_OO__Black_OOO",White_OO__Black:13,"13":"White_OO__Black",White_OOO__Black_OO:6,"6":"White_OOO__Black_OO",White_OOO__Black:14,"14":"White_OOO__Black",White__Black_OO:7,"7":"White__Black_OO",White__Black_OOO:11,"11":"White__Black_OOO", });
-/**
-* A rank on the chess board.
-*/
-export const Rank = Object.freeze({ _1:0,"0":"_1",_2:1,"1":"_2",_3:2,"2":"_3",_4:3,"3":"_4",_5:4,"4":"_5",_6:5,"5":"_6",_7:6,"6":"_7",_8:7,"7":"_8", });
-/**
 * Color of a square or piece.
 */
 export const Color = Object.freeze({ White:0,"0":"White",Black:1,"1":"Black", });
+/**
+* A file on the chess board.
+*/
+export const File = Object.freeze({ _A:0,"0":"_A",_B:1,"1":"_B",_C:2,"2":"_C",_D:3,"3":"_D",_E:4,"4":"_E",_F:5,"5":"_F",_G:6,"6":"_G",_H:7,"7":"_H", });
 /**
 * Type of piece. Real pieces have values 1..6.
 */
@@ -102,6 +95,13 @@ export const PieceType = Object.freeze({ Null:0,"0":"Null",Pawn:1,"1":"Pawn",Kni
 * Represents a piece than has the movement of every other piece.
 */
 Super:7,"7":"Super", });
+/**
+* A rank on the chess board.
+*/
+export const Rank = Object.freeze({ _1:0,"0":"_1",_2:1,"1":"_2",_3:2,"2":"_3",_4:3,"3":"_4",_5:4,"4":"_5",_6:5,"5":"_6",_7:6,"6":"_7",_8:7,"7":"_8", });
+/**
+*/
+export const CastlingState = Object.freeze({ None:0,"0":"None",All:15,"15":"All",White_OO:1,"1":"White_OO",White_OOO:2,"2":"White_OOO",Black_OO:4,"4":"Black_OO",Black_OOO:8,"8":"Black_OOO",White:3,"3":"White",Black:12,"12":"Black",Kingside:5,"5":"Kingside",Queenside:10,"10":"Queenside",White_OO__Black_OOO:9,"9":"White_OO__Black_OOO",White_OO__Black:13,"13":"White_OO__Black",White_OOO__Black_OO:6,"6":"White_OOO__Black_OO",White_OOO__Black:14,"14":"White_OOO__Black",White__Black_OO:7,"7":"White__Black_OO",White__Black_OOO:11,"11":"White__Black_OOO", });
 /**
 */
 export class ManagedKey {
@@ -227,6 +227,13 @@ export class Stats {
     */
     get size() {
         const ret = wasm.__wbg_get_stats_size(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+    * @returns {number}
+    */
+    get percentFull() {
+        const ret = wasm.__wbg_get_stats_percentFull(this.__wbg_ptr);
         return ret >>> 0;
     }
 }

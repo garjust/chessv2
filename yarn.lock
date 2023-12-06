@@ -5900,8 +5900,8 @@ __metadata:
 
 "wasm-chess@file:./vendor/wasm-chess::locator=chessv2%40workspace%3A.":
   version: 0.1.0
-  resolution: "wasm-chess@file:./vendor/wasm-chess#./vendor/wasm-chess::hash=c762a5&locator=chessv2%40workspace%3A."
-  checksum: c64caf0c2b0d4199b497b2045dfad02490ec47a44645cfdd83e615912913116c648d00ee368a32f0052c673a14839634e60c5efc86a7cdd57b3c8d61ef0e911c
+  resolution: "wasm-chess@file:./vendor/wasm-chess#./vendor/wasm-chess::hash=357d14&locator=chessv2%40workspace%3A."
+  checksum: 4ba6fb023ef8e9208de7e18032498d86678108bfdeab6c3344ca0d7c2d5e9f9eda0e7e896b5b33e1e6f2e179cbb34ae7dc29e96acf37bf9643263943c426ca33
   languageName: node
   linkType: hard
 

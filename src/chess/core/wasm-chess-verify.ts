@@ -48,12 +48,14 @@ export const verifyEnums = () => {
   assert('color-white', Color.White, WasmChess.Color.White);
   assert('color-black', Color.Black, WasmChess.Color.Black);
 
+  assert('piece-type-null', PieceType.Null, WasmChess.PieceType.Null);
   assert('piece-type-pawn', PieceType.Pawn, WasmChess.PieceType.Pawn);
   assert('piece-type-knight', PieceType.Knight, WasmChess.PieceType.Knight);
   assert('piece-type-bishop', PieceType.Bishop, WasmChess.PieceType.Bishop);
   assert('piece-type-rook', PieceType.Rook, WasmChess.PieceType.Rook);
   assert('piece-type-queen', PieceType.Queen, WasmChess.PieceType.Queen);
   assert('piece-type-king', PieceType.King, WasmChess.PieceType.King);
+  // assert('piece-type-super', PieceType.Super, WasmChess.PieceType.Super);
 
   assert('castling-None', CastlingState.None, WasmChess.CastlingState.None);
   assert(
