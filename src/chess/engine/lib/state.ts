@@ -1,6 +1,6 @@
 import HistoryTable from './history-table';
 import PVTable from './pv-table';
-import TTableMap from './ttable-map';
+import TTableMap from './ttable/ttable-map';
 import { Move } from '../../types';
 import { TranspositionTable, TranspositionTableEntry } from '../types';
 import { Int32TupleZobrist } from '../../lib/zobrist/int32-tuple-zobrist';

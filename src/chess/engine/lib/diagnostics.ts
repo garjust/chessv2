@@ -122,11 +122,13 @@ export default class Diagnotics {
 
     const diagnosticsResults: DiagnosticsResult = {
       logStringTTable: ttableStats
-        ? `ttable: size=${formatNumber(
-            ttableStats.size,
-          )} :: hits=${formatNumber(ttableStats.hits)}, miss=${formatNumber(
-            ttableStats.miss,
-          )}, type1=${formatNumber(ttableStats.type1)} cachehit=${(
+        ? `ttable: size=${formatNumber(ttableStats.size)} (${(
+            ttableStats.percentFull * 100
+          ).toFixed(2)}%) :: hits=${formatNumber(
+            ttableStats.hits,
+          )}, miss=${formatNumber(ttableStats.miss)}, type1=${formatNumber(
+            ttableStats.type1,
+          )} cachehit=${(
             (ttableStats.hits /
               (ttableStats.hits + ttableStats.miss + ttableStats.type1)) *
             100

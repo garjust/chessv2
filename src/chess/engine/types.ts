@@ -67,5 +67,9 @@ export interface TranspositionTable<T> {
     miss: number;
     type1: number;
     size: number;
+    /**
+     * Percentage full the TTable is [0..1]
+     */
+    percentFull: number;
   };
 }

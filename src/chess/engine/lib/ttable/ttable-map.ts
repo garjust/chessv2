@@ -1,5 +1,5 @@
-import { CurrentZobrist } from '../../lib/zobrist/types';
-import { TranspositionTable } from '../types';
+import { CurrentZobrist } from '../../../lib/zobrist/types';
+import { TranspositionTable } from '../../types';
 
 type Entry<T> = {
   data: T;
@@ -39,7 +39,7 @@ export default class TTableMap<T> implements TranspositionTable<T> {
     const entry = this.map.get(key[0])?.get(key[1]);
     if (entry === undefined) {
       this.miss++;
-    } else if (entry.checkKey === key) {
+    } else if (entry.checkKey[0] !== key[0] || entry.checkKey[1] !== key[1]) {
       this.type1++;
       return undefined;
     } else {
@@ -58,6 +58,7 @@ export default class TTableMap<T> implements TranspositionTable<T> {
       miss: this.miss,
       type1: this.type1,
       size: this.map.size,
+      percentFull: NaN,
     };
   }
 }
