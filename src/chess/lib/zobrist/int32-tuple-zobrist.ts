@@ -5,18 +5,8 @@ import {
   SquareFile,
   Square,
 } from '../../types';
+import { NUMBERS, makeNumbers } from './numbers';
 import { CurrentZobrist } from './types';
-
-const numbers = (n: number): number[] => {
-  const array: number[] = [];
-  for (let i = 0; i < n; i++) {
-    array.push(Math.abs(Math.random() * 2 ** 31));
-  }
-  return array;
-};
-
-const N = 1 + 8 + 16 + 64 * 6 * 2; // 793
-const NUMBERS = [numbers(N), numbers(N)];
 
 export const squareOccupancyIndex = (
   color: Color,
