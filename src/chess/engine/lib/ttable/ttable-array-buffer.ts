@@ -9,10 +9,20 @@ const ELEMENT_BYTES_SIZE = CHECK_KEY_BYTES_SIZE + ENTRY_BYTES_SIZE;
 const sizeInElements = (mb: number): number =>
   (mb * 1000 * 1000) / ELEMENT_BYTES_SIZE;
 
+/**
+ * Implement a TTable using a raw ArrayBuffer of bytes.
+ */
 export default class TTableArrayBuffer
   implements TranspositionTable<TranspositionTableEntry>
 {
+  /**
+   * Underlying buffer storing the table's bytes.
+   */
   private readonly buffer: ArrayBuffer;
+  /**
+   * A view of the table's bytes as 32 bit unsigned integers. Each entry
+   * takes up 4 elements.
+   */
   private readonly data: Uint32Array;
   private readonly zobrist;
   private readonly sizeInElements;
