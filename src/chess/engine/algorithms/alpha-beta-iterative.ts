@@ -11,6 +11,7 @@ import {
 } from '../types';
 import Logger from '../../../lib/logger';
 import { MAX_DEPTH } from '../lib/state';
+import { DEFAULT_CONFIGURATION } from '../lib/config';
 
 const INITIAL_DEPTH = 1;
 
@@ -36,7 +37,10 @@ export default class AlphaBetaIterative implements SearchInterface {
   context: Context;
   logger: Logger;
 
-  constructor(reporter: InfoReporter) {
+  constructor(
+    reporter: InfoReporter,
+    options: Partial<typeof DEFAULT_CONFIGURATION> = {},
+  ) {
     this.context = new Context(reporter, {
       pruneNodes: true,
       quiescenceSearch: true,
@@ -48,6 +52,7 @@ export default class AlphaBetaIterative implements SearchInterface {
         hashMove: true,
       },
       pruneFromTTable: true,
+      ...options,
     });
     this.logger = new Logger('iterative');
   }

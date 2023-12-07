@@ -9,6 +9,7 @@ import {
 } from '../types';
 import { MAX_DEPTH } from '../lib/state';
 import Logger from '../../../lib/logger';
+import { DEFAULT_CONFIGURATION } from '../lib/config';
 
 /**
  * A step up from the negamax algorithm, this is the classic tree search
@@ -22,9 +23,13 @@ export default class AlphaBeta implements SearchInterface {
   diagnostics?: Diagnotics;
   logger: Logger;
 
-  constructor(reporter: InfoReporter) {
+  constructor(
+    reporter: InfoReporter,
+    options: Partial<typeof DEFAULT_CONFIGURATION> = {},
+  ) {
     this.context = new Context(reporter, {
       pruneNodes: true,
+      ...options,
     });
     this.logger = new Logger('alpha-beta');
   }

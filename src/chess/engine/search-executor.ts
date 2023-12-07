@@ -1,5 +1,6 @@
 import { Move, Position } from '../types';
 import { AlphaBeta, AlphaBetaIterative } from './algorithms';
+import { DEFAULT_CONFIGURATION } from './lib/config';
 import { SearchInterface, InfoReporter, SearchLimit } from './types';
 
 export const Registry = {
@@ -18,8 +19,12 @@ export const LATEST: Version = 'iterative';
 export class SearchExecutor {
   search: SearchInterface;
 
-  constructor(version: Version, infoReporter: InfoReporter) {
-    this.search = new Registry[version](infoReporter);
+  constructor(
+    version: Version,
+    infoReporter: InfoReporter,
+    options: Partial<typeof DEFAULT_CONFIGURATION> = {},
+  ) {
+    this.search = new Registry[version](infoReporter, options);
   }
 
   nextMove(

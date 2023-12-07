@@ -170,6 +170,7 @@ function handleLoadSearchExecutor(
         proxy((info: Info) => {
           infoFromExecutor$.next(info);
         }),
+        { ttableSizeMb: state.options.hashSize },
       ).then(([executor, cleanup]) =>
         loadSearchExecutorDoneAction(
           executorInstance(executor, () => {

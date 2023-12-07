@@ -33,4 +33,5 @@ export const DEFAULT_CONFIGURATION = {
   },
   quiescenceSearch: false,
   pruneFromTTable: false,
+  ttableSizeMb: 128,
 };

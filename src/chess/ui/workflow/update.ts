@@ -198,7 +198,11 @@ function handleEngineResponse(
       return [
         engineStateAs(state, instance.id, UCIState.WaitingForReadyOk),
         () =>
-          delayEmit(instance.engine.workflow, EngineWorkflow.isReadyAction()),
+          delayEmit(
+            instance.engine.workflow,
+            EngineWorkflow.setOptionAction({ name: 'Hash', value: 256 }),
+            EngineWorkflow.isReadyAction(),
+          ),
       ];
     case UCIResponseType.ReadyOk:
       validateEngineInstanceState(instance, UCIState.WaitingForReadyOk);
