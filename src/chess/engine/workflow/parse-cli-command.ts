@@ -20,11 +20,15 @@ import {
 const parseGoCommand = (parts: string[]): GoCommand => {
   const result: GoCommand = {};
 
-  for (let cursor = parts.shift(); parts.length === 0; cursor = parts.shift()) {
+  for (
+    let cursor = parts.shift();
+    cursor !== undefined;
+    cursor = parts.shift()
+  ) {
     switch (cursor as keyof GoCommand) {
       case 'searchmoves':
         result.searchmoves = [...parts.map(moveFromString)];
-        parts.length = 0;
+        parts = [];
         break;
       case 'ponder':
         result.ponder = true;
@@ -61,7 +65,6 @@ const parseGoCommand = (parts: string[]): GoCommand => {
         break;
       default:
         throw new Error(`unsupported go command: "${cursor}"`);
-        break;
     }
   }
 
