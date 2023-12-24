@@ -5,6 +5,7 @@ OUT_DIR=build
 rm -rf ${OUT_DIR}
 mkdir -p ${OUT_DIR}
 
+# Primary esbuild for chess engine and worker scripts.
 yarn esbuild \
   src/script/perft.ts \
   src/script/engine.ts \
@@ -19,6 +20,13 @@ yarn esbuild \
   --entry-names=[name] \
   --outdir=${OUT_DIR} "$@"
   # --analyze
+
+# Make built scripts easily executable
+for executableName in engine.mjs perft.mjs; do
+  chmod u+x ${OUT_DIR}/${executableName}
+  sed -i '.bak' '1s/^/#!\/usr\/bin\/env node\'$'\n/g' ${OUT_DIR}/${executableName}
+  rm ${OUT_DIR}/${executableName}.bak
+done
 
 # Build the chess web app
 # vite build

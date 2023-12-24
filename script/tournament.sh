@@ -1,1 +1,3 @@
-vendor/cutechess-cli -engine name=stockfish cmd=stockfish tc=180+1 proto=uci -engine name=justin cmd=~/Development/chessv2/script/engine.sh tc=180+1 proto=uci
+vendor/cutechess-cli \
+  -engine name=stockfish cmd=stockfish tc=30+1 proto=uci \
+  -engine name=justin cmd=./build/engine.mjs tc=30+1 proto=uci
