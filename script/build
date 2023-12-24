@@ -2,6 +2,8 @@
 
 OUT_DIR=build
 
+echo "Building engine $1"
+
 rm -rf ${OUT_DIR}
 mkdir -p ${OUT_DIR}
 
@@ -18,7 +20,7 @@ yarn esbuild \
   --define:USE_NODE_WORKER_THREAD=true \
   --out-extension:.js=.mjs \
   --entry-names=[name] \
-  --outdir=${OUT_DIR} "$@"
+  --outdir=${OUT_DIR}
   # --analyze
 
 # Make built scripts easily executable
@@ -27,6 +29,14 @@ for executableName in engine.mjs perft.mjs; do
   sed -i '.bak' '1s/^/#!\/usr\/bin\/env node\'$'\n/g' ${OUT_DIR}/${executableName}
   rm ${OUT_DIR}/${executableName}.bak
 done
+
+# Move the built engine to a named directory.
+if [ -z "$1" ]; then
+  echo "No name for engine version to build, exiting without copy"
+else
+  rm -rf vendor/engine-builds/$1
+  cp -r $OUT_DIR vendor/engine-builds/$1
+fi
 
 # Build the chess web app
 # vite build
