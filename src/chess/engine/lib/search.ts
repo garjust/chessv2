@@ -179,6 +179,10 @@ export default class Search {
   // capturing moves. Therefore this search function only scores "quiet"
   // positions, that is positions with no possible capturing moves.
   quiescenceSearch(alpha: number, beta: number): number {
+    if (this.context.timer?.tick()) {
+      throw new TimeoutError();
+    }
+
     this.context.diagnostics?.quiescenceNodeVisit();
 
     const noMove = this.context.core.evaluateNormalized();
