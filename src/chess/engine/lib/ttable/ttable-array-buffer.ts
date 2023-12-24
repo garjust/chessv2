@@ -2,12 +2,15 @@ import { CurrentZobrist } from '../../../lib/zobrist/types';
 import { TranspositionTable, TranspositionTableEntry } from '../../types';
 import { entryMeta, entryMove, unpackEntry } from './entry';
 
-const CHECK_KEY_BYTES_SIZE = 8;
-const ENTRY_BYTES_SIZE = 8;
+const CHECK_KEY_BYTES_SIZE = 8; // 1 64-bit number
+const ENTRY_BYTES_SIZE = 8; // 1 64-bit number
+
+/**
+ * Define element size in **bytes** for ease of ArrayBuffer creation.
+ */
 const ELEMENT_BYTES_SIZE = CHECK_KEY_BYTES_SIZE + ENTRY_BYTES_SIZE;
 
-const sizeInElements = (mb: number): number =>
-  (mb * 1000 * 1000) / ELEMENT_BYTES_SIZE;
+const bytesFromMB = (mb: number): number => mb * 1000 * 1000;
 
 /**
  * Implement a TTable using a raw ArrayBuffer of bytes.
@@ -32,10 +35,15 @@ export default class TTableArrayBuffer
   private type1 = 0;
   private size = 0;
 
-  constructor(sizeInMb: number, zobrist: CurrentZobrist<[number, number]>) {
+  constructor(sizeInMB: number, zobrist: CurrentZobrist<[number, number]>) {
+    const sizeInBytes = bytesFromMB(sizeInMB);
+    if (sizeInBytes % ELEMENT_BYTES_SIZE !== 0) {
+      throw new Error(`Cannot evenly divide ${sizeInMB}MB into elements`);
+    }
+
     this.zobrist = zobrist;
-    this.sizeInElements = sizeInElements(sizeInMb);
-    this.buffer = new ArrayBuffer(this.sizeInElements * ELEMENT_BYTES_SIZE);
+    this.sizeInElements = sizeInBytes / ELEMENT_BYTES_SIZE;
+    this.buffer = new ArrayBuffer(sizeInBytes);
     this.data = new Uint32Array(this.buffer);
   }
 

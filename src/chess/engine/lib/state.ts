@@ -22,7 +22,7 @@ export default class State {
     this.killerMoves = new Array(maxDepth);
     this.historyTable = new HistoryTable();
     // this.tTable = new TTableMap(new Int32TupleZobrist());
-    this.tTable = new TTableArrayBuffer(256, new Int32TupleZobrist()); // 256mb
+    this.tTable = new TTableArrayBuffer(256, new Int32TupleZobrist()); // 256MB
     this.pvTable = new PVTable(maxDepth);
   }
 
