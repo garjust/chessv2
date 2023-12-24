@@ -68,7 +68,7 @@ export default class Context {
     // If we want to use the TT to extract the PV we overwrite the result's
     // PV.
     if (this.useTTForPV) {
-      result.pv = extractPV(this.state.tTable, this.core);
+      result.pv = extractPV(this.state.tTable, this.core, maxDepth);
     }
     // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();

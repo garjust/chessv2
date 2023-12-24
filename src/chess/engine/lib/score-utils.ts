@@ -22,13 +22,14 @@ export const uciInfoEvaluation = (score: number, maxDepth: number): string => {
 
 export const extractPV = (
   table: TranspositionTable<TranspositionTableEntry>,
-  engine: Core,
+  core: Core,
+  maxDepth: number,
 ): Move[] => {
   const pv: Move[] = [];
   let i = 0;
 
   // Probe the transposition table until we are no longer at a PV-node.
-  for (; i < Infinity; i++) {
+  for (; i < maxDepth; i++) {
     const entry = table.get();
     if (entry?.nodeType === NodeType.PV && entry?.move) {
       pv.push(entry.move);
@@ -36,10 +37,10 @@ export const extractPV = (
       break;
     }
 
-    engine.applyMove(entry.move);
+    core.applyMove(entry.move);
   }
   for (; i > 0; i--) {
-    engine.undoLastMove();
+    core.undoLastMove();
   }
 
   return pv;
