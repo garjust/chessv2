@@ -88,6 +88,9 @@ export default class Search {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
+    if (this.context.sampler.sample()) {
+      console.warn('[sample]', 'some data');
+    }
 
     this.context.diagnostics?.nodeVisit(inverseDepth);
 
@@ -181,6 +184,9 @@ export default class Search {
   quiescenceSearch(alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
+    }
+    if (this.context.sampler.sample()) {
+      console.warn('[sample]', 'some data in quiescence');
     }
 
     this.context.diagnostics?.quiescenceNodeVisit();

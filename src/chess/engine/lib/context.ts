@@ -9,6 +9,7 @@ import State from './state';
 import { InfoReporter, SearchResult } from '../types';
 import { DEFAULT_CONFIGURATION } from './config';
 import TimerSync from '../../../lib/timer-sync';
+import Sampler from './sampler';
 
 /**
  * The context object contains any information, state, or other objects
@@ -27,6 +28,7 @@ export default class Context {
   readonly state: State;
   diagnostics?: Diagnostics;
   timer: TimerSync;
+  sampler: Sampler;
 
   constructor(
     reporter: InfoReporter,
@@ -38,6 +40,7 @@ export default class Context {
     this.core.zobrist = this.state.tTable.currentKey;
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
     this.timer = new TimerSync(0);
+    this.sampler = new Sampler();
   }
 
   async search(
