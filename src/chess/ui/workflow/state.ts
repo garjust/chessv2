@@ -212,3 +212,5 @@ export const isWaitingForEngine = (state: State, engineId: string): boolean => {
 
 export const isDisplayingCurrentPosition = (state: State): boolean =>
   state.game.moveIndex === state.game.moveList.length;
+
+export const gameIsOver = (state: State): boolean => state.game.winner !== null;

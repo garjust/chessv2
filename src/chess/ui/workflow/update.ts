@@ -35,6 +35,7 @@ import {
   engineInstance,
   isDisplayingCurrentPosition,
   validateEngineInstanceState,
+  gameIsOver,
 } from './state';
 import { catchError, from, map, merge, of } from 'rxjs';
 import Core from '../../core';
@@ -66,6 +67,10 @@ const logger = new Logger('ui-workflow');
 const ENGINE_VERSION: Version = LATEST;
 
 function handleAttemptEngineMove(state: State): Update<State, Action> {
+  if (gameIsOver(state)) {
+    return [state, null];
+  }
+
   const playerForTurn = state.game.players[state.game.turn];
 
   if (playerForTurn !== HumanPlayer) {
@@ -315,6 +320,10 @@ function handleMovePiece(
   action: Action & { type: Type.MovePiece },
   { core }: Context,
 ): Update<State, Action> {
+  if (gameIsOver(state)) {
+    return [state, null];
+  }
+
   const { move } = action;
   const legalMoves = state.game.moves;
 
