@@ -20,7 +20,6 @@ import { DEFAULT_CONFIGURATION } from '../lib/config';
  */
 export default class AlphaBeta implements SearchInterface {
   context: Context;
-  diagnostics?: Diagnotics;
   logger: Logger;
 
   constructor(
@@ -34,29 +33,22 @@ export default class AlphaBeta implements SearchInterface {
     this.logger = new Logger('alpha-beta');
   }
 
-  get diagnosticsResult() {
-    return this.diagnostics?.result ?? null;
-  }
-
   get label() {
     return 'alpha-beta';
   }
 
-  async nextMove(
+  nextMove(
     position: Position,
     movesToSearch: Move[],
     _2: number,
     limits: SearchLimit,
   ) {
-    this.diagnostics = undefined;
-
-    const [{ move }, diagnostics] = await this.context.search(
+    const [{ pv, bestScore }, diagnostics] = this.context.search(
       position,
       limits.depth ?? MAX_DEPTH,
       movesToSearch,
     );
 
-    this.diagnostics = diagnostics;
     if (diagnostics.result) {
       this.context.reporter({
         depth: diagnostics.result.depth.toString(),
@@ -71,7 +63,7 @@ export default class AlphaBeta implements SearchInterface {
       });
       this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
     }
-    return move;
+    return { move: bestScore.move, evaluation: bestScore.score, pv };
   }
 
   ponderMove(_1: Position, _2: Move) {

@@ -12,7 +12,7 @@ export interface SearchInterface {
     movesToSearch: Move[],
     timeout: number,
     limits: SearchLimit,
-  ): Promise<Move>;
+  ): { move: Move; evaluation: number; pv: Move[] };
   ponderMove(position: Position, move: Move): void;
 }
 

@@ -33,7 +33,6 @@ const INITIAL_DEPTH = 1;
  *   would otherwise be (better move ordering, more TTable hits, etc).
  */
 export default class AlphaBetaIterative implements SearchInterface {
-  diagnostics?: Diagnotics;
   context: Context;
   logger: Logger;
 
@@ -57,30 +56,25 @@ export default class AlphaBetaIterative implements SearchInterface {
     this.logger = new Logger('iterative');
   }
 
-  get diagnosticsResult() {
-    return this.diagnostics?.result ?? null;
-  }
-
   get label() {
     return 'alpha-beta-iterative';
   }
 
-  async nextMove(
+  nextMove(
     position: Position,
     movesToSearch: Move[],
     timeout: number,
     limits?: SearchLimit,
   ) {
-    this.diagnostics = undefined;
     let currentResult: SearchResult | null = null;
-    let diagnostics: Diagnotics | undefined;
+    let diagnostics: Diagnotics;
 
     const maxDepth = limits?.depth ?? MAX_DEPTH;
     this.context.timer.start(limits?.moveTime ?? timeout);
 
     for (let i = INITIAL_DEPTH; i <= maxDepth; i++) {
       try {
-        [currentResult, diagnostics] = await this.context.search(
+        [currentResult, diagnostics] = this.context.search(
           position,
           i,
           movesToSearch,
@@ -94,7 +88,6 @@ export default class AlphaBetaIterative implements SearchInterface {
         }
       }
 
-      this.diagnostics = diagnostics;
       this.context.reporter({
         string: diagnostics.ttableLog(this.context.state),
       });
@@ -117,7 +110,11 @@ export default class AlphaBetaIterative implements SearchInterface {
     if (currentResult === null) {
       throw Error('no search result');
     }
-    return currentResult.move;
+    return {
+      move: currentResult.move,
+      evaluation: currentResult.bestScore.score,
+      pv: currentResult.pv,
+    };
   }
 
   ponderMove(_1: Position, _2: Move) {

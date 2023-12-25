@@ -44,13 +44,13 @@ export default class Context {
     this.diagnostics = new Diagnostics(1);
   }
 
-  async search(
+  search(
     position: Position,
     maxDepth: number,
     movesToSearch: Move[],
-  ): Promise<[SearchResult, Diagnostics]> {
+  ): [SearchResult, Diagnostics] {
     this.diagnostics = new Diagnostics(maxDepth);
-    const result = await this.run(position, maxDepth, movesToSearch);
+    const result = this.run(position, maxDepth, movesToSearch);
     this.diagnostics.recordResult(result, this.state);
 
     return [result, this.diagnostics];
@@ -58,13 +58,13 @@ export default class Context {
 
   useTTForPV = true;
 
-  async run(position: Position, maxDepth: number, movesToSearch: Move[]) {
+  run(position: Position, maxDepth: number, movesToSearch: Move[]) {
     this.core.position = position;
 
     // Before executing a search update state.
     this.state.pvTable = new PVTable(maxDepth);
 
-    const result = await new Search(this).search(maxDepth, movesToSearch);
+    const result = new Search(this).search(maxDepth, movesToSearch);
 
     // If we want to use the TT to extract the PV we overwrite the result's
     // PV.

@@ -12,7 +12,7 @@ export default class Search {
   }
 
   // Alpha-beta negamax search with various optional features.
-  async search(maxDepth: number, movesToSearch: Move[]): Promise<SearchResult> {
+  search(maxDepth: number, movesToSearch: Move[]): SearchResult {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -49,8 +49,7 @@ export default class Search {
       this.context.core.applyMove(move);
       const result = {
         move,
-        score:
-          -1 * (await this.searchNodes(maxDepth - 1, beta * -1, alpha * -1)),
+        score: -1 * this.searchNodes(maxDepth - 1, beta * -1, alpha * -1),
       };
       this.context.core.undoLastMove();
 
@@ -80,11 +79,7 @@ export default class Search {
   }
 
   // Recursive search function for the alpha-beta negamax search.
-  async searchNodes(
-    inverseDepth: number,
-    alpha: number,
-    beta: number,
-  ): Promise<number> {
+  searchNodes(inverseDepth: number, alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
@@ -140,8 +135,7 @@ export default class Search {
 
     for (const move of moves) {
       this.context.core.applyMove(move);
-      const x =
-        -1 * (await this.searchNodes(inverseDepth - 1, beta * -1, alpha * -1));
+      const x = -1 * this.searchNodes(inverseDepth - 1, beta * -1, alpha * -1);
       this.context.core.undoLastMove();
 
       if (x > alpha) {

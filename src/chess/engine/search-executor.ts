@@ -32,8 +32,8 @@ export class SearchExecutor {
     movesToSearch: Move[],
     timeout: number,
     limits: SearchLimit,
-  ): Promise<Move> {
-    return this.search.nextMove(position, movesToSearch, timeout, limits);
+  ): Move {
+    return this.search.nextMove(position, movesToSearch, timeout, limits).move;
   }
 
   ponderMove(position: Position, move: Move) {
