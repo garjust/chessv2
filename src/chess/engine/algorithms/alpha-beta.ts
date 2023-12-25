@@ -1,5 +1,4 @@
 import { Move, Position } from '../../types';
-import Diagnotics from '../lib/diagnostics';
 import Context from '../lib/context';
 import {
   InfoReporter,
@@ -43,26 +42,25 @@ export default class AlphaBeta implements SearchInterface {
     _2: number,
     limits: SearchLimit,
   ) {
-    const [{ pv, bestScore }, diagnostics] = this.context.search(
+    const [{ pv, bestScore }, diagnosticsResult] = this.context.search(
       position,
       limits.depth ?? MAX_DEPTH,
       movesToSearch,
     );
 
-    if (diagnostics.result) {
-      this.context.reporter({
-        depth: diagnostics.result.depth.toString(),
-        score: diagnostics.result.evaluation,
-        time: diagnostics.result.timing.toString(),
-        nodes: diagnostics.result.totalNodes.toString(),
-        nps: (
-          (diagnostics.result.totalNodes / diagnostics.result.timing) *
-          1000
-        ).toFixed(0),
-        pv: diagnostics.result.principleVariation?.join(' '),
-      });
-      this.logger.debug(`${this.label} full diagnostic`, diagnostics.result);
-    }
+    this.context.reporter({
+      depth: diagnosticsResult.depth.toString(),
+      score: diagnosticsResult.evaluation,
+      time: diagnosticsResult.timing.toString(),
+      nodes: diagnosticsResult.totalNodes.toString(),
+      nps: (
+        (diagnosticsResult.totalNodes / diagnosticsResult.timing) *
+        1000
+      ).toFixed(0),
+      pv: diagnosticsResult.principleVariation?.join(' '),
+    });
+    // this.logger.debug(`${this.label} full diagnostic`, diagnosticResults);
+
     return { move: bestScore.move, evaluation: bestScore.score, pv };
   }
 

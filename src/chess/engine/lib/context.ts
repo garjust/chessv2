@@ -1,7 +1,7 @@
 import Search from './search';
 import Core from '../../core';
 import { Move, MoveWithExtraData, Position } from '../../types';
-import Diagnostics from './diagnostics';
+import Diagnostics, { DiagnosticsResult } from './diagnostics';
 import { orderMoves } from './move-ordering';
 import PVTable from './pv-table';
 import { extractPV } from './score-utils';
@@ -48,12 +48,16 @@ export default class Context {
     position: Position,
     maxDepth: number,
     movesToSearch: Move[],
-  ): [SearchResult, Diagnostics] {
+  ): [SearchResult, DiagnosticsResult] {
     this.diagnostics = new Diagnostics(maxDepth);
     const result = this.run(position, maxDepth, movesToSearch);
-    this.diagnostics.recordResult(result, this.state);
 
-    return [result, this.diagnostics];
+    const diagnosticsResult = this.diagnostics.recordResult(result, this.state);
+    this.reporter({
+      string: this.diagnostics.ttableLog(this.state),
+    });
+
+    return [result, diagnosticsResult];
   }
 
   useTTForPV = true;

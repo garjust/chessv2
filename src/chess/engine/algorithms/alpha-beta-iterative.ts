@@ -1,5 +1,5 @@
 import { Move, Position } from '../../types';
-import Diagnotics from '../lib/diagnostics';
+import { DiagnosticsResult } from '../lib/diagnostics';
 import Context from '../lib/context';
 import TimeoutError from '../lib/timeout-error';
 import {
@@ -67,14 +67,14 @@ export default class AlphaBetaIterative implements SearchInterface {
     limits?: SearchLimit,
   ) {
     let currentResult: SearchResult | null = null;
-    let diagnostics: Diagnotics;
+    let diagnosticsResult: DiagnosticsResult;
 
     const maxDepth = limits?.depth ?? MAX_DEPTH;
     this.context.timer.start(limits?.moveTime ?? timeout);
 
     for (let i = INITIAL_DEPTH; i <= maxDepth; i++) {
       try {
-        [currentResult, diagnostics] = this.context.search(
+        [currentResult, diagnosticsResult] = this.context.search(
           position,
           i,
           movesToSearch,
@@ -89,22 +89,17 @@ export default class AlphaBetaIterative implements SearchInterface {
       }
 
       this.context.reporter({
-        string: diagnostics.ttableLog(this.context.state),
+        depth: diagnosticsResult.depth.toString(),
+        score: diagnosticsResult.evaluation,
+        time: diagnosticsResult.timing.toString(),
+        nodes: diagnosticsResult.totalNodes.toString(),
+        nps: (
+          (diagnosticsResult.totalNodes / diagnosticsResult.timing) *
+          1000
+        ).toFixed(0),
+        pv: diagnosticsResult.principleVariation?.join(' '),
       });
-      if (diagnostics.result) {
-        this.context.reporter({
-          depth: diagnostics.result.depth.toString(),
-          score: diagnostics.result.evaluation,
-          time: diagnostics.result.timing.toString(),
-          nodes: diagnostics.result.totalNodes.toString(),
-          nps: (
-            (diagnostics.result.totalNodes / diagnostics.result.timing) *
-            1000
-          ).toFixed(0),
-          pv: diagnostics.result.principleVariation?.join(' '),
-        });
-        // this.logger.warn(`${this.label} search result`, diagnostics.result);
-      }
+      // this.logger.warn(`${this.label} search result`, diagnosticsResult);
     }
 
     if (currentResult === null) {

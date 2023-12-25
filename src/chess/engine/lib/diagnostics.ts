@@ -51,7 +51,6 @@ export type DiagnosticsResult = {
 export default class Diagnotics {
   plyCounters: PlyCounter[] = [];
   searchTree?: SearchTree;
-  result?: DiagnosticsResult;
 
   private readonly maxDepth: number;
   private readonly enableTreeDiagnostics;
@@ -96,7 +95,7 @@ export default class Diagnotics {
     this.plyCounters[this.maxDepth].cuts++;
   }
 
-  recordResult(result: SearchResult, state?: State) {
+  recordResult(result: SearchResult, state?: State): DiagnosticsResult {
     const { move, scores, pv } = result;
 
     const timing = Date.now() - this.start;
@@ -134,7 +133,7 @@ export default class Diagnotics {
       principleVariation: pv.map((move) => moveString(move)),
     };
 
-    this.result = diagnosticsResults;
+    return diagnosticsResults;
   }
 
   ttableLog(state: State): string {
