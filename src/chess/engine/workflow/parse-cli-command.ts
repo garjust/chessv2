@@ -105,7 +105,7 @@ export const parse = (commandString: string): Public => {
     case 'ucinewgame':
       return uciNewGameAction();
     case 'position': {
-      const [fen, ...moveStrings] = args;
+      const [fen, _, ...moveStrings] = args;
       const moves = moveStrings.map(moveFromString);
 
       return positionAction(

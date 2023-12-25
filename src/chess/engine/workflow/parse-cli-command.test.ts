@@ -12,7 +12,7 @@ test('parse', () => {
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [],
   });
-  expect(parse('position startpos e2e4 e7e5')).toEqual<Public>({
+  expect(parse('position startpos moves e2e4 e7e5')).toEqual<Public>({
     type: Type.Position,
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     moves: [

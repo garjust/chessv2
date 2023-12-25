@@ -41,7 +41,7 @@ export const rankIndexForSquare = (square: Square) => Math.floor(square / 8);
 export const fileIndexForSquare = (square: Square) => square % 8;
 
 export const squareLabel = (square: Square): SquareLabel =>
-  SQUARE_LABEL_LOOKUP[square];
+  SQUARE_LABEL_LOOKUP[square] ?? '--';
 
 export const labelToSquare = (label: SquareLabel): Square =>
   SQUARE_LABEL_LOOKUP.indexOf(label);

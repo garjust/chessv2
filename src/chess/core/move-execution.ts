@@ -19,6 +19,7 @@ import { fileIndexForSquare, flipColor, isStartPositionPawn } from '../utils';
 import { updateSquareControlMaps } from './attacks';
 import { CASTLING_ROOK_MOVES } from './lookup';
 import { PositionWithComputedData } from './types';
+import { moveString } from '../move-notation';
 
 export type MoveResult = {
   move: Move;
@@ -56,7 +57,7 @@ export const applyMove = (
   let castlingRookMove: Move | undefined;
 
   if (!piece) {
-    throw Error('no piece to move');
+    throw Error(`no piece to move: ${moveString(move)}`);
   }
   if (piece.color !== position.turn) {
     throw Error('cannot move piece for other color');
