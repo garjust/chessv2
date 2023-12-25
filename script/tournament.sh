@@ -1,3 +1,6 @@
 vendor/cutechess-cli \
-  -engine name=stockfish cmd=stockfish tc=30+1 proto=uci \
-  -engine name=justin cmd=./build/engine.mjs tc=30+1 proto=uci
+  -engine name=alphabeta cmd=./vendor/engine-builds/alphabeta.v0/engine.mjs st=1 proto=uci \
+  -engine name=iterative cmd=./vendor/engine-builds/iterative.v0/engine.mjs st=1 proto=uci \
+  -rounds 2 -games 2 \
+  -outcomeinterval 1 \
+  -openings file=./vendor/silver-50.pgn -debug
