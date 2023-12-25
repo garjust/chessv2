@@ -95,6 +95,9 @@ export default class AlphaBetaIterative implements SearchInterface {
       }
 
       this.diagnostics = diagnostics;
+      this.context.reporter({
+        string: diagnostics.ttableLog(this.context.state),
+      });
       if (diagnostics.result) {
         this.context.reporter({
           depth: diagnostics.result.depth.toString(),
@@ -107,7 +110,7 @@ export default class AlphaBetaIterative implements SearchInterface {
           ).toFixed(0),
           pv: diagnostics.result.principleVariation?.join(' '),
         });
-        this.logger.warn(`${this.label} search result`, diagnostics.result);
+        // this.logger.warn(`${this.label} search result`, diagnostics.result);
       }
     }
 

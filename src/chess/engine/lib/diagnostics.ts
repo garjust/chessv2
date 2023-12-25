@@ -35,7 +35,6 @@ const emptyPlyCounter = (): PlyCounter => ({
 });
 
 export type DiagnosticsResult = {
-  logStringTTable: string;
   move: string;
   evaluation: string;
   moveScores: MoveScores;
@@ -118,22 +117,8 @@ export default class Diagnotics {
           tTable: state.tTable,
         }
       : undefined;
-    const ttableStats = stateData?.tTable.stats();
 
     const diagnosticsResults: DiagnosticsResult = {
-      logStringTTable: ttableStats
-        ? `ttable info: size=${formatNumber(ttableStats.size)} (${(
-            ttableStats.percentFull * 100
-          ).toFixed(2)}%) :: hits=${formatNumber(
-            ttableStats.hits,
-          )}, miss=${formatNumber(ttableStats.miss)}, type1=${formatNumber(
-            ttableStats.type1,
-          )} cachehit=${(
-            (ttableStats.hits /
-              (ttableStats.hits + ttableStats.miss + ttableStats.type1)) *
-            100
-          ).toFixed(2)}%`
-        : '',
       move: moveString(move),
       evaluation: uciInfoEvaluation(result.bestScore.score, this.maxDepth),
       moveScores: scores.map(({ move, score }) => ({
@@ -150,5 +135,17 @@ export default class Diagnotics {
     };
 
     this.result = diagnosticsResults;
+  }
+
+  ttableLog(state: State): string {
+    const stats = state.tTable.stats();
+    return `ttable: size=${formatNumber(stats.size)}(${(
+      stats.percentFull * 100
+    ).toFixed(2)}%) hits=${formatNumber(stats.hits)} miss=${formatNumber(
+      stats.miss,
+    )} type1=${formatNumber(stats.type1)} cachehit=${(
+      (stats.hits / (stats.hits + stats.miss + stats.type1)) *
+      100
+    ).toFixed(2)}%`;
   }
 }

@@ -89,7 +89,9 @@ export default class Search {
       throw new TimeoutError();
     }
     if (this.context.sampler.sample()) {
-      console.warn('[sample]', 'some data');
+      this.context.reporter({
+        string: this.context.diagnostics?.ttableLog(this.context.state),
+      });
     }
 
     this.context.diagnostics?.nodeVisit(inverseDepth);
@@ -186,7 +188,9 @@ export default class Search {
       throw new TimeoutError();
     }
     if (this.context.sampler.sample()) {
-      console.warn('[sample]', 'some data in quiescence');
+      this.context.reporter({
+        string: this.context.diagnostics?.ttableLog(this.context.state),
+      });
     }
 
     this.context.diagnostics?.quiescenceNodeVisit();

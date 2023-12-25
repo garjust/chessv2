@@ -26,7 +26,7 @@ export default class Context {
   readonly core: Core;
   readonly configuration: typeof DEFAULT_CONFIGURATION;
   readonly state: State;
-  diagnostics?: Diagnostics;
+  diagnostics: Diagnostics;
   timer: TimerSync;
   sampler: Sampler;
 
@@ -41,6 +41,7 @@ export default class Context {
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
     this.timer = new TimerSync(0);
     this.sampler = new Sampler();
+    this.diagnostics = new Diagnostics(1);
   }
 
   async search(
