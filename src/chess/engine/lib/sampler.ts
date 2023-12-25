@@ -20,7 +20,7 @@ export default class Sampler {
       sampleNodes: number;
     } = {
       sampleMs: 1000,
-      sampleNodes: 500,
+      sampleNodes: 25000,
     },
   ) {
     this.timer = new TimerSync(sampleMs);
