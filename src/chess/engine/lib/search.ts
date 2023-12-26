@@ -3,6 +3,7 @@ import { Move } from '../../types';
 import type Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from '../types';
+import { extractPV } from './score-utils';
 
 export default class Search {
   context: Context;
@@ -14,7 +15,8 @@ export default class Search {
   /**
    * Alpha-beta negamax search with various optional features.
    */
-  search(maxDepth: number, movesToSearch: Move[]): SearchResult {
+  search(maxPlies: number, movesToSearch: Move[]): SearchResult {
+    const depth = maxPlies;
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -25,7 +27,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      maxDepth,
+      depth,
     );
     if (movesToSearch.length > 0) {
       for (let i = moves.length - 1; i >= 0; i--) {
@@ -51,7 +53,7 @@ export default class Search {
       this.context.core.applyMove(move);
       const result = {
         move,
-        score: -1 * this.searchNodes(maxDepth - 1, beta * -1, alpha * -1),
+        score: -1 * this.searchNodes(depth - 1, beta * -1, alpha * -1),
       };
       this.context.core.undoLastMove();
 
@@ -61,22 +63,29 @@ export default class Search {
         bestMove = result.move;
         bestScore = result.score;
         alpha = result.score;
-        this.context.state.pvTable.set(maxDepth, result.move);
+        this.context.state.pvTable.set(depth, result.move);
       }
     }
 
     this.context.state.tTable.set({
       nodeType: NodeType.PV,
-      depth: maxDepth,
+      depth: depth,
       score: alpha,
       move: bestMove,
     });
+
+    let pv: Move[];
+    if (this.context.configuration.useTTForPV) {
+      pv = extractPV(this.context.state.tTable, this.context.core, maxPlies);
+    } else {
+      pv = this.context.state.pvTable.pv;
+    }
 
     return {
       scores,
       bestScore: { score: bestScore, move: bestMove },
       move: bestMove,
-      pv: this.context.state.pvTable.pv,
+      pv,
     };
   }
 

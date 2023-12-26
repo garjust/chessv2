@@ -60,8 +60,6 @@ export default class Context {
     return [result, diagnosticsResult];
   }
 
-  useTTForPV = true;
-
   run(position: Position, maxPlies: number, movesToSearch: Move[]) {
     this.core.position = position;
 
@@ -70,13 +68,8 @@ export default class Context {
 
     const result = new Search(this).search(maxPlies, movesToSearch);
 
-    // If we want to use the TT to extract the PV we overwrite the result's
-    // PV.
-    if (this.useTTForPV) {
-      result.pv = extractPV(this.state.tTable, this.core, maxPlies);
-    }
     // Extract the PV from the result for future searches with this context.
-    this.state.currentPV = [...result.pv].reverse();
+    this.state.currentPV = [...result.pv];
 
     return result;
   }

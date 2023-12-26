@@ -11,19 +11,18 @@ import TTableArrayBuffer from './ttable/ttable-array-buffer';
 export const MAX_DEPTH = 25;
 
 export default class State {
+  readonly tTable: TranspositionTable<TranspositionTableEntry>;
   readonly killerMoves: Move[];
   readonly historyTable: HistoryTable;
-  readonly tTable: TranspositionTable<TranspositionTableEntry>;
-
   pvTable: PVTable;
   currentPV: Move[] = [];
 
-  constructor(maxDepth: number = MAX_DEPTH) {
-    this.killerMoves = new Array(maxDepth);
-    this.historyTable = new HistoryTable();
+  constructor(maxPlies: number = MAX_DEPTH) {
     // this.tTable = new TTableMap(new Int32TupleZobrist());
     this.tTable = new TTableArrayBuffer(256, new Int32TupleZobrist()); // 256MB
-    this.pvTable = new PVTable(maxDepth);
+    this.killerMoves = new Array(maxPlies);
+    this.historyTable = new HistoryTable();
+    this.pvTable = new PVTable(maxPlies);
   }
 
   pvMove(depth: number): Move | undefined {
