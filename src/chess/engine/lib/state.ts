@@ -15,7 +15,7 @@ export default class State {
   readonly killerMoves: Move[];
   readonly historyTable: HistoryTable;
   pvTable: PVTable;
-  currentPV: Move[] = [];
+  private currentPV: Move[] = [];
 
   constructor(maxPlies: number = MAX_DEPTH) {
     // this.tTable = new TTableMap(new Int32TupleZobrist());
@@ -25,7 +25,11 @@ export default class State {
     this.pvTable = new PVTable(maxPlies);
   }
 
-  pvMove(depth: number): Move | undefined {
-    return this.currentPV[depth - 2];
+  setCurrentPV(moves: Move[]) {
+    this.currentPV = [...moves];
+  }
+
+  pvMove(ply: number): Move | undefined {
+    return this.currentPV[ply];
   }
 }

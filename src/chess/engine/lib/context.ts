@@ -69,7 +69,7 @@ export default class Context {
     const result = new Search(this).search(maxPlies, movesToSearch);
 
     // Extract the PV from the result for future searches with this context.
-    this.state.currentPV = [...result.pv];
+    this.state.setCurrentPV(result.pv);
 
     return result;
   }
@@ -80,7 +80,8 @@ export default class Context {
 
   orderMoves(
     moves: MoveWithExtraData[],
-    currentDepth: number,
+    depth: number,
+    ply: number,
   ): MoveWithExtraData[] {
     if (this.configuration.moveOrdering) {
       return orderMoves(
@@ -90,10 +91,10 @@ export default class Context {
           ? this.state.tTable.get()?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
-          ? this.state.pvMove(currentDepth)
+          ? this.state.pvMove(ply)
           : undefined,
         this.configuration.moveOrderingHeuristics.killerMove
-          ? this.state.killerMoves[currentDepth]
+          ? this.state.killerMoves[depth]
           : undefined,
         this.configuration.moveOrderingHeuristics.historyTable
           ? this.state.historyTable

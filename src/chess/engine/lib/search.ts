@@ -17,6 +17,7 @@ export default class Search {
    */
   search(maxPlies: number, movesToSearch: Move[]): SearchResult {
     const depth = maxPlies;
+    const ply = 0;
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -28,6 +29,7 @@ export default class Search {
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
       depth,
+      ply,
     );
     if (movesToSearch.length > 0) {
       for (let i = moves.length - 1; i >= 0; i--) {
@@ -53,7 +55,7 @@ export default class Search {
       this.context.core.applyMove(move);
       const result = {
         move,
-        score: -1 * this.searchNodes(depth - 1, beta * -1, alpha * -1),
+        score: -1 * this.searchNodes(depth - 1, ply + 1, beta * -1, alpha * -1),
       };
       this.context.core.undoLastMove();
 
@@ -92,7 +94,7 @@ export default class Search {
   /**
    *  Recursive search function for the alpha-beta negamax search.
    */
-  searchNodes(depth: number, alpha: number, beta: number): number {
+  searchNodes(depth: number, ply: number, alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
@@ -133,6 +135,7 @@ export default class Search {
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
       depth,
+      ply,
     );
 
     // If there are no moves at this node then the game has ended.
@@ -148,7 +151,8 @@ export default class Search {
 
     for (const move of moves) {
       this.context.core.applyMove(move);
-      const x = -1 * this.searchNodes(depth - 1, beta * -1, alpha * -1);
+      const x =
+        -1 * this.searchNodes(depth - 1, ply + 1, beta * -1, alpha * -1);
       this.context.core.undoLastMove();
 
       if (x > alpha) {
