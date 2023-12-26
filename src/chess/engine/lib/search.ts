@@ -11,7 +11,9 @@ export default class Search {
     this.context = context;
   }
 
-  // Alpha-beta negamax search with various optional features.
+  /**
+   * Alpha-beta negamax search with various optional features.
+   */
   search(maxDepth: number, movesToSearch: Move[]): SearchResult {
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
@@ -78,7 +80,9 @@ export default class Search {
     };
   }
 
-  // Recursive search function for the alpha-beta negamax search.
+  /**
+   *  Recursive search function for the alpha-beta negamax search.
+   */
   searchNodes(inverseDepth: number, alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
@@ -172,11 +176,13 @@ export default class Search {
     return alpha;
   }
 
-  // Alpha-beta negamax quiescence search.
-  //
-  // This is a alpha-beta tree search with no depth limit which only examines
-  // capturing moves. Therefore this search function only scores "quiet"
-  // positions, that is positions with no possible capturing moves.
+  /**
+   * Alpha-beta negamax quiescence search.
+   *
+   * This is a alpha-beta tree search with no depth limit which only examines
+   * capturing moves. Therefore this search function only scores "quiet"
+   * positions, that is positions with no possible capturing moves.
+   */
   quiescenceSearch(alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();

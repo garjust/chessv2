@@ -42,7 +42,7 @@ export default class Sampler {
       sampleNodes: 50000,
     },
   ) {
-    this.timer = new TimerSync(sampleMs);
+    this.timer = new TimerSync(sampleMs, { label: 'sampler-timer' });
     this.counter = 0;
     this.timeSampleRate = sampleMs;
     this.nodeSampleRate = sampleNodes;

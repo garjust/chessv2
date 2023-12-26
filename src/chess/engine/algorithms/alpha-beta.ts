@@ -5,10 +5,12 @@ import {
   SearchConstructor,
   SearchInterface,
   SearchLimit,
+  SearchResult,
 } from '../types';
 import { MAX_DEPTH } from '../lib/state';
 import Logger from '../../../lib/logger';
 import { DEFAULT_CONFIGURATION } from '../lib/config';
+import { DiagnosticsResult } from '../lib/diagnostics';
 
 /**
  * A step up from the negamax algorithm, this is the classic tree search
@@ -39,10 +41,12 @@ export default class AlphaBeta implements SearchInterface {
   nextMove(
     position: Position,
     movesToSearch: Move[],
-    _2: number,
+    timeout: number,
     limits: SearchLimit,
   ) {
-    const [{ pv, bestScore }, diagnosticsResult] = this.context.search(
+    this.context.timer.start(limits?.moveTime ?? timeout);
+
+    const [currentResult, diagnosticsResult] = this.context.search(
       position,
       limits.depth ?? MAX_DEPTH,
       movesToSearch,
@@ -61,7 +65,11 @@ export default class AlphaBeta implements SearchInterface {
     });
     // this.logger.debug(`${this.label} full diagnostic`, diagnosticResults);
 
-    return { move: bestScore.move, evaluation: bestScore.score, pv };
+    return {
+      move: currentResult.bestScore.move,
+      evaluation: currentResult.bestScore.score,
+      pv: currentResult.pv,
+    };
   }
 
   ponderMove(_1: Position, _2: Move) {

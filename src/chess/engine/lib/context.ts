@@ -39,7 +39,7 @@ export default class Context {
     this.state = new State();
     this.core.zobrist = this.state.tTable.currentKey;
     this.configuration = { ...DEFAULT_CONFIGURATION, ...config };
-    this.timer = new TimerSync(0);
+    this.timer = new TimerSync(0, { label: 'search-timer' });
     this.sampler = new Sampler();
     this.diagnostics = new Diagnostics(1);
   }

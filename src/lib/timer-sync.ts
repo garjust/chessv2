@@ -1,6 +1,6 @@
 import Logger from './logger';
 
-const logger = new Logger('timer');
+const logger = new Logger('timer-sync');
 
 export default class TimerSync {
   readonly label;
