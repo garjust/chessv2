@@ -47,12 +47,8 @@ A chess engine can be loaded in two ways:
 - Cut% is incorrect because v3 visits more nodes than there are moves
 - Evaluation function should be able to detect checkmate + draw, allowing mates to be found one-ply less in the search
   - Requires move generation at leaf nodes
-- *TTable memory is crashing chrome.*
 - *Support UCI*
-  - Handle all extra commands to "go"
   - Handle setting hash size
   - Handle stopping search asap
-  - Handle sending info
-- *ELO the computers*
 
 ## Bug Positions
