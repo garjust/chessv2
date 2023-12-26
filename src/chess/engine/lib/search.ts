@@ -67,7 +67,7 @@ export default class Search {
 
     this.context.state.tTable.set({
       nodeType: NodeType.PV,
-      inverseDepth: maxDepth,
+      depth: maxDepth,
       score: alpha,
       move: bestMove,
     });
@@ -107,7 +107,7 @@ export default class Search {
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      cacheHit.inverseDepth >= inverseDepth
+      cacheHit.depth >= inverseDepth
     ) {
       this.context.diagnostics?.cutFromTable(inverseDepth);
       return cacheHit.score;
@@ -166,7 +166,7 @@ export default class Search {
 
     this.context.state.tTable.set({
       nodeType,
-      inverseDepth: inverseDepth,
+      depth: inverseDepth,
       score: alpha,
       move: nodeMove,
     });

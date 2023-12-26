@@ -46,11 +46,11 @@ export default class Context {
 
   search(
     position: Position,
-    maxDepth: number,
+    maxPlies: number,
     movesToSearch: Move[],
   ): [SearchResult, DiagnosticsResult] {
-    this.diagnostics = new Diagnostics(maxDepth);
-    const result = this.run(position, maxDepth, movesToSearch);
+    this.diagnostics = new Diagnostics(maxPlies);
+    const result = this.run(position, maxPlies, movesToSearch);
 
     const diagnosticsResult = this.diagnostics.recordResult(result, this.state);
     this.reporter({
@@ -62,18 +62,18 @@ export default class Context {
 
   useTTForPV = true;
 
-  run(position: Position, maxDepth: number, movesToSearch: Move[]) {
+  run(position: Position, maxPlies: number, movesToSearch: Move[]) {
     this.core.position = position;
 
     // Before executing a search update state.
-    this.state.pvTable = new PVTable(maxDepth);
+    this.state.pvTable = new PVTable(maxPlies);
 
-    const result = new Search(this).search(maxDepth, movesToSearch);
+    const result = new Search(this).search(maxPlies, movesToSearch);
 
     // If we want to use the TT to extract the PV we overwrite the result's
     // PV.
     if (this.useTTForPV) {
-      result.pv = extractPV(this.state.tTable, this.core, maxDepth);
+      result.pv = extractPV(this.state.tTable, this.core, maxPlies);
     }
     // Extract the PV from the result for future searches with this context.
     this.state.currentPV = [...result.pv].reverse();

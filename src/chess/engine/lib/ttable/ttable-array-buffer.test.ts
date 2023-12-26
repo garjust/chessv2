@@ -24,13 +24,13 @@ class TestZobrist implements CurrentZobrist<[number, number]> {
 
 const ALL_ENTRY: TranspositionTableEntry = {
   nodeType: NodeType.All,
-  inverseDepth: 5,
+  depth: 5,
   score: 120,
   move: { from: 23, to: 24, promotion: PieceType.Null },
 };
 const PV_ENTRY: TranspositionTableEntry = {
   nodeType: NodeType.PV,
-  inverseDepth: 12,
+  depth: 12,
   score: 143243,
   move: { from: 0, to: 1, promotion: PieceType.Null },
 };
