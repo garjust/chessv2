@@ -92,7 +92,7 @@ export default class Search {
   /**
    *  Recursive search function for the alpha-beta negamax search.
    */
-  searchNodes(inverseDepth: number, alpha: number, beta: number): number {
+  searchNodes(depth: number, alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
@@ -102,7 +102,7 @@ export default class Search {
       });
     }
 
-    this.context.diagnostics?.nodeVisit(inverseDepth);
+    this.context.diagnostics?.nodeVisit(depth);
 
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
@@ -116,13 +116,13 @@ export default class Search {
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      cacheHit.depth >= inverseDepth
+      cacheHit.depth >= depth
     ) {
-      this.context.diagnostics?.cutFromTable(inverseDepth);
+      this.context.diagnostics?.cutFromTable(depth);
       return cacheHit.score;
     }
 
-    if (inverseDepth === 0) {
+    if (depth === 0) {
       if (this.context.configuration.quiescenceSearch) {
         return this.quiescenceSearch(alpha, beta);
       } else {
@@ -132,7 +132,7 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      inverseDepth,
+      depth,
     );
 
     // If there are no moves at this node then the game has ended.
@@ -140,7 +140,7 @@ export default class Search {
       if (
         this.context.core.checks(this.context.core.position.turn).length > 0
       ) {
-        return -1 * (MATE_SCORE + inverseDepth);
+        return -1 * (MATE_SCORE + depth);
       } else {
         return DRAW_SCORE;
       }
@@ -148,26 +148,26 @@ export default class Search {
 
     for (const move of moves) {
       this.context.core.applyMove(move);
-      const x = -1 * this.searchNodes(inverseDepth - 1, beta * -1, alpha * -1);
+      const x = -1 * this.searchNodes(depth - 1, beta * -1, alpha * -1);
       this.context.core.undoLastMove();
 
       if (x > alpha) {
         nodeType = NodeType.PV;
         nodeMove = move;
-        this.context.state.pvTable.set(inverseDepth, move);
+        this.context.state.pvTable.set(depth, move);
 
         alpha = x;
       }
       if (this.context.configuration.pruneNodes && alpha >= beta) {
-        this.context.diagnostics?.cut(inverseDepth);
+        this.context.diagnostics?.cut(depth);
         nodeType = NodeType.Cut;
         nodeMove = move;
 
         if (!move.attack) {
           // New killer move for this depth.
-          this.context.state.killerMoves[inverseDepth] = move;
+          this.context.state.killerMoves[depth] = move;
         }
-        this.context.state.historyTable.increment(move, inverseDepth);
+        this.context.state.historyTable.increment(move, depth);
 
         break;
       }
@@ -175,12 +175,12 @@ export default class Search {
 
     this.context.state.tTable.set({
       nodeType,
-      depth: inverseDepth,
+      depth: depth,
       score: alpha,
       move: nodeMove,
     });
 
-    this.context.diagnostics?.nodeType(inverseDepth, nodeType);
+    this.context.diagnostics?.nodeType(depth, nodeType);
 
     return alpha;
   }

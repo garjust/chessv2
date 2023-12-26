@@ -2,6 +2,16 @@ import { Move } from '../../types';
 
 /**
  * Triangular PV table.
+ *
+ * As the search deepens the PV grows further along the array:
+ * ∅
+ * m4
+ * m3 m4
+ * m2 m3 m4
+ * m1 m2 m3 m4
+ *
+ * Hence the triangular structure. Note that the table starts with an extra null
+ * size array to make the copy of the shorter PV safe.
  */
 export default class PVTable {
   private table: Move[][];
