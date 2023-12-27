@@ -215,7 +215,7 @@ export default class Search {
     }
     if (alpha >= beta) {
       this.context.diagnostics?.quiescenceCut();
-      return alpha;
+      return alpha; // return beta here?
     }
 
     const moves = this.context.quiescenceOrderMoves(
