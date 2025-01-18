@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import wasm from 'vite-plugin-wasm';
+import path from 'path';
 
 export default defineConfig({
   clearScreen: false,
@@ -25,7 +26,10 @@ export default defineConfig({
       // This alias allows us to shim the node worker_threads module when
       // bundling for the browser. With this we can consolidate worker code
       // further.
-      'node:worker_threads': './src/worker_threads-shim.ts',
+      'node:worker_threads': path.resolve(
+        __dirname,
+        'vendor/worker_threads-shim.js',
+      ),
     },
   },
   test: {
