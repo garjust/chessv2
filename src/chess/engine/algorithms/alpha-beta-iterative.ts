@@ -51,6 +51,7 @@ export default class AlphaBetaIterative implements SearchInterface {
         hashMove: true,
       },
       pruneFromTTable: true,
+      useTTForPV: true,
       ...options,
     });
     this.logger = new Logger('iterative');

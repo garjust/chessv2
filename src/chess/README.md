@@ -36,6 +36,8 @@ A chess engine can be loaded in two ways:
   2. Implement a hashing function for the key tuple given a memory size.
   3. Combine and profit.
 
+- Return beta when doing a cut in queisence search?
+
 
 ### Old thoughts
 

@@ -3,6 +3,7 @@ import { Move } from '../../types';
 import type Context from './context';
 import TimeoutError from './timeout-error';
 import { NodeType, SearchResult } from '../types';
+import { extractPV } from './score-utils';
 
 export default class Search {
   context: Context;
@@ -14,7 +15,9 @@ export default class Search {
   /**
    * Alpha-beta negamax search with various optional features.
    */
-  search(maxDepth: number, movesToSearch: Move[]): SearchResult {
+  search(maxPlies: number, movesToSearch: Move[]): SearchResult {
+    const depth = maxPlies;
+    const ply = 0;
     const scores: { move: Move; score: number }[] = [];
     // Start with an illegal move so it is well defined.
     let bestMove: Move;
@@ -25,7 +28,8 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      maxDepth,
+      depth,
+      ply,
     );
     if (movesToSearch.length > 0) {
       for (let i = moves.length - 1; i >= 0; i--) {
@@ -51,7 +55,7 @@ export default class Search {
       this.context.core.applyMove(move);
       const result = {
         move,
-        score: -1 * this.searchNodes(maxDepth - 1, beta * -1, alpha * -1),
+        score: -1 * this.searchNodes(depth - 1, ply + 1, beta * -1, alpha * -1),
       };
       this.context.core.undoLastMove();
 
@@ -61,29 +65,36 @@ export default class Search {
         bestMove = result.move;
         bestScore = result.score;
         alpha = result.score;
-        this.context.state.pvTable.set(maxDepth, result.move);
+        this.context.state.pvTable.set(depth, result.move);
       }
     }
 
     this.context.state.tTable.set({
       nodeType: NodeType.PV,
-      inverseDepth: maxDepth,
+      depth: depth,
       score: alpha,
       move: bestMove,
     });
+
+    let pv: Move[];
+    if (this.context.configuration.useTTForPV) {
+      pv = extractPV(this.context.state.tTable, this.context.core, maxPlies);
+    } else {
+      pv = this.context.state.pvTable.pv;
+    }
 
     return {
       scores,
       bestScore: { score: bestScore, move: bestMove },
       move: bestMove,
-      pv: this.context.state.pvTable.pv,
+      pv,
     };
   }
 
   /**
    *  Recursive search function for the alpha-beta negamax search.
    */
-  searchNodes(inverseDepth: number, alpha: number, beta: number): number {
+  searchNodes(depth: number, ply: number, alpha: number, beta: number): number {
     if (this.context.timer?.tick()) {
       throw new TimeoutError();
     }
@@ -93,7 +104,7 @@ export default class Search {
       });
     }
 
-    this.context.diagnostics?.nodeVisit(inverseDepth);
+    this.context.diagnostics?.nodeVisit(depth);
 
     let nodeType = NodeType.All;
     let nodeMove: Move | undefined;
@@ -107,13 +118,13 @@ export default class Search {
       cacheHit &&
       cacheHit.nodeType === NodeType.Cut &&
       cacheHit.score >= beta &&
-      cacheHit.inverseDepth >= inverseDepth
+      cacheHit.depth >= depth
     ) {
-      this.context.diagnostics?.cutFromTable(inverseDepth);
+      this.context.diagnostics?.cutFromTable(depth);
       return cacheHit.score;
     }
 
-    if (inverseDepth === 0) {
+    if (depth === 0) {
       if (this.context.configuration.quiescenceSearch) {
         return this.quiescenceSearch(alpha, beta);
       } else {
@@ -123,7 +134,8 @@ export default class Search {
 
     const moves = this.context.orderMoves(
       this.context.core.generateMoves(),
-      inverseDepth,
+      depth,
+      ply,
     );
 
     // If there are no moves at this node then the game has ended.
@@ -131,7 +143,7 @@ export default class Search {
       if (
         this.context.core.checks(this.context.core.position.turn).length > 0
       ) {
-        return -1 * (MATE_SCORE + inverseDepth);
+        return -1 * (MATE_SCORE + depth);
       } else {
         return DRAW_SCORE;
       }
@@ -139,26 +151,27 @@ export default class Search {
 
     for (const move of moves) {
       this.context.core.applyMove(move);
-      const x = -1 * this.searchNodes(inverseDepth - 1, beta * -1, alpha * -1);
+      const x =
+        -1 * this.searchNodes(depth - 1, ply + 1, beta * -1, alpha * -1);
       this.context.core.undoLastMove();
 
       if (x > alpha) {
         nodeType = NodeType.PV;
         nodeMove = move;
-        this.context.state.pvTable.set(inverseDepth, move);
+        this.context.state.pvTable.set(depth, move);
 
         alpha = x;
       }
       if (this.context.configuration.pruneNodes && alpha >= beta) {
-        this.context.diagnostics?.cut(inverseDepth);
+        this.context.diagnostics?.cut(depth);
         nodeType = NodeType.Cut;
         nodeMove = move;
 
         if (!move.attack) {
           // New killer move for this depth.
-          this.context.state.killerMoves[inverseDepth] = move;
+          this.context.state.killerMoves[depth] = move;
         }
-        this.context.state.historyTable.increment(move, inverseDepth);
+        this.context.state.historyTable.increment(move, depth);
 
         break;
       }
@@ -166,12 +179,12 @@ export default class Search {
 
     this.context.state.tTable.set({
       nodeType,
-      inverseDepth: inverseDepth,
+      depth: depth,
       score: alpha,
       move: nodeMove,
     });
 
-    this.context.diagnostics?.nodeType(inverseDepth, nodeType);
+    this.context.diagnostics?.nodeType(depth, nodeType);
 
     return alpha;
   }
@@ -202,7 +215,7 @@ export default class Search {
     }
     if (alpha >= beta) {
       this.context.diagnostics?.quiescenceCut();
-      return alpha;
+      return alpha; // return beta here?
     }
 
     const moves = this.context.quiescenceOrderMoves(

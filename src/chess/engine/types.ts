@@ -58,8 +58,10 @@ export type TranspositionTableEntry = {
    * are created at the second ply of an N-depth search this value will be
    * equal to N-1. Lower values mean more plys were searched to determine the
    * score.
+   *
+   * Also known as "distance to horizon node".
    */
-  inverseDepth: number;
+  depth: number;
   /**
    * This is the score returned by the search function when this entry was
    * made.

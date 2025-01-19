@@ -2,22 +2,32 @@ import { Move } from '../../types';
 
 /**
  * Triangular PV table.
+ *
+ * As the search deepens the PV grows further along the array:
+ * ∅
+ * m4
+ * m3 m4
+ * m2 m3 m4
+ * m1 m2 m3 m4
+ *
+ * Hence the triangular structure. Note that the table starts with an extra null
+ * size array to make the copy of the shorter PV safe.
  */
 export default class PVTable {
-  _table: Move[][] = [[]];
+  private table: Move[][];
 
-  constructor(maxDepth: number) {
-    this._table = [];
-    for (let i = 0; i <= maxDepth; i++) {
-      this._table.push([]);
+  constructor(maxPlies: number) {
+    this.table = [];
+    for (let i = 0; i <= maxPlies; i++) {
+      this.table.push([]);
     }
   }
 
   set(depth: number, move: Move): void {
-    this._table[depth] = [move, ...this._table[depth - 1]];
+    this.table[depth] = [move, ...this.table[depth - 1]];
   }
 
   get pv(): Move[] {
-    return [...this._table[this._table.length - 1]];
+    return [...this.table[this.table.length - 1]];
   }
 }

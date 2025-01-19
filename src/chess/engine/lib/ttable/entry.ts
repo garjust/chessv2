@@ -21,7 +21,7 @@ const MOVE_PROMOTION_MASK = PIECE_TYPE_MASK << MOVE_PROMOTION_SHIFT;
 
 export const entryMeta = (entry: TranspositionTableEntry): number =>
   entry.nodeType |
-  (entry.inverseDepth << DEPTH_SHIFT) |
+  (entry.depth << DEPTH_SHIFT) |
   (entry.score << SCORE_SHIFT);
 
 export const entryMove = (entry: TranspositionTableEntry): number =>
@@ -36,7 +36,7 @@ export const unpackEntry = (
   move: number,
 ): TranspositionTableEntry => ({
   nodeType: meta & NODE_TYPE_MASK,
-  inverseDepth: (meta & DEPTH_MASK) >>> DEPTH_SHIFT,
+  depth: (meta & DEPTH_MASK) >>> DEPTH_SHIFT,
   score: (meta & SCORE_MASK) >>> SCORE_SHIFT,
   move:
     move !== 0

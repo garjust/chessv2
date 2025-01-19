@@ -46,11 +46,11 @@ export default class Context {
 
   search(
     position: Position,
-    maxDepth: number,
+    maxPlies: number,
     movesToSearch: Move[],
   ): [SearchResult, DiagnosticsResult] {
-    this.diagnostics = new Diagnostics(maxDepth);
-    const result = this.run(position, maxDepth, movesToSearch);
+    this.diagnostics = new Diagnostics(maxPlies);
+    const result = this.run(position, maxPlies, movesToSearch);
 
     const diagnosticsResult = this.diagnostics.recordResult(result, this.state);
     this.reporter({
@@ -60,23 +60,16 @@ export default class Context {
     return [result, diagnosticsResult];
   }
 
-  useTTForPV = true;
-
-  run(position: Position, maxDepth: number, movesToSearch: Move[]) {
+  run(position: Position, maxPlies: number, movesToSearch: Move[]) {
     this.core.position = position;
 
     // Before executing a search update state.
-    this.state.pvTable = new PVTable(maxDepth);
+    this.state.pvTable = new PVTable(maxPlies);
 
-    const result = new Search(this).search(maxDepth, movesToSearch);
+    const result = new Search(this).search(maxPlies, movesToSearch);
 
-    // If we want to use the TT to extract the PV we overwrite the result's
-    // PV.
-    if (this.useTTForPV) {
-      result.pv = extractPV(this.state.tTable, this.core, maxDepth);
-    }
     // Extract the PV from the result for future searches with this context.
-    this.state.currentPV = [...result.pv].reverse();
+    this.state.setCurrentPV(result.pv);
 
     return result;
   }
@@ -87,7 +80,8 @@ export default class Context {
 
   orderMoves(
     moves: MoveWithExtraData[],
-    currentDepth: number,
+    depth: number,
+    ply: number,
   ): MoveWithExtraData[] {
     if (this.configuration.moveOrdering) {
       return orderMoves(
@@ -97,10 +91,10 @@ export default class Context {
           ? this.state.tTable.get()?.move
           : undefined,
         this.configuration.moveOrderingHeuristics.pvMove
-          ? this.state.pvMove(currentDepth)
+          ? this.state.pvMove(ply)
           : undefined,
         this.configuration.moveOrderingHeuristics.killerMove
-          ? this.state.killerMoves[currentDepth]
+          ? this.state.killerMoves[depth]
           : undefined,
         this.configuration.moveOrderingHeuristics.historyTable
           ? this.state.historyTable
